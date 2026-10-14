@@ -1,0 +1,122 @@
+# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+# for more about ignoring files.
+
+# compiled output
+dist
+tmp
+out-tsc
+build
+*.tsbuildinfo
+/bazel-out
+
+# dependencies
+node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode / Cursor
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+.cache
+.eslintcache
+*.local
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Nx
+.nx/cache
+.nx/workspace-data
+.nx/installation
+.nx/cloud
+.nx/key
+.cursor/rules/nx-rules.mdc
+.github/instructions/nx.instructions.md
+graph.html
+graph.json
+
+# Next.js
+.next
+out
+
+# NestJS / Node
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Angular
+.angular
+
+# Vite
+vite.config.*.timestamp*
+vitest.config.*.timestamp*
+
+# Expo / React Native
+.expo
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build
+.kotlin
+
+# Storybook
+storybook-static
+
+# Testing
+/cypress/videos
+/cypress/screenshots
+/playwright-report
+/test-results
+/blob-report
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Package managers
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+.pnpm-store
+
+# Optional tooling
+*.swp
+*.swo
+*~
+.vercel
+.netlify
+.firebase
+.turbo
