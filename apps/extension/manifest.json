@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Intent Engineering Galaxy (Claude Code Mod & Multi-AI)",
+  "version": "0.1.0",
+  "description": "Injects the `iG` (Intent Galaxy) pill button into Claude, ChatGPT, Grok & Gemini input bars for 60s visual intent alignment.",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*",
+        "https://chatgpt.com/*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*",
+        "http://127.0.0.1/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@intent-eng/protocol": [
+        "libs/protocol/src/index.ts"
+      ],
+      "@intent-eng/core": [
+        "libs/core/src/index.ts"
+      ],
+      "@intent-eng/epistemic": [
+        "libs/epistemic/src/index.ts"
+      ]
+    }
+  }
+}

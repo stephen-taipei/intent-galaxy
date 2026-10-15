@@ -1,10 +1,19 @@
 {
-  "name": "@intent-eng/monorepo",
-  "version": "1.0.0",
-  "private": true,
+  "name": "intent-engineering-galaxy",
+  "version": "0.1.0",
+  "description": "60-second visual decision galaxy & deterministic intent AST compiler for local repos, Claude Code Mods, and browser extensions.",
+  "license": "Apache-2.0",
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ]
+  "bin": {
+    "intent-engineering-galaxy": "./apps/cli/bin/intent-galaxy.mjs",
+    "intent-galaxy": "./apps/cli/bin/intent-galaxy.mjs"
+  },
+  "scripts": {
+    "start": "node ./apps/cli/bin/intent-galaxy.mjs --standalone",
+    "mcp": "node ./apps/cli/bin/intent-galaxy.mjs",
+    "test": "node --experimental-strip-types libs/core/src/verify.ts && node --experimental-strip-types libs/epistemic/src/verify-splitter.ts"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
 }

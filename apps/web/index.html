@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intent Engineering Galaxy — Local CLI + Extension + Claude Code Mod</title>
+<style>
+  :root { --bg: #080b11; --panel: #111723; --border: #1e293b; --text: #e2e8f0; --muted: #64748b; --q1: #38bdf8; --q2: #10b981; --q3: #a855f7; --q4: #f43f5e; --gold: #f59e0b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: var(--bg); color: var(--text); height: 100vh; display: grid; grid-template-columns: 1fr 400px; grid-template-rows: 52px 1fr 175px 128px; overflow: hidden; }
+  header { grid-column: 1 / -1; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+  .brand { font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(56,189,248,0.15); color: var(--q1); border: 1px solid rgba(56,189,248,0.3); }
+  .kbd-bar { font-size: 11.5px; color: var(--muted); display: flex; gap: 12px; }
+  kbd { background: #1e293b; color: #cbd5e1; padding: 1px 6px; border-radius: 4px; font-size: 11px; border: 1px solid #334155; }
+  #galaxy-stage { position: relative; width: 100%; height: 100%; overflow: hidden; background: radial-gradient(circle at 50% 50%, rgba(30,41,59,0.45) 0%, rgba(8,11,17,1) 72%); }
+  #orbit-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .q-tag { position: absolute; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; background: rgba(17,23,35,0.92); border: 1px solid var(--border); z-index: 2; pointer-events: none; }
+  .q-tag.q1 { top: 12px; left: 50%; transform: translateX(-50%); color: var(--q1); border-color: rgba(56,189,248,0.35); }
+  .q-tag.q2 { top: 12px; right: 14px; color: var(--q2); border-color: rgba(16,185,129,0.35); }
+  .q-tag.q3 { bottom: 12px; left: 50%; transform: translateX(-50%); color: #c084fc; border-color: rgba(168,85,247,0.35); }
+  .q-tag.q4 { top: 12px; left: 14px; color: #fb7185; border-color: rgba(244,63,94,0.35); }
+  #center-core { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 250px; padding: 12px 16px; border-radius: 14px; background: rgba(15,23,42,0.96); border: 2px solid #475569; text-align: center; box-shadow: 0 0 35px rgba(56,189,248,0.14); z-index: 10; }
+  #center-core .sub { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--q1); margin-bottom: 3px; }
+  #center-core .goal { font-size: 12.5px; font-weight: 700; line-height: 1.35; color: #fff; }
+  #center-core .metric { font-size: 11px; color: var(--gold); margin-top: 5px; }
+  .node-btn { position: absolute; transform: translate(-50%, -50%); padding: 7px 11px; border-radius: 9px; background: rgba(17,23,35,0.94); border: 1.5px solid #334155; color: var(--text); font-size: 11.5px; font-weight: 600; cursor: pointer; transition: all 0.15s; z-index: 5; min-width: 148px; text-align: left; }
+  .node-btn:hover, .node-btn.focused { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,0.2); z-index: 20; }
+  .node-btn .nid { font-size: 10px; opacity: 0.65; margin-right: 4px; font-family: monospace; }
+  .node-btn .blind-star { float: right; font-size: 10px; color: var(--gold); }
+  .node-btn .chip { display: block; font-size: 9.5px; font-weight: 400; color: #94a3b8; margin-top: 2px; }
+  .node-btn.dimmed { opacity: 0.3; }
+  .node-btn[data-stance="include"] { background: rgba(16,185,129,0.16); border-color: var(--q2); color: #ecfdf5; opacity: 1; }
+  .node-btn[data-stance="exclude"] { background: rgba(244,63,94,0.14); border-color: var(--q4); color: #ffe4e6; }
+  .node-btn[data-stance="exclude"] .lbl { text-decoration: line-through; }
+  .node-btn[data-src="user"] { outline: 2px solid #fff; outline-offset: 2px; }
+  .node-btn[data-src="derived"] { border-style: dashed; }
+  .node-btn.conflict { border-color: var(--q4) !important; background: rgba(244,63,94,0.28) !important; }
+  #cards-dock { grid-column: 1 / 2; grid-row: 3 / 4; background: var(--panel); border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 14px; }
+  .arch-card { background: #0b101b; border: 1.5px solid var(--border); border-radius: 9px; padding: 8px 11px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; }
+  .arch-card.active { border-color: var(--q1); background: rgba(56,189,248,0.07); }
+  .arch-card .c-head { display: flex; justify-content: space-between; align-items: center; }
+  .arch-card .c-title { font-size: 12px; font-weight: 700; color: #fff; }
+  .arch-card .c-badge { font-size: 9.5px; padding: 1px 5px; border-radius: 4px; background: rgba(168,85,247,0.18); color: #d8b4fe; }
+  .arch-card .c-row { font-size: 10.5px; color: #cbd5e1; margin-top: 2px; }
+  .arch-card .c-kill { font-size: 10.5px; color: #fda4af; margin-top: 2px; }
+  /* 底部仿 Claude Code Mod 原生狀態列與輸入框預覽區 */
+  #claude-mod-dock { grid-column: 1 / 2; grid-row: 4 / 5; background: #141413; border-top: 1px solid #2e2e2c; padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
+  .cm-status-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1aa; }
+  .cm-ok { color: #22c55e; font-weight: 600; margin-right: 4px; }
+  .cm-pill { background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; }
+  .cm-pill.ig-btn { background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(168,85,247,0.25)); border-color: #38bdf8; color: #fff; box-shadow: 0 0 12px rgba(56,189,248,0.25); }
+  .cm-input-row { display: flex; align-items: center; background: #1e1e1c; border: 1px solid #3f3f46; border-radius: 10px; padding: 7px 12px; gap: 10px; }
+  #cm-prompt-input { flex: 1; background: transparent; border: none; color: #f4f4f5; font-size: 12.5px; outline: none; }
+  .cm-model-tag { font-size: 11.5px; color: #a1a1aa; font-weight: 600; }
+  aside { grid-column: 2 / 3; grid-row: 2 / 5; background: #0c111d; border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px; }
+  aside h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--q1); margin-bottom: 8px; }
+  .status-banner { padding: 7px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 600; margin-bottom: 8px; }
+  .status-banner.sat { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+  .status-banner.unsat { background: rgba(244,63,94,0.16); color: #fb7185; border: 1px solid rgba(244,63,94,0.4); }
+  .spec-box { flex: 1; background: #070a10; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: ui-monospace, monospace; font-size: 11px; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; overflow-y: auto; }
+  .btn { margin-top: 8px; padding: 9px; border-radius: 7px; border: none; font-weight: 700; font-size: 12px; cursor: pointer; background: var(--q1); color: #080b11; }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">🌌 intent-engineering-galaxy <span class="badge">0.1.0 · Local CLI + Extension + Claude Code Mod</span></div>
+  <div class="kbd-bar">
+    <span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 主幹</span>
+    <span><kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> 導航</span>
+    <span><kbd>Space</kbd> 採納</span>
+    <span><kbd>x</kbd> 排除護欄</span>
+    <span><kbd>r</kbd>/<kbd>s</kbd> 解衝突</span>
+    <span><kbd>Enter</kbd> 直接注入下方 Claude Code 輸入框</span>
+  </div>
+</header>
+<main id="galaxy-stage">
+  <svg id="orbit-svg" viewBox="0 0 1000 600" preserveAspectRatio="none"></svg>
+  <div class="q-tag q1">▲ Q1 歸零者（第一性原理）· 信仰：零邊際獲客</div>
+  <div class="q-tag q2">▶ Q2 老兵（實戰槓桿）· 信仰：首週留存率</div>
+  <div class="q-tag q3">▼ Q3 越界者（跨界同構）· 信仰：非對稱機制</div>
+  <div class="q-tag q4">◀ Q4 驗屍官（波普爾證偽）· 信仰：14天現金流</div>
+  <div id="center-core">
+    <div class="sub">你真正在決定的是</div>
+    <div id="core-decision" class="goal">用開源/病毒裂變換取極速滲透，還是用閉門高單價守住算力毛利？</div>
+    <div id="core-metric" class="metric">🎯 成功指標：30 天內 1,000 名付費或活躍種子戶</div>
+  </div>
+  <div id="nodes-layer"></div>
+</main>
+<section id="cards-dock"></section>
+<!-- 模擬你的 Claude Code Mod 原生工具列與輸入框 -->
+<section id="claude-mod-dock">
+  <div class="cm-status-row">
+    <span class="cm-ok">✓ CI @12c551e</span><span>workflow 2/2 完成 · 全部通過</span>
+    <span style="margin-left:auto; color:#71717a">5h 5% · ctx 57%</span>
+    <span class="cm-pill">Sub5</span><span class="cm-pill">cL</span><span class="cm-pill">cS</span><span class="cm-pill">cA</span><span class="cm-pill">cR</span><span class="cm-pill">gF</span><span class="cm-pill">Recap</span>
+    <button class="cm-pill ig-btn" onclick="injectIntoClaudeMod()" title="Claude Code Mod 原生整合按鈕：點擊將上方鎖定之星系契約直接注入輸入框">🌌 iG (Intent Galaxy)</button>
+  </div>
+  <div class="cm-input-row">
+    <input id="cm-prompt-input" type="text" value="更新 README 截圖" placeholder="在 Claude Code 輸入需求，按上方 Enter 或點 iG 自動將鎖定星系契約注入此處..." />
+    <span class="cm-model-tag">Opus 5.5 · 中 ↵</span>
+  </div>
+</section>
+<aside>
+  <h2>Live Intent AST 契約編譯器</h2>
+  <div id="status-bar" class="status-banner sat">✓ SAT 邏輯自洽 — 點選 1/2/3 或節點混音</div>
+  <div id="spec-output" class="spec-box"></div>
+  <button class="btn" onclick="injectIntoClaudeMod()">⚡ 按 [Enter] 寫入 .intent.lock.json 並注入下方 Claude 輸入框</button>
+</aside>
+<script>
+const COORDS = [
+  { x: 35, y: 18 }, { x: 50, y: 14 }, { x: 65, y: 18 },
+  { x: 83, y: 33 }, { x: 86, y: 50 }, { x: 83, y: 67 },
+  { x: 65, y: 82 }, { x: 50, y: 86 }, { x: 35, y: 82 },
+  { x: 17, y: 67 }, { x: 14, y: 50 }, { x: 17, y: 33 }
+];
+const NODES = [
+  { id: "N1", q: "Q1", label: "砍註冊欄至2個免驗證", claim: "砍註冊欄位至2個並免除信箱驗證，換取首日80%轉化", kill: "14天假帳號率>15%則錯", blind: null },
+  { id: "N2", q: "Q1", label: "純本地端零算力體驗", claim: "核心推論改跑瀏覽器WebGPU，伺服器算力成本歸零", kill: "低階機跳出率>40%則錯", blind: "邊緣端算力轉嫁" },
+  { id: "N3", q: "Q1", label: "單一痛點極致單頁化", claim: "砍掉所有儀表板只留60秒星系圖單頁，禁做多頁SaaS", kill: "次週留存<25%則錯", blind: null },
+  { id: "N4", q: "Q2", label: "輸出圖帶雙邊額度浮水印", claim: "匯出之架構圖強制附帶推薦連結，點擊雙邊贈50次額度", kill: "14天K因子<0.4則錯", blind: null },
+  { id: "N5", q: "Q2", label: "百人閉門高單價預購制", claim: "關閉免費註冊，僅開放100席年費創始會員預購", kill: "7天內預購<20席則錯", blind: "社交推銷羞恥感" },
+  { id: "N6", q: "Q2", label: "開源核心引擎+雲端變現", claim: "將@intent-eng/core開源衝GitHub Star，僅收費MCP雲端同步", kill: "14天Star<500則錯", blind: null },
+  { id: "N7", q: "Q3", label: "暗池工單賞金撮合板", claim: "[D2金融暗池] 高難度架構問題掛暗池賞金，吸引頂尖架構師解答", kill: "無人掛單超過7天則錯", blind: "雙邊流動性冷啟動" },
+  { id: "N8", q: "Q3", label: "樹突哨兵雙信號過濾", claim: "[D3免疫學] 本地正則初篩+模型二次確認才消耗API額度", kill: "誤攔截率>10%則錯", blind: null },
+  { id: "N9", q: "Q3", label: "公會賽季排行榜激勵", claim: "[D4遊戲公會] 公開展示頂尖意圖模板與Fork次數排行榜", kill: "分享率<5%則錯", blind: null },
+  { id: "N10", q: "Q4", label: "禁無風控免費算力裸奔", claim: "若開放免費免驗證且無本地過濾，7天內必遭羊毛黨刷爆API破產", kill: "單日API帳單>$200即熔斷", blind: "羊毛黨算力擠兌" },
+  { id: "N11", q: "Q4", label: "B2B用戶拒發廉價推銷碼", claim: "若要求資深工程師發送俗氣折價碼，因社交羞恥感轉發率必趨近0", kill: "14天分享點擊<2%即作廢", blind: "B2B社交貨幣門檻" },
+  { id: "N12", q: "Q4", label: "禁未驗證需求先寫重後端", claim: "若在20人盲測勝率未過半前先建多租戶帳務後端，沉沒成本必拖死專案", kill: "14天盲測勝率<=50%即停工", blind: null }
+];
+const EDGES = [
+  { type: "excludes", from: "N4", to: "N5", why: "免費病毒裂變與閉門預購互斥" },
+  { type: "excludes", from: "N1", to: "N5", why: "免驗證極速註冊與閉門審核互斥" },
+  { type: "excludes", from: "N4", to: "N11", why: "直接發折價浮水印違反B2B社交羞恥護欄" },
+  { type: "requires", from: "N1", to: "N8", why: "免驗證註冊必須搭配樹突哨兵過濾防刷" },
+  { type: "requires", from: "N4", to: "N10", why: "病毒裂變必須啟用算力防刷爆護欄" }
+];
+const ARCHETYPES = {
+  alpha: { id: "alpha", key: "1", title: "啟動樹突哨兵·極速病毒裂變", badge: "⬥ D3 免疫學", include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"], sacrifice: "首月算力由個人現金流付帳，無預購營收可補。", fatal: "若 14 天 K 因子 < 0.4 或單日帳單 > $200 即作廢" },
+  beta:  { id: "beta",  key: "2", title: "開源核心引擎·公會排行槓桿", badge: "✦ D4 遊戲設計", include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"], sacrifice: "前 30 天由免費伸手黨消耗維護精力，無短期現金流。", fatal: "若 14 天 GitHub Star < 500 或盲測勝率 <= 50% 即作廢" },
+  gamma: { id: "gamma", key: "3", title: "設暗池賞金板·百人閉門高毛利", badge: "◈ D2 金融工程", include: ["N3", "N5", "N7", "N8", "N11"], exclude: ["N1", "N4"], sacrifice: "泛流量增長歸零，沒有病毒自然裂變可補。", fatal: "若 7 天創始預購 < 20 席或暗池無人掛單即作廢" }
+};
+let baseId = "gamma", overrides = new Map(), seq = 0, focusedIdx = 0, synthActive = false;
+function solve() {
+  const arch = baseId ? ARCHETYPES[baseId] : null, baseMap = new Map();
+  if (arch) { arch.include.forEach(id => baseMap.set(id, "include")); arch.exclude.forEach(id => baseMap.set(id, "exclude")); }
+  const eff = new Map();
+  NODES.forEach(n => {
+    if (overrides.has(n.id)) eff.set(n.id, { stance: overrides.get(n.id).stance, src: "user", via: [] });
+    else if (baseMap.has(n.id)) eff.set(n.id, { stance: baseMap.get(n.id), src: "default", via: [] });
+    else eff.set(n.id, { stance: "neutral", src: "none", via: [] });
+  });
+  for (const e of EDGES.filter(x => x.type === "requires")) {
+    const f = eff.get(e.from), t = eff.get(e.to);
+    if (f.stance === "include" && t.stance === "neutral" && t.src !== "user") eff.set(e.to, { stance: "include", src: "derived", via: [e.from] });
+  }
+  const conflicts = [];
+  for (const e of EDGES.filter(x => x.type === "excludes")) {
+    if (synthActive) continue;
+    const a = eff.get(e.from), b = eff.get(e.to);
+    if (a.stance === "include" && b.stance === "include") {
+      if (a.src === "user" && b.src !== "user") eff.set(e.to, { stance: "exclude", src: "derived", via: [e.from] });
+      else if (b.src === "user" && a.src !== "user") eff.set(e.from, { stance: "exclude", src: "derived", via: [e.to] });
+      else conflicts.push(e);
+    }
+  }
+  return { eff, conflicts };
+}
+function selectArchetype(id, clear = false) { baseId = id; if (clear) { overrides.clear(); synthActive = false; } render(); }
+function setNodeStance(id, target) {
+  const cur = solve().eff.get(id).stance, next = cur === target ? "neutral" : target;
+  const arch = baseId ? ARCHETYPES[baseId] : null;
+  const baseSt = arch ? (arch.include.includes(id) ? "include" : arch.exclude.includes(id) ? "exclude" : "neutral") : "neutral";
+  if (next === baseSt) overrides.delete(id); else overrides.set(id, { stance: next, seq: ++seq });
+  render();
+}
+async function injectIntoClaudeMod() {
+  const { eff, conflicts } = solve();
+  if (conflicts.length) { alert("請先按 [r] 或 [s] 解決衝突！"); return; }
+  const ast = document.getElementById("spec-output").textContent;
+  const inputEl = document.getElementById("cm-prompt-input");
+  const mustIds = NODES.filter(n => n.q !== "Q4" && eff.get(n.id).stance === "include").map(n => n.id + ":" + n.label).join(" / ");
+  const guardIds = NODES.filter(n => n.q === "Q4" && eff.get(n.id).stance === "include").map(n => n.id + ":" + n.label).join(" / ");
+  const notIds = NODES.filter(n => n.q !== "Q4" && eff.get(n.id).stance === "exclude").map(n => n.id + ":" + n.label).join(" / ");
+  inputEl.value = `[IntentLock: ${ARCHETYPES[baseId]?.title || "Custom"}] MUST(${mustIds}) | GUARD(${guardIds}) | MUST_NOT(${notIds}) -> 請依此邊界執行`;
+  inputEl.style.borderColor = "#38bdf8";
+  try {
+    await fetch("/api/lock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ astMarkdown: ast, baseId }) });
+  } catch (_) {}
+}
+function render() {
+  const { eff, conflicts } = solve(), badIds = new Set(conflicts.flatMap(c => [c.from, c.to]));
+  document.getElementById("nodes-layer").innerHTML = NODES.map((n, idx) => {
+    const pos = COORDS[idx], st = eff.get(n.id), dimmed = st.stance === "neutral";
+    const blind = n.blind ? `<span class="blind-star">✦ 盲區</span>` : "";
+    const chip = st.src === "derived" ? `<span class="chip">${st.stance === "include" ? "← 依賴 " : "⊘ 互斥 "}${st.via.join(",")}</span>` : st.src === "user" ? `<span class="chip">📌 手動釘選</span>` : "";
+    return `<button class="node-btn ${dimmed ? "dimmed" : ""} ${idx === focusedIdx ? "focused" : ""} ${badIds.has(n.id) ? "conflict" : ""}" data-node-id="${n.id}" data-stance="${st.stance}" data-src="${st.src}" style="left:${pos.x}%; top:${pos.y}%" onclick="focusedIdx=${idx}; setNodeStance('${n.id}', 'include')" oncontextmenu="event.preventDefault(); focusedIdx=${idx}; setNodeStance('${n.id}', 'exclude')"><span class="nid">${n.id}</span>${blind}<span class="lbl">${n.label}</span>${chip}</button>`;
+  }).join("");
+  let paths = "";
+  NODES.forEach((n, idx) => {
+    const pos = COORDS[idx], st = eff.get(n.id);
+    if (st.stance === "include") paths += `<path d="M ${pos.x*10} ${pos.y*6} Q ${(pos.x*10+500)/2} ${pos.y*6} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${st.src === "derived" ? "5,5" : "none"}" opacity="0.78"/>`;
+  });
+  document.getElementById("orbit-svg").innerHTML = paths;
+  document.getElementById("cards-dock").innerHTML = Object.values(ARCHETYPES).map(a => `<div class="arch-card ${baseId === a.id ? "active" : ""}" onclick="selectArchetype('${a.id}')"><div class="c-head"><span class="c-title">[${a.key}] ${a.title}</span><span class="c-badge">${a.badge}</span></div><div class="c-row">💸 代價：${a.sacrifice}</div><div class="c-kill">⚡ 致死：${a.fatal}</div></div>`).join("");
+  const mustHave = NODES.filter(n => n.q !== "Q4" && eff.get(n.id).stance === "include");
+  const guardrails = NODES.filter(n => n.q === "Q4" && eff.get(n.id).stance === "include");
+  const mustNot = NODES.filter(n => n.q !== "Q4" && eff.get(n.id).stance === "exclude");
+  document.getElementById("spec-output").textContent = [
+    `# LOCKED INTENT AST (${ARCHETYPES[baseId]?.title || "Custom"})`,
+    `\n## 1. MUST 採納機制 (${mustHave.length})`, ...mustHave.map(n => `- [${n.id}] ${n.claim}`),
+    `\n## 2. GUARDRAILS 證偽護欄 (${guardrails.length})`, ...guardrails.map(n => `- [${n.id}] ${n.claim} (${n.kill})`),
+    `\n## 3. MUST NOT 排除反目標 (${mustNot.length})`, ...mustNot.map(n => `- [${n.id}] 禁止: ${n.claim}`)
+  ].join("\n");
+}
+window.addEventListener("keydown", (e) => {
+  if (document.activeElement.tagName === "INPUT") return;
+  const k = e.key === "Process" ? e.code.replace("Key", "").toLowerCase() : e.key;
+  if (k === "1") selectArchetype("alpha"); else if (k === "2") selectArchetype("beta"); else if (k === "3") selectArchetype("gamma");
+  else if (k === "j" || k === "l" || k === "Tab") { e.preventDefault(); focusedIdx = (focusedIdx + 1) % NODES.length; render(); }
+  else if (k === "k" || k === "h") { focusedIdx = (focusedIdx - 1 + NODES.length) % NODES.length; render(); }
+  else if (k === " " || k === "i") { e.preventDefault(); setNodeStance(NODES[focusedIdx].id, "include"); }
+  else if (k === "x") setNodeStance(NODES[focusedIdx].id, "exclude");
+  else if (k === "0" || k === "n") { overrides.delete(NODES[focusedIdx].id); render(); }
+  else if (k === "s") { synthActive = true; render(); }
+  else if (k === "Enter") injectIntoClaudeMod();
+});
+render();
+</script>
+</body>
+</html>

@@ -1,5 +1,4 @@
 import type { Stance } from "../../protocol/src/index.ts";
-
 export type Model = Readonly<{ version: string; feasibleVersion: string; validated: true; ids: readonly string[]; feasibleMasks: readonly number[] }>;
 export type Input = Readonly<{ model: Model; base: readonly Stance[]; overrides: ReadonlyMap<number, Stance> }>;
 export type L3 = Readonly<{ id: string; stance: Stance }>;
@@ -7,12 +6,10 @@ export type Result =
   | Readonly<{ status: "STALE_MODEL" | "INVALID_INPUT" | "BASE_UNSAT"; preconditions: string }>
   | Readonly<{ status: "L3_UNSAT"; core: readonly L3[]; preconditions: string }>
   | Readonly<{ status: "SAT"; chosenMask: number; forcedIn: readonly string[]; forcedOut: readonly string[]; droppedDefaults: readonly string[]; pending: readonly string[]; explicitL3: readonly L3[]; modelVersion: string }>;
-
 const PRE = "CALLER_VALIDATES_INPUTS_AND_COMPLETE_CNF_BUDGET_BEFORE_MODEL_STABLE_ID_ORDER";
 const pop = (x: number): number => x.toString(2).replaceAll("0", "").length;
 const fits = (ms: readonly number[], es: readonly (readonly [number, Stance])[]): number[] =>
   ms.filter(mask => es.every(([i, s]) => Boolean(mask & (1 << i)) === (s === "include")));
-
 export function compileIntent({ model: m, base, overrides }: Input): Result {
   const n = m.ids.length, all = (1 << n) - 1, preconditions = PRE;
   const invalid = !m.validated || n > 12 || base.length !== n ||
