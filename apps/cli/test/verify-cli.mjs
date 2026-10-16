@@ -74,7 +74,7 @@ try {
   assert.equal(lines[1].t, "skeleton");
   assert.equal(lines.filter((e) => e.t === "node").length, 12);
   assert.equal(lines.at(-1).t, "repaired");
-  assert.equal(lines.at(-1).analysis.nodes.N7.label, "暗池工單賞金撮合板");
+  assert.equal(lines.at(-1).analysis.nodes.N7.label, "邊緣節點串流首屏");
   assert.equal(lines.at(-1).analysis.withheld_kill, undefined, "withheld_kill 不可送進瀏覽器");
 
   // 通道 A：MCP 反向灌入
@@ -101,7 +101,7 @@ try {
   assert.equal(lock.status, 200);
   const lockRes = await lock.json();
   const result = await opened;
-  assert.ok(result.result.content[0].text.startsWith("# LOCKED INTENT AST (啟動樹突哨兵·極速裂變)"));
+  assert.ok(result.result.content[0].text.startsWith("# LOCKED INTENT AST (預渲染·Islands 瘦身)"));
   assert.ok(result.result.content[0].text.includes(lockRes.specHash));
   const lockFile = JSON.parse(fs.readFileSync(path.join(tmp, ".intent.lock.json"), "utf8"));
   const { specHash } = await import(path.join(ROOT, "libs/protocol/src/jcs.ts"));
