@@ -18,7 +18,7 @@ try {
   const { SAMPLE_GALAXY } = await import(path.join(out, "galaxy/apps/web/sample-galaxy.js"));
   assert.equal(core.solveGalaxy(core.repairAnalysis(SAMPLE_GALAXY).analysis, "beta", new Map()).status, "SAT");
   // 擴充功能的生活題型示範：修復管線零發現、三張卡都可行
-  for (const file of fs.readdirSync(path.join(ROOT_DIR, "apps/extension/samples"))) {
+  for (const file of fs.readdirSync(path.join(ROOT_DIR, "apps/extension/samples")).filter((f) => f.endsWith(".js"))) {
     const galaxy = Object.values(await import(path.join(ROOT_DIR, "apps/extension/samples", file)))[0];
     const repaired = core.repairAnalysis(galaxy);
     assert.deepEqual(repaired.findings, [], `${file}: ${JSON.stringify(repaired.findings)}`);

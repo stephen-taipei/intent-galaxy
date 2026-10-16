@@ -43,12 +43,20 @@ function hideCard() { card.hidden = true; galaxy.focus(); }
 const demoActions = () => DEMOS.map((d) => [d.label, () => { goal = d.goal; setStrip(""); galaxy.setGalaxy(d.galaxy, { goal: d.goal }); }]);
 const fmt = (sec) => sec >= 60 ? `${Math.floor(sec / 60)} 分 ${sec % 60} 秒` : `${sec} 秒`;
 
-/** 頂部提示條：等待中顯示經過時間與「貼上 JSON」備援。 */
-function setStrip(html) {
-  strip.hidden = !html;
-  strip.innerHTML = html;
-  strip.querySelector("[data-paste]")?.addEventListener("click", showPaste);
+/** 頂部提示條：text 為說明文字；buttons 為 [label, handler]。只在內容改變時重建，按鈕才點得到、焦點不會跑掉。 */
+function setStrip(text, buttons = [], note = "") {
+  strip.hidden = !text;
+  strip.replaceChildren();
+  if (!text) return;
+  const line = Object.assign(document.createElement("span"), { className: "t", textContent: text });
+  strip.append(line, ...buttons.map(([label, fn]) => {
+    const b = Object.assign(document.createElement("button"), { type: "button", textContent: label });
+    b.addEventListener("click", fn);
+    return b;
+  }));
+  if (note) strip.append(Object.assign(document.createElement("small"), { textContent: note }));
 }
+const resetJob = () => { toParent({ type: "intent-reset" }); waiting = false; setStrip(""); };
 
 function showGalaxy(analysis, g, { adopt = false } = {}) {
   goal = g || goal;
@@ -93,11 +101,17 @@ function startWaiting(g, elapsedSec = 0) {
   waiting = true;
   galaxy.beginStream(goal);
   galaxy.showMessage("等待 AI 在對話中回覆星系 JSON…");
-  updateWaiting(elapsedSec);
+  setStrip(`⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`, [["已回覆但沒出現？貼上 JSON", showPaste], ["放棄等待", () => { resetJob(); galaxy.showMessage("已放棄等待。可以在輸入框打新的問題，再按 iG。"); }]],
+    "推理型模型（如 Pro、Thinking）常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓。");
 }
-function updateWaiting(elapsedSec) {
-  setStrip(`⋯ 等待 ${esc(site)} 回覆 · ${fmt(elapsedSec)}　<button type="button" data-paste>已回覆但沒出現？貼上 JSON</button>`
-    + (elapsedSec > 90 ? `<small>推理型模型（如 Pro、Thinking）常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓。</small>` : ""));
+function updateWaiting(elapsedSec, unsent) {
+  const t = strip.querySelector(".t");
+  if (t) t.textContent = unsent ? "⚠ 提示詞還在輸入框裡：請在對話框按一下送出" : `⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`;
+}
+function showFailed(detail) {
+  waiting = false;
+  galaxy.showMessage(detail);
+  setStrip(`⚠ ${detail}`, [["重新生成", () => { resetJob(); confirmChat(); }], ["貼上 JSON", showPaste], ["放棄", resetJob]]);
 }
 
 function spawnViaChat() {
@@ -125,12 +139,17 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
     if (job.status === "done" && job.analysis) {
       showGalaxy(job.analysis, job.goal);
       // 已有結果時仍可重問同一題（例如換了模型）。
-      setStrip(`這是這個對話已生成的星系　<button type="button" data-regen>重新生成</button>`);
-      strip.querySelector("[data-regen]")?.addEventListener("click", () => confirmChat([["回到星系", () => showGalaxy(job.analysis, job.goal)]]));
+      setStrip("這是這個對話已生成的星系", [["重新生成", () => confirmChat([["回到星系", () => showGalaxy(job.analysis, job.goal)]])]]);
       return;
     }
     if (job.status === "waiting") return startWaiting(job.goal, job.elapsedSec);
-    if (job.status === "failed") { startWaiting(job.goal, job.elapsedSec); galaxy.showMessage(job.detail); return; }
+    if (job.status === "failed") { goal = job.goal; galaxy.beginStream(goal); return showFailed(job.detail); }
+  }
+  // 上一個問題還在等，輸入框又打了新問題：先決定要繼續等還是放棄。
+  if (job?.status === "waiting" && newGoal) {
+    return showCard("上一個問題還在等 AI 回覆",
+      `正在等：<b>${esc(job.goal)}</b><br>AI 回完之前，網站通常不接受新訊息。要繼續等，還是放棄它、改問新的問題？`,
+      [["繼續等待", () => startWaiting(job.goal, job.elapsedSec), true], ["放棄並改問新問題", () => { resetJob(); confirmChat(); }]]);
   }
   if (goal) {
     if (await cliAlive()) return spawnViaCli().catch((err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }));
@@ -148,9 +167,12 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
 api.runtime.onMessage.addListener((msg) => {
   if (msg?.id !== id) return;
   if (msg.type === "ig-open") open(msg);
-  if (msg.type === "ig-progress" && waiting) updateWaiting(msg.elapsedSec);
+  if (msg.type === "ig-progress" && waiting) updateWaiting(msg.elapsedSec, msg.unsent);
   if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
-  if (msg.type === "ig-chat-error") { galaxy.showMessage(msg.detail); setStrip(`⚠ ${esc(msg.detail)}　<button type="button" data-paste>貼上 JSON</button>`); }
+  if (msg.type === "ig-chat-error") {
+    if (msg.failed || !waiting) showFailed(msg.detail);
+    else galaxy.showMessage(msg.detail);
+  }
 });
 
 galaxy.addEventListener("intent-lock", async (e) => {
