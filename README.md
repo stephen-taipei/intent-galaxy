@@ -13,7 +13,7 @@
 | ---- | ---- | ---- |
 | **CLI** | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 星系伺服器，可選 Claude、Codex、Gemini、agy CLI 或 12 家 API 生成 | ✅ |
 | **MCP** | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`，Claude Code、Codex、Gemini CLI、agy 都能掛 | ✅ |
-| **Extension** | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 輸入框旁加 `🌌 iG` 膠囊 | ✅ |
+| **Extension** | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 輸入框旁加 `🌌 iG` 膠囊；直接請該網頁的 AI 生成星系，不需要本機伺服器 | ✅ |
 | **Kill-gate** | `.intent.lock.json`（RFC 8785 JCS + SHA-256）與 14 天後的 commit 驗屍守門員 | ✅ |
 
 ## 快速開始

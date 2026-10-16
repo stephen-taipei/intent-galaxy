@@ -7,7 +7,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { ROOT, isMain, libSources, transpileTo } from "./transpile.mjs";
 
-const SOURCES = ["apps/web/galaxy-overlay.js", "apps/web/sample-galaxy.js", ...libSources("protocol", "core")];
+const SOURCES = ["apps/web/galaxy-overlay.js", "apps/web/sample-galaxy.js", ...libSources("protocol", "core"), "libs/epistemic/src/prompt.ts"];
 const SHARED = ["content.js", "background.js", "panel.html", "panel.js"];
 
 export function buildGalaxyBundle(outDir) {
