@@ -51,12 +51,13 @@
     const btn = document.createElement("button");
     btn.id = PILL_ID;
     btn.type = "button";
-    btn.textContent = "🌌 iG";
-    btn.title = "Intent Galaxy（Cmd/Ctrl+Shift+G）";
+    // 掛不進輸入框工具列時改成右下角浮動按鈕：寫出全名，避免被當成頁面本身的小圖示。
+    btn.textContent = kind === "floating" ? "🌌 Intent Galaxy" : "🌌 iG";
+    btn.title = "Intent Galaxy：把輸入框裡的目標展開成星系，選好方案後填回對話框（Cmd/Ctrl+Shift+G）";
     btn.dataset.kind = kind;
     btn.style.cssText = "all:unset; box-sizing:border-box; cursor:pointer; font:600 11.5px/1 -apple-system,BlinkMacSystemFont,sans-serif; padding:5px 9px; margin:0 4px; border-radius:6px; color:#fff;"
       + " background:linear-gradient(135deg,rgba(56,189,248,.35),rgba(168,85,247,.35)); border:1px solid #38bdf8; box-shadow:0 0 10px rgba(56,189,248,.25); white-space:nowrap;"
-      + (kind === "floating" ? " position:fixed; bottom:18px; right:18px; z-index:2147483646;" : "");
+      + (kind === "floating" ? " position:fixed; bottom:18px; right:18px; z-index:2147483646; font-size:13px; padding:9px 14px; border-radius:999px; background:linear-gradient(135deg,#0ea5e9,#8b5cf6);" : "");
     btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); togglePanel(); });
     return btn;
   }
@@ -150,6 +151,9 @@
       if (!writeToEditor(editor, text, "LOCKED INTENT AST")) navigator.clipboard?.writeText(text).catch(() => {});
     }
   });
+
+  // 工具列圖示（background.js）以 scripting.executeScript 在同一個 isolated world 呼叫；頁面腳本看不到這個全域。
+  window.__intentGalaxyToggle = togglePanel;
 
   // Cmd/Ctrl+Shift+G：capture 階段攔截，避免被頁面快捷鍵吃掉；以 e.code 判斷，IME 開啟時同樣可用。
   window.addEventListener("keydown", (e) => {
