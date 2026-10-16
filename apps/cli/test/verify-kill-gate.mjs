@@ -71,6 +71,8 @@ try {
   assert.notEqual(withheld.status, 0);
   assert.ok(withheld.stderr.includes(old.withheldKill.fatalPremise), withheld.stderr);
   assert.equal(r2.commit(`next\n\nIntent-Lock: ${old.specHash}\nIntent-Withheld: card`).status, 0);
+  const { readVerdicts } = await import("../src/init-hook.mjs");
+  assert.deepEqual(readVerdicts(r2.dir), ["dead"], "太短的 Evidence 不算判決");
   // 範圍外的 commit 不受影響
   r2.write("docs/x.md", "x\n"); r2.git("add", "-A");
   assert.equal(r2.commit("docs").status, 0);

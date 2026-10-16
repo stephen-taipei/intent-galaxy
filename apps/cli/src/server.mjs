@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { stripTypeScriptTypes } from "node:module";
 import { spawnGalaxy } from "./spawn.mjs";
-import { detectHookInstalled } from "./init-hook.mjs";
+import { detectHookInstalled, readVerdicts } from "./init-hook.mjs";
 import { LockError, buildIntentLock, repairAnalysis, solveGalaxy } from "../../../libs/core/src/index.ts";
 import { ARCHETYPE_KEYS, NODE_IDS } from "../../../libs/protocol/src/index.ts";
 
@@ -125,7 +125,7 @@ export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths =
         const baseKey = ARCHETYPE_KEYS.includes(body.baseKey) ? body.baseKey : null;
         let lock;
         try {
-          lock = await buildIntentLock({ analysis, solution: solveGalaxy(analysis, baseKey, overrides), baseKey, goal, scopePaths, hookInstalled: detectHookInstalled(lockDir) });
+          lock = await buildIntentLock({ analysis, solution: solveGalaxy(analysis, baseKey, overrides), baseKey, goal, scopePaths, hookInstalled: detectHookInstalled(lockDir), recentVerdicts: readVerdicts(lockDir) });
         } catch (e) {
           if (e instanceof LockError) return json(res, 422, { ok: false, error: e.message });
           throw e;

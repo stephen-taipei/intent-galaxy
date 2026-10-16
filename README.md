@@ -5,7 +5,9 @@
 
 ![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
 
-<!-- 截圖 / 動圖位：星系首屏、按 1/2/3 點亮主幹、Enter 注入輸入框 -->
+| 先發散：12 顆節點與 ✦ 盲區，不畫連線 | 後收斂：按 `1` 點亮主幹，右側即時編譯 AST |
+| --- | --- |
+| ![星系首屏](https://raw.githubusercontent.com/stephen-taipei/intent-engineering-galaxy/main/docs/images/galaxy-diverge.png) | ![按 1 收斂](https://raw.githubusercontent.com/stephen-taipei/intent-engineering-galaxy/main/docs/images/galaxy-converge.png) |
 
 | 形態 | 內容 | 狀態 |
 | ---- | ---- | ---- |

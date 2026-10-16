@@ -52,6 +52,9 @@ const served = location.protocol.startsWith("http");
 const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); badge.textContent = g.source === "mcp" ? "MCP 灌入" : g.source === "spawn" ? "claude -p 生成" : "示範星系"; galaxy.focus(); };
 
 galaxy.setGalaxy(SAMPLE_GALAXY);
+// ?base=alpha|beta|gamma：開啟時直接套用策略卡（分享示範連結、截圖用）。
+const presetBase = new URLSearchParams(location.search).get("base");
+if (presetBase) galaxy.selectArchetype(presetBase);
 if (served) {
   fetch("/api/galaxy").then((r) => r.json()).then((g) => { if (g.analysis) show(g); }).catch(() => {});
   new EventSource("/api/events").addEventListener("galaxy", (e) => show(JSON.parse(e.data)));

@@ -44,9 +44,16 @@ export interface IntentLock {
 
 export class LockError extends Error {}
 
-export async function buildIntentLock({ analysis: a, solution: sol, baseKey, goal = "", decidedAt = new Date(), scopePaths = ["*"], hookInstalled = false }: {
+/** 連續兩次 Intent-Kill: unobservable 之後，下一張鎖的 killCondition14d 必須含阿拉伯數字（Grok 審查 §2.2：沒有數字就沒有驗屍）。 */
+export function requiresNumericKill(recentVerdicts: readonly string[]): boolean {
+  return recentVerdicts.length >= 2 && recentVerdicts.slice(-2).every((v) => v === "unobservable");
+}
+
+export async function buildIntentLock({ analysis: a, solution: sol, baseKey, goal = "", decidedAt = new Date(), scopePaths = ["*"], hookInstalled = false, recentVerdicts = [] }: {
   analysis: IntentAnalysisResponse; solution: GalaxySolution; baseKey: ArchetypeKey | null;
   goal?: string; decidedAt?: Date; scopePaths?: string[]; hookInstalled?: boolean;
+  /** 這個 repo 歷來的 Intent-Kill 判決，由舊到新。 */
+  recentVerdicts?: readonly string[];
 }): Promise<IntentLock> {
   if (sol.status !== "SAT") throw new LockError(`星系目前是 ${sol.status}，先解除衝突才能簽署`);
   const arch = baseKey ? a.archetypes[baseKey] : undefined;
@@ -58,6 +65,9 @@ export async function buildIntentLock({ analysis: a, solution: sol, baseKey, goa
   // 焊在牌上的致死前提：策略卡的 fatal（仍被採納時）優先，否則取第一顆被採納的 Q4 節點。
   const fatalId = (arch && included.includes(arch.fatal) ? arch.fatal : included.find((id) => quadrantOf(id) === "Q4")) as Q4NodeId | undefined;
   if (!fatalId) throw new LockError("至少要採納一顆 Q4 證偽節點，14 天後才有可驗屍的致死前提");
+  if (requiresNumericKill(recentVerdicts) && !/[0-9]/.test(a.nodes[fatalId].kill ?? "")) {
+    throw new LockError(`前兩張契約都判為 unobservable。這次焊在牌上的 ${fatalId} 致死條件沒有數字，無法驗屍；請改選含數字指標的 Q4 節點`);
+  }
   const weldedKill: WeldedKill = { falsifierId: fatalId, fatalPremise: a.nodes[fatalId].claim, killCondition14d: a.nodes[fatalId].kill };
   const w = a.withheld_kill;
   const withheldKill: WithheldKill | null = w ? {
