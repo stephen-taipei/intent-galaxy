@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { ROOT, isMain, libSources, transpileTo } from "./transpile.mjs";
 
 const SOURCES = ["apps/web/galaxy-overlay.js", "apps/web/sample-galaxy.js", ...libSources("protocol", "core")];
-const SHARED = ["content.js", "panel.html", "panel.js"];
+const SHARED = ["content.js", "background.js", "panel.html", "panel.js"];
 
 export function buildGalaxyBundle(outDir) {
   fs.rmSync(path.join(outDir, "galaxy"), { recursive: true, force: true });
@@ -20,6 +20,7 @@ if (isMain(import.meta.url)) {
   buildGalaxyBundle(chrome);
   buildGalaxyBundle(firefox);
   for (const f of SHARED) fs.copyFileSync(path.join(chrome, f), path.join(firefox, f));
+  fs.cpSync(path.join(chrome, "icons"), path.join(firefox, "icons"), { recursive: true });
   console.log(`✅ synced ${SOURCES.length} galaxy modules → apps/extension, apps/extension-firefox`);
   if (process.argv.includes("--zip")) {
     const { version } = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
