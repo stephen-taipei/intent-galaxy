@@ -105,10 +105,11 @@
     placePanel();
     document.body.appendChild(panel);
     // 目標文字只走 runtime 訊息：頁面腳本讀得到 iframe src，但無法偽造 runtime 訊息。
-    panel.addEventListener("load", () => { api.runtime.sendMessage({ type: "ig-open", id: panelId, goal: openGoal }); panel.focus(); }, { once: true });
+    panel.addEventListener("load", () => { api.runtime.sendMessage({ type: "ig-open", id: panelId, goal: openGoal, site: location.hostname.replace(/^www\./, "") }); panel.focus(); }, { once: true });
   }
 
   function closePanel() {
+    stopWatch();
     panel?.remove();
     panel = null;
     targetEditor?.focus();
@@ -141,9 +142,74 @@
     return landed();
   }
 
+  // ── 用當前網頁的 AI 生成：送出提示詞，從頁面文字中找出回覆的星系 JSON ──
+  let watchTimer = 0;
+  function stopWatch() { clearInterval(watchTimer); watchTimer = 0; }
+
+  /** 取出第一個完整的根物件：略過字串內的括號（與 apps/cli/src/spawn.mjs 相同演算法）。 */
+  function extractRootObject(text) {
+    const start = text.indexOf("{");
+    if (start < 0) return null;
+    let depth = 0, inStr = false, esc = false;
+    for (let i = start; i < text.length; i++) {
+      const c = text[i];
+      if (inStr) { if (esc) esc = false; else if (c === "\\") esc = true; else if (c === "\"") inStr = false; continue; }
+      if (c === "\"") inStr = true;
+      else if (c === "{") depth++;
+      else if (c === "}" && --depth === 0) { try { return JSON.parse(text.slice(start, i + 1)); } catch { return null; } }
+    }
+    return null;
+  }
+
+  function sendPrompt(editor, prompt) {
+    if (!writeToEditor(editor, prompt, "INTENT-SPAWNER")) return false;
+    // 送出按鈕通常在輸入後才出現或啟用：稍等再按；找不到就模擬 Enter。
+    setTimeout(() => {
+      const form = editor.closest("form, fieldset") ?? editor.parentElement?.parentElement?.parentElement;
+      const send = [...(form ?? document).querySelectorAll(SEND_BUTTON)].find((b) => visible(b) && !b.disabled);
+      if (send) send.click();
+      else editor.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, bubbles: true, cancelable: true }));
+    }, 400);
+    return true;
+  }
+
+  // 回覆裡的 JSON 會出現 "schema_version"（帶引號）；提示詞裡的 TypeScript schema 沒有引號，不會誤判。
+  // 以送出前的出現次數為基準，只接受新出現的那一份，避免拿到同一對話裡舊的星系。
+  const KEY = '"schema_version"';
+  const countKey = (text) => text.split(KEY).length - 1;
+
+  function watchReply(id) {
+    stopWatch();
+    const started = Date.now(), baseline = countKey(document.body.innerText);
+    let last = "";
+    const report = (msg) => api.runtime.sendMessage({ ...msg, id }).catch?.(() => {});
+    watchTimer = setInterval(() => {
+      const elapsedSec = Math.round((Date.now() - started) / 1000);
+      const text = document.body.innerText;
+      let obj = null;
+      if (countKey(text) > baseline) {
+        const k = text.lastIndexOf(KEY);
+        obj = extractRootObject(text.slice(text.lastIndexOf("{", k)));
+      }
+      if (obj?.schema_version === "1.0" && obj.nodes) {
+        const key = JSON.stringify(obj);
+        // 連續兩次讀到相同的 JSON 才視為回覆完成，避免拿到串流中途的片段。
+        if (key === last) { stopWatch(); report({ type: "ig-galaxy", analysis: obj }); return; }
+        last = key;
+      }
+      if (elapsedSec > 480) { stopWatch(); report({ type: "ig-chat-error", detail: "等了 8 分鐘仍沒有讀到星系 JSON；可以在對話裡請 AI 只輸出 JSON，再按一次 iG。" }); return; }
+      report({ type: "ig-progress", elapsedSec });
+    }, 1500);
+  }
+
   window.addEventListener("message", (e) => {
     if (e.origin !== EXT_ORIGIN || !panel || e.source !== panel.contentWindow || e.data?.id !== panelId) return;
     if (e.data.type === "intent-close") closePanel();
+    if (e.data.type === "intent-chat-spawn" && typeof e.data.prompt === "string") {
+      const editor = targetEditor?.isConnected ? targetEditor : findEditor();
+      if (sendPrompt(editor, e.data.prompt)) watchReply(panelId);
+      else api.runtime.sendMessage({ type: "ig-chat-error", id: panelId, detail: "找不到這個網頁的輸入框，無法送出提示詞。" });
+    }
     if (e.data.type === "intent-lock") {
       const text = openGoal ? `${openGoal}\n\n${e.data.ast}` : e.data.ast;
       const editor = targetEditor?.isConnected ? targetEditor : findEditor();
