@@ -6,7 +6,7 @@
 <title>Intent Galaxy</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", sans-serif; }
-  body { background: #080b11; color: #e2e8f0; height: 100vh; display: grid; grid-template-rows: 52px 1fr 104px; overflow: hidden; }
+  body { background: #080b11; color: #e2e8f0; height: 100vh; display: grid; grid-template-rows: 52px 1fr; overflow: hidden; }
   header { background: #111723; border-bottom: 1px solid #1e293b; display: flex; align-items: center; gap: 14px; padding: 0 18px; }
   .brand { font-weight: 700; font-size: 14px; white-space: nowrap; }
   .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); margin-left: 8px; }
@@ -16,12 +16,6 @@
   header button { padding: 6px 14px; border-radius: 8px; border: none; background: #38bdf8; color: #080b11; font-weight: 700; font-size: 12px; cursor: pointer; }
   header button:disabled { opacity: .5; cursor: wait; }
   intent-galaxy-overlay { min-height: 0; }
-  /* 模擬 Claude Code Mod（deckhand）狀態列與輸入框：示範 Enter 後的注入結果 */
-  #claude-mod-dock { background: #141413; border-top: 1px solid #2e2e2c; padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
-  .cm-status-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1aa; }
-  .cm-pill { background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; }
-  .cm-pill.ig-btn { background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(168,85,247,0.25)); border-color: #38bdf8; color: #fff; cursor: pointer; }
-  #cm-prompt-input { background: #1e1e1c; border: 1px solid #3f3f46; border-radius: 10px; padding: 7px 12px; color: #f4f4f5; font-size: 12px; height: 40px; resize: none; outline: none; }
 </style>
 </head>
 <body>
@@ -33,15 +27,6 @@
   </form>
 </header>
 <intent-galaxy-overlay id="galaxy"></intent-galaxy-overlay>
-<section id="claude-mod-dock">
-  <div class="cm-status-row">
-    <span style="color:#71717a">Claude Code Mod 狀態列（模擬）</span>
-    <span style="margin-left:auto"></span>
-    <span class="cm-pill">Sub5</span><span class="cm-pill">cL</span><span class="cm-pill">cS</span><span class="cm-pill">cA</span><span class="cm-pill">cR</span><span class="cm-pill">gF</span><span class="cm-pill">Recap</span>
-    <button class="cm-pill ig-btn" id="ig-pill" title="聚焦星系（Cmd/Ctrl+Shift+G）">🌌 iG</button>
-  </div>
-  <textarea id="cm-prompt-input" placeholder="鎖定後，LOCKED INTENT AST 會注入這裡…"></textarea>
-</section>
 <script type="module">
 import "./galaxy-overlay.js";
 import { SAMPLE_GALAXY } from "./sample-galaxy.js";
@@ -84,19 +69,19 @@ document.getElementById("goal-form").addEventListener("submit", async (e) => {
 });
 
 galaxy.addEventListener("intent-lock", async (e) => {
-  const input = document.getElementById("cm-prompt-input");
-  let ast = e.detail.ast;
+  let ast = e.detail.ast, lockNote = "";
   if (served) {
     // 示範星系沒有登記在伺服器（galaxyId 0），附上 analysis 讓伺服器重算並簽署鎖檔。
     const body = { ...e.detail, analysis: e.detail.galaxyId ? undefined : galaxy.analysis, goal: galaxy.goal };
     const res = await fetch("/api/lock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch((err) => ({ ok: false, error: err.message }));
     if (!res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
     ast = res.ast;
-    galaxy.showMessage(`🔒 已寫入 .intent.lock.json · ${res.specHash.slice(0, 12)} · ${res.auditDueAt.slice(0, 10)} 驗屍${res.hookInstalled ? "" : "（尚未 init-hook）"}`);
+    lockNote = `🔒 已寫入 .intent.lock.json · ${res.specHash.slice(0, 12)} · ${res.auditDueAt.slice(0, 10)} 驗屍${res.hookInstalled ? "" : "（尚未 init-hook）"}`;
   }
-  input.value = ast; input.style.borderColor = "#38bdf8";
+  // 本機獨立頁面沒有輸入框可注入，改把 LOCKED INTENT AST 複製到剪貼簿。
+  const copied = await navigator.clipboard?.writeText(ast).then(() => true, () => false);
+  galaxy.showMessage([lockNote, copied ? "📋 AST 已複製到剪貼簿" : "AST 未能複製到剪貼簿"].filter(Boolean).join(" · "));
 });
-document.getElementById("ig-pill").addEventListener("click", () => galaxy.focus());
 window.addEventListener("keydown", (e) => {
   if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyG") { e.preventDefault(); galaxy.focus(); }
 });
