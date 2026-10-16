@@ -1,0 +1,324 @@
+// <intent-galaxy-overlay>：純正星系版 UI 的 Shadow DOM Web Component。
+// 同一份元件用於 CLI 網頁（apps/web/index.html）與瀏覽器擴充功能（內嵌於 AI 網頁輸入框上方）。
+// 事件：intent-lock {ast, baseKey, overrides, galaxyId}、intent-close、intent-synth-request {conflicts}。
+import { renderLockedAst, renderSacrifice, repairAnalysis, solveGalaxy } from "../../libs/core/src/index.ts";
+import { NODE_IDS, quadrantOf } from "../../libs/protocol/src/index.ts";
+
+const COORDS = [
+  { x: 35, y: 17 }, { x: 50, y: 12 }, { x: 65, y: 17 },
+  { x: 84, y: 32 }, { x: 87, y: 50 }, { x: 84, y: 68 },
+  { x: 65, y: 83 }, { x: 50, y: 88 }, { x: 35, y: 83 },
+  { x: 16, y: 68 }, { x: 13, y: 50 }, { x: 16, y: 32 },
+];
+const QUADRANT_TAGS = {
+  Q1: "▲ Q1 歸零者（第一性原理）", Q2: "▶ Q2 老兵（實戰槓桿）",
+  Q3: "▼ Q3 越界者（跨界同構）", Q4: "◀ Q4 驗屍官（波普爾證偽）",
+};
+const ARCH = [["alpha", "1"], ["beta", "2"], ["gamma", "3"]];
+const HINT_QUADRANT = { f: "Q1", d: "Q2", l: "Q3", p: "Q4" };
+const DIST_BADGE = { 1: "· D1", 2: "◈ D2", 3: "⬥ D3", 4: "✦ D4" };
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
+const clip = (s, n) => { const a = [...String(s ?? "")]; return a.length > n ? a.slice(0, n - 1).join("") + "…" : a.join(""); };
+
+// 中文 IME 相容（CLAUDE.md 鐵律 3）：注音／倉頡開啟時 e.key 為 "Process" 或非 ASCII，改讀 e.code。
+export function normalizeKey(e) {
+  const fromCode = (code) => code.startsWith("Key") ? code.slice(3).toLowerCase() : code.startsWith("Digit") ? code.slice(5) : code === "Space" ? " " : code;
+  if (e.code && (e.code.startsWith("Digit") && e.shiftKey)) return fromCode(e.code);
+  if (e.key === "Process" || (e.key.length === 1 && !/^[\x20-\x7e]$/.test(e.key))) return fromCode(e.code ?? "");
+  return e.key.length === 1 ? e.key.toLowerCase() : e.key;
+}
+
+const STYLE = `
+:host { --bg:#080b11; --panel:#111723; --border:#1e293b; --text:#e2e8f0; --muted:#64748b; --q1:#38bdf8; --q2:#10b981; --q3:#a855f7; --q4:#f43f5e; --gold:#f59e0b;
+  display:block; position:relative; color:var(--text); background:var(--bg); font:12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang TC","Noto Sans TC",sans-serif; outline:none; overflow:hidden; }
+* { box-sizing:border-box; margin:0; padding:0; }
+.wrap { display:grid; grid-template-columns:1fr 360px; grid-template-rows:1fr auto auto; height:100%; }
+:host([embedded]) .wrap { grid-template-columns:1fr; }
+:host([embedded]) aside { display:none; }
+#stage { position:relative; min-height:300px; overflow:hidden; background:radial-gradient(circle at 50% 50%, rgba(30,41,59,.45) 0%, rgba(8,11,17,1) 72%); }
+svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.q-tag { position:absolute; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:6px; background:rgba(17,23,35,.92); border:1px solid var(--border); pointer-events:none; }
+.q-tag.Q1 { top:6px; left:50%; transform:translateX(-50%); color:var(--q1); }
+.q-tag.Q2, .q-tag.Q4 { top:34px; }
+.q-tag.Q2 { right:8px; color:var(--q2); }
+.q-tag.Q3 { bottom:6px; left:50%; transform:translateX(-50%); color:#c084fc; }
+.q-tag.Q4 { left:8px; color:#fb7185; }
+.q-tag small { color:var(--muted); font-weight:400; }
+#core { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(250px,34%); padding:10px 14px; border-radius:14px; background:rgba(15,23,42,.96); border:2px solid #475569; text-align:center; box-shadow:0 0 35px rgba(56,189,248,.14); z-index:10; }
+#core .sub { font-size:9.5px; letter-spacing:1px; color:var(--q1); margin-bottom:3px; }
+#core .goal { font-size:12.5px; font-weight:700; color:#fff; }
+#core .metric { font-size:10.5px; color:var(--gold); margin-top:4px; }
+.node { position:absolute; transform:translate(-50%,-50%); padding:6px 10px; border-radius:9px; background:rgba(17,23,35,.94); border:1.5px solid #334155; color:var(--text); font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; transition:opacity .15s, border-color .15s, background .15s; z-index:5; min-width:118px; max-width:180px; text-align:left; }
+.node:hover, .node.focused { border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.2); z-index:20; }
+.node .nid { font-size:10px; opacity:.65; margin-right:4px; font-family:ui-monospace,monospace; }
+.node .blind { float:right; font-size:10px; color:var(--gold); margin-left:4px; }
+.node .chip { display:block; font-size:9.5px; font-weight:400; color:#94a3b8; margin-top:2px; }
+.node.ghost { border-style:dashed; color:var(--muted); cursor:default; animation:pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity:.45; } }
+.node.dimmed { opacity:.4; }
+.node[data-stance="include"] { background:rgba(16,185,129,.16); border-color:var(--q2); color:#ecfdf5; opacity:1; }
+.node[data-stance="exclude"] { background:rgba(244,63,94,.14); border-color:var(--q4); color:#ffe4e6; opacity:1; }
+.node[data-stance="exclude"] .lbl { text-decoration:line-through; }
+.node[data-q="Q4"][data-stance="exclude"] .lbl { text-decoration:none; }
+.node[data-src="user"] { outline:2px solid #fff; outline-offset:2px; }
+.node[data-src="derived"] { border-style:dashed; }
+.node.conflict { border-color:var(--q4) !important; background:rgba(244,63,94,.32) !important; }
+#cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:8px 10px; background:var(--panel); border-top:1px solid var(--border); }
+.card { background:#0b101b; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; cursor:pointer; font:inherit; color:inherit; text-align:left; }
+.card.active { border-color:var(--q1); background:rgba(56,189,248,.07); }
+.card.ghost { border-style:dashed; color:var(--muted); cursor:default; }
+.card .head { display:flex; justify-content:space-between; gap:6px; align-items:center; }
+.card .title { font-size:12px; font-weight:700; color:#fff; }
+.card .badge { font-size:9.5px; padding:1px 5px; border-radius:4px; background:rgba(168,85,247,.18); color:#d8b4fe; white-space:nowrap; }
+.card .row { font-size:10.5px; color:#cbd5e1; margin-top:2px; }
+.card .kill { font-size:10.5px; color:#fda4af; margin-top:2px; }
+#bar { display:flex; align-items:center; gap:10px; padding:6px 10px; background:#0c111d; border-top:1px solid var(--border); font-size:11px; color:var(--muted); }
+#bar .status { font-weight:600; padding:2px 8px; border-radius:6px; }
+.status.sat { color:#34d399; background:rgba(16,185,129,.12); }
+.status.unsat { color:#fb7185; background:rgba(244,63,94,.16); }
+.status.wait { color:var(--q1); background:rgba(56,189,248,.12); }
+#bar .keys { margin-left:auto; }
+kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-size:10px; border:1px solid #334155; font-family:inherit; }
+#bar button { font:inherit; font-weight:700; padding:4px 10px; border-radius:6px; border:none; background:var(--q1); color:#080b11; cursor:pointer; }
+aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
+aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
+aside pre { flex:1; overflow:auto; background:#070a10; border:1px solid var(--border); border-radius:8px; padding:10px; font:11px/1.5 ui-monospace,monospace; color:#cbd5e1; white-space:pre-wrap; }
+aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow:auto; }
+`;
+
+export class IntentGalaxyOverlay extends HTMLElement {
+  #analysis = null; #draft = null; #galaxyId = 0; #findings = [];
+  #baseKey = null; #overrides = new Map(); #seq = 0; #focus = 0;
+  #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null;
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: "open" }).innerHTML = `<style>${STYLE}</style><div class="wrap">
+      <main id="stage"><svg viewBox="0 0 1000 600" preserveAspectRatio="none"></svg><div id="tags"></div>
+        <div id="core"><div class="sub">你真正在決定的是</div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></main>
+      <section id="cards"></section>
+      <footer id="bar"><span class="status"></span><span class="msg"></span>
+        <span class="keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 主幹 · <kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> 導航 · <kbd>Space</kbd> 採納 · <kbd>x</kbd> 排除 · <kbd>r</kbd> 解衝突 · <kbd>u</kbd> 復原</span>
+        <button type="button" id="lock">⏎ 鎖定並注入</button></footer>
+      <aside><h2>LIVE INTENT AST</h2><div class="findings"></div><pre></pre></aside></div>`;
+    const root = this.shadowRoot;
+    // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
+    root.addEventListener("click", () => this.focus({ preventScroll: true }));
+    root.getElementById("nodes").addEventListener("click", (e) => this.#onNodeClick(e, "include"));
+    root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#onNodeClick(e, "exclude"); });
+    root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
+    root.getElementById("lock").addEventListener("click", () => this.lock());
+    this.addEventListener("keydown", (e) => this.#onKey(e));
+  }
+
+  connectedCallback() { if (!this.hasAttribute("tabindex")) this.tabIndex = 0; this.#render(); }
+
+  /** 完整星系（IntentAnalysisResponse）。會先經 V1–V18 修復管線。 */
+  get analysis() { return this.#analysis; }
+  set analysis(value) { this.setGalaxy(value); }
+
+  setGalaxy(value, { galaxyId = 0, goal = "" } = {}) {
+    const repaired = repairAnalysis(value);
+    this.#findings = repaired.findings;
+    if (!repaired.ok) { this.#message = `星系資料無法編譯：${repaired.findings.at(-1)?.msg ?? ""}`; this.#render(); return false; }
+    this.#analysis = repaired.analysis; this.#draft = null; this.#galaxyId = galaxyId; this.goal = goal;
+    this.#baseKey = null; this.#overrides.clear(); this.#undo = []; this.#redo = []; this.#message = "";
+    this.#render();
+    return true;
+  }
+
+  /** 進入串流等待狀態：中心顯示命題，四周 12 個 Ghost Slots。 */
+  beginStream(goal) {
+    this.#analysis = null; this.#findings = []; this.goal = goal;
+    this.#draft = { core: { decision: goal, metric: "" }, nodes: {}, archetypes: {} };
+    this.#message = "正在展開星系…"; this.#render();
+  }
+
+  /** 套用 /api/spawn 的 NDJSON 事件，逐顆點亮節點。 */
+  applyStreamEvent(ev) {
+    if (ev.t === "repaired") { this.setGalaxy(ev.analysis, { galaxyId: ev.galaxyId ?? 0, goal: this.goal }); return; }
+    if (ev.t === "error") { this.#message = `生成失敗（${ev.code}）${ev.detail ? "：" + ev.detail : ""}`; this.#render(); return; }
+    if (!this.#draft) this.beginStream(this.goal ?? "");
+    if (ev.t === "skeleton" && ev.core) this.#draft.core = ev.core;
+    else if (ev.t === "node") this.#draft.nodes[ev.id] = ev.node;
+    else if (ev.t === "archetype") this.#draft.archetypes[ev.key] = ev.archetype;
+    this.#render();
+  }
+
+  selectArchetype(key, clearOverrides = false) {
+    if (!this.#analysis?.archetypes[key]) return;
+    this.#snapshot();
+    this.#baseKey = key;
+    if (clearOverrides) this.#overrides.clear();
+    this.#render();
+  }
+
+  setStance(id, target) {
+    if (!this.#analysis) return;
+    this.#snapshot();
+    // 再按一次同一立場即切回忽略；結果等於策略卡預設時移除覆寫，
+    // 但預設已被互斥推導讓位（derived）時必須保留覆寫，用戶的明確決定才會生效。
+    const view = this.#solution?.nodes[id], shown = view?.stance;
+    const next = shown === target ? "neutral" : target;
+    const arch = this.#baseKey ? this.#analysis.archetypes[this.#baseKey] : null;
+    const baseStance = arch?.include.includes(id) ? "include" : arch?.exclude.includes(id) ? "exclude" : "neutral";
+    if (next === baseStance && view?.src !== "derived") this.#overrides.delete(id);
+    else this.#overrides.set(id, { stance: next, seq: ++this.#seq });
+    this.#render();
+  }
+
+  /** r：衝突核心中依序撤銷較舊的手動決定，直到 SAT（保留較新決定）。 */
+  resolveConflicts() {
+    if (!this.#solution?.conflicts.length) return;
+    this.#snapshot();
+    let guard = 12;
+    while (this.#solve().status === "L3_UNSAT" && guard--) {
+      const core = this.#solve().conflicts;
+      const oldest = core.filter((id) => this.#overrides.has(id)).sort((a, b) => this.#overrides.get(a).seq - this.#overrides.get(b).seq)[0];
+      if (!oldest) break;
+      this.#overrides.delete(oldest);
+    }
+    this.#message = "已保留較新決定解除衝突"; this.#render();
+  }
+
+  lock() {
+    const sol = this.#solution;
+    if (!sol || !this.#analysis) return;
+    if (sol.status !== "SAT") { this.#message = "請先按 r 解除衝突（或 s 申請 TRIZ 合成）"; this.#render(); return; }
+    const ast = renderLockedAst(this.#analysis, sol, this.#baseKey);
+    const overrides = Object.fromEntries([...this.#overrides].map(([id, o]) => [id, o.stance]));
+    this.dispatchEvent(new CustomEvent("intent-lock", { bubbles: true, composed: true, detail: { ast, baseKey: this.#baseKey, overrides, galaxyId: this.#galaxyId } }));
+  }
+
+  #solve() {
+    const overrides = new Map([...this.#overrides].map(([id, o]) => [id, o.stance]));
+    return solveGalaxy(this.#analysis, this.#baseKey, overrides);
+  }
+
+  #snapshot() {
+    this.#undo.push({ baseKey: this.#baseKey, overrides: new Map(this.#overrides) });
+    if (this.#undo.length > 100) this.#undo.shift();
+    this.#redo = [];
+  }
+
+  #restore(from, to) {
+    const snap = from.pop();
+    if (!snap) return;
+    to.push({ baseKey: this.#baseKey, overrides: new Map(this.#overrides) });
+    this.#baseKey = snap.baseKey; this.#overrides = snap.overrides; this.#render();
+  }
+
+  #onNodeClick(e, stance) {
+    const id = e.target.closest("[data-node]")?.dataset.node;
+    if (!id || !this.#analysis) return;
+    this.#focus = NODE_IDS.indexOf(id);
+    this.setStance(id, stance);
+  }
+
+  #move(dir) {
+    const from = COORDS[this.#focus];
+    let best = -1, bestCost = Infinity;
+    COORDS.forEach((p, i) => {
+      const dx = p.x - from.x, dy = p.y - from.y;
+      const [along, across] = dir === "h" ? [-dx, dy] : dir === "l" ? [dx, dy] : dir === "k" ? [-dy, dx] : [dy, dx];
+      if (i === this.#focus || along <= 0) return; // 半平面過濾
+      const cost = along + 2 * Math.abs(across);
+      if (cost < bestCost) { bestCost = cost; best = i; }
+    });
+    if (best >= 0) { this.#focus = best; this.#render(); }
+  }
+
+  #onKey(e) {
+    const t = e.composedPath()[0];
+    if (t?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t?.tagName)) return;
+    if (e.metaKey || e.altKey) return;
+    const k = normalizeKey(e);
+    const handled = () => { e.preventDefault(); e.stopPropagation(); };
+    if (k === "Escape") { handled(); this.dispatchEvent(new CustomEvent("intent-close", { bubbles: true, composed: true })); return; }
+    if (e.ctrlKey) { if (k === "r") { handled(); this.#restore(this.#redo, this.#undo); } return; }
+    if (this.#hint) {
+      handled();
+      if (this.#hint === "g" && HINT_QUADRANT[k]) { this.#hint = HINT_QUADRANT[k]; return; }
+      if (/^Q[1-4]$/.test(this.#hint) && /^[1-3]$/.test(k)) { this.#focus = (Number(this.#hint[1]) - 1) * 3 + Number(k) - 1; }
+      this.#hint = ""; this.#render(); return;
+    }
+    const focused = NODE_IDS[this.#focus];
+    if (/^[1-3]$/.test(k)) { handled(); this.selectArchetype(ARCH[Number(k) - 1][0], e.shiftKey); }
+    else if ("hjkl".includes(k) && k.length === 1) { handled(); this.#move(k); }
+    else if (k === "Tab") { handled(); this.#focus = (this.#focus + (e.shiftKey ? 11 : 1)) % 12; this.#render(); }
+    else if (k === " " || k === "i") { handled(); this.setStance(focused, "include"); }
+    else if (k === "x") { handled(); this.setStance(focused, "exclude"); }
+    else if (k === "0" || k === "n") { handled(); this.setStance(focused, "neutral"); }
+    else if (k === "c") { handled(); const c = this.#solution?.conflicts[0]; if (c) { this.#focus = NODE_IDS.indexOf(c); this.#render(); } }
+    else if (k === "r") { handled(); this.resolveConflicts(); }
+    else if (k === "s") {
+      handled();
+      const conflicts = this.#solution?.conflicts ?? [];
+      this.dispatchEvent(new CustomEvent("intent-synth-request", { bubbles: true, composed: true, detail: { conflicts } }));
+      this.#message = conflicts.length ? "TRIZ 矛盾合成尚未接上 Stage 3 管線，先按 r 解除" : "目前沒有衝突";
+      this.#render();
+    }
+    else if (k === "u") { handled(); this.#restore(this.#undo, this.#redo); }
+    else if (k === "g") { handled(); this.#hint = "g"; }
+    else if (k === "Enter") { handled(); this.lock(); }
+  }
+
+  #render() {
+    const root = this.shadowRoot;
+    if (!root) return;
+    const a = this.#analysis, draft = this.#draft;
+    const core = a?.core ?? draft?.core ?? { decision: this.goal || "等待星系資料…", metric: "" };
+    const nodes = a?.nodes ?? draft?.nodes ?? {};
+    const archetypes = a?.archetypes ?? draft?.archetypes ?? {};
+    const quadrants = a?.quadrants ?? {};
+    const sol = this.#solution = a ? this.#solve() : null;
+    const conflicts = new Set(sol?.conflicts ?? []);
+
+    root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS).map(([q, label]) =>
+      `<div class="q-tag ${q}" title="${esc(quadrants[q]?.scar)}">${label}${quadrants[q]?.sacred ? ` <small>· ${esc(quadrants[q].sacred)}</small>` : ""}</div>`).join("");
+    root.querySelector("#core .goal").textContent = String(core.decision ?? "").replace(/^你真正在決定的是[:：]\s*/, "");
+    root.querySelector("#core .metric").textContent = core.metric ? `🎯 ${core.metric}` : "";
+
+    root.getElementById("nodes").innerHTML = NODE_IDS.map((id, i) => {
+      const n = nodes[id], pos = COORDS[i], q = quadrantOf(id);
+      const style = `left:${pos.x}%;top:${pos.y}%`;
+      if (!n) return `<button type="button" class="node ghost" style="${style}" tabindex="-1"><span class="nid">${id}</span>…</button>`;
+      const view = sol?.nodes[id] ?? { stance: "neutral", src: "none" };
+      const dimmed = this.#baseKey && view.stance === "neutral";
+      const chip = view.src === "derived" ? `<span class="chip">${view.stance === "include" ? "← 依賴推導" : "⊘ 互斥讓位"}</span>`
+        : view.src === "user" ? `<span class="chip">📌 手動釘選</span>`
+        : q === "Q4" && view.stance === "exclude" ? `<span class="chip">⚠ 明示承擔風險</span>` : "";
+      const cls = ["node", dimmed && "dimmed", i === this.#focus && "focused", conflicts.has(id) && "conflict"].filter(Boolean).join(" ");
+      const blind = n.blind ? `<span class="blind" title="${esc(n.blind)}">✦ 盲區</span>` : "";
+      return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" title="${esc(n.claim)}\n⚡ ${esc(n.kill)}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
+    }).join("");
+
+    // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。
+    root.querySelector("svg").innerHTML = !sol || !this.#baseKey ? "" : NODE_IDS.map((id, i) => {
+      if (sol.nodes[id].stance !== "include") return "";
+      const p = COORDS[i], x = p.x * 10, y = p.y * 6;
+      return `<path d="M ${x} ${y} Q ${(x + 500) / 2} ${y} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
+    }).join("");
+
+    root.getElementById("cards").innerHTML = ARCH.map(([key, num]) => {
+      const c = archetypes[key];
+      if (!c) return `<div class="card ghost"><div class="title">[${num}] ${draft ? "生成中…" : "—"}</div></div>`;
+      const dist = Math.max(0, ...(c.include ?? []).map((id) => nodes[id]?.lateral?.dist ?? 0));
+      const fatalKill = nodes[c.fatal]?.kill ?? "";
+      return `<button type="button" class="card ${this.#baseKey === key ? "active" : ""}" data-arch="${key}">
+        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span>${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</div>
+        <div class="row">💸 代價：${esc(clip(renderSacrifice(c.sacrifice), 40))}</div>
+        <div class="kill">⚡ 致死：${esc(clip(fatalKill, 30))}</div></button>`;
+    }).join("");
+
+    const status = root.querySelector("#bar .status");
+    if (!sol) { status.className = "status wait"; status.textContent = draft ? `⋯ 串流中 ${Object.keys(nodes).length}/12` : "⋯ 等待星系"; }
+    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : "✦ 先發散：按 1/2/3 選主幹"; }
+    else { status.className = "status unsat"; status.textContent = `✗ ${sol.status}${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}`; }
+    root.querySelector("#bar .msg").textContent = this.#hint ? `g 直達：${this.#hint}` : this.#message;
+    root.querySelector("aside pre").textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
+    root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
+  }
+}
+
+if (!customElements.get("intent-galaxy-overlay")) customElements.define("intent-galaxy-overlay", IntentGalaxyOverlay);
