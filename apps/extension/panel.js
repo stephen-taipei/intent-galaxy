@@ -13,7 +13,8 @@ const id = new URLSearchParams(location.search).get("id");
 const galaxy = document.querySelector("intent-galaxy-overlay");
 const card = document.getElementById("card");
 const strip = document.getElementById("strip");
-const toParent = (msg) => parent.postMessage({ ...msg, id }, "*");
+// 傳給所在分頁的 content script：經 background.js 轉送的擴充功能內部訊息（window.postMessage 會被網頁自己的腳本讀到）。
+const toParent = (msg) => api.runtime.sendMessage({ type: "ig-to-content", id, msg }).catch?.(() => {});
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
 // 一般人用的示範題目（npm 網頁版保留工程題目）。
 const DEMOS = [
@@ -28,9 +29,17 @@ let site = "", goal = "", waiting = false;
 let nonce = "";        // 目前顯示的生成工作的識別碼（放棄時只取消這一個）
 let cliBusy = false;   // 本機 CLI 生成中：縮小、換對話都保留面板
 let shown = "idle";    // 畫面狀態：idle | card | waiting | galaxy | failed
+let pendingGoal = "";  // 本機 CLI 生成中，輸入框又打了新問題：生成完再問要不要換
+let lastFailed = "";   // 目前顯示的失敗原因（同樣的通知不重畫，貼上 JSON 的卡片才不會被關掉）
+const CLI_GOAL_MAX = 4000; // 本機 CLI 接受的問題長度上限（apps/cli/src/server.mjs）
+const dropped = new Set(); // 改用本機生成後不再理會的網頁 run
 
 async function cliAlive() {
   try { return (await fetch(`${CLI}/api/galaxy`, { signal: AbortSignal.timeout(800) })).ok; } catch { return false; }
+}
+/** 本機 CLI 最近一次生成的星系（不分對話；只在問題相同或使用者明確要求時才拿來用）。 */
+async function cliLatest() {
+  try { const cur = await (await fetch(`${CLI}/api/galaxy`, { signal: AbortSignal.timeout(800) })).json(); return cur?.analysis ? cur : null; } catch { return null; }
 }
 
 /** 面板中央的說明卡；actions 為 [label, handler, primary?]。 */
@@ -67,13 +76,14 @@ function setStrip(text, buttons = [], note = "") {
 }
 const resetJob = () => { toParent({ type: "intent-reset", nonce }); nonce = ""; waiting = false; shown = "idle"; setStrip(""); };
 
-function showGalaxy(analysis, g, { adopt = false } = {}) {
+function showGalaxy(analysis, g, { adopt = false, galaxyId = 0 } = {}) {
   // 先驗證：格式不對時保留原本的等待／失敗提示條與按鈕。
-  if (!galaxy.setGalaxy(analysis, { goal: g || goal })) { galaxy.showMessage("星系格式不完整，請再生成一次，或貼上修正後的 JSON"); return false; }
+  if (!galaxy.setGalaxy(analysis, { goal: g || goal, galaxyId })) { galaxy.showMessage("星系格式不完整，請再生成一次，或貼上修正後的 JSON"); return false; }
   hideCard();
   goal = g || goal;
   waiting = false;
   shown = "galaxy";
+  lastFailed = "";
   setStrip("");
   galaxy.showMessage(goal ? `這是「${goal.slice(0, 40)}」的星系。按 1／2／3 選方案，再按 Enter 填回對話框。` : "");
   if (adopt) toParent({ type: "intent-adopt", analysis, goal, nonce });
@@ -91,6 +101,7 @@ function showPaste() {
       let obj = null;
       try { obj = at >= 0 ? JSON.parse(text.slice(at, text.lastIndexOf("}") + 1)) : null; } catch { obj = null; }
       if (obj && showGalaxy(obj, goal, { adopt: true })) { lastPaste = ""; nonce = ""; return; }
+      if (obj && shown === "galaxy") return; // 格式不完整：showGalaxy 已在畫面上說明，原本的星系保留
       showCard("讀不到星系", "貼上的內容不是完整的星系 JSON。請確認從 { 開頭複製到最後的 }。", [["再貼一次", showPaste, true]]);
     }, true], ["取消", () => {}]]);
   const area = document.getElementById("paste");
@@ -102,15 +113,25 @@ function showCliFailed() {
   shown = "failed";
   setStrip("⚠ 本機 AI 沒有產出可用的星系", [["重試（本機）", () => { setStrip(""); spawnViaCli().catch(cliError); }], ["改用網頁上的 AI", () => confirmChat()]]);
 }
-const cliError = (err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message });
+const cliError = (err) => { galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }); galaxy.showMessage(err.message); };
 
 async function spawnViaCli() {
+  // 太長的問題本機 CLI 不收（會一直回 400）：改用網頁上的 AI。
+  if (goal.length > CLI_GOAL_MAX) return confirmChat();
   cliBusy = true;
   toParent({ type: "intent-busy", busy: true });
+  // 換成本機生成：前一個網頁 run 的提示條與識別碼不再適用，它之後的通知也不再顯示（不會蓋掉本機的星系）。
+  if (nonce) dropped.add(nonce);
+  nonce = ""; waiting = false; lastFailed = ""; pendingGoal = "";
+  setStrip("");
   try {
     galaxy.beginStream(goal);
     shown = "waiting";
     const res = await fetch(`${CLI}/api/spawn`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ goal }) });
+    if (!res.ok || !res.body) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.error ? `本機 CLI 拒絕：${err.error}` : `本機 CLI 回應 ${res.status}`);
+    }
     const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
     let buf = "";
     for (;;) {
@@ -123,14 +144,18 @@ async function spawnViaCli() {
         if (!line.trim()) continue;
         const ev = JSON.parse(line);
         galaxy.applyStreamEvent(ev);
-        // 本機 CLI 生成完成：記成這個對話的結果，重新打開時直接顯示，不必再跑一次。
-        if (ev.t === "repaired" && galaxy.analysis) { shown = "galaxy"; toParent({ type: "intent-adopt", analysis: galaxy.analysis, goal }); }
+        // 本機生成的結果由本機 CLI 保存（不寫進網站或擴充功能的記錄）；同一個問題再按 iG 時從 /api/galaxy 帶回來。
+        if (ev.t === "repaired" && galaxy.analysis) shown = "galaxy";
       }
     }
   } finally {
     cliBusy = false;
     if (shown === "waiting") showCliFailed();
     toParent({ type: "intent-busy", busy: false });
+    // 生成期間輸入框換了問題：現在才問要不要換。
+    const next = pendingGoal;
+    pendingGoal = "";
+    if (next && next !== goal) askNewQuestion(next);
   }
 }
 
@@ -165,12 +190,16 @@ function updateWaiting(elapsedSec, unsent) {
   if (t && !unsent) t.textContent = `⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`;
 }
 function showFailed(detail) {
+  // 同樣的失敗再通知一次（例如另一個分頁也讀到）：不重畫，使用者開著的「貼上 JSON」卡片不會被關掉。
+  if (shown === "failed" && detail === lastFailed && !card.hidden) return;
   hideCard();
   waiting = false;
   shown = "failed";
+  lastFailed = detail;
   galaxy.showMessage(detail);
   // 沒有對應的工作（例如提示詞根本沒放進輸入框）時，不提供「放棄」，避免刪到這個對話其他的記錄。
-  const actions = [["重新生成", () => { if (nonce) resetJob(); confirmChat(); }], ["貼上 JSON", showPaste]];
+  // 「重新生成」先只開確認卡片；按「開始生成」才取消舊的 run，按「返回」一切照舊（還能貼上 JSON）。
+  const actions = [["重新生成", () => confirmChat([["返回", () => {}]], () => { if (nonce) resetJob(); })], ["貼上 JSON", showPaste]];
   if (nonce) actions.push(["放棄", resetJob]);
   setStrip(`⚠ ${detail}`, actions);
 }
@@ -182,26 +211,33 @@ function spawnViaChat() {
   startWaiting(goal, 0, true);
 }
 
-function confirmChat(extra = []) {
+function confirmChat(extra = [], beforeStart = null) {
   const g = goal; // 卡片開著時畫面可能換成別的星系：送出的永遠是卡片上寫的這個問題
   showCard(`用 ${site} 生成星系`,
     `目標：<b>${esc(goal)}</b><br><br>`
       + "我會把一段分析提示詞放進這個對話的輸入框，<b>由你按送出</b>；AI 回覆後自動畫出星系。對話裡的提示詞和 JSON 會自動折疊成一行，點一下可以展開。<br>"
       + "<small>⏱ 一般模型約 1–3 分鐘；推理型高階模型（如 ChatGPT Pro、Thinking、Gemini Pro）可能要 5–15 分鐘，想快一點可以先在網頁上切換到一般模型。<br>"
       + "不想讓提示詞出現在對話裡？在終端機執行 <code>npx @stephen.taipei/intent-galaxy</code>，改用本機的 AI 生成。</small>",
-    [["開始生成", () => { goal = g; spawnViaChat(); }, true], ...extra, ...demoActions()]);
+    [["開始生成", () => { beforeStart?.(); goal = g; spawnViaChat(); }, true], ...extra, ...demoActions()]);
 }
 
 /** 這個對話已生成的星系，附「重新生成」（例如換了模型想再問一次）。 */
 function showDone(job) {
   if (!showGalaxy(job.analysis, job.goal)) return;
   nonce = job.nonce ?? "";
-  setStrip("這是這個對話已生成的星系", [["重新生成", () => confirmChat([["回到星系", () => showDone(job)]])]]);
+  // 「回到星系」只關掉卡片：星系一直在下面，已選的方案和節點立場都保留。
+  setStrip("這是這個對話已生成的星系", [["重新生成", () => { const g = goal; confirmChat([["回到星系", () => { goal = g; }]]); }]]);
 }
 
 /** 新問題：本機 CLI 在線就直接生成（ask 時先確認），否則請網頁上的 AI。 */
-async function generate(back = [], ask = false) {
+async function generate(back = [], ask = false, reuse = true) {
   if (!(await cliAlive())) return confirmChat(back);
+  // 本機 CLI 最近生成的就是這個問題（例如鎖定後想再調整）：直接顯示，不重跑。
+  const cur = reuse ? await cliLatest() : null;
+  if (cur && cur.goal === goal && showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })) {
+    return setStrip("這是本機已生成的星系", [["重新生成", () => { const g = goal; generate([["回到星系", () => { goal = g; }]], true, false); }]]);
+  }
+  if (goal.length > CLI_GOAL_MAX) return confirmChat(back);
   if (!ask) return spawnViaCli().catch(cliError);
   const g = goal;
   showCard("用本機 AI 生成星系", `目標：<b>${esc(g)}</b><br><br>本機的 Intent Galaxy 正在執行，會用它生成（不會出現在對話裡）。`,
@@ -213,15 +249,17 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
   galaxy.focus();
   // 縮小後叫回來：保留畫面（勾選的方案、等待進度）；只有出現新問題或狀態已改變時才換。
   if (reopen) {
-    if (cliBusy) return;
-    if (job?.status === "done" && (shown === "waiting" || shown === "idle")) return showDone(job);
+    // 本機 CLI 生成中：先記下新問題，生成完再問。
+    if (cliBusy) {
+      if (text && text !== goal) { pendingGoal = text; galaxy.showMessage("本機正在生成上一個問題；完成後會問你要不要換成輸入框的新問題。"); }
+      return;
+    }
+    if (job?.status === "done" && (shown === "waiting" || shown === "idle") && (!text || text === job.goal)) return showDone(job);
     if (shown === "galaxy" || shown === "waiting" || shown === "card") {
       if (!text || text === goal) return;
       if (shown === "card") { goal = text; return generate([], true); }
-      if (shown === "waiting") return askWhileWaiting(job ?? { goal }, text);
-      const current = galaxy.analysis, currentGoal = goal;
-      return showCard("輸入框有新的問題", `「${esc(text)}」<br><br>要用它重新生成星系，還是留在目前這個星系？`,
-        [["用新問題生成", () => { goal = text; generate([["回到剛才的星系", () => showGalaxy(current, currentGoal)]]); }, true], ["留在目前的星系", () => {}]]);
+      if (shown === "waiting") return askWhileWaiting(job ?? { goal, nonce }, text);
+      return askNewQuestion(text);
     }
   }
   goal = text;
@@ -238,32 +276,38 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
   if (goal) return generate(job?.status === "done" && job.analysis ? [["回到上一個星系", () => showDone(job)]] : [], reopen);
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
   if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在決定的是[:：]\s*/, "") ?? "");
-  // 3. 本機 CLI 在線且有最近生成的星系：直接顯示（本機生成的結果不在對話裡，由本機 CLI 保存）。
-  if (await cliAlive()) {
-    const cur = await fetch(`${CLI}/api/galaxy`).then((r) => r.json()).catch(() => null);
-    if (cur?.analysis && showGalaxy(cur.analysis, cur.goal ?? "")) return;
-  }
+  // 3. 本機 CLI 有最近生成的星系：不分對話，所以不自動顯示，只提供按鈕（可能是別的網站或 Claude Code 的決策）。
+  const cur = await cliLatest();
+  const local = cur ? [[`載入本機最近的星系：${cur.goal.slice(0, 20)}${cur.goal.length > 20 ? "…" : ""}`, () => showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })]] : [];
   showCard("先寫下你要決定的事",
     "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>"
       + "星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。",
-    demoActions());
+    [...demoActions(), ...local]);
+}
+
+/** 星系開著時輸入框換了問題：問要不要用新問題重來；「回到」只關卡片，原本的星系與已選方案都保留。 */
+function askNewQuestion(text) {
+  const currentGoal = goal;
+  showCard("輸入框有新的問題", `「${esc(text)}」<br><br>要用它重新生成星系，還是留在目前這個星系？`,
+    [["用新問題生成", () => { goal = text; generate([["回到剛才的星系", () => { goal = currentGoal; }]]); }, true], ["留在目前的星系", () => {}]]);
 }
 
 function askWhileWaiting(job, newText) {
   showCard("上一個問題還在等 AI 回覆",
     `正在等：<b>${esc(job.goal)}</b><br>AI 回完之前，網站通常不接受新訊息。要繼續等，還是放棄它、改問新的問題？`,
-    // 卡片開著時 AI 可能已回完（畫面已換成星系或失敗）：那時「繼續等待」只關掉卡片。
-    [["繼續等待", () => { if (shown === "waiting") startWaiting(job.goal, job.elapsedSec ?? 0, job.unsent); }, true], ["放棄並改問新問題", () => { resetJob(); goal = newText; generate(); }]]);
+    // 卡片開著時 AI 回完會換成星系或失敗並關掉卡片；按得到「繼續等待」就表示還在等（除非在別的分頁取消了）。
+    [["繼續等待", () => { if (!job.nonce || nonce === job.nonce) { nonce = job.nonce ?? nonce; startWaiting(job.goal, job.elapsedSec ?? 0, job.unsent); } }, true],
+      ["放棄並改問新問題", () => { resetJob(); goal = newText; generate(); }]]);
 }
 
 api.runtime.onMessage.addListener((msg) => {
-  if (msg?.id !== id) return;
+  if (msg?.id !== id || msg.type === "ig-to-content" || (msg.nonce && dropped.has(msg.nonce))) return;
   if (msg.type === "ig-open") open(msg);
   if (msg.type === "ig-started") nonce = msg.nonce;
   if (msg.type === "ig-progress" && waiting) { if (msg.nonce) nonce = msg.nonce; updateWaiting(msg.elapsedSec, !!msg.unsent); }
   if (msg.type === "ig-reopen" && msg.job) { nonce = msg.job.nonce; startWaiting(msg.job.goal, msg.job.elapsedSec, msg.job.unsent); }
   if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
-  if (msg.type === "ig-reset") { waiting = false; nonce = ""; shown = "idle"; setStrip(""); galaxy.showMessage("這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。"); }
+  if (msg.type === "ig-reset" && (!msg.nonce || msg.nonce === nonce)) { waiting = false; nonce = ""; shown = "idle"; lastFailed = ""; setStrip(""); galaxy.showMessage("這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。"); }
   if (msg.type === "ig-chat-error") {
     if (msg.nonce !== undefined && msg.failed) nonce = msg.nonce;
     if (msg.failed || !waiting) showFailed(msg.detail);

@@ -4,11 +4,28 @@
 // 每次「用網頁上的 AI 生成」都是一筆 run：提示詞結尾帶唯一識別碼 [ig:<nonce>]，記錄存在 storage（ig:run:<nonce>）。
 // 哪個對話有哪些 run，一律由「頁面上看得到哪些識別碼」決定，不靠網址：換對話、專案頁、暫時對話、新對話換網址都不必特別處理。
 (() => {
-  if (window.__intentGalaxyMounted) return;
+  // 擴充功能更新或重新載入後，舊的 content script 會失效（runtime 斷線）：那時允許新的一份接手。
+  if (window.__intentGalaxyMounted && window.__intentGalaxyAlive?.()) return;
   window.__intentGalaxyMounted = true;
 
   const api = globalThis.browser ?? globalThis.chrome;
-  const EXT_ORIGIN = new URL(api.runtime.getURL("")).origin;
+  const alive = () => { try { return !!api.runtime?.id; } catch { return false; } };
+  window.__intentGalaxyAlive = alive;
+  const INSTANCE = crypto.randomUUID(); // 這個分頁的 content script；只有送出提示詞的分頁能判定逾時
+  const timers = [];
+  let dead = false;
+  /** 擴充功能已失效：停掉所有計時器與監聽，移除按鈕與面板，讓重新注入的新版接手。 */
+  function teardown() {
+    if (dead) return;
+    dead = true;
+    timers.forEach(clearInterval);
+    observer?.disconnect();
+    document.getElementById(PILL_ID)?.remove();
+    document.querySelector("intent-galaxy-frame")?.remove();
+    if (window.__intentGalaxyToggle === togglePanel) delete window.__intentGalaxyToggle;
+    window.__intentGalaxyMounted = false;
+  }
+  const every = (ms, fn) => timers.push(setInterval(() => { if (!alive()) return teardown(); fn(); }, ms));
   const PILL_ID = "intent-galaxy-mod-pill";
 
   // 各站輸入框選擇器，依序嘗試；全部失敗時退回頁面上最後一個可見的 contenteditable / textarea。
@@ -60,6 +77,7 @@
     btn.title = "Intent Galaxy：把輸入框裡的目標展開成星系，選好方案後填回對話框（Cmd/Ctrl+Shift+G）";
     btn.dataset.kind = kind;
     btn.dataset.state = pillState();
+    btn.dataset.owner = INSTANCE; // 舊版（已失效）留下的按鈕會被換掉
     btn.style.cssText = "all:unset; box-sizing:border-box; cursor:pointer; font:600 11.5px/1 -apple-system,BlinkMacSystemFont,sans-serif; padding:5px 9px; margin:0 4px; border-radius:6px; color:#fff;"
       + " background:linear-gradient(135deg,rgba(56,189,248,.35),rgba(168,85,247,.35)); border:1px solid #38bdf8; box-shadow:0 0 10px rgba(56,189,248,.25); white-space:nowrap;"
       + (kind === "floating" ? " position:fixed; bottom:18px; right:18px; z-index:2147483646; font-size:13px; padding:9px 14px; border-radius:999px; background:linear-gradient(135deg,#0ea5e9,#8b5cf6);" : "");
@@ -67,21 +85,29 @@
     return btn;
   }
 
-  function mountPill() {
+  let lastMountCheck = 0;
+  function mountPill(force = false) {
+    if (dead) return;
+    const current = document.getElementById(PILL_ID);
+    // 串流時 DOM 每個畫格都在變：按鈕還在、狀態沒變時，最多每秒重新找一次掛載點。
+    if (!force && current?.isConnected && current.dataset.state === pillState() && current.dataset.owner === INSTANCE && Date.now() - lastMountCheck < 1000) return;
+    lastMountCheck = Date.now();
     const editor = findEditor();
     const mount = findMount(editor);
     const existing = document.getElementById(PILL_ID);
-    if (existing && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
+    if (existing && existing.dataset.owner === INSTANCE && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
     existing?.remove();
     mount.parent.insertBefore(makePill(mount.kind), mount.before);
   }
 
-  let scheduled = false;
-  new MutationObserver(() => {
+  let scheduled = false, domDirty = true;
+  const observer = new MutationObserver(() => {
+    domDirty = true;
     if (scheduled) return;
     scheduled = true;
-    requestAnimationFrame(() => { scheduled = false; mountPill(); });
-  }).observe(document.body, { childList: true, subtree: true });
+    requestAnimationFrame(() => { scheduled = false; if (!alive()) return teardown(); mountPill(); });
+  });
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 
   // ── 狀態 ──
   // run 記錄：{ nonce, goal, status: "waiting" | "done" | "failed", startedAt, sentAt, owner, beat, unsent, analysis?, detail?, adopted? }
@@ -89,14 +115,17 @@
   let localRun = null;         // 這個分頁剛送出的 run（識別碼可能還在輸入框或還沒畫出）
   const cache = new Map();     // nonce → 記錄
   let frame = null, panel = null, panelId = "", panelPath = "", panelNonce = "", panelBusy = false, targetEditor = null, openGoal = "";
-  const INSTANCE = crypto.randomUUID(); // 這個分頁的 content script；只有送出提示詞的分頁能判定逾時
   const frameVisible = () => !!frame && !frame.hidden;
   const pillState = () => `${current?.status ?? "idle"}${current?.unsent ? "-unsent" : ""}-${frameVisible() ? "open" : "closed"}`;
   const UI_KEY = "ig:ui";
   const RUN_PREFIX = "ig:run:";
   const MAX_RUNS = 100;
   const runKey = (nonce) => `${RUN_PREFIX}${nonce}`;
+  // 無痕視窗、ChatGPT 暫時對話：記錄只留在記憶體，不寫進磁碟。
+  const ephemeral = () => !!api.extension?.inIncognitoContext || new URLSearchParams(location.search).has("temporary-chat");
   const store = api.storage?.local;
+  const RUN_TTL_MS = 30 * 24 * 3600_000; // run 記錄保存 30 天
+  let anyRuns = false;                    // storage 裡有沒有任何 run（沒有就不必掃描頁面）
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const selfWrites = new Map(); // 這個分頁自己剛寫的 key → 內容；storage.onChanged 看到時略過
   async function save(key, value) {
@@ -104,7 +133,7 @@
     try { await (value == null ? store.remove(key) : store.set({ [key]: value })); } catch { /* 無 storage 權限或配額已滿時只保留在記憶體 */ }
   }
   async function loadMany(keys) { try { return await store.get(keys); } catch { return {}; } }
-  const saveRun = (run) => { cache.set(run.nonce, run); return save(runKey(run.nonce), run); };
+  const saveRun = (run) => { cache.set(run.nonce, run); anyRuns = true; return run.ephemeral ? Promise.resolve() : save(runKey(run.nonce), run); };
 
   const PROBE = "INTENT-SPAWNER";     // 提示詞開頭的固定字串
   const AST_HEAD = "# LOCKED INTENT AST";
@@ -112,16 +141,24 @@
   const tagOf = (nonce) => `[ig:${nonce}]`;
 
   function editorText(el) { return el ? ("value" in el && el.tagName !== "DIV" ? el.value : el.innerText).trim() : ""; }
+  let lastAst = ""; // 這個分頁上次填回的 AST 原文：再次鎖定時精確移除它，其餘都是使用者自己打的字
+  // 填回的 AST 每一行的樣子（找不到上次原文時的備援判斷）
+  const AST_LINE = /^(# LOCKED INTENT AST|> |## \d+\. |- \[N\d{1,2}\] |- 放棄|- .+·.+)/;
   /** 輸入框內容拆成：使用者的問題（AST 之前）、AST 之後另外打的字。擴充功能放進去的提示詞不算使用者的字。 */
   function userParts(el) {
-    const t = editorText(el);
+    const t = editorText(el).replace(/\r/g, "");
     if (t.includes(PROBE)) return { before: "", after: "" };
+    const exact = lastAst && t.indexOf(lastAst.trim());
+    if (lastAst && exact >= 0) {
+      return { before: t.slice(0, exact).trim(), after: t.slice(exact + lastAst.trim().length).trim().replace(/^補充：/, "").trim() };
+    }
     const at = t.indexOf(AST_HEAD);
     if (at < 0) return { before: t, after: "" };
-    // AST 之後：去掉 AST 本身（到最後一個 AST 段落為止的連續非空行），剩下的是使用者後來補打的。
-    const rest = t.slice(at).split(/\n\s*\n/);
-    const tail = rest.slice(1).filter((p) => !/^(>|##|- |# )/.test(p.trim())).join("\n\n");
-    return { before: t.slice(0, at).trim(), after: tail.replace(/^補充：/, "").trim() };
+    // 逐行判斷：AST 的行一直吃到第一個「不像 AST」的非空行為止，之後全部算使用者補打的。
+    const lines = t.slice(at).split("\n");
+    let i = 0;
+    while (i < lines.length && (lines[i].trim() === "" || AST_LINE.test(lines[i].trim()))) i++;
+    return { before: t.slice(0, at).trim(), after: lines.slice(i).join("\n").trim().replace(/^補充：/, "").trim() };
   }
   const userText = (el) => userParts(el).before;
 
@@ -152,7 +189,13 @@
   }
 
   /** 面板屬於這個頁面嗎：同一個網址，或它顯示的 run 的識別碼在這個頁面上。 */
-  const panelBelongsHere = () => panelPath === location.pathname || (!!panelNonce && pageNonces().has(panelNonce));
+  /** 面板屬於這個頁面嗎：綁定 run 時以識別碼為準（頁面上、輸入框裡，或剛送出還沒畫出）；沒綁定時看網址。 */
+  function panelBelongsHere() {
+    if (!panelNonce) return panelPath === location.pathname;
+    const t = tags();
+    return t.page.some((x) => x.nonce === panelNonce) || t.editor.has(panelNonce)
+      || (localRun?.nonce === panelNonce && localRun.unsent && localRun.pathFrom === location.pathname);
+  }
 
   async function openPanel() {
     if (frame && !panelBelongsHere() && !panelBusy) closePanel();
@@ -306,7 +349,7 @@
 
   function closePanel() {
     frame?.remove();
-    frame = null; panel = null; panelPath = ""; panelNonce = ""; panelBusy = false;
+    frame = null; panel = null; panelPath = ""; panelNonce = ""; panelBusy = false; panelMissingSince = 0;
     mountPill();
     targetEditor?.isConnected && targetEditor.focus();
   }
@@ -394,11 +437,14 @@
     return out;
   }
 
+  // 不是對話內容的文字：網站的 script（常含 hydration 資料）、style 等，讀頁面時一律略過。
+  const NON_CONTENT = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"]);
+  const contentText = { acceptNode: (t) => (NON_CONTENT.has(t.parentElement?.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) };
   const isEditorNode = (n) => !!n.parentElement?.closest('[contenteditable="true"], textarea, intent-galaxy-frame');
   /** 頁面上的識別碼（依文件順序，每個只取第一次出現的文字節點）與輸入框裡的識別碼。 */
   function scanTags() {
     const page = [], seen = new Set(), editor = new Set();
-    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, contentText);
     let n;
     while ((n = walker.nextNode())) {
       if (!n.data.includes("[ig:")) continue;
@@ -410,23 +456,24 @@
     for (const el of document.querySelectorAll("textarea")) for (const m of el.value.matchAll(TAG_RE)) editor.add(m[1]);
     return { page, editor };
   }
-  let tagCache = { at: 0, tags: { page: [], editor: new Set() } };
-  const tags = (fresh = false) => (fresh || Date.now() - tagCache.at > 1000 ? (tagCache = { at: Date.now(), tags: scanTags() }) : tagCache).tags;
+  let tagCache = { page: [], editor: new Set() };
+  /** 頁面沒有變動就沿用上次的掃描結果（輸入框 textarea 的值不會觸發 DOM 變動，所以另外比對）。 */
+  let lastTextareas = "";
+  function tags() {
+    const ta = [...document.querySelectorAll("textarea")].map((el) => el.value.length).join(",");
+    if (domDirty || ta !== lastTextareas) { domDirty = false; lastTextareas = ta; tagCache = scanTags(); }
+    return tagCache;
+  }
   const pageNonces = () => new Set(tags().page.map((t) => t.nonce));
 
-  const inRange = (el, from, to) => !!(from.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) && (!to || !!(to.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING));
-  /** from 節點之後（到下一個 run 的識別碼之前）的星系：程式碼區塊讀 textContent（收合的部分也讀得到），再以整頁文字補漏。 */
-  function galaxiesBetween(from, to, tag, nextTag) {
-    const found = [];
-    for (const el of document.querySelectorAll("pre, code:not(pre code)")) if (inRange(el, from, to)) found.push(...galaxiesIn(el.textContent));
-    let text = document.body.innerText;
-    const at = text.indexOf(tag);
-    if (at >= 0) {
-      text = text.slice(at);
-      if (nextTag) { const end = text.indexOf(nextTag); if (end > 0) text = text.slice(0, end); }
-      found.push(...galaxiesIn(text));
-    }
-    return found;
+  /** from 節點之後（到下一個 run 的識別碼之前）的星系。只讀這一段的文字節點（含收合的程式碼、不含 script），不讀整頁。 */
+  function galaxiesBetween(from, to) {
+    if (!from.isConnected) return [];
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, contentText);
+    walker.currentNode = from;
+    let text = "", n;
+    while ((n = walker.nextNode()) && n !== to) text += isEditorNode(n) ? "" : n.data;
+    return galaxiesIn(text);
   }
   function latestGalaxy() {
     const found = [];
@@ -508,8 +555,9 @@
   const isOwner = (r) => r.owner === INSTANCE || Date.now() - (r.beat ?? 0) > STALE_OWNER_MS;
   const lastSeen = new Map();     // nonce → 上一次讀到的 JSON（連續兩次相同才算完成）
 
-  async function failRun(run, detail) {
-    Object.assign(run, { status: "failed", detail, unsent: false });
+  async function failRun(run, detail, failedKey = "") {
+    if (run.status === "failed" && run.detail === detail && run.failedKey === failedKey) return; // 同樣的失敗不重複通知
+    Object.assign(run, { status: "failed", detail, unsent: false, failedKey });
     await saveRun(run);
     toPanel(run.nonce, { type: "ig-chat-error", detail, failed: true });
   }
@@ -517,7 +565,7 @@
   async function finishRun(run, analysis) {
     let repaired = null;
     try { repaired = (await core()).repairAnalysis(analysis); } catch { /* 載入失敗時交給面板再驗一次 */ }
-    if (repaired && !repaired.ok) return failRun(run, `AI 回覆的星系 JSON 不完整（${repaired.findings.at(-1)?.msg ?? "格式錯誤"}）。可以重新生成，或請 AI 修正後貼上。`);
+    if (repaired && !repaired.ok) return failRun(run, `AI 回覆的星系 JSON 不完整（${repaired.findings.at(-1)?.msg ?? "格式錯誤"}）。可以重新生成，或請 AI 修正後貼上。`, JSON.stringify(analysis));
     Object.assign(run, { status: "done", analysis, detail: "", unsent: false });
     await saveRun(run);
     toPanel(run.nonce, { type: "ig-galaxy", analysis, goal: run.goal });
@@ -527,17 +575,24 @@
   async function checkRun(run, anchor, next, editorHas, immediate) {
     const now = Date.now();
     if (run.unsent) {
-      if (anchor) { Object.assign(run, { unsent: false, sentAt: now, pathTo: location.pathname }); await saveRun(run); toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) }); }
+      if (anchor) {
+        // 已送出：從現在起算等待時間；送出網址只在識別碼畫出前用得到，之後不再保存。
+        Object.assign(run, { unsent: false, sentAt: now });
+        delete run.pathFrom;
+        await saveRun(run);
+        toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) });
+      }
       else if (editorHas) run.lostSince = 0;
       else if (isOwner(run) && now - (run.lostSince ||= now) > UNSENT_GRACE_MS) return failRun(run, "提示詞沒有送出（輸入框裡已經沒有它）。可以重新生成。");
       if (!anchor) return toPanel(run.nonce, { type: "ig-progress", elapsedSec: 0, unsent: true });
     }
     if (!anchor) return;
-    const tag = tagOf(run.nonce);
-    const fresh = galaxiesBetween(anchor.node, next?.node, tag, next ? tagOf(next.nonce) : "").at(-1);
+    const fresh = galaxiesBetween(anchor.node, next?.node).at(-1);
     if (fresh && run.status !== "done") {
       // 連續兩次讀到相同的 JSON 才視為回覆完成，避免拿到串流中途的片段（面板打開時或已判失敗的不必等）。
+      // 已因這份 JSON 判定失敗的 run，只有讀到不同的 JSON（例如請 AI 修正後）才重試。
       const key = JSON.stringify(fresh);
+      if (run.status === "failed" && key === run.failedKey) return;
       if (immediate || run.status === "failed" || lastSeen.get(run.nonce) === key) { lastSeen.delete(run.nonce); return finishRun(run, fresh); }
       lastSeen.set(run.nonce, key);
       return;
@@ -552,10 +607,14 @@
 
   /** 讀頁面、更新 current、檢查等待中的 run。immediate：面板打開時，看到完整 JSON 就直接收下。 */
   let refreshing = null;
+  const lastChecked = new Map(); // nonce → 上次檢查失敗 run 的時間
+  let panelMissingSince = 0;
   async function refresh(immediate = false) {
     if (refreshing) return refreshing;
+    if (dead || (!immediate && document.hidden)) return; // 背景分頁不掃描；回到前景時補一次
+    if (!anyRuns && !localRun) { if (current) { current = null; mountPill(); } return; } // 從沒用過：不必掃描頁面
     refreshing = (async () => {
-      const { page, editor } = tags(true);
+      const { page, editor } = tags();
       const missing = page.map((t) => t.nonce).filter((n) => !cache.has(n));
       if (missing.length) {
         const got = await loadMany(missing.map(runKey));
@@ -564,13 +623,17 @@
       const onPage = page.filter((t) => cache.has(t.nonce));
       // 這個頁面的 run：頁面上最後一個有記錄的識別碼；這個分頁剛送出的 run 若還在輸入框或剛送出，優先。
       // 剛送出、識別碼還沒畫出的寬限只在送出的那個網址（或送出後新對話換成的網址）有效；使用者換到別的對話就不算。
-      const atSendPath = localRun && [localRun.pathFrom, localRun.pathTo].includes(location.pathname);
+      const atSendPath = localRun?.unsent && localRun.pathFrom === location.pathname;
       const local = localRun && (editor.has(localRun.nonce) || onPage.some((t) => t.nonce === localRun.nonce)
         || (atSendPath && Date.now() - (localRun.sentAt ?? localRun.startedAt) < RENDER_GRACE_MS)) ? localRun : null;
       current = local ?? (onPage.length ? cache.get(onPage.at(-1).nonce) : null);
       for (let i = 0; i < onPage.length; i++) {
         const run = cache.get(onPage[i].nonce);
-        if (run.status !== "done") await checkRun(run, onPage[i], page[page.indexOf(onPage[i]) + 1], editor.has(run.nonce), immediate);
+        if (run.status === "done") continue;
+        // 已失敗的 run 只在打開面板時或每 30 秒重查一次（AI 可能事後補了正確的 JSON）。
+        if (run.status === "failed" && !immediate && Date.now() - (lastChecked.get(run.nonce) ?? 0) < 30_000) continue;
+        lastChecked.set(run.nonce, Date.now());
+        await checkRun(run, onPage[i], page[page.indexOf(onPage[i]) + 1], editor.has(run.nonce), immediate);
       }
       // 還沒送出（或送出後還沒畫出）的 run 不在頁面上：仍要檢查它是否被清掉。
       if (localRun?.unsent && !onPage.some((t) => t.nonce === localRun.nonce)) await checkRun(localRun, null, null, editor.has(localRun.nonce), immediate);
@@ -579,6 +642,11 @@
         localRun = null;
       }
       cloakRuns(onPage);
+      // 網址沒變，面板顯示的 run 卻從頁面消失（例如 ChatGPT 暫時對話開了新對話，網址一直是 /）：
+      // 超過寬限就關閉，避免把別的對話的方案填進來。換網址的情況由 onPathChange 處理。
+      if (frame && panelNonce && !panelBusy && panelPath === location.pathname && !panelBelongsHere()) {
+        if (Date.now() - (panelMissingSince ||= Date.now()) > RENDER_GRACE_MS) closePanel();
+      } else panelMissingSince = 0;
       mountPill();
     })().finally(() => { refreshing = null; });
     return refreshing;
@@ -586,10 +654,11 @@
 
   // 有等待中的 run 時每 1.5 秒讀一次頁面；沒有時每 5 秒輕量檢查（換對話、別的分頁送出的 run 出現在頁面上）。
   let lastRefresh = 0;
-  setInterval(() => {
+  every(1500, () => {
     const busy = current?.status === "waiting" || localRun;
     if (busy || Date.now() - lastRefresh > 5000) { lastRefresh = Date.now(); refresh(); }
-  }, 1500);
+  });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden && alive()) refresh(); });
 
   // ── 把提示詞放進輸入框（由使用者按送出）──
 
@@ -601,6 +670,7 @@
     if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { sendPanel({ type: "ig-chat-error", detail: "找不到這個網頁的輸入框，無法送出提示詞。", failed: true, nonce: "" }); return; }
     const now = Date.now();
     const run = { nonce, goal, status: "waiting", startedAt: now, owner: INSTANCE, beat: now, unsent: true, pathFrom: location.pathname };
+    if (ephemeral()) run.ephemeral = true; // 無痕視窗、暫時對話：不寫進 storage
     localRun = current = run;
     panelNonce = nonce;
     await saveRun(run);
@@ -628,22 +698,26 @@
     }
     if (frame && !panelBusy && panelPath !== location.pathname) closePanel();
   }
-  setInterval(() => { if (location.pathname !== lastPath) onPathChange(); }, 1000);
+  every(1000, () => { if (location.pathname !== lastPath) onPathChange(); });
   // 支援 Navigation API 的瀏覽器：站內換頁一完成就處理，不必等下一次輪詢。
   globalThis.navigation?.addEventListener?.("navigatesuccess", () => { if (location.pathname !== lastPath) onPathChange(); });
 
   // 其他分頁更新了 run（例如另一個分頁先讀到回覆）：同步並通知顯示它的面板。
   api.storage?.onChanged?.addListener((changes, area) => {
-    if (area !== "local") return;
+    if (area !== "local" || dead) return;
+    if (!alive()) return teardown();
+    let relevant = false;
     for (const [key, { newValue }] of Object.entries(changes)) {
       if (!key.startsWith(RUN_PREFIX)) continue;
       const mine = selfWrites.get(key);
       if (mine !== undefined && mine === JSON.stringify(newValue ?? null)) { selfWrites.delete(key); continue; }
+      if (newValue) anyRuns = true;
+      relevant = true;
       const nonce = key.slice(RUN_PREFIX.length);
       // 只處理這個頁面相關的 run（頁面上看得到它的識別碼，或是這個分頁剛送出的）。
       if (!(pageNonces().has(nonce) || localRun?.nonce === nonce)) { if (cache.has(nonce)) { if (newValue) cache.set(nonce, newValue); else cache.delete(nonce); } continue; }
       const prev = cache.get(nonce);
-      if (!newValue) { cache.delete(nonce); if (localRun?.nonce === nonce) localRun = null; toPanel(nonce, { type: "ig-reset" }); continue; }
+      if (!newValue) { cache.delete(nonce); if (localRun?.nonce === nonce) localRun = null; if (!pruning.has(key)) toPanel(nonce, { type: "ig-reset" }); continue; }
       if (prev && prev.status === newValue.status && prev.unsent === newValue.unsent) { Object.assign(prev, { beat: newValue.beat, owner: newValue.owner }); continue; } // 只是心跳
       const run = prev ? Object.assign(prev, newValue) : newValue;
       cache.set(nonce, run);
@@ -651,29 +725,43 @@
       else if (run.status === "failed") toPanel(nonce, { type: "ig-chat-error", detail: run.detail, failed: true });
       else toPanel(nonce, { type: "ig-reopen", job: runInfo(run) });
     }
-    refresh();
+    if (relevant) refresh();
   });
 
-  // 只保留最近 MAX_RUNS 筆 run 記錄；舊版（以網址為 key）的記錄一併清掉。
+  // 記錄整理：每天最多一次，刪掉超過 30 天或超過 MAX_RUNS 筆的 run，以及舊版（以網址為 key）的記錄。
+  const pruning = new Set(); // 整理時刪掉的 key：其他分頁不必顯示「已取消」
   (async () => {
     try {
-      const all = await store.get(null);
-      const legacy = Object.keys(all).filter((k) => k.startsWith("ig:job:"));
-      const runs = Object.entries(all).filter(([k]) => k.startsWith(RUN_PREFIX)).sort((a, b) => (b[1]?.startedAt ?? 0) - (a[1]?.startedAt ?? 0));
-      const drop = [...legacy, ...runs.slice(MAX_RUNS).map(([k]) => k)];
+      const keys = store.getKeys ? await store.getKeys() : Object.keys(await store.get(null));
+      anyRuns = keys.some((k) => k.startsWith(RUN_PREFIX));
+      const { "ig:pruneAt": pruneAt = 0 } = await store.get("ig:pruneAt");
+      if (Date.now() - pruneAt < 24 * 3600_000) return;
+      await store.set({ "ig:pruneAt": Date.now() });
+      const all = await store.get(keys.filter((k) => k.startsWith(RUN_PREFIX)));
+      const runs = Object.entries(all).sort((a, b) => (b[1]?.startedAt ?? 0) - (a[1]?.startedAt ?? 0));
+      const drop = [...keys.filter((k) => k.startsWith("ig:job:")), ...runs.filter(([, r], i) => i >= MAX_RUNS || Date.now() - (r?.startedAt ?? 0) > RUN_TTL_MS).map(([k]) => k)];
+      drop.forEach((k) => pruning.add(k));
       if (drop.length) await store.remove(drop);
     } catch { /* 沒有 storage 權限 */ }
-  })();
-  refresh();
+  })().finally(() => refresh());
 
   // ── 面板傳來的動作 ──
-  window.addEventListener("message", async (e) => {
-    if (e.origin !== EXT_ORIGIN || !panel || e.source !== panel.contentWindow || e.data?.id !== panelId) return;
-    const msg = e.data;
+  // 面板經由擴充功能內部訊息（background.js 轉送到這個分頁）傳來；不用 window.postMessage，網頁腳本讀不到問題與星系。
+  api.runtime.onMessage.addListener((m) => {
+    if (m?.type !== "ig-to-content" || !panel || m.id !== panelId || !m.msg) return;
+    if (!alive()) return teardown();
+    onPanelMessage(m.msg);
+  });
+  async function onPanelMessage(msg) {
     if (msg.type === "intent-close") minimizePanel();
     if (msg.type === "intent-busy") {
       panelBusy = !!msg.busy;
-      if (!panelBusy && frame && !panelBelongsHere()) closePanel(); // 本機 CLI 跑完了，面板屬於別的對話（結果仍留在本機 CLI，可再開）
+      // 本機 CLI 跑完了，面板屬於別的對話：縮小中就關掉（結果仍留在本機 CLI，可再開）；
+      // 使用者已在這個對話叫回來、正看著它，就留下，視為帶到這個對話。
+      if (!panelBusy && frame && !panelBelongsHere()) {
+        if (frame.hidden) closePanel();
+        else { panelPath = location.pathname; panelNonce = ""; }
+      }
     }
     if (msg.type === "intent-chat-spawn" && typeof msg.prompt === "string") {
       if (panelBelongsHere()) startRun(String(msg.goal ?? ""), msg.prompt);
@@ -687,6 +775,8 @@
     // 放棄：只取消面板看到的那一個等待中／失敗的 run；已完成的星系不會被刪。
     if (msg.type === "intent-reset" && msg.nonce) {
       const run = cache.get(msg.nonce);
+      // 還沒送出：把輸入框裡的提示詞換回原本的問題，使用者才能直接打新問題。
+      if (localRun?.nonce === msg.nonce && localRun.unsent) restoreEditor(localRun.nonce, localRun.goal);
       if (localRun?.nonce === msg.nonce) localRun = null;
       if (!run || run.status !== "done") {
         cache.delete(msg.nonce);
@@ -704,9 +794,25 @@
       const extra = [before !== goal ? before : "", after].filter(Boolean).join("\n");
       const text = [goal, msg.ast, extra ? `補充：${extra}` : ""].filter(Boolean).join("\n\n");
       closePanel();
+      lastAst = String(msg.ast ?? "");
       if (!writeToEditor(editor, text, "LOCKED INTENT AST")) navigator.clipboard?.writeText(text).catch(() => {});
     }
-  });
+  }
+
+  /** 輸入框還有這個 run 的提示詞時，清掉並放回原本的問題。 */
+  function restoreEditor(nonce, goal) {
+    const editor = targetEditor?.isConnected ? targetEditor : findEditor();
+    if (!editor || !editorText(editor).includes(tagOf(nonce))) return;
+    if (editor instanceof HTMLTextAreaElement || editor instanceof HTMLInputElement) { writeToEditor(editor, goal, goal); return; }
+    editor.focus();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    document.execCommand("delete");
+    if (goal) writeToEditor(editor, goal, goal);
+  }
 
   mountPill();
 

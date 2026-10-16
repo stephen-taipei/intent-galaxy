@@ -147,7 +147,8 @@ export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths =
         const file = path.join(lockDir, ".intent.lock.json");
         fs.writeFileSync(file, JSON.stringify(lock, null, 2) + "\n");
         log(`locked ${lock.specHash.slice(0, 12)} → ${file}`);
-        const waiter = lockWaiters.get(body.galaxyId) ?? (current && lockWaiters.get(current.id));
+        // 只解開「同一個星系」的等待：其他來源（例如瀏覽器擴充功能鎖定網頁 AI 生成的星系）不可回覆給正在等的 MCP 呼叫。
+        const waiter = lockWaiters.get(body.galaxyId);
         if (waiter) waiter(lock);
         return json(res, 200, { ok: true, file, specHash: lock.specHash, auditDueAt: lock.auditDueAt, ast: lock.payload.ast, hookInstalled: lock.hookInstalled });
       }
