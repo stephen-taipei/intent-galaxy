@@ -1,16 +1,25 @@
 // 擴充功能星系面板（iframe 內，擴充功能來源）：生成或載入星系，Enter 後把 AST 交回 content script。
 // 生成來源：本機 CLI 在線就交給它（不出現在對話裡）；否則請當前網頁的 AI 在對話中產生星系 JSON。
+// 重新打開時：這個對話已生成（或正在生成）的星系優先顯示，不必重問。
 import "./galaxy/apps/web/galaxy-overlay.js";
-import { SAMPLE_GALAXY } from "./galaxy/apps/web/sample-galaxy.js";
 import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./galaxy/libs/epistemic/src/prompt.js";
+import { DISHWASHER_GALAXY } from "./samples/dishwasher.js";
+import { SWEET_SOUR_GALAXY } from "./samples/sweet-sour.js";
 
 const api = globalThis.browser ?? globalThis.chrome;
 const CLI = "http://127.0.0.1:4787";
 const id = new URLSearchParams(location.search).get("id");
 const galaxy = document.querySelector("intent-galaxy-overlay");
 const card = document.getElementById("card");
+const strip = document.getElementById("strip");
 const toParent = (msg) => parent.postMessage({ ...msg, id }, "*");
-let site = "", goal = "";
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
+// 一般人用的示範題目（npm 網頁版保留工程題目）。
+const DEMOS = [
+  { label: "示範：怎麼挑洗碗機", goal: "如何挑選洗碗機？", galaxy: DISHWASHER_GALAXY },
+  { label: "示範：酸甜又不負擔的食物", goal: "我喜歡又甜又酸的食物，但又不想吃了會讓身體太有負擔，有哪些選擇適合我？", galaxy: SWEET_SOUR_GALAXY },
+];
+let site = "", goal = "", waiting = false;
 
 async function cliAlive() {
   try { return (await fetch(`${CLI}/api/galaxy`, { signal: AbortSignal.timeout(800) })).ok; } catch { return false; }
@@ -19,7 +28,7 @@ async function cliAlive() {
 /** 面板中央的說明卡；actions 為 [label, handler, primary?]。 */
 function showCard(title, body, actions = []) {
   card.querySelector("h2").textContent = title;
-  card.querySelector("p").innerHTML = body;
+  card.querySelector(".body").innerHTML = body;
   const row = card.querySelector(".actions");
   row.replaceChildren(...actions.map(([label, fn, primary]) => {
     const b = Object.assign(document.createElement("button"), { type: "button", textContent: label, className: primary ? "primary" : "" });
@@ -30,7 +39,40 @@ function showCard(title, body, actions = []) {
   row.querySelector("button")?.focus();
 }
 function hideCard() { card.hidden = true; galaxy.focus(); }
-const showSample = () => galaxy.setGalaxy(SAMPLE_GALAXY, { goal: "示範：多版型、多主題系統" });
+
+const demoActions = () => DEMOS.map((d) => [d.label, () => { goal = d.goal; setStrip(""); galaxy.setGalaxy(d.galaxy, { goal: d.goal }); }]);
+const fmt = (sec) => sec >= 60 ? `${Math.floor(sec / 60)} 分 ${sec % 60} 秒` : `${sec} 秒`;
+
+/** 頂部提示條：等待中顯示經過時間與「貼上 JSON」備援。 */
+function setStrip(html) {
+  strip.hidden = !html;
+  strip.innerHTML = html;
+  strip.querySelector("[data-paste]")?.addEventListener("click", showPaste);
+}
+
+function showGalaxy(analysis, g, { adopt = false } = {}) {
+  goal = g || goal;
+  waiting = false;
+  setStrip("");
+  if (!galaxy.setGalaxy(analysis, { goal })) { galaxy.showMessage("AI 回覆的星系格式不完整，請再生成一次，或貼上修正後的 JSON"); return false; }
+  galaxy.showMessage(goal ? `這是「${goal.slice(0, 40)}」的星系。按 1／2／3 選方案，再按 Enter 填回對話框。` : "");
+  if (adopt) toParent({ type: "intent-adopt", analysis, goal });
+  return true;
+}
+
+/** 手動貼上：AI 已回覆但讀不到時（例如網站把長程式碼區塊收合），複製 JSON 貼進來。 */
+function showPaste() {
+  showCard("貼上 AI 回覆的 JSON",
+    "在對話裡找到 AI 回覆的 JSON 程式碼區塊，按它的「複製」按鈕，再貼到下面。<textarea id=\"paste\" placeholder=\"在這裡貼上（Cmd/Ctrl+V）\"></textarea>",
+    [["載入星系", () => {
+      const text = document.getElementById("paste")?.value ?? "";
+      const at = text.indexOf("{");
+      let obj = null;
+      try { obj = at >= 0 ? JSON.parse(text.slice(at, text.lastIndexOf("}") + 1)) : null; } catch { obj = null; }
+      if (!obj || !showGalaxy(obj, goal, { adopt: true })) showCard("讀不到星系", "貼上的內容不是完整的星系 JSON。請確認從 { 開頭複製到最後的 }。", [["再貼一次", showPaste, true]]);
+    }, true], ["取消", () => {}]]);
+  document.getElementById("paste")?.focus();
+}
 
 async function spawnViaCli() {
   galaxy.beginStream(goal);
@@ -46,36 +88,69 @@ async function spawnViaCli() {
   }
 }
 
-function spawnViaChat() {
+function startWaiting(g, elapsedSec = 0) {
+  goal = g || goal;
+  waiting = true;
   galaxy.beginStream(goal);
-  galaxy.showMessage("已送出提示詞，等待 AI 回覆…");
-  const prompt = `${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\nPut the JSON in one \`\`\`json code block.`;
-  toParent({ type: "intent-chat-spawn", prompt });
+  galaxy.showMessage("等待 AI 在對話中回覆星系 JSON…");
+  updateWaiting(elapsedSec);
+}
+function updateWaiting(elapsedSec) {
+  setStrip(`⋯ 等待 ${esc(site)} 回覆 · ${fmt(elapsedSec)}　<button type="button" data-paste>已回覆但沒出現？貼上 JSON</button>`
+    + (elapsedSec > 90 ? `<small>推理型模型（如 Pro、Thinking）常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓。</small>` : ""));
 }
 
-async function open(text, host) {
+function spawnViaChat() {
+  const prompt = `${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\n`
+    + "Answer directly in this reply: do not run code, call tools, or browse the web. Put the JSON in one ```json code block.";
+  toParent({ type: "intent-chat-spawn", prompt, goal });
+  startWaiting(goal, 0);
+}
+
+function confirmChat(extra = []) {
+  showCard(`用 ${site} 生成星系`,
+    `目標：<b>${esc(goal)}</b><br><br>`
+      + "我會在這個對話送出一段分析提示詞，AI 回覆後自動畫出星系。<br>"
+      + "<small>⏱ 一般模型約 1–3 分鐘；推理型高階模型（如 ChatGPT Pro、Thinking、Gemini Pro）可能要 5–15 分鐘，想快一點可以先在網頁上切換到一般模型。<br>"
+      + "不想讓提示詞出現在對話裡？在終端機執行 <code>npx @stephen.taipei/intent-galaxy</code>，改用本機的 AI 生成。</small>",
+    [["開始生成", spawnViaChat, true], ...extra, ...demoActions()]);
+}
+
+async function open({ goal: text = "", site: host = "這個 AI", job = null, pageGalaxy = null }) {
   goal = text; site = host;
   galaxy.focus();
-  if (!goal) {
-    showCard("先寫下你要決定的事",
-      "在這個網頁的輸入框打一句目標（例如「前端團隊要不要導入 monorepo」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>星系會把它拆成 4 位專家的 12 個觀點與 3 條方案，你選好後，方案會填回輸入框。",
-      [["看示範星系", showSample]]);
-    return;
+  const newGoal = goal && goal !== job?.goal;
+  // 1. 這個對話已有結果或正在生成：直接接續（輸入框打了新目標時，改問要不要用新目標重來）。
+  if (job && !newGoal) {
+    if (job.status === "done" && job.analysis) {
+      showGalaxy(job.analysis, job.goal);
+      // 已有結果時仍可重問同一題（例如換了模型）。
+      setStrip(`這是這個對話已生成的星系　<button type="button" data-regen>重新生成</button>`);
+      strip.querySelector("[data-regen]")?.addEventListener("click", () => confirmChat([["回到星系", () => showGalaxy(job.analysis, job.goal)]]));
+      return;
+    }
+    if (job.status === "waiting") return startWaiting(job.goal, job.elapsedSec);
+    if (job.status === "failed") { startWaiting(job.goal, job.elapsedSec); galaxy.showMessage(job.detail); return; }
   }
-  if (await cliAlive()) return spawnViaCli().catch((err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }));
-  showCard(`用 ${site} 生成星系`,
-    `目標：<b>${goal.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c])}</b><br><br>`
-      + "我會在這個對話送出一段分析提示詞，AI 回覆後自動畫出星系（通常 1–3 分鐘）。<br>"
-      + "<small>不想讓提示詞出現在對話裡？在終端機執行 <code>npx @stephen.taipei/intent-galaxy</code>，改用本機的 AI 生成。</small>",
-    [["開始生成", spawnViaChat, true], ["看示範星系", showSample]]);
+  if (goal) {
+    if (await cliAlive()) return spawnViaCli().catch((err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }));
+    const back = job?.status === "done" && job.analysis ? [["回到上一個星系", () => showGalaxy(job.analysis, job.goal)]] : [];
+    return confirmChat(back);
+  }
+  // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
+  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在決定的是[:：]\s*/, "") ?? "", { adopt: true });
+  showCard("先寫下你要決定的事",
+    "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>"
+      + "星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。",
+    demoActions());
 }
 
 api.runtime.onMessage.addListener((msg) => {
   if (msg?.id !== id) return;
-  if (msg.type === "ig-open") open(msg.goal ?? "", msg.site ?? "這個 AI");
-  if (msg.type === "ig-progress") galaxy.showMessage(`等待 AI 在對話中回覆星系 JSON · 已 ${msg.elapsedSec} 秒`);
-  if (msg.type === "ig-galaxy" && !galaxy.setGalaxy(msg.analysis, { goal })) galaxy.showMessage("AI 回覆的星系格式不完整，請再生成一次");
-  if (msg.type === "ig-chat-error") galaxy.showMessage(msg.detail);
+  if (msg.type === "ig-open") open(msg);
+  if (msg.type === "ig-progress" && waiting) updateWaiting(msg.elapsedSec);
+  if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
+  if (msg.type === "ig-chat-error") { galaxy.showMessage(msg.detail); setStrip(`⚠ ${esc(msg.detail)}　<button type="button" data-paste>貼上 JSON</button>`); }
 });
 
 galaxy.addEventListener("intent-lock", async (e) => {

@@ -21,7 +21,8 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "scripting"
+    "scripting",
+    "storage"
   ],
   "host_permissions": [
     "http://127.0.0.1/*",
@@ -61,7 +62,8 @@
       "resources": [
         "panel.html",
         "panel.js",
-        "galaxy/*"
+        "galaxy/*",
+        "samples/*"
       ],
       "matches": [
         "https://claude.ai/*",

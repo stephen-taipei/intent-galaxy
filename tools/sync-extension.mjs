@@ -20,7 +20,7 @@ if (isMain(import.meta.url)) {
   buildGalaxyBundle(chrome);
   buildGalaxyBundle(firefox);
   for (const f of SHARED) fs.copyFileSync(path.join(chrome, f), path.join(firefox, f));
-  fs.cpSync(path.join(chrome, "icons"), path.join(firefox, "icons"), { recursive: true });
+  for (const dir of ["icons", "samples"]) fs.cpSync(path.join(chrome, dir), path.join(firefox, dir), { recursive: true });
   console.log(`✅ synced ${SOURCES.length} galaxy modules → apps/extension, apps/extension-firefox`);
   if (process.argv.includes("--zip")) {
     const { version } = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));
