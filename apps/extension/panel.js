@@ -32,7 +32,9 @@ let shown = "idle";    // 畫面狀態：idle | card | waiting | galaxy | failed
 let pendingGoal = "";  // 本機 CLI 生成中，輸入框又打了新問題：生成完再問要不要換
 let lastFailed = "";   // 目前顯示的失敗原因（同樣的通知不重畫，貼上 JSON 的卡片才不會被關掉）
 const CLI_GOAL_MAX = 4000; // 本機 CLI 接受的問題長度上限（apps/cli/src/server.mjs）
-const dropped = new Set(); // 改用本機生成後不再理會的網頁 run
+const dropped = new Set(); // 改用本機生成後不再理會的網頁 run（之後又明確回到它時移除）
+/** 面板改為顯示某個網頁 run：記下識別碼，它的通知也重新接收。 */
+const bindNonce = (n) => { nonce = n ?? ""; dropped.delete(nonce); };
 
 async function cliAlive() {
   try { return (await fetch(`${CLI}/api/galaxy`, { signal: AbortSignal.timeout(800) })).ok; } catch { return false; }
@@ -165,8 +167,15 @@ function waitingStrip(elapsedSec, unsent) {
   if (unsent) return setStrip("📨 提示詞已放進輸入框：請按對話框的送出鍵，送出後這裡會自動接著等", [giveUp]);
   slowShown = elapsedSec >= SLOW_HINT_SEC;
   setStrip(`⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`,
-    [["已回覆但沒出現？貼上 JSON", showPaste], ...(slowShown ? [["先看示範", () => { waiting = false; demoActions()[0][1](); }]] : []), giveUp],
+    [["已回覆但沒出現？貼上 JSON", showPaste], ...(slowShown ? [["先看示範", () => showDemoWhileWaiting(elapsedSec)]] : []), giveUp],
     slowShown ? "超過 20 秒還沒有回覆：可能選了深度推理模型（如 Pro、Thinking），常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓；想快一點，下次先在網頁上切換到一般模型。" : "");
+}
+/** 等待中先看示範：提示條保留「回到等待」；真的回覆到了會直接換成它的星系。 */
+function showDemoWhileWaiting(elapsedSec) {
+  const g = goal, started = Date.now() - elapsedSec * 1000;
+  waiting = false;
+  demoActions()[0][1]();
+  setStrip(`⋯ 「${g.slice(0, 20)}」仍在生成，完成時會自動換成它的星系`, [["回到等待", () => startWaiting(g, Math.round((Date.now() - started) / 1000))]]);
 }
 function startWaiting(g, elapsedSec = 0, unsent = false) {
   hideCard();
@@ -224,7 +233,7 @@ function confirmChat(extra = [], beforeStart = null) {
 /** 這個對話已生成的星系，附「重新生成」（例如換了模型想再問一次）。 */
 function showDone(job) {
   if (!showGalaxy(job.analysis, job.goal)) return;
-  nonce = job.nonce ?? "";
+  bindNonce(job.nonce);
   // 「回到星系」只關掉卡片：星系一直在下面，已選的方案和節點立場都保留。
   setStrip("這是這個對話已生成的星系", [["重新生成", () => { const g = goal; confirmChat([["回到星系", () => { goal = g; }]]); }]]);
 }
@@ -255,6 +264,11 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
       return;
     }
     if (job?.status === "done" && (shown === "waiting" || shown === "idle") && (!text || text === job.goal)) return showDone(job);
+    // 這個對話還有問題在等（例如先看示範時）：輸入框換了新問題，先決定要繼續等還是放棄；沒換就保留目前畫面。
+    if (job?.status === "waiting" && shown !== "waiting") {
+      if (text && text !== job.goal && text !== goal) return askWhileWaiting(job, text);
+      if (shown !== "idle") return;
+    }
     if (shown === "galaxy" || shown === "waiting" || shown === "card") {
       if (!text || text === goal) return;
       if (shown === "card") { goal = text; return generate([], true); }
@@ -263,7 +277,7 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
     }
   }
   goal = text;
-  nonce = job?.nonce ?? "";
+  bindNonce(job?.nonce);
   const newGoal = goal && goal !== job?.goal;
   // 1. 這個對話已有結果或正在生成：直接接續（輸入框打了新目標時，改問要不要用新目標重來）。
   if (job && !newGoal) {
@@ -296,14 +310,14 @@ function askWhileWaiting(job, newText) {
   showCard("上一個問題還在等 AI 回覆",
     `正在等：<b>${esc(job.goal)}</b><br>AI 回完之前，網站通常不接受新訊息。要繼續等，還是放棄它、改問新的問題？`,
     // 卡片開著時 AI 回完會換成星系或失敗並關掉卡片；按得到「繼續等待」就表示還在等（除非在別的分頁取消了）。
-    [["繼續等待", () => { if (!job.nonce || nonce === job.nonce) { nonce = job.nonce ?? nonce; startWaiting(job.goal, job.elapsedSec ?? 0, job.unsent); } }, true],
+    [["繼續等待", () => { if (!job.nonce || nonce === job.nonce) { bindNonce(job.nonce ?? nonce); startWaiting(job.goal, job.elapsedSec ?? 0, job.unsent); } }, true],
       ["放棄並改問新問題", () => { resetJob(); goal = newText; generate(); }]]);
 }
 
 api.runtime.onMessage.addListener((msg) => {
   if (msg?.id !== id || msg.type === "ig-to-content" || (msg.nonce && dropped.has(msg.nonce))) return;
   if (msg.type === "ig-open") open(msg);
-  if (msg.type === "ig-started") nonce = msg.nonce;
+  if (msg.type === "ig-started") bindNonce(msg.nonce);
   if (msg.type === "ig-progress" && waiting) { if (msg.nonce) nonce = msg.nonce; updateWaiting(msg.elapsedSec, !!msg.unsent); }
   if (msg.type === "ig-reopen" && msg.job) { nonce = msg.job.nonce; startWaiting(msg.job.goal, msg.job.elapsedSec, msg.job.unsent); }
   if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
@@ -316,9 +330,10 @@ api.runtime.onMessage.addListener((msg) => {
 });
 
 galaxy.addEventListener("intent-lock", async (e) => {
-  // CLI 在線時由它簽署 .intent.lock.json；被拒（例如沒有採納 Q4 節點）就留在面板顯示原因。
-  if (await cliAlive()) {
-    const body = { ...e.detail, analysis: e.detail.galaxyId ? undefined : galaxy.analysis, goal: galaxy.goal };
+  // 本機 CLI 生成的星系（有 galaxyId）由 CLI 簽署 .intent.lock.json；被拒（例如沒有採納 Q4 節點）就留在面板顯示原因。
+  // 網頁 AI、貼上、示範的星系與 CLI 所在的專案無關，不寫鎖檔。一律附上 analysis：CLI 重啟後舊 id 找不到時照樣能簽。
+  if (e.detail.galaxyId && await cliAlive()) {
+    const body = { ...e.detail, analysis: galaxy.analysis, goal: galaxy.goal };
     const res = await fetch(`${CLI}/api/lock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch(() => null);
     if (res && !res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
   }

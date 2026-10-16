@@ -25,7 +25,8 @@ process.emitWarning = function (warning, ...rest) {
 };
 
 export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths = ["*"], log = () => {} }) {
-  let current = null, seq = 0, port = 0;
+  // 星系 id 從啟動時間起算：重新啟動後，瀏覽器手上的舊 id 不會剛好對到新程序的另一個星系（例如 MCP 正在等的那個）。
+  let current = null, seq = Date.now(), port = 0;
   const galaxies = new Map();
   const sseClients = new Set();
   const lockWaiters = new Map();

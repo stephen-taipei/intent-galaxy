@@ -4,28 +4,35 @@
 // 每次「用網頁上的 AI 生成」都是一筆 run：提示詞結尾帶唯一識別碼 [ig:<nonce>]，記錄存在 storage（ig:run:<nonce>）。
 // 哪個對話有哪些 run，一律由「頁面上看得到哪些識別碼」決定，不靠網址：換對話、專案頁、暫時對話、新對話換網址都不必特別處理。
 (() => {
-  // 擴充功能更新或重新載入後，舊的 content script 會失效（runtime 斷線）：那時允許新的一份接手。
+  // 擴充功能更新或重新載入後，舊的 content script 會失效（runtime 斷線）：那時由新的一份接手。
   if (window.__intentGalaxyMounted && window.__intentGalaxyAlive?.()) return;
+  try { window.__intentGalaxyTeardown?.(); } catch { /* 舊版沒有提供，或已無法執行 */ }
+  // 舊版留下的按鈕與面板（Firefox 會直接銷毀舊的 content script，來不及自己清）
+  document.querySelectorAll("#intent-galaxy-mod-pill, intent-galaxy-frame").forEach((el) => el.remove());
   window.__intentGalaxyMounted = true;
 
   const api = globalThis.browser ?? globalThis.chrome;
   const alive = () => { try { return !!api.runtime?.id; } catch { return false; } };
   window.__intentGalaxyAlive = alive;
   const INSTANCE = crypto.randomUUID(); // 這個分頁的 content script；只有送出提示詞的分頁能判定逾時
-  const timers = [];
+  const timers = [], unlisten = [];
   let dead = false;
   /** 擴充功能已失效：停掉所有計時器與監聽，移除按鈕與面板，讓重新注入的新版接手。 */
   function teardown() {
     if (dead) return;
     dead = true;
     timers.forEach(clearInterval);
+    unlisten.forEach((off) => { try { off(); } catch { /* context 已失效 */ } });
     observer?.disconnect();
     document.getElementById(PILL_ID)?.remove();
     document.querySelector("intent-galaxy-frame")?.remove();
     if (window.__intentGalaxyToggle === togglePanel) delete window.__intentGalaxyToggle;
     window.__intentGalaxyMounted = false;
   }
+  window.__intentGalaxyTeardown = teardown;
   const every = (ms, fn) => timers.push(setInterval(() => { if (!alive()) return teardown(); fn(); }, ms));
+  /** 掛在頁面（document、window）上的監聽：teardown 時一併移除，新版才不會被舊的攔截。 */
+  const listen = (target, type, fn, opts) => { target.addEventListener(type, fn, opts); unlisten.push(() => target.removeEventListener(type, fn, opts)); };
   const PILL_ID = "intent-galaxy-mod-pill";
 
   // 各站輸入框選擇器，依序嘗試；全部失敗時退回頁面上最後一個可見的 contenteditable / textarea。
@@ -183,9 +190,11 @@
   /** 關於某個 run 的通知：只送給正在顯示這個 run（或還沒綁定 run）的面板。 */
   const toPanel = (nonce, msg) => { if (panel && (!panelNonce || panelNonce === nonce)) sendPanel({ ...msg, nonce }); };
   function panelState(reopen) {
-    if (current) panelNonce = current.nonce;
+    // 面板正綁著這個分頁剛放進輸入框、還在等的 run：繼續綁著它（即使提示詞被清掉、頁面上最後一個 run 是別的）。
+    const run = localRun && localRun.nonce === panelNonce && localRun.status === "waiting" ? localRun : current;
+    if (run) panelNonce = run.nonce;
     return { type: "ig-open", goal: openGoal, site: location.hostname.replace(/^www\./, ""), reopen,
-      job: runInfo(current), pageGalaxy: current ? null : latestGalaxy() };
+      job: runInfo(run), pageGalaxy: run ? null : latestGalaxy() };
   }
 
   /** 面板屬於這個頁面嗎：同一個網址，或它顯示的 run 的識別碼在這個頁面上。 */
@@ -362,7 +371,7 @@
     }
     openPanel();
   }
-  window.addEventListener("resize", clampFrame);
+  listen(window, "resize", clampFrame);
 
   // 寫入原生輸入框：<textarea> 用原生 setter + input 事件；ProseMirror / Quill / contenteditable 先模擬貼上，失敗再用 insertText。
   function writeToEditor(el, text, probe) {
@@ -537,7 +546,7 @@
     if (el.getAttribute("data-ig-banner") !== banner) el.setAttribute("data-ig-banner", banner);
   }
   // 點擊：收合時點一下展開（只在收合時攔截，展開後網站自己的按鈕照常運作）；展開時點最上面那條橫幅收合。
-  document.addEventListener("click", (e) => {
+  listen(document, "click", (e) => {
     const el = e.target instanceof Element ? e.target.closest("[data-ig-cloak]") : null;
     if (!el) return;
     const expanded = el.getAttribute("data-ig-expanded") === "true";
@@ -608,7 +617,7 @@
   /** 讀頁面、更新 current、檢查等待中的 run。immediate：面板打開時，看到完整 JSON 就直接收下。 */
   let refreshing = null;
   const lastChecked = new Map(); // nonce → 上次檢查失敗 run 的時間
-  let panelMissingSince = 0;
+  let panelMissingSince = 0, panelSeen = ""; // panelSeen：面板綁定的 run 曾出現在這個頁面上（從沒出現過的不算「消失」）
   async function refresh(immediate = false) {
     if (refreshing) return refreshing;
     if (dead || (!immediate && document.hidden)) return; // 背景分頁不掃描；回到前景時補一次
@@ -644,7 +653,8 @@
       cloakRuns(onPage);
       // 網址沒變，面板顯示的 run 卻從頁面消失（例如 ChatGPT 暫時對話開了新對話，網址一直是 /）：
       // 超過寬限就關閉，避免把別的對話的方案填進來。換網址的情況由 onPathChange 處理。
-      if (frame && panelNonce && !panelBusy && panelPath === location.pathname && !panelBelongsHere()) {
+      if (panelNonce && onPage.some((t) => t.nonce === panelNonce)) panelSeen = panelNonce;
+      if (frame && panelNonce && panelSeen === panelNonce && !panelBusy && panelPath === location.pathname && !panelBelongsHere()) {
         if (Date.now() - (panelMissingSince ||= Date.now()) > RENDER_GRACE_MS) closePanel();
       } else panelMissingSince = 0;
       mountPill();
@@ -658,13 +668,13 @@
     const busy = current?.status === "waiting" || localRun;
     if (busy || Date.now() - lastRefresh > 5000) { lastRefresh = Date.now(); refresh(); }
   });
-  document.addEventListener("visibilitychange", () => { if (!document.hidden && alive()) refresh(); });
+  listen(document, "visibilitychange", () => { if (!document.hidden && alive()) refresh(); });
 
   // ── 把提示詞放進輸入框（由使用者按送出）──
 
   async function startRun(goal, prompt) {
     await refresh(true);
-    if (current?.status === "waiting") { sendPanel({ type: "ig-chat-error", detail: "上一個問題還在等 AI 回覆。請等它完成，或先按「放棄等待」。" }); return; }
+    if (current?.status === "waiting") { sendPanel({ type: "ig-chat-error", detail: "上一個問題還在等 AI 回覆，這次沒有放進輸入框。請等它完成，或先放棄它再問。", failed: true, nonce: "" }); return; }
     const editor = targetEditor?.isConnected ? targetEditor : findEditor();
     const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
     if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { sendPanel({ type: "ig-chat-error", detail: "找不到這個網頁的輸入框，無法送出提示詞。", failed: true, nonce: "" }); return; }
@@ -700,7 +710,7 @@
   }
   every(1000, () => { if (location.pathname !== lastPath) onPathChange(); });
   // 支援 Navigation API 的瀏覽器：站內換頁一完成就處理，不必等下一次輪詢。
-  globalThis.navigation?.addEventListener?.("navigatesuccess", () => { if (location.pathname !== lastPath) onPathChange(); });
+  if (globalThis.navigation?.addEventListener) listen(globalThis.navigation, "navigatesuccess", () => { if (location.pathname !== lastPath) onPathChange(); });
 
   // 其他分頁更新了 run（例如另一個分頁先讀到回覆）：同步並通知顯示它的面板。
   api.storage?.onChanged?.addListener((changes, area) => {
@@ -717,7 +727,13 @@
       // 只處理這個頁面相關的 run（頁面上看得到它的識別碼，或是這個分頁剛送出的）。
       if (!(pageNonces().has(nonce) || localRun?.nonce === nonce)) { if (cache.has(nonce)) { if (newValue) cache.set(nonce, newValue); else cache.delete(nonce); } continue; }
       const prev = cache.get(nonce);
-      if (!newValue) { cache.delete(nonce); if (localRun?.nonce === nonce) localRun = null; if (!pruning.has(key)) toPanel(nonce, { type: "ig-reset" }); continue; }
+      if (!newValue) {
+        cache.delete(nonce);
+        if (localRun?.nonce === nonce) localRun = null;
+        // 只有等待中／失敗、還沒過期的 run 會被使用者取消；已完成或過期的是每日整理刪的，不必通知。
+        if (prev && prev.status !== "done" && Date.now() - (prev.startedAt ?? 0) < RUN_TTL_MS) toPanel(nonce, { type: "ig-reset" });
+        continue;
+      }
       if (prev && prev.status === newValue.status && prev.unsent === newValue.unsent) { Object.assign(prev, { beat: newValue.beat, owner: newValue.owner }); continue; } // 只是心跳
       const run = prev ? Object.assign(prev, newValue) : newValue;
       cache.set(nonce, run);
@@ -729,7 +745,6 @@
   });
 
   // 記錄整理：每天最多一次，刪掉超過 30 天或超過 MAX_RUNS 筆的 run，以及舊版（以網址為 key）的記錄。
-  const pruning = new Set(); // 整理時刪掉的 key：其他分頁不必顯示「已取消」
   (async () => {
     try {
       const keys = store.getKeys ? await store.getKeys() : Object.keys(await store.get(null));
@@ -740,7 +755,6 @@
       const all = await store.get(keys.filter((k) => k.startsWith(RUN_PREFIX)));
       const runs = Object.entries(all).sort((a, b) => (b[1]?.startedAt ?? 0) - (a[1]?.startedAt ?? 0));
       const drop = [...keys.filter((k) => k.startsWith("ig:job:")), ...runs.filter(([, r], i) => i >= MAX_RUNS || Date.now() - (r?.startedAt ?? 0) > RUN_TTL_MS).map(([k]) => k)];
-      drop.forEach((k) => pruning.add(k));
       if (drop.length) await store.remove(drop);
     } catch { /* 沒有 storage 權限 */ }
   })().finally(() => refresh());
@@ -811,7 +825,12 @@
     sel.removeAllRanges();
     sel.addRange(range);
     document.execCommand("delete");
-    if (goal) writeToEditor(editor, goal, goal);
+    if (!goal) return;
+    // 只插入一次：網站的貼上處理可能改掉空行，不能用原文比對是否成功，改看輸入框是否還是空的。
+    const dt = new DataTransfer();
+    dt.setData("text/plain", goal);
+    editor.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
+    if (!editorText(editor)) document.execCommand("insertText", false, goal);
   }
 
   mountPill();
@@ -820,7 +839,7 @@
   window.__intentGalaxyToggle = togglePanel;
 
   // Cmd/Ctrl+Shift+G：capture 階段攔截，避免被頁面快捷鍵吃掉；以 e.code 判斷，IME 開啟時同樣可用。
-  window.addEventListener("keydown", (e) => {
+  listen(window, "keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyG") { e.preventDefault(); e.stopPropagation(); togglePanel(); }
   }, true);
 })();

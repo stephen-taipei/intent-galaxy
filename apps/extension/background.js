@@ -23,3 +23,10 @@ api.runtime.onMessage.addListener((msg, sender) => {
   if (msg?.type !== "ig-to-content" || sender.id !== api.runtime.id || !sender.url?.startsWith(PANEL_URL) || sender.tab?.id == null) return;
   api.tabs.sendMessage(sender.tab.id, msg, { frameId: 0 }).catch(() => {});
 });
+
+// 安裝或更新後：已開著的 AI 分頁不會自動拿到新版 content script，主動注入（舊版會自己卸載，交給新版）。
+api.runtime.onInstalled.addListener(async ({ reason }) => {
+  if (reason !== "install" && reason !== "update") return;
+  const tabs = await api.tabs.query({ url: SITES.map((h) => `https://${h}/*`) }).catch(() => []);
+  for (const tab of tabs) api.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] }).catch(() => {});
+});
