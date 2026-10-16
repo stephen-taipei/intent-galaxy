@@ -87,7 +87,7 @@ npm start            # 直接從原始碼啟動（Node 執行期剝除 TypeScrip
 npm run build        # 產生 dist/（npm 套件內容；npm pack / publish 前會自動執行）
 ```
 
-架構與資料結構以 [`INTENT-SPEC-FINAL.md`](INTENT-SPEC-FINAL.md) 為準；開發交接見 [`HANDOVER.md`](HANDOVER.md)。
+架構與資料結構以 [`INTENT-SPEC-FINAL.md`](INTENT-SPEC-FINAL.md) 為準。
 
 ## License
 

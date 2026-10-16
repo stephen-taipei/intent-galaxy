@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 來源：reviews/results-v0.1.1/review-grok-4.7.md §2.6（「這支檔案就是規格」）。
+// 來源：Grok 4.7 第二輪審查 §2.6（「這支檔案就是規格」）。
 // 由 `npx @stephen.taipei/intent-galaxy init-hook` 複製到使用者 repo 的 .intent/hooks/kill-gate.mjs，零依賴。
 // 與參考實作的差異：session 模式在 git repo 外直接靜默結束（SessionStart 不可中斷啟動）。
 // Passive kill-gate. Silence before auditDueAt. After that, a scoped

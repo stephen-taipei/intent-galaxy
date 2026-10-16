@@ -19,7 +19,6 @@
 ```text
 intent-galaxy/
 ├── INTENT-SPEC-FINAL.md          # 終極技術規格書 (v1.0.0 Galaxy-First Edition)
-├── HANDOVER.md                   # Claude App 階段性開發交接清單
 ├── CLAUDE.md                     # 本文件 (Claude 自動載入之專案上下文)
 ├── apps/
 │   ├── cli/                      # npx 入口 (bin/intent-galaxy.mjs)：127.0.0.1 HTTP + Stdio MCP Server
