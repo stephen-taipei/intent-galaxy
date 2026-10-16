@@ -10,10 +10,10 @@
     "galaxy",
     "zero-dependency"
   ],
-  "homepage": "https://github.com/stephen-taipei/intent-engineering-galaxy#readme",
+  "homepage": "https://github.com/stephen-taipei/intent-galaxy#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stephen-taipei/intent-engineering-galaxy.git"
+    "url": "git+https://github.com/stephen-taipei/intent-galaxy.git"
   },
   "license": "Apache-2.0",
   "type": "module",

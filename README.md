@@ -7,7 +7,7 @@
 
 | 先發散：12 顆節點與 ✦ 盲區，不畫連線 | 後收斂：按 `1` 點亮主幹，右側即時編譯 AST |
 | --- | --- |
-| ![星系首屏](https://raw.githubusercontent.com/stephen-taipei/intent-engineering-galaxy/main/docs/images/galaxy-diverge.png) | ![按 1 收斂](https://raw.githubusercontent.com/stephen-taipei/intent-engineering-galaxy/main/docs/images/galaxy-converge.png) |
+| ![星系首屏](https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/images/galaxy-diverge.png) | ![按 1 收斂](https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/images/galaxy-converge.png) |
 
 | 形態 | 內容 | 狀態 |
 | ---- | ---- | ---- |
