@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import http from "node:http";
 import { fileURLToPath } from "node:url";
+import { extractRootObject } from "../src/spawn.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const BIN = path.join(ROOT, "apps/cli/bin/intent-galaxy.mjs");
@@ -15,6 +16,7 @@ fs.writeFileSync(fakeClaude, `#!/usr/bin/env node
 const { SAMPLE_GALAXY } = await import(${JSON.stringify(path.join(ROOT, "apps/web/sample-galaxy.js"))});
 const text = "\`\`\`json\\n" + JSON.stringify(SAMPLE_GALAXY) + "\\n\`\`\`";
 const out = (o) => process.stdout.write(JSON.stringify(o) + "\\n");
+out({ type: "system", subtype: "thinking_tokens", estimated_tokens: 150 });
 for (let i = 0; i < text.length; i += 97) out({ type: "stream_event", event: { type: "content_block_delta", delta: { type: "text_delta", text: text.slice(i, i + 97) } } });
 out({ type: "result", subtype: "success" });
 `, { mode: 0o755 });
@@ -51,6 +53,11 @@ const rpc = (method, params) => new Promise((resolve) => {
 const post = (p, body, headers = {}) => fetch(base + p, { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body: JSON.stringify(body) });
 const rawGet = (p, headers = {}) => new Promise((resolve) => http.get({ host: "127.0.0.1", port, path: p, headers }, (res) => { res.resume(); resolve(res.statusCode); }));
 
+// 模型輸出擷取：略過 ``` 圍欄、尾端說明文字與字串內的括號
+assert.deepEqual(extractRootObject('```json\n{"a":"}{","b":{"c":1}}\n```\n補充 {x}'), { a: "}{", b: { c: 1 } });
+assert.equal(extractRootObject("沒有 JSON"), null);
+assert.equal(extractRootObject('{"a":'), null);
+
 try {
   // HTTP 防護
   for (const p of ["/libs/../package.json", "/%2e%2e/package.json", "/..%2f..%2fpackage.json", "/%2e%2e/libs/core/src/verify.ts/../../../../package.json"]) assert.equal(await rawGet(p), 404, p);
@@ -63,7 +70,8 @@ try {
 
   // 通道 B：/api/spawn 串流
   const lines = (await (await post("/api/spawn", { goal: "開源還是閉源" })).text()).trim().split("\n").map((l) => JSON.parse(l));
-  assert.equal(lines[0].t, "skeleton");
+  assert.deepEqual([lines[0].t, lines[0].thinkingTokens], ["progress", 150]);
+  assert.equal(lines[1].t, "skeleton");
   assert.equal(lines.filter((e) => e.t === "node").length, 12);
   assert.equal(lines.at(-1).t, "repaired");
   assert.equal(lines.at(-1).analysis.nodes.N7.label, "暗池工單賞金撮合板");
