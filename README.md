@@ -11,33 +11,49 @@
 
 | 形態 | 內容 | 狀態 |
 | ---- | ---- | ---- |
-| **CLI** | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 星系伺服器 + `claude -p` 串流生成 | ✅ |
-| **MCP** | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`，Enter 後把 AST 回傳給 Claude | ✅ |
-| **Extension** | Chrome / Firefox：在 Claude、ChatGPT、Grok、Gemini 輸入框旁加 `🌌 iG` 膠囊 | ✅ |
+| **CLI** | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 星系伺服器，可選 Claude、Codex、Gemini、agy CLI 或 12 家 API 生成 | ✅ |
+| **MCP** | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`，Claude Code、Codex、Gemini CLI、agy 都能掛 | ✅ |
+| **Extension** | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 輸入框旁加 `🌌 iG` 膠囊 | ✅ |
 | **Kill-gate** | `.intent.lock.json`（RFC 8785 JCS + SHA-256）與 14 天後的 commit 驗屍守門員 | ✅ |
 
 ## 快速開始
 
-需求：Node ≥ 22.18。星系生成另需已登入的 [Claude Code](https://code.claude.com) CLI（`claude`）。
+需求：Node ≥ 22.18。星系生成另需下表任一個 AI（已登入的 CLI，或設定好 API key）。
 
 ```bash
 cd ~/code/some-repo
 npx @stephen.taipei/intent-galaxy          # 開啟 http://127.0.0.1:4787，輸入一句目標按 Enter 生成星系
 npx @stephen.taipei/intent-galaxy --port 4300 --no-open
+npx @stephen.taipei/intent-galaxy --provider gemini           # 指定預設 AI；網頁右上角也能切換
 ```
 
 - 只綁 `127.0.0.1`；每個請求檢查 Host（防 DNS rebinding）、POST 來源與路徑穿越。
-- 生成走本機 `claude -p` 訂閱制 CLI，不需要 API key。預設模型 Opus，約需 3–4 分鐘（大部分是模型思考，畫面會顯示思考 tokens）。
+- 網頁頂部可選 AI 與模型，偵測不到的選項會標出缺什麼（例如「請設定 OPENAI_API_KEY」）。Claude CLI 預設 Opus，約需 3–4 分鐘。
+- API key 只從環境變數讀取，留在本機伺服器，不會送進瀏覽器。
 - 按 Enter 鎖定時，在目前目錄寫入 `.intent.lock.json`。
 
-### 註冊為 Claude Code MCP
+### 支援的 AI
+
+| 類型 | 供應商（`--provider`） | 需要 |
+| --- | --- | --- |
+| 本機 CLI（免 API key） | `claude` Claude Code、`codex` OpenAI Codex、`gemini` Gemini CLI、`agy` Antigravity | 已登入的 CLI 在 `PATH` 上 |
+| API | `anthropic` Claude、`openai` GPT、`google` Gemini、`xai` Grok、`deepseek`、`mistral`、`qwen` 通義千問、`moonshot` Kimi、`groq`、`openrouter` | 對應的 `ANTHROPIC_API_KEY`、`OPENAI_API_KEY`、`GEMINI_API_KEY`、`XAI_API_KEY`、`DEEPSEEK_API_KEY`、`MISTRAL_API_KEY`、`DASHSCOPE_API_KEY`、`MOONSHOT_API_KEY`、`GROQ_API_KEY`、`OPENROUTER_API_KEY` |
+| 本機開源模型 | `ollama`（Llama、Qwen、Gemma…） | Ollama 在 `127.0.0.1:11434` 執行中 |
+| 其他 | `custom` 任何 OpenAI 相容端點 | `INTENT_GALAXY_OPENAI_BASE_URL`（可選 `INTENT_GALAXY_OPENAI_API_KEY`） |
+
+API 供應商的模型清單會即時向供應商查詢；也可用 `--model` 或 `INTENT_GALAXY_MODEL` 指定。CLI 以唯讀／規劃模式執行，不會改動檔案。
+
+### 註冊為 MCP（Claude Code、Codex、Gemini CLI、agy）
 
 ```bash
 claude mcp add intent-galaxy -- npx -y @stephen.taipei/intent-galaxy
+codex mcp add intent-galaxy -- npx -y @stephen.taipei/intent-galaxy
+gemini mcp add intent-galaxy npx -y @stephen.taipei/intent-galaxy
+agy mcp add intent-galaxy npx -y @stephen.taipei/intent-galaxy
 ```
 
-在 Claude Code 裡請它「用 intent galaxy 分析這個目標」：宿主 Claude 先呼叫 `intent_spawner_prompt` 取得規則，
-自己產出 12 節點 JSON，再呼叫 `intent_open_galaxy`。瀏覽器自動開啟星系，你按 Enter 後 AST 會回到對話裡。這條路不額外呼叫 `claude -p`。
+在對話裡請它「用 intent galaxy 分析這個目標」：宿主 AI 先呼叫 `intent_spawner_prompt` 取得規則，
+自己產出 12 節點 JSON，再呼叫 `intent_open_galaxy`。瀏覽器自動開啟星系，你按 Enter 後 AST 會回到對話裡。這條路由宿主 AI 自己生成，不額外呼叫其他模型。
 
 ### 14 天被動打臉（kill-gate）
 

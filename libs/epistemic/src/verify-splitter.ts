@@ -8,6 +8,9 @@ const sample = JSON.stringify({
 });
 const sp = new IntentNdjsonSplitter(1); const evs = [...sp.push(sample), ...sp.end()];
 assert.equal(evs.filter(e => e.t === "node").length, 12);
+// 鍵內含未跳脫換行（模型夾雜說明文字）→ 回報 bad_json，不可拋出例外
+const messy = new IntentNdjsonSplitter(2).push('{"values: [\n": 1}');
+assert.equal(messy.at(-1)?.t, "error");
 console.log("✅ libs/epistemic verified!");
 import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./prompt.ts";
 assert.ok(SPAWNER_SYSTEM_PROMPT.startsWith("You are INTENT-SPAWNER."));
