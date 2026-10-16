@@ -20,10 +20,10 @@
 </head>
 <body>
 <header>
-  <div class="brand">🌌 Intent Galaxy<span class="badge" id="source-badge">示範星系</span></div>
+  <div class="brand">🌌 Intent Galaxy<span class="badge" id="source-badge" title="目前星系的來源：示範資料、claude -p 生成，或 MCP 從 Claude Code 灌入">示範星系</span></div>
   <form id="goal-form">
     <input id="goal" type="text" autocomplete="off" placeholder="輸入一句模糊目標，按 Enter 以本機 claude -p 生成 12 顆節點…">
-    <button type="submit" id="spawn-btn">生成星系</button>
+    <button type="submit" id="spawn-btn" title="用本機 claude -p 依你的目標生成新的 12 顆節點星系（約 3–4 分鐘）">生成星系</button>
   </form>
 </header>
 <intent-galaxy-overlay id="galaxy"></intent-galaxy-overlay>

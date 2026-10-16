@@ -17,6 +17,14 @@ const QUADRANT_TAGS = {
 const ARCH = [["alpha", "1"], ["beta", "2"], ["gamma", "3"]];
 const HINT_QUADRANT = { f: "Q1", d: "Q2", l: "Q3", p: "Q4" };
 const DIST_BADGE = { 1: "· D1", 2: "◈ D2", 3: "⬥ D3", 4: "✦ D4" };
+const KEY_HINTS = [
+  [["1", "2", "3"], "主幹", "套用第 1／2／3 張策略卡，一次點亮它採納的節點。<br><span class=dim>Shift+數字：先清掉你的手動調整再套用。</span>"],
+  [["h", "j", "k", "l"], "導航", "在 12 顆節點間移動焦點：h 左、j 下、k 上、l 右。<br><span class=dim>Tab 依序切換，g＋象限鍵＋數字可直達。</span>"],
+  [["Space"], "採納", "把目前焦點的節點加入方案（再按一次取消）。<br><span class=dim>滑鼠：左鍵點節點。</span>"],
+  [["x"], "排除", "明確標記「不做」這個節點（再按一次取消）。<br><span class=dim>Q4 驗屍官節點被排除時，代表你知道這個風險並選擇承擔。滑鼠：右鍵點節點。</span>"],
+  [["r"], "解除互斥", "有些節點彼此互斥（例如「零算力」與「API 帳單熔斷」不能同時成立）。同時選了互斥節點時，狀態會變紅。<br>按 r 會自動撤銷<b>較早</b>的手動選擇，保留你最新的決定，直到方案沒有矛盾。"],
+  [["u"], "復原", "復原上一步操作。<br><span class=dim>Ctrl+R 重做。</span>"],
+];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
 const clip = (s, n) => { const a = [...String(s ?? "")]; return a.length > n ? a.slice(0, n - 1).join("") + "…" : a.join(""); };
 
@@ -105,6 +113,13 @@ aside .head button { font:inherit; font-size:10.5px; padding:2px 8px; border-rad
 #summary .item p { font-size:11px; color:#94a3b8; margin-top:1px; }
 #summary .chips { display:flex; flex-wrap:wrap; gap:5px; }
 #summary .chips span { font-size:11px; padding:2px 7px; border-radius:5px; background:#1e293b; color:#cbd5e1; }
+#tip { position:absolute; z-index:100; max-width:300px; padding:8px 10px; border-radius:8px; background:#1e293b; border:1px solid #475569; color:#e2e8f0; font-size:11.5px; line-height:1.55; box-shadow:0 8px 24px rgba(0,0,0,.45); pointer-events:none; opacity:0; transition:opacity .12s; }
+#tip.on { opacity:1; }
+#tip b { color:#fff; }
+#tip .dim { color:#94a3b8; }
+#tip .k { color:#fda4af; }
+#tip .g { color:#fcd34d; }
+#bar .keys > span { cursor:help; }
 aside pre { flex:1; overflow:auto; background:#070a10; border:1px solid var(--border); border-radius:8px; padding:10px; font:11px/1.5 ui-monospace,monospace; color:#cbd5e1; white-space:pre-wrap; }
 aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow:auto; }
 `;
@@ -121,9 +136,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
         <div id="core"><div class="sub">你真正在決定的是</div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></main>
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
-        <span class="keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 主幹 · <kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> 導航 · <kbd>Space</kbd> 採納 · <kbd>x</kbd> 排除 · <kbd>r</kbd> 解衝突 · <kbd>u</kbd> 復原</span>
-        <button type="button" id="lock">⏎ 鎖定並注入</button></footer>
-      <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div>`;
+        <span class="keys">${KEY_HINTS.map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${label}</span>`).join(" · ")}</span>
+        <button type="button" id="lock"></button></footer>
+      <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle" data-tip="切換檢視：摘要 ↔ 實際送給 AI 的原始指令文字（LOCKED INTENT AST）">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
     root.addEventListener("click", () => this.focus({ preventScroll: true }));
@@ -132,6 +147,12 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
     root.getElementById("lock").addEventListener("click", () => this.lock());
     root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
+    // 統一 tooltip：任何帶 data-tip 的元素（節點、策略卡、按鍵說明、按鈕）滑過或鍵盤聚焦時顯示。
+    const showTip = (e) => { const el = e.target.closest?.("[data-tip]"); if (el) this.#showTip(el); else this.#hideTip(); };
+    root.addEventListener("pointerover", showTip);
+    root.addEventListener("focusin", showTip);
+    root.addEventListener("pointerleave", () => this.#hideTip(), true);
+    root.addEventListener("pointerdown", () => this.#hideTip());
     this.addEventListener("keydown", (e) => this.#onKey(e));
   }
 
@@ -319,7 +340,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
         : q === "Q4" && view.stance === "exclude" ? `<span class="chip">⚠ 明示承擔風險</span>` : "";
       const cls = ["node", dimmed && "dimmed", i === this.#focus && "focused", conflicts.has(id) && "conflict"].filter(Boolean).join(" ");
       const blind = n.blind ? `<span class="blind" title="${esc(n.blind)}">✦ 盲區</span>` : "";
-      return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" title="${esc(n.claim)}\n⚡ ${esc(n.kill)}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
+      return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" data-tip="${esc(this.#nodeTip(id, n, q, view))}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
     }).join("");
 
     // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。
@@ -336,7 +357,14 @@ export class IntentGalaxyOverlay extends HTMLElement {
       const dist = Math.max(0, ...(c.include ?? []).map((id) => nodes[id]?.lateral?.dist ?? 0));
       const fatalKill = nodes[c.fatal]?.kill ?? "";
       const cls = ["card", this.#baseKey === key && "active", isRec && "rec"].filter(Boolean).join(" ");
-      return `<button type="button" class="${cls}" data-arch="${key}"${isRec ? ` title="主 Agent 推薦：${esc(a.recommend.why)}"` : ""}>
+      const tip = `<b>[${num}] ${esc(c.title)}</b>${c.thesis ? `<br>${esc(c.thesis)}` : ""}`
+        + (isRec && a.recommend.why ? `<br><span class=g>★ 主 Agent 推薦：${esc(a.recommend.why)}</span>` : "")
+        + `<br>採納：${(c.include ?? []).map((id) => esc(nodes[id]?.label ?? id)).join("、")}`
+        + (c.exclude?.length ? `<br>排除：${c.exclude.map((id) => esc(nodes[id]?.label ?? id)).join("、")}` : "")
+        + `<br>💸 代價：${esc(renderSacrifice(c.sacrifice))}`
+        + (fatalKill ? `<br><span class=k>⚡ 致死前提：${esc(fatalKill)}</span>` : "")
+        + `<br><span class=dim>點擊或按 ${num} 套用 · Shift+${num} 清掉手動調整後套用</span>`;
+      return `<button type="button" class="${cls}" data-arch="${key}" data-tip="${esc(tip)}">
         <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge">★ 推薦</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
         ${isRec && a.recommend.why ? `<div class="why">★ ${esc(clip(a.recommend.why, 30))}</div>` : ""}
         <div class="row">💸 代價：${esc(clip(renderSacrifice(c.sacrifice), 40))}</div>
@@ -346,7 +374,15 @@ export class IntentGalaxyOverlay extends HTMLElement {
     const status = root.querySelector("#bar .status");
     if (!sol) { status.className = "status wait"; status.textContent = draft ? `⋯ 串流中 ${Object.keys(nodes).length}/12` : "⋯ 等待星系"; }
     else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : `✦ 先發散：按 1/2/3 選主幹${rec ? `（★ 推薦 ${ARCH.find(([k]) => k === rec)[1]}）` : ""}`; }
-    else { status.className = "status unsat"; status.textContent = `✗ ${sol.status}${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}`; }
+    else { status.className = "status unsat"; status.textContent = `✗ 有互斥${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}（按 r 解除）`; }
+    status.dataset.tip = !sol ? "星系資料還沒到齊。" : sol.status === "SAT"
+      ? (this.#baseKey ? "目前的選擇彼此相容，可以確定方案。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
+      : `選取的節點彼此矛盾（${esc(sol.status)}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。`;
+    const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
+    lockBtn.textContent = embedded ? "⏎ 確定並填入對話框" : "⏎ 確定並複製指令";
+    lockBtn.dataset.tip = `把目前方案編譯成給 AI 的指令（右側「原始 AST」的內容），`
+      + (embedded ? "直接填入 AI 網頁的輸入框，你再按送出。" : "寫入 <b>.intent.lock.json</b>（14 天後驗屍用），並複製到剪貼簿，可以貼給 Claude Code。")
+      + `<br><span class=dim>快捷鍵：Enter</span>`;
     root.querySelector("#bar .msg").textContent = this.#hint ? `g 直達：${this.#hint}` : this.#message;
     const pre = root.querySelector("aside pre"), summary = root.getElementById("summary");
     pre.textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
@@ -355,6 +391,31 @@ export class IntentGalaxyOverlay extends HTMLElement {
     summary.innerHTML = this.#summaryHtml(a, sol, conflicts);
     root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
   }
+
+  #nodeTip(id, n, q, view) {
+    const state = view.stance === "include" ? (q === "Q4" ? "🛡 已設為護欄" : "✅ 已採納") : view.stance === "exclude" ? (q === "Q4" ? "⚠ 已承擔此風險" : "⛔ 已排除") : "尚未選擇";
+    const why = view.src === "derived" ? (view.stance === "include" ? "（因其他節點依賴它而自動加入）" : "（與已選節點互斥而自動讓位）") : view.src === "user" ? "（你手動設定）" : view.src === "default" ? "（來自策略卡）" : "";
+    return `<b>${esc(id)} ${esc(n.label)}</b><br>${esc(n.claim)}`
+      + (n.kill ? `<br><span class=k>⚡ 失效條件：${esc(n.kill)}</span>` : "")
+      + (n.blind ? `<br><span class=g>✦ 盲區：${esc(n.blind)}</span>` : "")
+      + `<br><span class=dim>狀態：${state}${why}<br>左鍵（Space）採納 · 右鍵（x）排除 · 再按一次取消</span>`;
+  }
+
+  #tipTimer = 0;
+  #showTip(el) {
+    clearTimeout(this.#tipTimer);
+    this.#tipTimer = setTimeout(() => {
+      const tip = this.shadowRoot.getElementById("tip"), host = this.getBoundingClientRect(), r = el.getBoundingClientRect();
+      tip.innerHTML = el.dataset.tip;
+      tip.classList.add("on");
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      const left = Math.min(Math.max(8, r.left - host.left + r.width / 2 - w / 2), host.width - w - 8);
+      const above = r.top - host.top - h - 8;
+      tip.style.left = `${left}px`;
+      tip.style.top = `${above >= 8 ? above : Math.min(r.bottom - host.top + 8, host.height - h - 8)}px`;
+    }, 220);
+  }
+  #hideTip() { clearTimeout(this.#tipTimer); this.shadowRoot.getElementById("tip")?.classList.remove("on"); }
 
   /** 右側摘要：把 LOCKED INTENT AST 的五個區塊改寫成人看得懂的分組卡片（極性規則同 renderLockedAst）。 */
   #summaryHtml(a, sol, conflicts) {
