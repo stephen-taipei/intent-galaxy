@@ -140,3 +140,6 @@ dist-ext/
 reviews/
 HANDOVER.md
 INTENT-RFC*.md
+
+# Latency benchmark output (tools/bench-latency.mjs)
+bench/

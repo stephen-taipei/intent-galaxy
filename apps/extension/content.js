@@ -55,7 +55,7 @@
     btn.type = "button";
     // 掛不進輸入框工具列時改成右下角浮動按鈕：寫出全名，避免被當成頁面本身的小圖示。
     const status = current?.status;
-    const badge = status === "done" && !frameVisible() ? " ✓ 星系完成" : status === "waiting" ? " ⋯ 生成中" : status === "failed" ? " ⚠" : "";
+    const badge = status === "done" && !frameVisible() ? " ✓ 星系完成" : status === "waiting" ? (current.unsent ? " ⋯ 待送出" : " ⋯ 生成中") : status === "failed" ? " ⚠" : "";
     btn.textContent = (kind === "floating" ? "🌌 Intent Galaxy" : "🌌 iG") + badge;
     btn.title = "Intent Galaxy：把輸入框裡的目標展開成星系，選好方案後填回對話框（Cmd/Ctrl+Shift+G）";
     btn.dataset.kind = kind;
@@ -91,7 +91,7 @@
   let frame = null, panel = null, panelId = "", panelPath = "", panelNonce = "", panelBusy = false, targetEditor = null, openGoal = "";
   const INSTANCE = crypto.randomUUID(); // 這個分頁的 content script；只有送出提示詞的分頁能判定逾時
   const frameVisible = () => !!frame && !frame.hidden;
-  const pillState = () => `${current?.status ?? "idle"}-${frameVisible() ? "open" : "closed"}`;
+  const pillState = () => `${current?.status ?? "idle"}${current?.unsent ? "-unsent" : ""}-${frameVisible() ? "open" : "closed"}`;
   const UI_KEY = "ig:ui";
   const RUN_PREFIX = "ig:run:";
   const MAX_RUNS = 100;
@@ -435,6 +435,69 @@
     return found.at(-1) ?? null;
   }
 
+  // ── 折疊對話裡的提示詞與 JSON 回覆 ──
+  // 只折疊「這個擴充功能送出、storage 有記錄」的 run：它的提示詞那一則，以及緊接著的 AI 回覆。
+  // 只加 data 屬性與 CSS，不改網站的 DOM 內容（React 管理的節點不能動）；認不出網站的訊息結構時一律不折疊（fail-open）。
+  const ADAPTERS = [
+    // ChatGPT（以及其他用同樣標記的網站）
+    { match: () => !!document.querySelector("[data-message-author-role]"), turn: "[data-message-author-role]", role: (el) => el.getAttribute("data-message-author-role") },
+    // Gemini
+    { match: () => location.hostname === "gemini.google.com", turn: "user-query, model-response", role: (el) => (el.tagName === "USER-QUERY" ? "user" : "assistant") },
+    // Claude
+    { match: () => location.hostname === "claude.ai", turn: '[data-testid="user-message"], .font-claude-response, .font-claude-message', role: (el) => (el.matches('[data-testid="user-message"]') ? "user" : "assistant") },
+  ];
+  const CLOAK_CSS = `
+    [data-ig-cloak] { position: relative !important; }
+    [data-ig-cloak]:not([data-ig-expanded="true"]) { max-height: 46px !important; overflow: hidden !important; cursor: pointer !important; }
+    [data-ig-cloak]:not([data-ig-expanded="true"]) > * { opacity: .03 !important; pointer-events: none !important; }
+    [data-ig-cloak]::before { content: attr(data-ig-banner); position: absolute; left: 0; right: 0; top: 0; z-index: 3; box-sizing: border-box; height: 40px; display: flex; align-items: center;
+      padding: 0 14px; border: 1px solid rgba(56,189,248,.55); border-radius: 12px; background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(139,92,246,.16)), #0b1220;
+      color: #e2e8f0; font: 600 13px/1.2 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    [data-ig-cloak][data-ig-expanded="true"] { padding-top: 46px !important; }`;
+  let cloakStyled = false;
+  const shortGoal = (g) => (g.length > 30 ? `${g.slice(0, 30)}…` : g);
+  function bannerFor(kind, run) {
+    if (kind === "prompt") return `🌌 Intent Galaxy 分析提示詞：「${shortGoal(run.goal)}」　（點一下展開）`;
+    if (run.status === "done") return `✅ 星系已生成　在 🌌 iG 面板查看　（點一下展開 JSON）`;
+    if (run.status === "failed") return `⚠ 星系 JSON 讀取失敗　（點一下展開，可複製後貼到面板）`;
+    return `⚡ AI 正在生成星系…　（點一下展開）`;
+  }
+  function cloakRuns(onPage) {
+    const adapter = ADAPTERS.find((a) => a.match());
+    if (!adapter || !onPage.length) return;
+    const turns = [...document.querySelectorAll(adapter.turn)].filter((el) => !el.parentElement?.closest(adapter.turn)); // 只取最外層的訊息節點
+    if (!turns.length) return;
+    for (const t of onPage) {
+      const run = cache.get(t.nonce);
+      if (!run) continue;
+      const inner = t.node.parentElement?.closest(adapter.turn);
+      const promptTurn = inner && turns.find((x) => x === inner || x.contains(inner));
+      if (!promptTurn || adapter.role(promptTurn) !== "user") continue; // 認不出：不折疊
+      setCloak(promptTurn, "prompt", run);
+      const reply = turns[turns.indexOf(promptTurn) + 1];
+      if (reply && adapter.role(reply) === "assistant") setCloak(reply, "response", run);
+    }
+  }
+  function setCloak(el, kind, run) {
+    if (!cloakStyled) {
+      cloakStyled = true;
+      const style = document.createElement("style");
+      style.textContent = CLOAK_CSS;
+      (document.head ?? document.documentElement).appendChild(style);
+    }
+    const banner = bannerFor(kind, run);
+    if (el.getAttribute("data-ig-cloak") !== kind) el.setAttribute("data-ig-cloak", kind);
+    if (el.getAttribute("data-ig-banner") !== banner) el.setAttribute("data-ig-banner", banner);
+  }
+  // 點擊：收合時點一下展開（只在收合時攔截，展開後網站自己的按鈕照常運作）；展開時點最上面那條橫幅收合。
+  document.addEventListener("click", (e) => {
+    const el = e.target instanceof Element ? e.target.closest("[data-ig-cloak]") : null;
+    if (!el) return;
+    const expanded = el.getAttribute("data-ig-expanded") === "true";
+    if (!expanded) { el.setAttribute("data-ig-expanded", "true"); e.preventDefault(); e.stopPropagation(); return; }
+    if (e.clientY - el.getBoundingClientRect().top <= 42) { el.removeAttribute("data-ig-expanded"); e.preventDefault(); e.stopPropagation(); }
+  }, true);
+
   // ── run 的生命週期 ──
   const MAX_WAIT_SEC = 30 * 60;   // 推理型模型（Pro / Thinking）常要 5–15 分鐘以上；從提示詞出現在對話裡時起算
   const UNSENT_GRACE_MS = 60_000; // 提示詞既不在輸入框也不在對話裡（被清掉）超過這麼久：判定沒有送出
@@ -464,7 +527,7 @@
   async function checkRun(run, anchor, next, editorHas, immediate) {
     const now = Date.now();
     if (run.unsent) {
-      if (anchor) { Object.assign(run, { unsent: false, sentAt: now }); await saveRun(run); toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) }); }
+      if (anchor) { Object.assign(run, { unsent: false, sentAt: now, pathTo: location.pathname }); await saveRun(run); toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) }); }
       else if (editorHas) run.lostSince = 0;
       else if (isOwner(run) && now - (run.lostSince ||= now) > UNSENT_GRACE_MS) return failRun(run, "提示詞沒有送出（輸入框裡已經沒有它）。可以重新生成。");
       if (!anchor) return toPanel(run.nonce, { type: "ig-progress", elapsedSec: 0, unsent: true });
@@ -515,6 +578,7 @@
       if (localRun && (localRun.status !== "waiting" || (!localRun.unsent && !onPage.some((t) => t.nonce === localRun.nonce) && Date.now() - (localRun.sentAt ?? localRun.startedAt) > RENDER_GRACE_MS))) {
         localRun = null;
       }
+      cloakRuns(onPage);
       mountPill();
     })().finally(() => { refreshing = null; });
     return refreshing;
@@ -527,14 +591,7 @@
     if (busy || Date.now() - lastRefresh > 5000) { lastRefresh = Date.now(); refresh(); }
   }, 1500);
 
-  // ── 送出提示詞 ──
-  let sendGen = 0; // 送出期間（約 2 秒）使用者若放棄，作廢後續的補按送出
-  function clickSend(editor) {
-    const form = editor.closest("form, fieldset") ?? editor.parentElement?.parentElement?.parentElement;
-    const send = [...(form ?? document).querySelectorAll(SEND_BUTTON)].find((b) => visible(b) && !b.disabled);
-    if (send) send.click();
-    else editor.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, bubbles: true, cancelable: true }));
-  }
+  // ── 把提示詞放進輸入框（由使用者按送出）──
 
   async function startRun(goal, prompt) {
     await refresh(true);
@@ -549,17 +606,8 @@
     await saveRun(run);
     sendPanel({ type: "ig-started", nonce });
     mountPill();
-    const gen = ++sendGen;
-    // 送出按鈕通常在輸入後才出現或啟用：稍等再按；提示詞還在輸入框就再按一次。
-    await sleep(400); if (gen !== sendGen) return;
-    clickSend(editor);
-    // 送出後新對話常會立刻換網址（/ → /c/<id>）：記下第一個新網址，識別碼畫出前的寬限也適用於它。
-    for (let t = 0; t < 1500; t += 100) {
-      await sleep(100); if (gen !== sendGen) return;
-      if (!run.pathTo && location.pathname !== run.pathFrom) run.pathTo = location.pathname;
-    }
-    if (editorText(editor).includes(tagOf(nonce))) { clickSend(editor); await sleep(1200); if (gen !== sendGen) return; }
-    if (editorText(editor).includes(tagOf(nonce)) && run.status === "waiting") toPanel(nonce, { type: "ig-chat-error", detail: "提示詞已放進輸入框，但網站沒有自動送出（AI 可能還在回覆上一則）。請在對話框按一下送出，這裡會自動接著等。" });
+    // 由使用者自己按送出（自動送出可能違反各家網站的使用條款）：這裡只提醒，送出後識別碼出現在對話裡就自動接著等。
+    toPanel(nonce, { type: "ig-progress", elapsedSec: 0, unsent: true });
     refresh();
   }
 
@@ -639,7 +687,7 @@
     // 放棄：只取消面板看到的那一個等待中／失敗的 run；已完成的星系不會被刪。
     if (msg.type === "intent-reset" && msg.nonce) {
       const run = cache.get(msg.nonce);
-      if (localRun?.nonce === msg.nonce) { sendGen++; localRun = null; }
+      if (localRun?.nonce === msg.nonce) localRun = null;
       if (!run || run.status !== "done") {
         cache.delete(msg.nonce);
         if (current?.nonce === msg.nonce) current = null;

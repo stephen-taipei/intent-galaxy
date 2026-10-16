@@ -5,6 +5,7 @@ import "./galaxy/apps/web/galaxy-overlay.js";
 import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./galaxy/libs/epistemic/src/prompt.js";
 import { DISHWASHER_GALAXY } from "./samples/dishwasher.js";
 import { SWEET_SOUR_GALAXY } from "./samples/sweet-sour.js";
+import { SAMPLE_GALAXY } from "./galaxy/apps/web/sample-galaxy.js";
 
 const api = globalThis.browser ?? globalThis.chrome;
 const CLI = "http://127.0.0.1:4787";
@@ -18,7 +19,11 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const DEMOS = [
   { label: "示範：怎麼挑洗碗機", goal: "如何挑選洗碗機？", galaxy: DISHWASHER_GALAXY },
   { label: "示範：酸甜又不負擔的食物", goal: "我喜歡又甜又酸的食物，但又不想吃了會讓身體太有負擔，有哪些選擇適合我？", galaxy: SWEET_SOUR_GALAXY },
+  { label: "示範：多主題前端架構", goal: "多版型、多主題的前端系統該怎麼設計？", galaxy: SAMPLE_GALAXY },
 ];
+// 網頁版提示詞的第一行：先消除模型「自己開程式驗證字數」的動機（ChatGPT Pro 曾因此跑 200 多秒），再禁止呼叫工具。
+const RUNTIME_HEADER = "[RUNTIME] Reply with plain text only. Do not call any tool (code, browsing, canvas). Do not verify or count; the client validates and repairs all limits. Approximate lengths are acceptable. Start output immediately with the fenced block.";
+const SLOW_HINT_SEC = 20;
 let site = "", goal = "", waiting = false;
 let nonce = "";        // 目前顯示的生成工作的識別碼（放棄時只取消這一個）
 let cliBusy = false;   // 本機 CLI 生成中：縮小、換對話都保留面板
@@ -129,20 +134,35 @@ async function spawnViaCli() {
   }
 }
 
+let slowShown = false;
+function waitingStrip(elapsedSec, unsent) {
+  const giveUp = ["放棄等待", () => { resetJob(); galaxy.showMessage("已放棄等待。可以在輸入框打新的問題，再按 iG。"); }];
+  if (unsent) return setStrip("📨 提示詞已放進輸入框：請按對話框的送出鍵，送出後這裡會自動接著等", [giveUp]);
+  slowShown = elapsedSec >= SLOW_HINT_SEC;
+  setStrip(`⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`,
+    [["已回覆但沒出現？貼上 JSON", showPaste], ...(slowShown ? [["先看示範", () => { waiting = false; demoActions()[0][1](); }]] : []), giveUp],
+    slowShown ? "超過 20 秒還沒有回覆：可能選了深度推理模型（如 Pro、Thinking），常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓；想快一點，下次先在網頁上切換到一般模型。" : "");
+}
 function startWaiting(g, elapsedSec = 0, unsent = false) {
   hideCard();
   goal = g || goal;
   waiting = true;
   shown = "waiting";
   galaxy.beginStream(goal);
-  galaxy.showMessage("等待 AI 在對話中回覆星系 JSON…");
-  setStrip(`⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`, [["已回覆但沒出現？貼上 JSON", showPaste], ["放棄等待", () => { resetJob(); galaxy.showMessage("已放棄等待。可以在輸入框打新的問題，再按 iG。"); }]],
-    "推理型模型（如 Pro、Thinking）常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓。");
-  updateWaiting(elapsedSec, unsent);
+  galaxy.showMessage(unsent ? "等你按下送出…" : "等待 AI 在對話中回覆星系 JSON…");
+  waitingUnsent = unsent;
+  waitingStrip(elapsedSec, unsent);
 }
+let waitingUnsent = false;
 function updateWaiting(elapsedSec, unsent) {
+  // 狀態改變（送出了、超過 20 秒）時重建一次提示條；其他時候只更新秒數，按鈕才點得到。
+  if (unsent !== waitingUnsent || (!unsent && !slowShown && elapsedSec >= SLOW_HINT_SEC)) {
+    waitingUnsent = unsent;
+    if (!unsent) galaxy.showMessage("等待 AI 在對話中回覆星系 JSON…");
+    return waitingStrip(elapsedSec, unsent);
+  }
   const t = strip.querySelector(".t");
-  if (t) t.textContent = unsent ? "⚠ 提示詞還在輸入框裡：請在對話框按一下送出" : `⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`;
+  if (t && !unsent) t.textContent = `⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`;
 }
 function showFailed(detail) {
   hideCard();
@@ -156,17 +176,17 @@ function showFailed(detail) {
 }
 
 function spawnViaChat() {
-  const prompt = `${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\n`
-    + "Answer directly in this reply: do not run code, call tools, or browse the web. Put the JSON in one ```json code block.";
+  const prompt = `${RUNTIME_HEADER}\n\n${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\n`
+    + "Put the JSON in one ```json code block.";
   toParent({ type: "intent-chat-spawn", prompt, goal });
-  startWaiting(goal, 0);
+  startWaiting(goal, 0, true);
 }
 
 function confirmChat(extra = []) {
   const g = goal; // 卡片開著時畫面可能換成別的星系：送出的永遠是卡片上寫的這個問題
   showCard(`用 ${site} 生成星系`,
     `目標：<b>${esc(goal)}</b><br><br>`
-      + "我會在這個對話送出一段分析提示詞，AI 回覆後自動畫出星系。<br>"
+      + "我會把一段分析提示詞放進這個對話的輸入框，<b>由你按送出</b>；AI 回覆後自動畫出星系。對話裡的提示詞和 JSON 會自動折疊成一行，點一下可以展開。<br>"
       + "<small>⏱ 一般模型約 1–3 分鐘；推理型高階模型（如 ChatGPT Pro、Thinking、Gemini Pro）可能要 5–15 分鐘，想快一點可以先在網頁上切換到一般模型。<br>"
       + "不想讓提示詞出現在對話裡？在終端機執行 <code>npx @stephen.taipei/intent-galaxy</code>，改用本機的 AI 生成。</small>",
     [["開始生成", () => { goal = g; spawnViaChat(); }, true], ...extra, ...demoActions()]);
@@ -240,7 +260,7 @@ api.runtime.onMessage.addListener((msg) => {
   if (msg?.id !== id) return;
   if (msg.type === "ig-open") open(msg);
   if (msg.type === "ig-started") nonce = msg.nonce;
-  if (msg.type === "ig-progress" && waiting) { if (msg.nonce) nonce = msg.nonce; updateWaiting(msg.elapsedSec, msg.unsent); }
+  if (msg.type === "ig-progress" && waiting) { if (msg.nonce) nonce = msg.nonce; updateWaiting(msg.elapsedSec, !!msg.unsent); }
   if (msg.type === "ig-reopen" && msg.job) { nonce = msg.job.nonce; startWaiting(msg.job.goal, msg.job.elapsedSec, msg.job.unsent); }
   if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
   if (msg.type === "ig-reset") { waiting = false; nonce = ""; shown = "idle"; setStrip(""); galaxy.showMessage("這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。"); }
