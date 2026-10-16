@@ -59,6 +59,22 @@ export function detectHookInstalled(cwd = process.cwd()) {
   return fs.existsSync(path.join(root, ".intent/hooks/kill-gate.mjs")) && candidates.some((f) => (read(f) ?? "").includes("kill-gate.mjs"));
 }
 
+/** 這個 repo 歷來有效的 Intent-Kill 判決（由舊到新），規則與 kill-gate.mjs 相同：Evidence 至少 12 個 code point。 */
+export function readVerdicts(cwd = process.cwd()) {
+  const raw = git(cwd, ["log", "--reverse", "-F", "--grep", "Intent-Kill", "--format=%B%x1e"]);
+  if (!raw) return [];
+  const verdicts = [];
+  for (const message of raw.split("\u001e")) {
+    const t = {};
+    for (const line of message.split(/\r?\n/)) {
+      const m = line.trim().match(/^(Intent-(?:Kill|Kill-Evidence))\s*[:：]\s*(.+)$/);
+      if (m) t[m[1]] = m[2].trim();
+    }
+    if (/^(alive|dead|unobservable)$/.test(t["Intent-Kill"] ?? "") && [...(t["Intent-Kill-Evidence"] ?? "")].length >= 12) verdicts.push(t["Intent-Kill"]);
+  }
+  return verdicts;
+}
+
 export function initHook(cwd = process.cwd(), log = console.log) {
   const root = git(cwd, ["rev-parse", "--show-toplevel"]);
   if (!root) throw new Error("init-hook 必須在 git repo 內執行");
