@@ -121,9 +121,10 @@ storybook-static
 .firebase
 .turbo
 
-# Extension build output (npm run build:ext)
+# Extension build output (npm run build:ext / pack:ext)
 apps/extension/galaxy/
 apps/extension-firefox/galaxy/
 apps/extension-firefox/content.js
 apps/extension-firefox/panel.html
 apps/extension-firefox/panel.js
+dist-ext/

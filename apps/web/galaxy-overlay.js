@@ -147,6 +147,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
     this.#render();
   }
 
+  /** 在狀態列顯示一則訊息（例如鎖檔被伺服器拒絕的原因）。 */
+  showMessage(text) { this.#message = text; this.#render(); }
+
   selectArchetype(key, clearOverrides = false) {
     if (!this.#analysis?.archetypes[key]) return;
     this.#snapshot();
