@@ -1,4 +1,4 @@
-// Content Script：在 Claude / ChatGPT / Grok / Gemini 輸入框工具列（或 Claude Code Mod 狀態列）掛載 `🌌 iG` 膠囊，
+// Content Script：在 Claude / ChatGPT / Gemini / Grok / DeepSeek / Qwen / Perplexity / Copilot / Mistral / Kimi 輸入框工具列（或 Claude Code Mod 狀態列）掛載 `🌌 iG` 膠囊，
 // 點擊或按 Cmd/Ctrl+Shift+G 於輸入框上方展開星系面板（擴充功能 iframe），Enter 鎖定後把 LOCKED INTENT AST 寫回輸入框。
 (() => {
   if (window.__intentGalaxyMounted) return;
@@ -15,6 +15,12 @@
     "chatgpt.com": ["#prompt-textarea", 'form [contenteditable="true"]', "form textarea"],
     "grok.com": ['form [contenteditable="true"]', "form textarea", "textarea"],
     "gemini.google.com": ['rich-textarea [contenteditable="true"]', ".ql-editor[contenteditable]"],
+    "chat.deepseek.com": ["textarea#chat-input", "textarea"],
+    "chat.qwen.ai": ["textarea#chat-input", "textarea"],
+    "perplexity.ai": ['[contenteditable="true"]#ask-input', "textarea"],
+    "copilot.microsoft.com": ["textarea#userInput", "textarea"],
+    "chat.mistral.ai": ['[contenteditable="true"]', "textarea"],
+    "kimi.com": ['.chat-input-editor[contenteditable="true"]', '[contenteditable="true"]'],
   };
   const SEND_BUTTON = 'button[aria-label*="Send" i], button[aria-label*="傳送"], button[aria-label*="送出"], button[data-testid*="send" i], button[type="submit"]';
   const MOD_PILLS = ["Recap", "gF", "Sub5"]; // Claude Code Mod（deckhand）狀態列上的既有膠囊

@@ -28,7 +28,10 @@ export class IntentNdjsonSplitter {
       else if (c === "\\") this.#esc = true;
       else if (c === "\"") {
         this.#inStr = false;
-        if (this.#strIsKey) this.#keys[this.#stack.length] = JSON.parse(this.#buf.slice(this.#strStart, this.#pos + 1));
+        if (this.#strIsKey) {
+          // 模型在 JSON 前後夾雜說明文字時，鍵可能含未跳脫的換行：視為形狀錯誤而非拋出例外。
+          try { this.#keys[this.#stack.length] = JSON.parse(this.#buf.slice(this.#strStart, this.#pos + 1)); } catch { out.push(this.#fail("bad_json", false)); }
+        }
         else this.#valueEnd(out, this.#pos + 1);
       }
       return;

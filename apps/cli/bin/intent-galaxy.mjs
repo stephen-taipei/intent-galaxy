@@ -19,6 +19,11 @@ if (argv[0] === "init-hook") {
   try { initHook(process.cwd()); process.exit(0); } catch (e) { console.error(`✗ ${e.message}`); process.exit(1); }
 }
 const flag = (name) => argv.includes(name);
+// --provider / --model：網頁「生成星系」的預設 AI（也可用 INTENT_GALAXY_PROVIDER / INTENT_GALAXY_MODEL）。
+for (const [name, env] of [["--provider", "INTENT_GALAXY_PROVIDER"], ["--model", "INTENT_GALAXY_MODEL"]]) {
+  const i = argv.indexOf(name);
+  if (i >= 0 && argv[i + 1]) process.env[env] = argv[i + 1];
+}
 const portArg = argv.indexOf("--port");
 const preferredPort = Number(portArg >= 0 ? argv[portArg + 1] : process.env.INTENT_GALAXY_PORT ?? DEFAULT_PORT);
 const standalone = flag("--standalone") || process.stdin.isTTY;

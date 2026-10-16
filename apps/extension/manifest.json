@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Intent Galaxy (Claude Code Mod & Multi-AI)",
+  "name": "Intent Galaxy (Multi-AI)",
   "version": "0.1.0",
-  "description": "Injects the `iG` (Intent Galaxy) pill button into Claude, ChatGPT, Grok & Gemini input bars for 60s visual intent alignment.",
+  "description": "Adds an iG (Intent Galaxy) pill to Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral and Kimi chat inputs for 60s visual intent alignment.",
   "host_permissions": [
     "http://127.0.0.1/*"
   ],
@@ -12,7 +12,13 @@
         "https://claude.ai/*",
         "https://chatgpt.com/*",
         "https://grok.com/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://chat.deepseek.com/*",
+        "https://chat.qwen.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://copilot.microsoft.com/*",
+        "https://chat.mistral.ai/*",
+        "https://www.kimi.com/*"
       ],
       "js": [
         "content.js"
@@ -31,7 +37,13 @@
         "https://claude.ai/*",
         "https://chatgpt.com/*",
         "https://grok.com/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://chat.deepseek.com/*",
+        "https://chat.qwen.ai/*",
+        "https://www.perplexity.ai/*",
+        "https://copilot.microsoft.com/*",
+        "https://chat.mistral.ai/*",
+        "https://www.kimi.com/*"
       ]
     }
   ]

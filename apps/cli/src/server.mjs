@@ -4,12 +4,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { stripTypeScriptTypes } from "node:module";
 import { spawnGalaxy } from "./spawn.mjs";
+import { PROVIDER_IDS, defaultProviderId, detectProviders, listModels } from "./providers.mjs";
 import { detectHookInstalled, readVerdicts } from "./init-hook.mjs";
 import { LockError, buildIntentLock, repairAnalysis, solveGalaxy } from "../../../libs/core/src/index.ts";
 import { ARCHETYPE_KEYS, NODE_IDS } from "../../../libs/protocol/src/index.ts";
 
 const MAX_BODY = 1 << 20;
 const STANCES = new Set(["include", "exclude", "neutral"]);
+const MODEL_RE = /^[\w.:/@-]{1,120}$/;
 // withheld_kill（扣留的第四把刀）只留在伺服器與鎖檔，永不送進瀏覽器（spec §3.2 S6、RFC V3 §1.3）。
 const omitWithheld = (analysis) => { if (!analysis) return analysis; const { withheld_kill, ...rest } = analysis; return rest; };
 const browserSafe = (g) => g && { ...g, analysis: omitWithheld(g.analysis) };
@@ -85,6 +87,15 @@ export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths =
     const url = new URL(req.url, hub.url);
     try {
       if (req.method === "GET" && url.pathname === "/api/galaxy") return json(res, 200, browserSafe(current) ?? { id: 0, analysis: null });
+      if (req.method === "GET" && url.pathname === "/api/providers") {
+        const providers = await detectProviders();
+        return json(res, 200, { providers, defaultProvider: await defaultProviderId(providers) });
+      }
+      if (req.method === "GET" && url.pathname === "/api/models") {
+        const id = url.searchParams.get("provider");
+        if (!PROVIDER_IDS.includes(id)) return json(res, 400, { ok: false, error: "unknown provider" });
+        return json(res, 200, { models: await listModels(id) });
+      }
       if (req.method === "GET" && url.pathname === "/api/events") {
         res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-store", Connection: "keep-alive" });
         res.write(": connected\n\n");
@@ -97,17 +108,20 @@ export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths =
       if (!originOk(req)) return json(res, 403, { ok: false, error: "origin not allowed" });
 
       if (url.pathname === "/api/spawn") {
-        const { goal } = await readJson(req);
+        const { goal, provider, model } = await readJson(req);
         if (typeof goal !== "string" || !goal.trim() || goal.length > 4000) return json(res, 400, { ok: false, error: "goal must be a non-empty string (<= 4000 chars)" });
+        if (provider !== undefined && !PROVIDER_IDS.includes(provider)) return json(res, 400, { ok: false, error: "unknown provider" });
+        if (model !== undefined && model !== "" && !(typeof model === "string" && MODEL_RE.test(model))) return json(res, 400, { ok: false, error: "invalid model id" });
+        const chosen = provider ?? await defaultProviderId();
         res.writeHead(200, { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-store" });
-        log(`spawn: ${goal.slice(0, 60)}`);
+        log(`spawn [${chosen}${model ? " " + model : ""}]: ${goal.slice(0, 60)}`);
         const abort = spawnGalaxy(goal, (ev) => {
           if (ev.t === "repaired") ev = { ...ev, galaxyId: hub.publish(goal, ev.analysis, ev.findings, "spawn").id, analysis: omitWithheld(ev.analysis) };
           if (res.writableEnded) return;
           res.write(JSON.stringify(ev) + "\n");
           // spawnGalaxy 只在收尾時送出 repaired 或 error。
           if (ev.t === "repaired" || ev.t === "error") res.end();
-        });
+        }, { provider: chosen, model: model || undefined });
         res.on("close", () => abort());
         return;
       }

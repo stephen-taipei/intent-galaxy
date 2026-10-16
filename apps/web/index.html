@@ -15,6 +15,10 @@
   #goal:focus { border-color: #38bdf8; }
   header button { padding: 6px 14px; border-radius: 8px; border: none; background: #38bdf8; color: #080b11; font-weight: 700; font-size: 12px; cursor: pointer; }
   header button:disabled { opacity: .5; cursor: wait; }
+  #provider, #model { background: #0b101b; border: 1px solid #334155; border-radius: 8px; padding: 6px 8px; color: #e2e8f0; font-size: 12px; outline: none; }
+  #provider { max-width: 190px; }
+  #model { width: 170px; }
+  #provider:focus, #model:focus { border-color: #38bdf8; }
   intent-galaxy-overlay { min-height: 0; }
   /* 產生指令後的「下一步」視窗 */
   #done { margin: auto; width: min(560px, calc(100vw - 32px)); background: #111723; color: #e2e8f0; border: 1px solid #334155; border-radius: 14px; padding: 20px 22px; box-shadow: 0 24px 60px rgba(0,0,0,.6); }
@@ -36,8 +40,11 @@
 <header>
   <div class="brand">🌌 Intent Galaxy<span class="badge" id="source-badge" title="目前星系的來源：示範資料、claude -p 生成，或 MCP 從 Claude Code 灌入">示範星系</span></div>
   <form id="goal-form">
-    <input id="goal" type="text" autocomplete="off" placeholder="輸入一句模糊目標，按 Enter 以本機 claude -p 生成 12 顆節點…">
-    <button type="submit" id="spawn-btn" title="用本機 claude -p 依你的目標生成新的 12 顆節點星系（約 3–4 分鐘）">生成星系</button>
+    <input id="goal" type="text" autocomplete="off" placeholder="輸入一句模糊目標，按 Enter 用右邊選的 AI 生成 12 顆節點…">
+    <select id="provider" title="用哪個 AI 生成星系：本機已登入的 CLI（免 API key），或設定了 API key 的供應商"></select>
+    <input id="model" list="model-list" autocomplete="off" placeholder="模型（留空＝預設）" title="模型 ID；可從清單選，或直接輸入">
+    <datalist id="model-list"></datalist>
+    <button type="submit" id="spawn-btn" title="用選定的 AI 依你的目標生成新的 12 顆節點星系（通常 1–4 分鐘）">生成星系</button>
   </form>
 </header>
 <intent-galaxy-overlay id="galaxy"></intent-galaxy-overlay>
@@ -59,7 +66,7 @@ import { SAMPLE_GALAXY } from "./sample-galaxy.js";
 const galaxy = document.getElementById("galaxy");
 const badge = document.getElementById("source-badge");
 const served = location.protocol.startsWith("http");
-const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); badge.textContent = g.source === "mcp" ? "MCP 灌入" : g.source === "spawn" ? "claude -p 生成" : "示範星系"; galaxy.focus(); };
+const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); badge.textContent = g.source === "mcp" ? "MCP 灌入" : g.source === "spawn" ? "AI 生成" : "示範星系"; galaxy.focus(); };
 
 galaxy.setGalaxy(SAMPLE_GALAXY);
 // ?base=alpha|beta|gamma：開啟時直接套用策略卡（分享示範連結、截圖用）。
@@ -71,13 +78,44 @@ if (served) {
 }
 galaxy.focus();
 
+// AI 供應商與模型選單：選擇記在 localStorage（只是偏好，讀寫失敗就用伺服器預設）。
+const providerSel = document.getElementById("provider"), modelInput = document.getElementById("model");
+const pref = { get: (k) => { try { return localStorage.getItem(k) ?? ""; } catch { return ""; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+async function loadModels() {
+  const list = document.getElementById("model-list");
+  list.innerHTML = "";
+  const opt = providerSel.selectedOptions[0];
+  modelInput.placeholder = opt?.dataset.default ? `模型（預設 ${opt.dataset.default}）` : opt?.dataset.kind === "api" ? "模型 ID（必填）" : "模型（留空＝CLI 預設）";
+  const { models = [] } = await fetch(`/api/models?provider=${encodeURIComponent(providerSel.value)}`).then((r) => r.json()).catch(() => ({}));
+  list.append(...models.map((m) => Object.assign(document.createElement("option"), { value: m })));
+}
+if (served) {
+  fetch("/api/providers").then((r) => r.json()).then(({ providers, defaultProvider }) => {
+    const groups = { cli: "本機 CLI（免 API key）", api: "API（需 API key）" };
+    for (const [kind, label] of Object.entries(groups)) {
+      const g = Object.assign(document.createElement("optgroup"), { label });
+      for (const p of providers.filter((x) => x.kind === kind)) {
+        g.append(Object.assign(document.createElement("option"), { value: p.id, textContent: p.available ? p.label : `${p.label}（${p.hint}）`, disabled: !p.available }));
+        Object.assign(g.lastChild.dataset, { kind: p.kind, default: p.defaultModel });
+      }
+      providerSel.append(g);
+    }
+    const saved = pref.get("ig-provider");
+    providerSel.value = providers.some((p) => p.id === saved && p.available) ? saved : defaultProvider;
+    modelInput.value = pref.get(`ig-model-${providerSel.value}`);
+    loadModels();
+  }).catch(() => { providerSel.hidden = modelInput.hidden = true; });
+} else { providerSel.hidden = modelInput.hidden = true; }
+providerSel.addEventListener("change", () => { pref.set("ig-provider", providerSel.value); modelInput.value = pref.get(`ig-model-${providerSel.value}`); loadModels(); });
+modelInput.addEventListener("change", () => pref.set(`ig-model-${providerSel.value}`, modelInput.value.trim()));
+
 document.getElementById("goal-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const goal = document.getElementById("goal").value.trim(), btn = document.getElementById("spawn-btn");
   if (!goal || !served) return;
   btn.disabled = true; galaxy.beginStream(goal); galaxy.focus();
   try {
-    const res = await fetch("/api/spawn", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ goal }) });
+    const res = await fetch("/api/spawn", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ goal, provider: providerSel.value || undefined, model: modelInput.value.trim() }) });
     const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
     let buf = "";
     for (;;) {
@@ -87,7 +125,7 @@ document.getElementById("goal-form").addEventListener("submit", async (e) => {
       let nl;
       while ((nl = buf.indexOf("\n")) >= 0) { const line = buf.slice(0, nl); buf = buf.slice(nl + 1); if (line.trim()) galaxy.applyStreamEvent(JSON.parse(line)); }
     }
-    badge.textContent = "claude -p 生成";
+    badge.textContent = `${providerSel.selectedOptions[0]?.textContent ?? "AI"} 生成`;
   } catch (err) {
     galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message });
   } finally { btn.disabled = false; }

@@ -184,7 +184,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     if (ev.t === "repaired") { this.setGalaxy(ev.analysis, { galaxyId: ev.galaxyId ?? 0, goal: this.goal }); return; }
     if (ev.t === "error") { this.#message = `生成失敗（${ev.code}）${ev.detail ? "：" + ev.detail : ""}`; this.#render(); return; }
     if (!this.#draft) this.beginStream(this.goal ?? "");
-    if (ev.t === "progress") { this.#message = `模型思考中 · 約 ${Number(ev.thinkingTokens).toLocaleString()} tokens`; this.#render(); return; }
+    if (ev.t === "progress") { this.#message = ev.thinkingTokens != null ? `模型思考中 · 約 ${Number(ev.thinkingTokens).toLocaleString()} tokens` : `${ev.provider ?? "模型"} 生成中 · 已等待 ${ev.elapsedSec ?? 0} 秒`; this.#render(); return; }
     if (ev.t === "skeleton") this.#message = "";
     if (ev.t === "skeleton" && ev.core) this.#draft.core = ev.core;
     else if (ev.t === "node") this.#draft.nodes[ev.id] = ev.node;
