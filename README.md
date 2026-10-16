@@ -1,4 +1,4 @@
-# Intent Engineering Galaxy 🌌
+# Intent Galaxy 🌌
 
 把一句模糊目標展開成「中心命題 + 4 位敵對專家 + 12 顆思緒節點」的星系圖。先發散看見盲區，再用鍵盤 1 分鐘收斂，
 最後由**零 LLM 的純函式編譯器**產出確定性的 `LOCKED INTENT AST`，直接注入 Claude Code 或 AI 網頁的輸入框。
@@ -11,7 +11,7 @@
 
 | 形態 | 內容 | 狀態 |
 | ---- | ---- | ---- |
-| **CLI** | `npx intent-engineering-galaxy`：127.0.0.1 星系伺服器 + `claude -p` 串流生成 | ✅ |
+| **CLI** | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 星系伺服器 + `claude -p` 串流生成 | ✅ |
 | **MCP** | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`，Enter 後把 AST 回傳給 Claude | ✅ |
 | **Extension** | Chrome / Firefox：在 Claude、ChatGPT、Grok、Gemini 輸入框旁加 `🌌 iG` 膠囊 | ✅ |
 | **Kill-gate** | `.intent.lock.json`（RFC 8785 JCS + SHA-256）與 14 天後的 commit 驗屍守門員 | ✅ |
@@ -22,8 +22,8 @@
 
 ```bash
 cd ~/code/some-repo
-npx intent-engineering-galaxy          # 開啟 http://127.0.0.1:4787，輸入一句目標按 Enter 生成星系
-npx intent-engineering-galaxy --port 4300 --no-open
+npx @stephen.taipei/intent-galaxy          # 開啟 http://127.0.0.1:4787，輸入一句目標按 Enter 生成星系
+npx @stephen.taipei/intent-galaxy --port 4300 --no-open
 ```
 
 - 只綁 `127.0.0.1`；每個請求檢查 Host（防 DNS rebinding）、POST 來源與路徑穿越。
@@ -33,7 +33,7 @@ npx intent-engineering-galaxy --port 4300 --no-open
 ### 註冊為 Claude Code MCP
 
 ```bash
-claude mcp add intent-galaxy -- npx -y intent-engineering-galaxy
+claude mcp add intent-galaxy -- npx -y @stephen.taipei/intent-galaxy
 ```
 
 在 Claude Code 裡請它「用 intent galaxy 分析這個目標」：宿主 Claude 先呼叫 `intent_spawner_prompt` 取得規則，
@@ -42,7 +42,7 @@ claude mcp add intent-galaxy -- npx -y intent-engineering-galaxy
 ### 14 天被動打臉（kill-gate）
 
 ```bash
-npx intent-engineering-galaxy init-hook
+npx @stephen.taipei/intent-galaxy init-hook
 ```
 
 把 `kill-gate.mjs` 複製到 `.intent/hooks/`，並掛上 `commit-msg`（已有 husky 就追加到 `.husky/commit-msg`；否則在 `core.hooksPath` 為空時設成 `.intent/hooks`）、

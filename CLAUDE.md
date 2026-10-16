@@ -1,10 +1,10 @@
-# CLAUDE.md — intent-engineering-galaxy
+# CLAUDE.md — intent-galaxy
 
 ## 1. 專案定位與終極目標
-本專案為 `intent-engineering-galaxy`（意圖工程與 60 秒視覺化星系決策框架），架構與發行標準完全對標作者另一開源套件 `adorable-git-graph`：
+本專案為 Intent Galaxy（npm 套件 `@stephen.taipei/intent-galaxy`；意圖工程與 60 秒視覺化星系決策框架），架構與發行標準完全對標作者另一開源套件 `adorable-git-graph`：
 - **零外部 Runtime 依賴（0 Dependencies）**、Node.js >= 22、Apache-2.0 License。
 - **三位一體發行形態**：
-  1. **Local CLI & MCP Server (`apps/cli`)**：支援 `npx intent-engineering-galaxy` 於本機 `127.0.0.1` 啟動，並支援 Stdio MCP 協議直接與 Claude Code / CLI 工具雙向通訊。
+  1. **Local CLI & MCP Server (`apps/cli`)**：支援 `npx @stephen.taipei/intent-galaxy` 於本機 `127.0.0.1` 啟動，並支援 Stdio MCP 協議直接與 Claude Code / CLI 工具雙向通訊。
   2. **Chrome & Firefox Extensions (`apps/extension`, `apps/extension-firefox`)**：將 `🌌 iG` (Intent Galaxy) 膠囊按鈕注入各大 AI 網頁版（Claude, ChatGPT, Grok, Gemini），點擊後原地展開星系 Overlay，按下 Enter 直接將鎖定之 `LOCKED INTENT AST` 注入對話輸入框。
   3. **Claude Code Mod 原生 UI 整合 (`apps/web` & Mod Injector)**：完美融入作者自訂之 Claude 狀態列（`Sub5 | cL | cS | cA | cR | gF | Recap` 旁新增 `🌌 iG` 膠囊），實現零剪貼、零視窗跳轉的原生開發流。
 
@@ -17,7 +17,7 @@
 
 ## 3. Monorepo 目錄結構 (Nx + pnpm)
 ```text
-intent-engineering-galaxy/
+intent-galaxy/
 ├── INTENT-SPEC-FINAL.md          # 終極技術規格書 (v1.0.0 Galaxy-First Edition)
 ├── HANDOVER.md                   # Claude App 階段性開發交接清單
 ├── CLAUDE.md                     # 本文件 (Claude 自動載入之專案上下文)
@@ -38,7 +38,7 @@ intent-engineering-galaxy/
 - 註冊至 Claude Code MCP：`claude mcp add intent-galaxy -- node $(pwd)/apps/cli/bin/intent-galaxy.mjs`
 - 建置 npm 套件內容（`dist/`，`npm pack` 前自動執行）：`npm run build`
 - 同步／打包瀏覽器擴充功能：`npm run build:ext`、`npm run pack:ext`
-- 在任一 repo 安裝 14 天 kill-gate：`npx intent-engineering-galaxy init-hook`
+- 在任一 repo 安裝 14 天 kill-gate：`npx @stephen.taipei/intent-galaxy init-hook`
 
 ## 5. 開發鐵律 (Hard Constraints for Claude)
 1. **保持 0 Runtime Dependencies**：在 `apps/cli` 與 `libs/*` 中，優先使用 Node.js 22+ / Web 原生 API，不引入肥大的第三方 npm 套件。

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "galaxy",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["apps/cli/bin/intent-galaxy.mjs", "--standalone", "--no-open", "--port", "4787"],
+      "port": 4787
+    }
+  ]
+}

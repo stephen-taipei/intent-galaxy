@@ -18,7 +18,6 @@
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "intent-engineering-galaxy": "dist/apps/cli/bin/intent-galaxy.mjs",
     "intent-galaxy": "dist/apps/cli/bin/intent-galaxy.mjs"
   },
   "files": [

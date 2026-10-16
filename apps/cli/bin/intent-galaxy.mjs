@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// npx intent-engineering-galaxy：127.0.0.1 星系伺服器 + Stdio MCP Server（stdin 非 TTY 時啟用）。
+// npx @stephen.taipei/intent-galaxy：127.0.0.1 星系伺服器 + Stdio MCP Server（stdin 非 TTY 時啟用）。
 import fs from "node:fs";
 import path from "node:path";
 import { execFile } from "node:child_process";
@@ -38,7 +38,7 @@ const port = await galaxy.listen(Number.isInteger(preferredPort) ? preferredPort
 const url = `http://127.0.0.1:${port}`;
 
 if (standalone) {
-  console.log(`🌌 intent-engineering-galaxy ${version} listening on ${url} (127.0.0.1 only, 0 dependencies)`);
+  console.log(`🌌 intent-galaxy ${version} listening on ${url} (127.0.0.1 only, 0 dependencies)`);
   openBrowser(url);
 } else {
   log(`MCP stdio ready · galaxy UI on ${url}`);

@@ -1,4 +1,4 @@
-// `npx intent-engineering-galaxy init-hook`：把 kill-gate 掛到使用者 repo 的三個碰撞面（Grok 審查 §2.3、§2.5）。
+// `npx @stephen.taipei/intent-galaxy init-hook`：把 kill-gate 掛到使用者 repo 的三個碰撞面（Grok 審查 §2.3、§2.5）。
 // 1. commit-msg  2. GitHub PR 檢查 intent-kill  3. Claude Code SessionStart。只新增，不覆寫既有設定。
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
