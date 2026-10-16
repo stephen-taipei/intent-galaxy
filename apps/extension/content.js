@@ -82,8 +82,8 @@
   }).observe(document.body, { childList: true, subtree: true });
 
   // ── 星系面板：可拖曳、縮放、調透明度的浮動視窗；內容是擴充功能來源的 iframe（與頁面 CSS / CSP 隔離）──
-  // 面板綁定打開時的對話（panelPath）與目標（openGoal）：換對話就關閉，換目標就重建，按鈕動作只作用在它自己的對話。
-  let frame = null, panel = null, panelId = "", panelPath = "", targetEditor = null, openGoal = "";
+  // 面板綁定打開時的對話（panelPath）：換對話就關閉（本機 CLI 生成中除外），按鈕動作只作用在它自己的對話。
+  let frame = null, panel = null, panelId = "", panelPath = "", panelBusy = false, targetEditor = null, openGoal = "";
   // 這個對話的生成工作：{ goal, nonce, status: "waiting" | "done" | "failed", startedAt, path, owner, beat, unsent?, analysis?, detail?, adopted? }
   let job = null;
   const INSTANCE = crypto.randomUUID(); // 這個分頁的 content script；只有送出提示詞的分頁能把工作判為失敗
@@ -98,8 +98,17 @@
   const load = async (key) => { try { return (await store.get(key))[key] ?? null; } catch { return null; } };
   const save = async (key, value) => { try { await (value == null ? store.remove(key) : store.set({ [key]: value })); } catch { /* 無 storage 權限或配額已滿時只保留在記憶體 */ } };
   const saveJob = () => job && save(jobKey(job.path), job);
+  const PROBE = "INTENT-SPAWNER"; // 提示詞開頭的固定字串
+  const AST_HEAD = "# LOCKED INTENT AST";
 
   function editorText(el) { return el ? ("value" in el && el.tagName !== "DIV" ? el.value : el.innerText).trim() : ""; }
+  /** 輸入框裡「使用者自己的問題」：擴充功能放進去的提示詞不算，之前填回的 AST 也去掉。 */
+  function userText(el) {
+    const t = editorText(el);
+    if (t.includes(PROBE)) return "";
+    const at = t.indexOf(AST_HEAD);
+    return (at >= 0 ? t.slice(0, at) : t).trim();
+  }
 
   const FRAME_CSS = `
     :host { all: initial; box-sizing: border-box; position: fixed; z-index: 2147483647; display: flex; flex-direction: column; min-width: 420px; min-height: 300px;
@@ -116,27 +125,36 @@
     iframe { flex: 1; width: 100%; border: 0; background: #080b11; }
     :host(.dragging) iframe { pointer-events: none; }`;
 
-  /** 面板可以沿用嗎：同一個對話，而且輸入框沒有換成新的目標。 */
-  function panelStillValid() {
-    if (!frame || panelPath !== location.pathname) return false;
-    const text = editorText(findEditor());
-    return !text || text === openGoal || text.includes(PROBE);
+  /** 面板目前要顯示的狀態：輸入框的問題、這個對話的工作、頁面上已有的星系。 */
+  function panelState(reopen) {
+    const j = jobHere();
+    return { type: "ig-open", id: panelId, goal: openGoal, site: location.hostname.replace(/^www\./, ""), reopen,
+      job: j && { goal: j.goal, nonce: j.nonce ?? "", status: j.status, elapsedSec: Math.round((Date.now() - j.startedAt) / 1000), analysis: j.analysis ?? null, detail: j.detail ?? "", unsent: !!j.unsent },
+      pageGalaxy: j ? null : latestGalaxy() };
   }
+  const sendPanel = (msg) => { if (panel) api.runtime.sendMessage({ ...msg, id: panelId }).catch?.(() => {}); };
 
   async function openPanel() {
-    if (frame && !panelStillValid()) closePanel();
-    // 縮小中的面板直接叫回來：iframe 一直活著，本機 CLI 生成與等待都不中斷；回來前先檢查 AI 是否已回完。
+    await syncPath();
+    if (frame && panelPath !== location.pathname && !panelBusy) closePanel();
+    // 縮小中的面板叫回來：iframe 一直活著（本機 CLI 生成、勾選中的方案都保留）。
+    // 回來前先檢查 AI 是否已回完，並把輸入框目前的問題交給面板決定要不要換題。
     if (frame) {
       frame.hidden = false;
+      clampFrame();
       mountPill();
       panel?.focus();
       if (jobHere() && job.status !== "done") await checkReply(true);
+      const text = userText(findEditor());
+      if (text) openGoal = text;
+      if (panelPath === location.pathname) sendPanel(panelState(true));
       return;
     }
     targetEditor = findEditor();
-    openGoal = editorText(targetEditor);
+    openGoal = userText(targetEditor);
     panelId = crypto.randomUUID();
     panelPath = location.pathname;
+    panelBusy = false;
     frame = document.createElement("intent-galaxy-frame");
     const root = frame.attachShadow({ mode: "closed" });
     root.innerHTML = `<style>${FRAME_CSS}</style><header><span class="title">🌌 Intent Galaxy</span>
@@ -152,7 +170,7 @@
     const loaded = new Promise((r) => { markLoaded = r; });
     panel.addEventListener("load", markLoaded, { once: true });
     root.appendChild(panel);
-    const myPanel = panel, myId = panelId;
+    const myPanel = panel, myFrame = frame;
 
     const ui = (await load(UI_KEY)) ?? {};
     const opacity = root.querySelector("input");
@@ -165,34 +183,30 @@
     root.querySelector(".max").addEventListener("click", toggleMaximize);
     root.querySelector(".min").addEventListener("click", minimizePanel);
     root.querySelector(".close").addEventListener("click", closePanel);
-    // 只記錄使用者拖右下角造成的大小變化：略過初次通知、縮小時（0×0）與程式自己的擺放。
-    let first = true;
-    new ResizeObserver(() => {
-      if (first) { first = false; return; }
-      if (!frame || frame.hidden || frame.dataset.max || placing) return;
-      const r = frame.getBoundingClientRect();
-      if (r.width && r.height) persistUi({ rect: true });
+    // 只記錄使用者拖右下角造成的大小變化：與程式最後設定的尺寸相同（初次、還原、自動夾回）就不算。
+    new ResizeObserver((entries) => {
+      if (myFrame !== frame || frame.hidden || frame.dataset.max) return;
+      const box = entries[0]?.target.getBoundingClientRect();
+      if (!box?.width || !box.height) return;
+      if (Math.abs(box.width - lastSet.width) < 2 && Math.abs(box.height - lastSet.height) < 2) return;
+      lastSet = { width: box.width, height: box.height };
+      persistUi({ rect: true });
     }).observe(frame);
     mountPill();
 
     // 等待中或失敗的工作：打開前先檢查一次，AI 可能在面板關著時已經回完。
     if (jobHere() && job.status !== "done") await checkReply(true);
-    const pageGalaxy = jobHere() ? null : latestGalaxy();
     await loaded;
     if (panel !== myPanel) return; // 期間被關掉或重建
-    const j = jobHere();
-    api.runtime.sendMessage({ type: "ig-open", id: myId, goal: openGoal, site: location.hostname.replace(/^www\./, ""),
-      job: j && { goal: j.goal, status: j.status, elapsedSec: Math.round((Date.now() - j.startedAt) / 1000), analysis: j.analysis ?? null, detail: j.detail ?? "", unsent: !!j.unsent },
-      pageGalaxy });
+    sendPanel(panelState(false));
     myPanel.focus();
   }
 
   // 位置與大小：有記錄就沿用（夾在視窗內），否則貼在輸入框上方。
-  let placing = false;
+  let lastSet = { width: 0, height: 0 };
   function setRect(rect) {
-    placing = true;
+    lastSet = { width: rect.width, height: rect.height };
     Object.assign(frame.style, { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` });
-    requestAnimationFrame(() => { placing = false; });
   }
   function placeFrame(saved) {
     const vw = window.innerWidth, vh = window.innerHeight;
@@ -210,6 +224,7 @@
     setRect({ left, top, width, height });
   }
   const fillViewport = () => setRect({ left: 16, top: 16, width: window.innerWidth - 32, height: window.innerHeight - 32 });
+  const clampFrame = () => { if (frame && !frame.hidden) frame.dataset.max ? fillViewport() : placeFrame(frame.getBoundingClientRect()); };
 
   let persistTimer = 0, pendingUi = {};
   function persistUi(change) {
@@ -268,25 +283,25 @@
     if (!frame) return;
     frame.hidden = true;
     mountPill();
-    targetEditor?.focus();
+    targetEditor?.isConnected && targetEditor.focus();
   }
 
   function closePanel() {
     frame?.remove();
-    frame = null; panel = null; panelPath = "";
+    frame = null; panel = null; panelPath = ""; panelBusy = false;
     mountPill();
     targetEditor?.isConnected && targetEditor.focus();
   }
 
-  // 按鈕／快捷鍵：面板開著時縮小；但輸入框換了新目標，就用新目標重新打開。
+  // 按鈕／快捷鍵：面板開著時縮小；但輸入框換了新問題，就把新問題交給面板（面板會問要不要換題）。
   function togglePanel() {
-    if (frameVisible() && panelStillValid()) minimizePanel();
-    else openPanel();
+    if (frameVisible() && panelPath === location.pathname) {
+      const text = userText(findEditor());
+      if (!text || text === openGoal) return minimizePanel();
+    }
+    openPanel();
   }
-  window.addEventListener("resize", () => {
-    if (!frame || frame.hidden) return;
-    if (frame.dataset.max) fillViewport(); else placeFrame(frame.getBoundingClientRect());
-  });
+  window.addEventListener("resize", clampFrame);
 
   // 寫入原生輸入框：<textarea> 用原生 setter + input 事件；ProseMirror / Quill / contenteditable 先模擬貼上，失敗再用 insertText。
   function writeToEditor(el, text, probe) {
@@ -314,7 +329,6 @@
   }
 
   // ── 用當前網頁的 AI 生成：送出提示詞，從頁面中找出回覆的星系 JSON ──
-  const PROBE = "INTENT-SPAWNER"; // 提示詞開頭的固定字串
 
   /** 從 start 位置取出一個完整的 JSON 物件：略過字串內的括號（與 apps/cli/src/spawn.mjs 相同演算法）。 */
   function parseObjectAt(text, start) {
@@ -398,25 +412,32 @@
     else editor.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", code: "Enter", keyCode: 13, bubbles: true, cancelable: true }));
   }
 
-  const toPanel = (msg) => { if (panel && panelPath === location.pathname) api.runtime.sendMessage({ ...msg, id: panelId }).catch?.(() => {}); };
-  const MAX_WAIT_SEC = 30 * 60; // 推理型模型（Pro / Thinking）常要 5–15 分鐘以上
+  /** 送給「屬於目前對話」的面板（關於目前對話工作的通知）。 */
+  const toPanel = (msg) => { if (panel && panelPath === location.pathname) sendPanel(msg); };
+  const MAX_WAIT_SEC = 30 * 60; // 推理型模型（Pro / Thinking）常要 5–15 分鐘以上；從真正送出時起算
   const STALE_OWNER_MS = 90_000; // 送出的分頁沒有心跳超過這麼久（例如已關閉），其他分頁可以接手
+  const FRESH_SEND_MS = 60_000; // 剛送出、頁面可能還沒畫出提示詞的寬限
   let corePromise = null; // 修復管線（擴充功能內的 galaxy/libs/core），用來在標記完成前確認 JSON 可用
   const core = () => (corePromise ??= import(api.runtime.getURL("galaxy/libs/core/src/index.js")));
 
-  /** 目前網址的工作；已完成的工作必須在頁面上找得到這次的提示詞（或是貼上／本機 CLI 收下的），避免共用網址（例如暫時對話）顯示別的結果。 */
+  /**
+   * 目前網址的工作。頁面上必須找得到這次帶識別碼的提示詞（剛送出、還沒送出、或是貼上／本機 CLI 收下的除外），
+   * 避免共用網址（例如停在 / 的暫時對話）把別的對話的工作顯示在每個新對話。
+   */
   function jobHere() {
     if (!job || job.path !== location.pathname) return null;
-    if (job.status === "done" && !job.adopted && !pageHasTag(job.nonce)) return null;
-    return job;
+    if (job.adopted || job.unsent) return job;
+    if (job.status === "waiting" && Date.now() - job.startedAt < FRESH_SEND_MS) return job;
+    return pageHasTag(job.nonce) ? job : null;
   }
   const isOwner = () => job?.owner === INSTANCE || Date.now() - (job?.beat ?? 0) > STALE_OWNER_MS;
+  const jobInfo = (j) => j && { goal: j.goal, nonce: j.nonce ?? "", status: j.status, elapsedSec: Math.round((Date.now() - j.startedAt) / 1000), analysis: j.analysis ?? null, detail: j.detail ?? "", unsent: !!j.unsent };
 
   async function failJob(detail) {
     stopWatch();
     Object.assign(job, { status: "failed", detail });
     await saveJob(); mountPill();
-    toPanel({ type: "ig-chat-error", detail, failed: true });
+    toPanel({ type: "ig-chat-error", detail, failed: true, nonce: job.nonce });
   }
 
   async function finishJob(analysis) {
@@ -435,9 +456,6 @@
   /** 檢查一次回覆。immediate：面板打開時，看到完整 JSON 就直接收下（不等第二次讀取）。 */
   async function checkReply(immediate = false) {
     if (!job || job.path !== location.pathname || job.status === "done") return;
-    const elapsedSec = Math.round((Date.now() - job.startedAt) / 1000);
-    // 提示詞是否還卡在輸入框（網站沒有接受自動送出）。
-    if (job.unsent && !editorText(findEditor()).includes(job.nonce)) { job.unsent = false; saveJob(); }
     // 只接受「這次送出的提示詞」之後的星系：用這次的識別碼找到那則訊息，舊的或別的回覆都在它前面。
     const tag = tagOf(job.nonce);
     const anchor = findTextNode(tag);
@@ -449,15 +467,26 @@
       lastSeen = key;
       return;
     }
+    if (anchor && (job.unsent || job.status === "failed")) {
+      // 提示詞現在才出現在對話裡（使用者手動送出），或失敗後 AI 仍在回覆：重新開始等待，從現在起算。
+      const now = Date.now();
+      Object.assign(job, { status: "waiting", unsent: false, detail: "", startedAt: now, owner: INSTANCE, beat: now });
+      lastBeat = now;
+      await saveJob(); mountPill();
+      if (!watchTimer) watchReply();
+      toPanel({ type: "ig-reopen", job: jobInfo(job) });
+      return;
+    }
     if (job.status !== "waiting") return;
+    const elapsedSec = Math.round((Date.now() - job.startedAt) / 1000);
     // 送出的分頁定期寫心跳；只有它（或心跳已過期時接手的分頁）能判定逾時，避免沒看到回覆的舊分頁誤判。
     if (job.owner === INSTANCE && Date.now() - lastBeat > 30_000) { lastBeat = Date.now(); job.beat = lastBeat; saveJob(); }
     if (elapsedSec > MAX_WAIT_SEC && isOwner()) {
-      return failJob(anchor || !job.unsent
-        ? "等了 30 分鐘仍沒有讀到星系 JSON。若 AI 已經回覆，請複製它的 JSON 後按「貼上 JSON」；也可以重新生成。"
-        : "提示詞一直沒有送出。可以重新生成，或在對話框自己按送出後再按 iG。");
+      return failJob(job.unsent
+        ? "提示詞一直沒有送出。可以重新生成，或在對話框自己按送出後再按 iG。"
+        : "等了 30 分鐘仍沒有讀到星系 JSON。若 AI 已經回覆，請複製它的 JSON 後按「貼上 JSON」；也可以重新生成。");
     }
-    toPanel({ type: "ig-progress", elapsedSec, unsent: !!job.unsent });
+    toPanel({ type: "ig-progress", elapsedSec, unsent: !!job.unsent, nonce: job.nonce });
   }
 
   // 生成工作獨立於面板：縮小或關閉面板後仍持續等待，完成時按鈕顯示「✓ 星系完成」。
@@ -467,26 +496,38 @@
   }
 
   let jobGen = 0; // 送出期間（約 2–3 秒）使用者若放棄或貼上，作廢這次送出
-  let pending = null; // 送出中、工作還沒建立：{ nonce, from }。網址可能在這段時間就從 / 變成 /c/<id>
+  let pending = null; // 送出中、工作還沒建立：{ nonce, from, to? }。網址可能在這段時間就從 / 變成 /c/<id>
   async function startJob(goal, prompt) {
-    if (jobHere()?.status === "waiting") { toPanel({ type: "ig-chat-error", detail: "上一個問題還在等 AI 回覆。請等它完成，或先按「放棄等待」。" }); return; }
+    if (jobHere()?.status === "waiting") { sendPanel({ type: "ig-chat-error", detail: "上一個問題還在等 AI 回覆。請等它完成，或先按「放棄等待」。" }); return; }
     const gen = ++jobGen;
     const editor = targetEditor?.isConnected ? targetEditor : findEditor();
     const nonce = crypto.randomUUID().slice(0, 8);
-    pending = { nonce, from: location.pathname };
     const tagged = `${prompt}\n${tagOf(nonce)}`;
-    if (!writeToEditor(editor, tagged, tagOf(nonce))) { pending = null; toPanel({ type: "ig-chat-error", detail: "找不到這個網頁的輸入框，無法送出提示詞。", failed: true }); return; }
+    if (!writeToEditor(editor, tagged, tagOf(nonce))) { sendPanel({ type: "ig-chat-error", detail: "找不到這個網頁的輸入框，無法送出提示詞。", failed: true, nonce: "" }); return; }
+    pending = { nonce, from: location.pathname };
+    sendPanel({ type: "ig-started", nonce });
+    const alive = () => gen === jobGen;
     // 送出按鈕通常在輸入後才出現或啟用：稍等再按，並確認提示詞真的離開了輸入框。
-    await sleep(400); if (gen !== jobGen) { pending = null; return; }
+    await sleep(400); if (!alive()) return void (pending = null);
     clickSend(editor);
-    await sleep(1500); if (gen !== jobGen) { pending = null; return; }
-    if (editorText(editor).includes(tagOf(nonce))) { clickSend(editor); await sleep(1200); if (gen !== jobGen) { pending = null; return; } }
-    pending = null;
+    // 送出後網址可能立刻從新對話變成對話網址：每 100 毫秒看一次，記下帶這次識別碼的新網址（使用者可能緊接著切到別的對話）。
+    for (let t = 0; t < 1500; t += 100) {
+      await sleep(100); if (!alive()) return void (pending = null);
+      if (!pending.to && location.pathname !== pending.from && isNewChatPath(pending.from) && findTextNode(tagOf(nonce))) pending.to = location.pathname;
+    }
+    if (editorText(editor).includes(tagOf(nonce))) { clickSend(editor); await sleep(1200); if (!alive()) return void (pending = null); }
     const now = Date.now();
-    job = { goal, nonce, status: "waiting", startedAt: now, path: location.pathname, owner: INSTANCE, beat: now, unsent: editorText(editor).includes(tagOf(nonce)) };
+    // 工作屬於送出時的對話；送出期間網址從新對話變成對話網址時，跟著搬到新網址。
+    const path = pending.to ?? pending.from;
+    const created = { goal, nonce, status: "waiting", startedAt: now, path, owner: INSTANCE, beat: now, unsent: editorText(editor).includes(tagOf(nonce)) };
+    pending = null;
+    if (path !== location.pathname) { await save(jobKey(path), created); return; } // 使用者已切到別的對話：只記錄，回來時接續
+    job = created;
     lastBeat = now;
-    await saveJob(); mountPill();
-    if (job.unsent) toPanel({ type: "ig-chat-error", detail: "提示詞已放進輸入框，但網站沒有自動送出（AI 可能還在回覆上一則）。請在對話框按一下送出，這裡會自動接著等。" });
+    await saveJob();
+    if (!alive() || job !== created) return;
+    mountPill();
+    if (job.unsent) toPanel({ type: "ig-chat-error", detail: "提示詞已放進輸入框，但網站沒有自動送出（AI 可能還在回覆上一則）。請在對話框按一下送出，這裡會自動接著等。", nonce });
     watchReply();
   }
 
@@ -501,41 +542,55 @@
     mountPill();
   }
 
-  let lastPath = location.pathname;
-  setInterval(() => {
-    if (location.pathname === lastPath) return;
-    const from = lastPath;
+  // 「新對話」網址：送出第一則訊息後會換成對話網址（ChatGPT / → /c/<id>、Claude /new → /chat/<id>、Gemini /app → /app/<id>）。
+  const isNewChatPath = (p) => p === "/" || /^\/(new|app|chat)\/?$/.test(p);
+  let lastPath = location.pathname, pathTask = null;
+  /** 把網址變化處理完（多個呼叫者共用同一個處理）。打開面板與處理面板訊息前都會先呼叫，避免用到換頁前的狀態。 */
+  async function syncPath() {
+    while (location.pathname !== lastPath) await (pathTask ??= onPathChange().finally(() => { pathTask = null; }));
+  }
+  async function onPathChange() {
+    const from = lastPath, to = location.pathname;
+    // 同一個對話換網址：只限「新對話 → 對話網址」，而且是剛送出（或送出中）的這次提示詞；等它畫出來最多 5 秒。
+    if (pending?.to && pending.to === to && frame && panelPath === from) { lastPath = to; panelPath = to; probeCache.at = 0; mountPill(); return; }
+    const nonce = pending?.from === from && !pending.to ? pending.nonce
+      : job?.status === "waiting" && job.path === from && Date.now() - job.startedAt < 120_000 ? job.nonce : null;
+    if (nonce && isNewChatPath(from) && !isNewChatPath(to)) {
+      for (let i = 0; i < 10 && !findTextNode(tagOf(nonce)); i++) { await sleep(500); if (location.pathname !== to) break; }
+      // 識別碼每次生成都不同：新網址上找得到它，就證明是同一個對話（即使該網址有舊記錄，也是這個對話自己的）。
+      if (location.pathname === to && findTextNode(tagOf(nonce))) {
+        lastPath = to;
+        probeCache.at = 0;
+        if (pending?.nonce === nonce) pending.to = to;
+        if (job?.nonce === nonce && job.path === from) { await save(jobKey(from), null); job.path = to; await saveJob(); }
+        if (frame && panelPath === from) panelPath = to;
+        mountPill();
+        return;
+      }
+    }
     lastPath = location.pathname;
     probeCache.at = 0;
-    // 新對話送出第一則訊息後網址會從 / 變成 /c/<id>（ChatGPT、Claude、Gemini 都類似）：
-    // 只有新網址的頁面上就是這次帶識別碼的提示詞時，才把工作搬過去（識別碼每次生成都不同，別的對話不可能有）。
-    if (job?.status === "waiting" && job.path === from && findTextNode(tagOf(job.nonce))) {
-      save(jobKey(from), null);
-      job.path = location.pathname;
-      saveJob();
-      if (frame && panelPath === from) panelPath = location.pathname;
-      return;
-    }
-    // 送出中（工作還沒建立）網址就變了：同一則提示詞在新網址上，面板跟著搬。
-    if (pending?.from === from && findTextNode(tagOf(pending.nonce))) {
-      if (frame && panelPath === from) panelPath = location.pathname;
-      return;
-    }
-    if (frame) closePanel(); // 面板屬於上一個對話
-    loadJobForPath();
-  }, 1000);
+    if (pending && pending.from === from) pending.to ??= from; // 送出中換到別的對話：工作仍屬於送出的那個對話
+    // 面板屬於上一個對話：關閉。本機 CLI 生成中則保留（縮小），完成時結果寫回它自己的對話。
+    if (frame && panelPath === from && !panelBusy) closePanel();
+    await loadJobForPath();
+  }
+  setInterval(() => { if (location.pathname !== lastPath) syncPath(); }, 1000);
+  // 支援 Navigation API 的瀏覽器：站內換頁一完成就處理，不必等下一次輪詢。
+  globalThis.navigation?.addEventListener?.("navigatesuccess", () => { if (location.pathname !== lastPath) syncPath(); });
 
   // 其他分頁更新了同一個對話的工作（例如另一個分頁先讀到回覆）：同步過來並通知面板。
   api.storage?.onChanged?.addListener((changes, area) => {
-    if (area !== "local" || !(jobKey() in changes)) return;
+    if (area !== "local" || !(jobKey() in changes) || location.pathname !== lastPath) return;
     const next = changes[jobKey()].newValue ?? null;
-    const prevStatus = job?.status;
     if (next && job && next.nonce === job.nonce && next.status === job.status) { job.beat = next.beat; job.owner = next.owner; return; } // 只是心跳
+    const prev = job;
     job = next;
     if (job?.status === "waiting") { if (!watchTimer) watchReply(); } else stopWatch();
     if (job?.status === "done") toPanel({ type: "ig-galaxy", analysis: job.analysis, goal: job.goal });
-    else if (job?.status === "failed") toPanel({ type: "ig-chat-error", detail: job.detail, failed: true });
-    else if (!job && prevStatus) toPanel({ type: "ig-reset" });
+    else if (job?.status === "failed") toPanel({ type: "ig-chat-error", detail: job.detail, failed: true, nonce: job.nonce });
+    else if (job?.status === "waiting" && job.nonce !== prev?.nonce) toPanel({ type: "ig-reopen", job: jobInfo(job) });
+    else if (!job && prev) toPanel({ type: "ig-reset" });
     mountPill();
   });
 
@@ -549,25 +604,42 @@
   })();
   loadJobForPath();
 
-  window.addEventListener("message", (e) => {
+  window.addEventListener("message", async (e) => {
     if (e.origin !== EXT_ORIGIN || !panel || e.source !== panel.contentWindow || e.data?.id !== panelId) return;
-    if (panelPath !== location.pathname) return; // 面板屬於別的對話（換頁時會關閉，這裡是保險）
-    const msg = e.data;
+    const msg = e.data, source = panel;
+    await syncPath();
+    if (panel !== source) return; // 換頁時面板已關閉
+    const here = panelPath === location.pathname; // 面板屬於目前的對話嗎（本機 CLI 生成中的面板可能跟著到別的對話）
     if (msg.type === "intent-close") minimizePanel();
-    if (msg.type === "intent-chat-spawn" && typeof msg.prompt === "string") startJob(String(msg.goal ?? ""), msg.prompt);
-    // 面板手動貼上、本機 CLI 生成或載入頁面上的星系：記成這個對話的結果，下次打開直接顯示。
-    if (msg.type === "intent-adopt" && isGalaxy(msg.analysis)) {
-      jobGen++; stopWatch();
-      job = { goal: String(msg.goal ?? ""), status: "done", startedAt: Date.now(), path: panelPath, analysis: msg.analysis, adopted: true, owner: INSTANCE, beat: Date.now() };
-      saveJob(); mountPill();
+    if (msg.type === "intent-busy") panelBusy = !!msg.busy;
+    if (msg.type === "intent-chat-spawn" && typeof msg.prompt === "string") {
+      if (here) startJob(String(msg.goal ?? ""), msg.prompt);
+      else sendPanel({ type: "ig-chat-error", detail: "這個面板屬於另一個對話。請按 ✕ 關閉後，在這個對話重新按 iG。", failed: true, nonce: "" });
     }
-    if (msg.type === "intent-reset") { jobGen++; stopWatch(); save(jobKey(panelPath), null); job = null; mountPill(); }
+    // 面板手動貼上、本機 CLI 生成或載入頁面上的星系：記成面板所屬對話的結果，下次打開直接顯示。
+    if (msg.type === "intent-adopt" && isGalaxy(msg.analysis)) {
+      const adopted = { goal: String(msg.goal ?? ""), status: "done", startedAt: Date.now(), path: panelPath, analysis: msg.analysis, adopted: true, owner: INSTANCE, beat: Date.now() };
+      if (here) { jobGen++; pending = null; stopWatch(); job = adopted; }
+      await save(jobKey(panelPath), adopted);
+      mountPill();
+    }
+    // 放棄：只取消面板看到的那個等待中／失敗的工作；已完成的星系不會被刪。
+    if (msg.type === "intent-reset") {
+      if (here) jobGen++, pending = null;
+      const target = here ? job : await load(jobKey(panelPath));
+      const matches = target && target.status !== "done" && (!msg.nonce || target.nonce === msg.nonce);
+      if (matches) {
+        await save(jobKey(panelPath), null);
+        if (here) { stopWatch(); job = null; }
+      }
+      mountPill();
+    }
     if (msg.type === "intent-lock") {
-      // 星系所屬的目標接在前面；使用者若已在輸入框打了別的內容，保留他打的字。
+      // 星系所屬的問題在前、AST 在後；使用者若另外打了補充說明（不是之前填回的 AST），接在最後。
       const editor = targetEditor?.isConnected ? targetEditor : findEditor();
-      const typed = editorText(editor);
-      const lead = typed && !typed.includes(PROBE) ? typed : String(msg.goal ?? openGoal);
-      const text = lead ? `${lead}\n\n${msg.ast}` : msg.ast;
+      const goal = String(msg.goal ?? openGoal).trim();
+      const extra = userText(editor);
+      const text = [goal, msg.ast, extra && extra !== goal ? `補充：${extra}` : ""].filter(Boolean).join("\n\n");
       closePanel();
       if (!writeToEditor(editor, text, "LOCKED INTENT AST")) navigator.clipboard?.writeText(text).catch(() => {});
     }
