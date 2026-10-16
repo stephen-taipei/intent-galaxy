@@ -59,27 +59,30 @@ function setStrip(text, buttons = [], note = "") {
 const resetJob = () => { toParent({ type: "intent-reset" }); waiting = false; setStrip(""); };
 
 function showGalaxy(analysis, g, { adopt = false } = {}) {
+  // 先驗證：格式不對時保留原本的等待／失敗提示條與按鈕。
+  if (!galaxy.setGalaxy(analysis, { goal: g || goal })) { galaxy.showMessage("星系格式不完整，請再生成一次，或貼上修正後的 JSON"); return false; }
   goal = g || goal;
   waiting = false;
   setStrip("");
-  if (!galaxy.setGalaxy(analysis, { goal })) { galaxy.showMessage("AI 回覆的星系格式不完整，請再生成一次，或貼上修正後的 JSON"); return false; }
   galaxy.showMessage(goal ? `這是「${goal.slice(0, 40)}」的星系。按 1／2／3 選方案，再按 Enter 填回對話框。` : "");
   if (adopt) toParent({ type: "intent-adopt", analysis, goal });
   return true;
 }
 
 /** 手動貼上：AI 已回覆但讀不到時（例如網站把長程式碼區塊收合），複製 JSON 貼進來。 */
+let lastPaste = "";
 function showPaste() {
   showCard("貼上 AI 回覆的 JSON",
     "在對話裡找到 AI 回覆的 JSON 程式碼區塊，按它的「複製」按鈕，再貼到下面。<textarea id=\"paste\" placeholder=\"在這裡貼上（Cmd/Ctrl+V）\"></textarea>",
     [["載入星系", () => {
-      const text = document.getElementById("paste")?.value ?? "";
+      const text = lastPaste = document.getElementById("paste")?.value ?? "";
       const at = text.indexOf("{");
       let obj = null;
       try { obj = at >= 0 ? JSON.parse(text.slice(at, text.lastIndexOf("}") + 1)) : null; } catch { obj = null; }
       if (!obj || !showGalaxy(obj, goal, { adopt: true })) showCard("讀不到星系", "貼上的內容不是完整的星系 JSON。請確認從 { 開頭複製到最後的 }。", [["再貼一次", showPaste, true]]);
     }, true], ["取消", () => {}]]);
-  document.getElementById("paste")?.focus();
+  const area = document.getElementById("paste");
+  if (area) { area.value = lastPaste; area.focus(); }
 }
 
 async function spawnViaCli() {
@@ -137,19 +140,20 @@ function confirmChat(extra = []) {
     [["開始生成", spawnViaChat, true], ...extra, ...demoActions()]);
 }
 
+/** 這個對話已生成的星系，附「重新生成」（例如換了模型想再問一次）。 */
+function showDone(job) {
+  if (!showGalaxy(job.analysis, job.goal)) return;
+  setStrip("這是這個對話已生成的星系", [["重新生成", () => confirmChat([["回到星系", () => showDone(job)]])]]);
+}
+
 async function open({ goal: text = "", site: host = "這個 AI", job = null, pageGalaxy = null }) {
   goal = text; site = host;
   galaxy.focus();
   const newGoal = goal && goal !== job?.goal;
   // 1. 這個對話已有結果或正在生成：直接接續（輸入框打了新目標時，改問要不要用新目標重來）。
   if (job && !newGoal) {
-    if (job.status === "done" && job.analysis) {
-      showGalaxy(job.analysis, job.goal);
-      // 已有結果時仍可重問同一題（例如換了模型）。
-      setStrip("這是這個對話已生成的星系", [["重新生成", () => confirmChat([["回到星系", () => showGalaxy(job.analysis, job.goal)]])]]);
-      return;
-    }
-    if (job.status === "waiting") return startWaiting(job.goal, job.elapsedSec);
+    if (job.status === "done" && job.analysis) return showDone(job);
+    if (job.status === "waiting") { startWaiting(job.goal, job.elapsedSec); return updateWaiting(job.elapsedSec, job.unsent); }
     if (job.status === "failed") { goal = job.goal; galaxy.beginStream(goal); return showFailed(job.detail); }
   }
   // 上一個問題還在等，輸入框又打了新問題：先決定要繼續等還是放棄。
@@ -160,7 +164,7 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
   }
   if (goal) {
     if (await cliAlive()) return spawnViaCli().catch((err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }));
-    const back = job?.status === "done" && job.analysis ? [["回到上一個星系", () => showGalaxy(job.analysis, job.goal)]] : [];
+    const back = job?.status === "done" && job.analysis ? [["回到上一個星系", () => showDone(job)]] : [];
     return confirmChat(back);
   }
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
@@ -176,6 +180,7 @@ api.runtime.onMessage.addListener((msg) => {
   if (msg.type === "ig-open") open(msg);
   if (msg.type === "ig-progress" && waiting) updateWaiting(msg.elapsedSec, msg.unsent);
   if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
+  if (msg.type === "ig-reset") { waiting = false; setStrip(""); galaxy.showMessage("這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。"); }
   if (msg.type === "ig-chat-error") {
     if (msg.failed || !waiting) showFailed(msg.detail);
     else galaxy.showMessage(msg.detail);
@@ -189,7 +194,7 @@ galaxy.addEventListener("intent-lock", async (e) => {
     const res = await fetch(`${CLI}/api/lock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch(() => null);
     if (res && !res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
   }
-  toParent({ type: "intent-lock", ast: e.detail.ast });
+  toParent({ type: "intent-lock", ast: e.detail.ast, goal: galaxy.goal || goal });
 });
 galaxy.addEventListener("intent-close", () => toParent({ type: "intent-close" }));
 window.addEventListener("keydown", (e) => {
