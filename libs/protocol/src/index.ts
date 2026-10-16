@@ -45,3 +45,4 @@ export type ArchetypeKey = "alpha" | "beta" | "gamma";
 export const NODE_IDS: readonly NodeId[] = ["N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12"];
 export const ARCHETYPE_KEYS: readonly ArchetypeKey[] = ["alpha", "beta", "gamma"];
 export const quadrantOf = (id: NodeId): QuadrantKey => (["Q1", "Q2", "Q3", "Q4"] as const)[Math.floor((Number(id.slice(1)) - 1) / 3)];
+export * from "./jcs.ts";

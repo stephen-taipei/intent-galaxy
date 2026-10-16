@@ -82,8 +82,16 @@ document.getElementById("goal-form").addEventListener("submit", async (e) => {
 
 galaxy.addEventListener("intent-lock", async (e) => {
   const input = document.getElementById("cm-prompt-input");
-  input.value = e.detail.ast; input.style.borderColor = "#38bdf8";
-  if (served) await fetch("/api/lock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(e.detail) }).catch(() => {});
+  let ast = e.detail.ast;
+  if (served) {
+    // 示範星系沒有登記在伺服器（galaxyId 0），附上 analysis 讓伺服器重算並簽署鎖檔。
+    const body = { ...e.detail, analysis: e.detail.galaxyId ? undefined : galaxy.analysis, goal: galaxy.goal };
+    const res = await fetch("/api/lock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch((err) => ({ ok: false, error: err.message }));
+    if (!res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
+    ast = res.ast;
+    galaxy.showMessage(`🔒 已寫入 .intent.lock.json · ${res.specHash.slice(0, 12)} · ${res.auditDueAt.slice(0, 10)} 驗屍${res.hookInstalled ? "" : "（尚未 init-hook）"}`);
+  }
+  input.value = ast; input.style.borderColor = "#38bdf8";
 });
 document.getElementById("ig-pill").addEventListener("click", () => galaxy.focus());
 window.addEventListener("keydown", (e) => {

@@ -36,6 +36,9 @@ intent-engineering-galaxy/
 - 執行核心單元測試（Node v24 原生 TypeScript）：`npm test`
 - 啟動本機獨立星系伺服器（127.0.0.1）：`npm start`
 - 註冊至 Claude Code MCP：`claude mcp add intent-galaxy -- node $(pwd)/apps/cli/bin/intent-galaxy.mjs`
+- 建置 npm 套件內容（`dist/`，`npm pack` 前自動執行）：`npm run build`
+- 同步／打包瀏覽器擴充功能：`npm run build:ext`、`npm run pack:ext`
+- 在任一 repo 安裝 14 天 kill-gate：`npx intent-engineering-galaxy init-hook`
 
 ## 5. 開發鐵律 (Hard Constraints for Claude)
 1. **保持 0 Runtime Dependencies**：在 `apps/cli` 與 `libs/*` 中，優先使用 Node.js 22+ / Web 原生 API，不引入肥大的第三方 npm 套件。

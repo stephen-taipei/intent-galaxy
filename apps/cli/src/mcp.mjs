@@ -47,7 +47,8 @@ export function startMcp(hub, { version, input = process.stdin, output = process
       if (args.wait === false) return text(`Galaxy opened at ${url}. The user has not locked it yet.${notes}`);
       const lock = await hub.waitForLock(id, 30 * 60_000);
       if (!lock) return text(`The user did not lock the galaxy at ${url} within 30 minutes.${notes}`, true);
-      return text(`${lock.ast}${notes}`);
+      const hook = lock.hookInstalled ? "" : "\nkill-gate hook 尚未安裝：執行 `npx intent-engineering-galaxy init-hook`，14 天後才會有人擋下 commit。";
+      return text(`${lock.payload.ast}\n\n.intent.lock.json specHash: ${lock.specHash} · auditDueAt: ${lock.auditDueAt}${hook}${notes}`);
     }
     return null;
   }

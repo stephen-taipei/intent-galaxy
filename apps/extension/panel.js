@@ -41,8 +41,13 @@ async function open(goal) {
 api.runtime.onMessage.addListener((msg) => { if (msg?.type === "ig-open" && msg.id === id) open(msg.goal ?? ""); });
 
 galaxy.addEventListener("intent-lock", async (e) => {
+  // CLI 在線時由它簽署 .intent.lock.json；被拒（例如沒有採納 Q4 節點）就留在面板顯示原因。
+  if (await cliAlive()) {
+    const body = { ...e.detail, analysis: e.detail.galaxyId ? undefined : galaxy.analysis, goal: galaxy.goal };
+    const res = await fetch(`${CLI}/api/lock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch(() => null);
+    if (res && !res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
+  }
   toParent({ type: "intent-lock", ast: e.detail.ast });
-  fetch(`${CLI}/api/lock`, { method: "POST", keepalive: true, headers: { "Content-Type": "application/json" }, body: JSON.stringify(e.detail) }).catch(() => {});
 });
 galaxy.addEventListener("intent-close", () => toParent({ type: "intent-close" }));
 window.addEventListener("keydown", (e) => {

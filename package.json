@@ -2,17 +2,38 @@
   "name": "intent-engineering-galaxy",
   "version": "0.1.0",
   "description": "60-second visual decision galaxy & deterministic intent AST compiler for local repos, Claude Code Mods, and browser extensions.",
+  "keywords": [
+    "intent",
+    "mcp",
+    "claude-code",
+    "decision-making",
+    "galaxy",
+    "zero-dependency"
+  ],
+  "homepage": "https://github.com/stephen-taipei/intent-engineering-galaxy#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephen-taipei/intent-engineering-galaxy.git"
+  },
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "intent-engineering-galaxy": "./apps/cli/bin/intent-galaxy.mjs",
-    "intent-galaxy": "./apps/cli/bin/intent-galaxy.mjs"
+    "intent-engineering-galaxy": "./dist/apps/cli/bin/intent-galaxy.mjs",
+    "intent-galaxy": "./dist/apps/cli/bin/intent-galaxy.mjs"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "start": "node ./apps/cli/bin/intent-galaxy.mjs --standalone",
     "mcp": "node ./apps/cli/bin/intent-galaxy.mjs",
-    "test": "node --experimental-strip-types libs/core/src/verify.ts && node --experimental-strip-types libs/epistemic/src/verify-splitter.ts && node apps/cli/test/verify-cli.mjs && node tools/verify-sync.mjs",
-    "build:ext": "node tools/sync-extension.mjs"
+    "test": "node --experimental-strip-types libs/protocol/src/verify-jcs.ts && node --experimental-strip-types libs/core/src/verify.ts && node --experimental-strip-types libs/epistemic/src/verify-splitter.ts && node apps/cli/test/verify-cli.mjs && node apps/cli/test/verify-kill-gate.mjs && node tools/verify-sync.mjs && node tools/verify-pack.mjs",
+    "build:ext": "node tools/sync-extension.mjs",
+    "build": "node tools/build.mjs",
+    "prepare": "node tools/build.mjs",
+    "pack:ext": "node tools/sync-extension.mjs --zip"
   },
   "engines": {
     "node": ">=22.18.0"
