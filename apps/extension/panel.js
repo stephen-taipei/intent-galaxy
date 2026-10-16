@@ -92,7 +92,14 @@ async function spawnViaCli() {
     if (done) break;
     buf += value;
     let nl;
-    while ((nl = buf.indexOf("\n")) >= 0) { const line = buf.slice(0, nl); buf = buf.slice(nl + 1); if (line.trim()) galaxy.applyStreamEvent(JSON.parse(line)); }
+    while ((nl = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, nl); buf = buf.slice(nl + 1);
+      if (!line.trim()) continue;
+      const ev = JSON.parse(line);
+      galaxy.applyStreamEvent(ev);
+      // 本機 CLI 生成完成：記成這個對話的結果，重新打開時直接顯示，不必再跑一次。
+      if (ev.t === "repaired" && galaxy.analysis) toParent({ type: "intent-adopt", analysis: galaxy.analysis, goal });
+    }
   }
 }
 
