@@ -6,7 +6,7 @@
 <title>Intent Galaxy</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", sans-serif; }
-  body { background: #080b11; color: #e2e8f0; height: 100vh; display: grid; grid-template-rows: 52px 1fr 104px; overflow: hidden; }
+  body { background: #080b11; color: #e2e8f0; height: 100vh; display: grid; grid-template-rows: 52px 1fr; overflow: hidden; }
   header { background: #111723; border-bottom: 1px solid #1e293b; display: flex; align-items: center; gap: 14px; padding: 0 18px; }
   .brand { font-weight: 700; font-size: 14px; white-space: nowrap; }
   .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); margin-left: 8px; }
@@ -16,32 +16,42 @@
   header button { padding: 6px 14px; border-radius: 8px; border: none; background: #38bdf8; color: #080b11; font-weight: 700; font-size: 12px; cursor: pointer; }
   header button:disabled { opacity: .5; cursor: wait; }
   intent-galaxy-overlay { min-height: 0; }
-  /* 模擬 Claude Code Mod（deckhand）狀態列與輸入框：示範 Enter 後的注入結果 */
-  #claude-mod-dock { background: #141413; border-top: 1px solid #2e2e2c; padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
-  .cm-status-row { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #a1a1aa; }
-  .cm-pill { background: #27272a; color: #e4e4e7; border: 1px solid #3f3f46; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; }
-  .cm-pill.ig-btn { background: linear-gradient(135deg, rgba(56,189,248,0.25), rgba(168,85,247,0.25)); border-color: #38bdf8; color: #fff; cursor: pointer; }
-  #cm-prompt-input { background: #1e1e1c; border: 1px solid #3f3f46; border-radius: 10px; padding: 7px 12px; color: #f4f4f5; font-size: 12px; height: 40px; resize: none; outline: none; }
+  /* 產生指令後的「下一步」視窗 */
+  #done { margin: auto; width: min(560px, calc(100vw - 32px)); background: #111723; color: #e2e8f0; border: 1px solid #334155; border-radius: 14px; padding: 20px 22px; box-shadow: 0 24px 60px rgba(0,0,0,.6); }
+  #done::backdrop { background: rgba(2,6,12,.65); }
+  #done h2 { font-size: 15px; margin-bottom: 4px; }
+  #done .sub { font-size: 12px; color: #94a3b8; margin-bottom: 14px; }
+  #done ol { padding-left: 20px; display: grid; gap: 10px; font-size: 13px; line-height: 1.6; }
+  #done ol small { display: block; color: #94a3b8; font-size: 11.5px; }
+  #done code { font-family: ui-monospace, monospace; font-size: 12px; color: #7dd3fc; }
+  #done details { margin-top: 14px; font-size: 12px; color: #94a3b8; }
+  #done summary { cursor: pointer; }
+  #done textarea { width: 100%; height: 180px; margin-top: 8px; background: #070a10; color: #cbd5e1; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; font: 11px/1.5 ui-monospace, monospace; resize: vertical; }
+  #done .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+  #done button { padding: 7px 14px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-weight: 600; font-size: 12px; cursor: pointer; }
+  #done button.primary { background: #38bdf8; border-color: #38bdf8; color: #080b11; }
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">🌌 intent-galaxy<span class="badge" id="source-badge">示範星系</span></div>
+  <div class="brand">🌌 Intent Galaxy<span class="badge" id="source-badge" title="目前星系的來源：示範資料、claude -p 生成，或 MCP 從 Claude Code 灌入">示範星系</span></div>
   <form id="goal-form">
     <input id="goal" type="text" autocomplete="off" placeholder="輸入一句模糊目標，按 Enter 以本機 claude -p 生成 12 顆節點…">
-    <button type="submit" id="spawn-btn">生成星系</button>
+    <button type="submit" id="spawn-btn" title="用本機 claude -p 依你的目標生成新的 12 顆節點星系（約 3–4 分鐘）">生成星系</button>
   </form>
 </header>
 <intent-galaxy-overlay id="galaxy"></intent-galaxy-overlay>
-<section id="claude-mod-dock">
-  <div class="cm-status-row">
-    <span style="color:#71717a">Claude Code Mod 狀態列（模擬）</span>
-    <span style="margin-left:auto"></span>
-    <span class="cm-pill">Sub5</span><span class="cm-pill">cL</span><span class="cm-pill">cS</span><span class="cm-pill">cA</span><span class="cm-pill">cR</span><span class="cm-pill">gF</span><span class="cm-pill">Recap</span>
-    <button class="cm-pill ig-btn" id="ig-pill" title="聚焦星系（Cmd/Ctrl+Shift+G）">🌌 iG</button>
-  </div>
-  <textarea id="cm-prompt-input" placeholder="鎖定後，LOCKED INTENT AST 會注入這裡…"></textarea>
-</section>
+<dialog id="done" aria-labelledby="done-title">
+  <h2 id="done-title"></h2>
+  <p class="sub">你選的方案已轉成一段 AI 看得懂的指令（LOCKED INTENT AST）。</p>
+  <ol>
+    <li id="done-copy"></li>
+    <li>貼到 <b>Claude Code</b> 或 ChatGPT 的對話框送出。<small>AI 會照「要做」動手、避開「不做」，遇到「護欄」條件就停下來回報，不會自己改方向。</small></li>
+    <li id="done-lock"></li>
+  </ol>
+  <details id="done-details"><summary>查看指令內容</summary><textarea id="done-ast" readonly></textarea></details>
+  <div class="actions"><button type="button" id="done-recopy">再複製一次</button><button type="button" class="primary" id="done-close">好，我去貼上</button></div>
+</dialog>
 <script type="module">
 import "./galaxy-overlay.js";
 import { SAMPLE_GALAXY } from "./sample-galaxy.js";
@@ -83,20 +93,37 @@ document.getElementById("goal-form").addEventListener("submit", async (e) => {
   } finally { btn.disabled = false; }
 });
 
+const done = document.getElementById("done");
+const copyAst = (text) => navigator.clipboard?.writeText(text).then(() => true, () => false) ?? Promise.resolve(false);
+document.getElementById("done-close").addEventListener("click", () => done.close());
+document.getElementById("done-recopy").addEventListener("click", async (e) => { e.target.textContent = (await copyAst(document.getElementById("done-ast").value)) ? "已複製 ✓" : "複製失敗，請手動選取"; });
+done.addEventListener("close", () => galaxy.focus());
+
 galaxy.addEventListener("intent-lock", async (e) => {
-  const input = document.getElementById("cm-prompt-input");
-  let ast = e.detail.ast;
+  let ast = e.detail.ast, lock = null;
   if (served) {
     // 示範星系沒有登記在伺服器（galaxyId 0），附上 analysis 讓伺服器重算並簽署鎖檔。
     const body = { ...e.detail, analysis: e.detail.galaxyId ? undefined : galaxy.analysis, goal: galaxy.goal };
     const res = await fetch("/api/lock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch((err) => ({ ok: false, error: err.message }));
     if (!res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
-    ast = res.ast;
-    galaxy.showMessage(`🔒 已寫入 .intent.lock.json · ${res.specHash.slice(0, 12)} · ${res.auditDueAt.slice(0, 10)} 驗屍${res.hookInstalled ? "" : "（尚未 init-hook）"}`);
+    ast = res.ast; lock = res;
   }
-  input.value = ast; input.style.borderColor = "#38bdf8";
+  // 本機獨立頁面沒有輸入框可注入，改把指令複製到剪貼簿，並用「下一步」視窗說明怎麼用。
+  const copied = await copyAst(ast);
+  const title = galaxy.analysis?.archetypes?.[e.detail.baseKey]?.title ?? "自訂組合";
+  document.getElementById("done-title").textContent = `✅ 方案已確定：${title}`;
+  document.getElementById("done-copy").innerHTML = copied
+    ? "<b>指令已複製到剪貼簿。</b>"
+    : "<b>請手動複製下方指令</b><small>瀏覽器沒有允許自動複製。</small>";
+  document.getElementById("done-lock").innerHTML = lock
+    ? `已存成 <code>.intent.lock.json</code>，記錄這次決定。<small>${lock.auditDueAt.slice(0, 10)}（14 天後）會提醒你驗收：護欄的失效條件有沒有發生。${lock.hookInstalled ? "" : "要自動提醒，請先在專案執行 <code>npx @stephen.taipei/intent-galaxy init-hook</code>。"}</small>`
+    : "14 天後回來檢查：護欄的失效條件有沒有發生。";
+  document.getElementById("done-ast").value = ast;
+  document.getElementById("done-details").open = !copied;
+  document.getElementById("done-recopy").textContent = "再複製一次";
+  galaxy.showMessage(copied ? "📋 指令已複製" : "指令未能自動複製");
+  done.showModal();
 });
-document.getElementById("ig-pill").addEventListener("click", () => galaxy.focus());
 window.addEventListener("keydown", (e) => {
   if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyG") { e.preventDefault(); galaxy.focus(); }
 });

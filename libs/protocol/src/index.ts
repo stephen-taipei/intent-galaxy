@@ -39,6 +39,8 @@ export interface IntentAnalysisResponse {
   };
   edges: Edge[];
   archetypes: { alpha: Archetype; beta?: Archetype; gamma?: Archetype };
+  /** 主 Agent 的預設推薦（Stage 1 產出；舊資料可缺）。只標示，不自動套用。 */
+  recommend?: { key: ArchetypeKey; why: string };
   withheld_kill?: { attack: AttackClass; hits: AssumptionId; claim: string; kill: string; label: string };
 }
 export type ArchetypeKey = "alpha" | "beta" | "gamma";

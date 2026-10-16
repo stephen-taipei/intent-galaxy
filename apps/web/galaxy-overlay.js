@@ -17,6 +17,14 @@ const QUADRANT_TAGS = {
 const ARCH = [["alpha", "1"], ["beta", "2"], ["gamma", "3"]];
 const HINT_QUADRANT = { f: "Q1", d: "Q2", l: "Q3", p: "Q4" };
 const DIST_BADGE = { 1: "· D1", 2: "◈ D2", 3: "⬥ D3", 4: "✦ D4" };
+const KEY_HINTS = [
+  [["1", "2", "3"], "主幹", "套用第 1／2／3 張策略卡，一次點亮它採納的節點。<br><span class=dim>Shift+數字：先清掉你的手動調整再套用。</span>"],
+  [["h", "j", "k", "l"], "導航", "在 12 顆節點間移動焦點：h 左、j 下、k 上、l 右。<br><span class=dim>Tab 依序切換，g＋象限鍵＋數字可直達。</span>"],
+  [["Space"], "採納", "把目前焦點的節點加入方案（再按一次取消）。<br><span class=dim>滑鼠：左鍵點節點。</span>"],
+  [["x"], "排除", "明確標記「不做」這個節點（再按一次取消）。<br><span class=dim>Q4 驗屍官節點被排除時，代表你知道這個風險並選擇承擔。滑鼠：右鍵點節點。</span>"],
+  [["r"], "解除互斥", "有些節點彼此互斥（例如「零算力」與「API 帳單熔斷」不能同時成立）。同時選了互斥節點時，狀態會變紅。<br>按 r 會自動撤銷<b>較早</b>的手動選擇，保留你最新的決定，直到方案沒有矛盾。"],
+  [["u"], "復原", "復原上一步操作。<br><span class=dim>Ctrl+R 重做。</span>"],
+];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
 const clip = (s, n) => { const a = [...String(s ?? "")]; return a.length > n ? a.slice(0, n - 1).join("") + "…" : a.join(""); };
 
@@ -66,6 +74,11 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 #cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:8px 10px; background:var(--panel); border-top:1px solid var(--border); }
 .card { background:#0b101b; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; cursor:pointer; font:inherit; color:inherit; text-align:left; }
 .card.active { border-color:var(--q1); background:rgba(56,189,248,.07); }
+.card.rec { border-color:rgba(245,158,11,.75); box-shadow:0 0 0 1px rgba(245,158,11,.2), 0 0 18px rgba(245,158,11,.12); }
+.card.rec.active { border-color:var(--q1); }
+.card .badges { display:flex; gap:4px; }
+.card .rec-badge { font-size:9.5px; padding:1px 6px; border-radius:4px; background:rgba(245,158,11,.2); color:#fcd34d; font-weight:700; white-space:nowrap; }
+.card .why { font-size:10.5px; color:#fcd34d; margin-top:2px; }
 .card.ghost { border-style:dashed; color:var(--muted); cursor:default; }
 .card .head { display:flex; justify-content:space-between; gap:6px; align-items:center; }
 .card .title { font-size:12px; font-weight:700; color:#fff; }
@@ -81,7 +94,32 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-size:10px; border:1px solid #334155; font-family:inherit; }
 #bar button { font:inherit; font-weight:700; padding:4px 10px; border-radius:6px; border:none; background:var(--q1); color:#080b11; cursor:pointer; }
 aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
+aside .head { display:flex; align-items:center; justify-content:space-between; }
 aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
+aside .head button { font:inherit; font-size:10.5px; padding:2px 8px; border-radius:5px; border:1px solid #334155; background:#111723; color:#94a3b8; cursor:pointer; }
+#summary { flex:1; overflow:auto; display:flex; flex-direction:column; gap:10px; min-height:0; }
+#summary .empty { color:var(--muted); font-size:11.5px; line-height:1.7; padding:6px 2px; }
+#summary .empty.unsat { color:#fb7185; }
+#summary .plan { padding:9px 11px; border-radius:9px; background:rgba(56,189,248,.07); border:1px solid rgba(56,189,248,.25); }
+#summary .plan b { display:block; font-size:13px; color:#fff; }
+#summary .plan span { display:block; font-size:11px; color:#94a3b8; margin-top:2px; }
+#summary section { border-left:3px solid var(--c); padding:2px 0 2px 10px; }
+#summary h3 { font-size:11.5px; color:var(--c); margin-bottom:5px; font-weight:700; }
+#summary h3 small { color:var(--muted); font-weight:400; margin-left:4px; }
+#summary .item { margin-bottom:6px; }
+#summary .item b { font-size:12px; color:#f1f5f9; }
+#summary .item .nid { font:10px ui-monospace,monospace; color:var(--muted); margin-right:5px; }
+#summary .item .tag { font-size:9.5px; color:#94a3b8; border:1px dashed #475569; border-radius:4px; padding:0 4px; margin-left:5px; }
+#summary .item p { font-size:11px; color:#94a3b8; margin-top:1px; }
+#summary .chips { display:flex; flex-wrap:wrap; gap:5px; }
+#summary .chips span { font-size:11px; padding:2px 7px; border-radius:5px; background:#1e293b; color:#cbd5e1; }
+#tip { position:absolute; z-index:100; max-width:300px; padding:8px 10px; border-radius:8px; background:#1e293b; border:1px solid #475569; color:#e2e8f0; font-size:11.5px; line-height:1.55; box-shadow:0 8px 24px rgba(0,0,0,.45); pointer-events:none; opacity:0; transition:opacity .12s; }
+#tip.on { opacity:1; }
+#tip b { color:#fff; }
+#tip .dim { color:#94a3b8; }
+#tip .k { color:#fda4af; }
+#tip .g { color:#fcd34d; }
+#bar .keys > span { cursor:help; }
 aside pre { flex:1; overflow:auto; background:#070a10; border:1px solid var(--border); border-radius:8px; padding:10px; font:11px/1.5 ui-monospace,monospace; color:#cbd5e1; white-space:pre-wrap; }
 aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow:auto; }
 `;
@@ -89,7 +127,7 @@ aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow
 export class IntentGalaxyOverlay extends HTMLElement {
   #analysis = null; #draft = null; #galaxyId = 0; #findings = [];
   #baseKey = null; #overrides = new Map(); #seq = 0; #focus = 0;
-  #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null;
+  #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null; #showRaw = false;
 
   constructor() {
     super();
@@ -98,9 +136,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
         <div id="core"><div class="sub">你真正在決定的是</div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></main>
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
-        <span class="keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 主幹 · <kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> 導航 · <kbd>Space</kbd> 採納 · <kbd>x</kbd> 排除 · <kbd>r</kbd> 解衝突 · <kbd>u</kbd> 復原</span>
-        <button type="button" id="lock">⏎ 鎖定並注入</button></footer>
-      <aside><h2>LIVE INTENT AST</h2><div class="findings"></div><pre></pre></aside></div>`;
+        <span class="keys">${KEY_HINTS.map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${label}</span>`).join(" · ")}</span>
+        <button type="button" id="lock"></button></footer>
+      <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle" data-tip="切換檢視：摘要 ↔ 實際送給 AI 的原始指令文字（LOCKED INTENT AST）">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
     root.addEventListener("click", () => this.focus({ preventScroll: true }));
@@ -108,6 +146,13 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#onNodeClick(e, "exclude"); });
     root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
     root.getElementById("lock").addEventListener("click", () => this.lock());
+    root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
+    // 統一 tooltip：任何帶 data-tip 的元素（節點、策略卡、按鍵說明、按鈕）滑過或鍵盤聚焦時顯示。
+    const showTip = (e) => { const el = e.target.closest?.("[data-tip]"); if (el) this.#showTip(el); else this.#hideTip(); };
+    root.addEventListener("pointerover", showTip);
+    root.addEventListener("focusin", showTip);
+    root.addEventListener("pointerleave", () => this.#hideTip(), true);
+    root.addEventListener("pointerdown", () => this.#hideTip());
     this.addEventListener("keydown", (e) => this.#onKey(e));
   }
 
@@ -295,7 +340,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
         : q === "Q4" && view.stance === "exclude" ? `<span class="chip">⚠ 明示承擔風險</span>` : "";
       const cls = ["node", dimmed && "dimmed", i === this.#focus && "focused", conflicts.has(id) && "conflict"].filter(Boolean).join(" ");
       const blind = n.blind ? `<span class="blind" title="${esc(n.blind)}">✦ 盲區</span>` : "";
-      return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" title="${esc(n.claim)}\n⚡ ${esc(n.kill)}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
+      return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" data-tip="${esc(this.#nodeTip(id, n, q, view))}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
     }).join("");
 
     // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。
@@ -305,24 +350,90 @@ export class IntentGalaxyOverlay extends HTMLElement {
       return `<path d="M ${x} ${y} Q ${(x + 500) / 2} ${y} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
     }).join("");
 
+    const rec = a?.recommend?.key;
     root.getElementById("cards").innerHTML = ARCH.map(([key, num]) => {
-      const c = archetypes[key];
+      const c = archetypes[key], isRec = rec === key;
       if (!c) return `<div class="card ghost"><div class="title">[${num}] ${draft ? "生成中…" : "—"}</div></div>`;
       const dist = Math.max(0, ...(c.include ?? []).map((id) => nodes[id]?.lateral?.dist ?? 0));
       const fatalKill = nodes[c.fatal]?.kill ?? "";
-      return `<button type="button" class="card ${this.#baseKey === key ? "active" : ""}" data-arch="${key}">
-        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span>${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</div>
+      const cls = ["card", this.#baseKey === key && "active", isRec && "rec"].filter(Boolean).join(" ");
+      const tip = `<b>[${num}] ${esc(c.title)}</b>${c.thesis ? `<br>${esc(c.thesis)}` : ""}`
+        + (isRec && a.recommend.why ? `<br><span class=g>★ 主 Agent 推薦：${esc(a.recommend.why)}</span>` : "")
+        + `<br>採納：${(c.include ?? []).map((id) => esc(nodes[id]?.label ?? id)).join("、")}`
+        + (c.exclude?.length ? `<br>排除：${c.exclude.map((id) => esc(nodes[id]?.label ?? id)).join("、")}` : "")
+        + `<br>💸 代價：${esc(renderSacrifice(c.sacrifice))}`
+        + (fatalKill ? `<br><span class=k>⚡ 致死前提：${esc(fatalKill)}</span>` : "")
+        + `<br><span class=dim>點擊或按 ${num} 套用 · Shift+${num} 清掉手動調整後套用</span>`;
+      return `<button type="button" class="${cls}" data-arch="${key}" data-tip="${esc(tip)}">
+        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge">★ 推薦</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
+        ${isRec && a.recommend.why ? `<div class="why">★ ${esc(clip(a.recommend.why, 30))}</div>` : ""}
         <div class="row">💸 代價：${esc(clip(renderSacrifice(c.sacrifice), 40))}</div>
         <div class="kill">⚡ 致死：${esc(clip(fatalKill, 30))}</div></button>`;
     }).join("");
 
     const status = root.querySelector("#bar .status");
     if (!sol) { status.className = "status wait"; status.textContent = draft ? `⋯ 串流中 ${Object.keys(nodes).length}/12` : "⋯ 等待星系"; }
-    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : "✦ 先發散：按 1/2/3 選主幹"; }
-    else { status.className = "status unsat"; status.textContent = `✗ ${sol.status}${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}`; }
+    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : `✦ 先發散：按 1/2/3 選主幹${rec ? `（★ 推薦 ${ARCH.find(([k]) => k === rec)[1]}）` : ""}`; }
+    else { status.className = "status unsat"; status.textContent = `✗ 有互斥${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}（按 r 解除）`; }
+    status.dataset.tip = !sol ? "星系資料還沒到齊。" : sol.status === "SAT"
+      ? (this.#baseKey ? "目前的選擇彼此相容，可以確定方案。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
+      : `選取的節點彼此矛盾（${esc(sol.status)}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。`;
+    const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
+    lockBtn.textContent = embedded ? "↵ 把方案填進對話框" : "📋 產生 AI 執行指令";
+    lockBtn.dataset.tip = `<b>選好方案後按這裡（或 Enter）</b><br>把右側的方案轉成一段給 AI 的指令，`
+      + (embedded ? "直接填進這個 AI 網頁的輸入框，你檢查後按送出即可。" : "複製到剪貼簿，貼給 Claude Code 或 ChatGPT，AI 就會照「要做／不做／護欄」動手。")
+      + `<br><span class=dim>${embedded ? "" : "同時寫入 .intent.lock.json，14 天後提醒你驗收護欄。"}</span>`;
     root.querySelector("#bar .msg").textContent = this.#hint ? `g 直達：${this.#hint}` : this.#message;
-    root.querySelector("aside pre").textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
+    const pre = root.querySelector("aside pre"), summary = root.getElementById("summary");
+    pre.textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
+    pre.hidden = !this.#showRaw; summary.hidden = this.#showRaw;
+    root.getElementById("raw-toggle").textContent = this.#showRaw ? "摘要" : "原始 AST";
+    summary.innerHTML = this.#summaryHtml(a, sol, conflicts);
     root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
+  }
+
+  #nodeTip(id, n, q, view) {
+    const state = view.stance === "include" ? (q === "Q4" ? "🛡 已設為護欄" : "✅ 已採納") : view.stance === "exclude" ? (q === "Q4" ? "⚠ 已承擔此風險" : "⛔ 已排除") : "尚未選擇";
+    const why = view.src === "derived" ? (view.stance === "include" ? "（因其他節點依賴它而自動加入）" : "（與已選節點互斥而自動讓位）") : view.src === "user" ? "（你手動設定）" : view.src === "default" ? "（來自策略卡）" : "";
+    return `<b>${esc(id)} ${esc(n.label)}</b><br>${esc(n.claim)}`
+      + (n.kill ? `<br><span class=k>⚡ 失效條件：${esc(n.kill)}</span>` : "")
+      + (n.blind ? `<br><span class=g>✦ 盲區：${esc(n.blind)}</span>` : "")
+      + `<br><span class=dim>狀態：${state}${why}<br>左鍵（Space）採納 · 右鍵（x）排除 · 再按一次取消</span>`;
+  }
+
+  #tipTimer = 0;
+  #showTip(el) {
+    clearTimeout(this.#tipTimer);
+    this.#tipTimer = setTimeout(() => {
+      const tip = this.shadowRoot.getElementById("tip"), host = this.getBoundingClientRect(), r = el.getBoundingClientRect();
+      tip.innerHTML = el.dataset.tip;
+      tip.classList.add("on");
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      const left = Math.min(Math.max(8, r.left - host.left + r.width / 2 - w / 2), host.width - w - 8);
+      const above = r.top - host.top - h - 8;
+      tip.style.left = `${left}px`;
+      tip.style.top = `${above >= 8 ? above : Math.min(r.bottom - host.top + 8, host.height - h - 8)}px`;
+    }, 220);
+  }
+  #hideTip() { clearTimeout(this.#tipTimer); this.shadowRoot.getElementById("tip")?.classList.remove("on"); }
+
+  /** 右側摘要：把 LOCKED INTENT AST 的五個區塊改寫成人看得懂的分組卡片（極性規則同 renderLockedAst）。 */
+  #summaryHtml(a, sol, conflicts) {
+    if (!sol) return `<div class="empty">等待星系資料…</div>`;
+    if (sol.status !== "SAT") return `<div class="empty unsat">有互斥衝突${conflicts.size ? `：${[...conflicts].join(" ⊗ ")}` : ""}<br>按 <kbd>r</kbd> 保留較新決定，或改選其他節點。</div>`;
+    const picked = NODE_IDS.filter((id) => sol.nodes[id].stance !== "neutral");
+    if (!this.#baseKey && !picked.length) return `<div class="empty">先看完 12 顆節點，再按 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> 選一條主幹（或用 <kbd>Space</kbd> / <kbd>x</kbd> 自己挑）。<br><br>這裡會整理成：<br>✅ 要做　🛡 護欄　⛔ 不做　⚠ 承擔風險　💸 代價</div>`;
+    const arch = this.#baseKey ? a.archetypes[this.#baseKey] : null;
+    const pick = (q4, stance) => NODE_IDS.filter((id) => (quadrantOf(id) === "Q4") === q4 && sol.nodes[id].stance === stance);
+    const item = (id, desc) => { const n = a.nodes[id]; return `<div class="item"><span class="nid">${id}</span><b>${esc(n.label)}</b>${sol.nodes[id].src === "derived" ? `<span class="tag">推導</span>` : sol.nodes[id].src === "user" ? `<span class="tag">手動</span>` : ""}<p>${esc(desc(n))}</p></div>`; };
+    const group = (icon, name, hint, color, ids, desc) => ids.length ? `<section style="--c:${color}"><h3>${icon} ${name}<small>${hint}</small></h3>${ids.map((id) => item(id, desc)).join("")}</section>` : "";
+    const sacrifice = arch ? ["p", "v", "t", "l", "x"].map((k) => arch.sacrifice?.[k]).filter(Boolean) : [];
+    return `<div class="plan"><b>${esc(arch?.title ?? "自訂組合")}</b>${arch?.thesis ? `<span>${esc(arch.thesis)}</span>` : ""}</div>`
+      + group("✅", "要做", `${pick(false, "include").length} 項`, "#10b981", pick(false, "include"), (n) => n.claim)
+      + group("🛡", "護欄", "出現就停", "#f59e0b", pick(true, "include"), (n) => n.kill || n.claim)
+      + group("⛔", "不做", "明確排除", "#f43f5e", pick(false, "exclude"), (n) => n.claim)
+      + group("⚠", "承擔風險", "已知但接受", "#fb923c", pick(true, "exclude"), (n) => n.claim)
+      + (sacrifice.length ? `<section style="--c:#a855f7"><h3>💸 代價<small>選這條必然失去</small></h3><div class="chips">${sacrifice.map((x) => `<span>${esc(x)}</span>`).join("")}</div></section>` : "");
   }
 }
 

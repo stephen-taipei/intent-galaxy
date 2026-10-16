@@ -22,7 +22,8 @@ export const MASTER_SPAWNER_PROMPT = [
   "- sacrifice written in the world where the card SUCCEEDS (no 若/如果): nodes (N1..N9), p, v, t, l, x (each <=12字).",
   "- fatal = included Q4 node welded to card.",
   "- thesis <=24字, title <=14字 matching Verb+CrossDomainAnchor+Outcome.",
-  "S6 withheld_kill: the 4th attack class not used in N10-12."
+  "S6 recommend: key = the archetype you would pick to hit core.metric, why <=24字 citing the metric or a scarce resource.",
+  "S7 withheld_kill: the 4th attack class not used in N10-12."
 ].join("\n");
 
 // INTENT-SPEC-FINAL.md §3.1 Wire Schema，原文附給模型作為輸出形狀依據。
@@ -56,6 +57,7 @@ export interface IntentAnalysisResponse {
   };
   edges: Edge[];
   archetypes: { alpha: Archetype; beta?: Archetype; gamma?: Archetype };
+  recommend: { key: "alpha" | "beta" | "gamma"; why: string };
   withheld_kill: { attack: AttackClass; hits: AssumptionId; claim: string; kill: string; label: string };
 }
 

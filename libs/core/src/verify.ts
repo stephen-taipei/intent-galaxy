@@ -92,7 +92,7 @@ await assert.rejects(buildIntentLock({ analysis: a, solution: clash, baseKey: "a
 assert.equal(requiresNumericKill(["dead", "unobservable"]), false);
 assert.equal(requiresNumericKill(["unobservable", "unobservable"]), true);
 assert.equal(requiresNumericKill(["unobservable", "unobservable", "alive"]), false);
-const vague = structuredClone(a); vague.nodes.N10.kill = "羊毛黨刷爆即熔斷";
+const vague = structuredClone(a); vague.nodes.N10.kill = "設定欄位太多即停";
 const twice = { analysis: vague, solution: solveGalaxy(vague, "alpha", new Map()), baseKey: "alpha" as const, recentVerdicts: ["unobservable", "unobservable"] };
 await assert.rejects(buildIntentLock(twice), LockError);
 assert.ok((await buildIntentLock({ ...twice, analysis: a, solution: solveGalaxy(a, "alpha", new Map()) })).specHash);
