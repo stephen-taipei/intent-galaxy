@@ -65,12 +65,13 @@ const resetJob = () => { toParent({ type: "intent-reset", nonce }); nonce = ""; 
 function showGalaxy(analysis, g, { adopt = false } = {}) {
   // 先驗證：格式不對時保留原本的等待／失敗提示條與按鈕。
   if (!galaxy.setGalaxy(analysis, { goal: g || goal })) { galaxy.showMessage("星系格式不完整，請再生成一次，或貼上修正後的 JSON"); return false; }
+  hideCard();
   goal = g || goal;
   waiting = false;
   shown = "galaxy";
   setStrip("");
   galaxy.showMessage(goal ? `這是「${goal.slice(0, 40)}」的星系。按 1／2／3 選方案，再按 Enter 填回對話框。` : "");
-  if (adopt) toParent({ type: "intent-adopt", analysis, goal });
+  if (adopt) toParent({ type: "intent-adopt", analysis, goal, nonce });
   return true;
 }
 
@@ -91,6 +92,12 @@ function showPaste() {
   // 保留上次貼的內容方便修改；全選起來，直接貼上新內容就會取代它。
   if (area) { area.value = lastPaste; area.focus(); area.select(); }
 }
+
+function showCliFailed() {
+  shown = "failed";
+  setStrip("⚠ 本機 AI 沒有產出可用的星系", [["重試（本機）", () => { setStrip(""); spawnViaCli().catch(cliError); }], ["改用網頁上的 AI", () => confirmChat()]]);
+}
+const cliError = (err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message });
 
 async function spawnViaCli() {
   cliBusy = true;
@@ -117,12 +124,13 @@ async function spawnViaCli() {
     }
   } finally {
     cliBusy = false;
-    if (shown === "waiting") shown = "idle";
+    if (shown === "waiting") showCliFailed();
     toParent({ type: "intent-busy", busy: false });
   }
 }
 
 function startWaiting(g, elapsedSec = 0, unsent = false) {
+  hideCard();
   goal = g || goal;
   waiting = true;
   shown = "waiting";
@@ -137,6 +145,7 @@ function updateWaiting(elapsedSec, unsent) {
   if (t) t.textContent = unsent ? "⚠ 提示詞還在輸入框裡：請在對話框按一下送出" : `⋯ 等待 ${site} 回覆 · ${fmt(elapsedSec)}`;
 }
 function showFailed(detail) {
+  hideCard();
   waiting = false;
   shown = "failed";
   galaxy.showMessage(detail);
@@ -154,12 +163,13 @@ function spawnViaChat() {
 }
 
 function confirmChat(extra = []) {
+  const g = goal; // 卡片開著時畫面可能換成別的星系：送出的永遠是卡片上寫的這個問題
   showCard(`用 ${site} 生成星系`,
     `目標：<b>${esc(goal)}</b><br><br>`
       + "我會在這個對話送出一段分析提示詞，AI 回覆後自動畫出星系。<br>"
       + "<small>⏱ 一般模型約 1–3 分鐘；推理型高階模型（如 ChatGPT Pro、Thinking、Gemini Pro）可能要 5–15 分鐘，想快一點可以先在網頁上切換到一般模型。<br>"
       + "不想讓提示詞出現在對話裡？在終端機執行 <code>npx @stephen.taipei/intent-galaxy</code>，改用本機的 AI 生成。</small>",
-    [["開始生成", spawnViaChat, true], ...extra, ...demoActions()]);
+    [["開始生成", () => { goal = g; spawnViaChat(); }, true], ...extra, ...demoActions()]);
 }
 
 /** 這個對話已生成的星系，附「重新生成」（例如換了模型想再問一次）。 */
@@ -169,10 +179,13 @@ function showDone(job) {
   setStrip("這是這個對話已生成的星系", [["重新生成", () => confirmChat([["回到星系", () => showDone(job)]])]]);
 }
 
-/** 新問題：本機 CLI 在線就直接生成，否則請網頁上的 AI。 */
-async function generate(back = []) {
-  if (await cliAlive()) return spawnViaCli().catch((err) => galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }));
-  confirmChat(back);
+/** 新問題：本機 CLI 在線就直接生成（ask 時先確認），否則請網頁上的 AI。 */
+async function generate(back = [], ask = false) {
+  if (!(await cliAlive())) return confirmChat(back);
+  if (!ask) return spawnViaCli().catch(cliError);
+  const g = goal;
+  showCard("用本機 AI 生成星系", `目標：<b>${esc(g)}</b><br><br>本機的 Intent Galaxy 正在執行，會用它生成（不會出現在對話裡）。`,
+    [["開始生成", () => { goal = g; spawnViaCli().catch(cliError); }, true], ...back, ["改用網頁上的 AI", () => { goal = g; confirmChat(back); }]]);
 }
 
 async function open({ goal: text = "", site: host = "這個 AI", job = null, pageGalaxy = null, reopen = false }) {
@@ -181,9 +194,10 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
   // 縮小後叫回來：保留畫面（勾選的方案、等待進度）；只有出現新問題或狀態已改變時才換。
   if (reopen) {
     if (cliBusy) return;
-    if (job?.status === "done" && shown !== "galaxy") return showDone(job);
-    if (shown === "galaxy" || shown === "waiting") {
+    if (job?.status === "done" && (shown === "waiting" || shown === "idle")) return showDone(job);
+    if (shown === "galaxy" || shown === "waiting" || shown === "card") {
       if (!text || text === goal) return;
+      if (shown === "card") { goal = text; return generate([], true); }
       if (shown === "waiting") return askWhileWaiting(job ?? { goal }, text);
       const current = galaxy.analysis, currentGoal = goal;
       return showCard("輸入框有新的問題", `「${esc(text)}」<br><br>要用它重新生成星系，還是留在目前這個星系？`,
@@ -201,9 +215,14 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
   }
   // 上一個問題還在等，輸入框又打了新問題：先決定要繼續等還是放棄。
   if (job?.status === "waiting" && newGoal) return askWhileWaiting(job, goal);
-  if (goal) return generate(job?.status === "done" && job.analysis ? [["回到上一個星系", () => showDone(job)]] : []);
+  if (goal) return generate(job?.status === "done" && job.analysis ? [["回到上一個星系", () => showDone(job)]] : [], reopen);
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
-  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在決定的是[:：]\s*/, "") ?? "", { adopt: true });
+  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在決定的是[:：]\s*/, "") ?? "");
+  // 3. 本機 CLI 在線且有最近生成的星系：直接顯示（本機生成的結果不在對話裡，由本機 CLI 保存）。
+  if (await cliAlive()) {
+    const cur = await fetch(`${CLI}/api/galaxy`).then((r) => r.json()).catch(() => null);
+    if (cur?.analysis && showGalaxy(cur.analysis, cur.goal ?? "")) return;
+  }
   showCard("先寫下你要決定的事",
     "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>"
       + "星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。",
@@ -213,7 +232,8 @@ async function open({ goal: text = "", site: host = "這個 AI", job = null, pag
 function askWhileWaiting(job, newText) {
   showCard("上一個問題還在等 AI 回覆",
     `正在等：<b>${esc(job.goal)}</b><br>AI 回完之前，網站通常不接受新訊息。要繼續等，還是放棄它、改問新的問題？`,
-    [["繼續等待", () => startWaiting(job.goal, job.elapsedSec ?? 0, job.unsent), true], ["放棄並改問新問題", () => { resetJob(); goal = newText; generate(); }]]);
+    // 卡片開著時 AI 可能已回完（畫面已換成星系或失敗）：那時「繼續等待」只關掉卡片。
+    [["繼續等待", () => { if (shown === "waiting") startWaiting(job.goal, job.elapsedSec ?? 0, job.unsent); }, true], ["放棄並改問新問題", () => { resetJob(); goal = newText; generate(); }]]);
 }
 
 api.runtime.onMessage.addListener((msg) => {
