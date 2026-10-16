@@ -379,10 +379,10 @@ export class IntentGalaxyOverlay extends HTMLElement {
       ? (this.#baseKey ? "目前的選擇彼此相容，可以確定方案。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
       : `選取的節點彼此矛盾（${esc(sol.status)}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。`;
     const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
-    lockBtn.textContent = embedded ? "⏎ 確定並填入對話框" : "⏎ 確定並複製指令";
-    lockBtn.dataset.tip = `把目前方案編譯成給 AI 的指令（右側「原始 AST」的內容），`
-      + (embedded ? "直接填入 AI 網頁的輸入框，你再按送出。" : "寫入 <b>.intent.lock.json</b>（14 天後驗屍用），並複製到剪貼簿，可以貼給 Claude Code。")
-      + `<br><span class=dim>快捷鍵：Enter</span>`;
+    lockBtn.textContent = embedded ? "↵ 把方案填進對話框" : "📋 產生 AI 執行指令";
+    lockBtn.dataset.tip = `<b>選好方案後按這裡（或 Enter）</b><br>把右側的方案轉成一段給 AI 的指令，`
+      + (embedded ? "直接填進這個 AI 網頁的輸入框，你檢查後按送出即可。" : "複製到剪貼簿，貼給 Claude Code 或 ChatGPT，AI 就會照「要做／不做／護欄」動手。")
+      + `<br><span class=dim>${embedded ? "" : "同時寫入 .intent.lock.json，14 天後提醒你驗收護欄。"}</span>`;
     root.querySelector("#bar .msg").textContent = this.#hint ? `g 直達：${this.#hint}` : this.#message;
     const pre = root.querySelector("aside pre"), summary = root.getElementById("summary");
     pre.textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
