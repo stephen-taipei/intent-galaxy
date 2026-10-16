@@ -11,9 +11,10 @@
   "scripts": {
     "start": "node ./apps/cli/bin/intent-galaxy.mjs --standalone",
     "mcp": "node ./apps/cli/bin/intent-galaxy.mjs",
-    "test": "node --experimental-strip-types libs/core/src/verify.ts && node --experimental-strip-types libs/epistemic/src/verify-splitter.ts"
+    "test": "node --experimental-strip-types libs/core/src/verify.ts && node --experimental-strip-types libs/epistemic/src/verify-splitter.ts && node apps/cli/test/verify-cli.mjs && node tools/verify-sync.mjs",
+    "build:ext": "node tools/sync-extension.mjs"
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.18.0"
   }
 }

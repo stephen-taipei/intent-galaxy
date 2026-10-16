@@ -26,3 +26,22 @@ export interface Archetype {
   sacrifice: { nodes: NodeId[]; p: string; v: string; t: string; l: string; x: string };
   fatal: Q4NodeId; thesis: string; title: string;
 }
+export interface IntentAnalysisResponse {
+  schema_version: "1.0";
+  _scratchpad?: unknown;
+  core: { decision: string; metric: string };
+  quadrants: { Q1: Persona; Q2: Persona; Q3: Persona; Q4: Persona };
+  nodes: {
+    N1: PlainNode; N2: PlainNode; N3: PlainNode;
+    N4: PlainNode; N5: PlainNode; N6: PlainNode;
+    N7: LateralNode; N8: LateralNode; N9: LateralNode;
+    N10: FalsifierNode; N11: FalsifierNode; N12: FalsifierNode;
+  };
+  edges: Edge[];
+  archetypes: { alpha: Archetype; beta?: Archetype; gamma?: Archetype };
+  withheld_kill?: { attack: AttackClass; hits: AssumptionId; claim: string; kill: string; label: string };
+}
+export type ArchetypeKey = "alpha" | "beta" | "gamma";
+export const NODE_IDS: readonly NodeId[] = ["N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11", "N12"];
+export const ARCHETYPE_KEYS: readonly ArchetypeKey[] = ["alpha", "beta", "gamma"];
+export const quadrantOf = (id: NodeId): QuadrantKey => (["Q1", "Q2", "Q3", "Q4"] as const)[Math.floor((Number(id.slice(1)) - 1) / 3)];

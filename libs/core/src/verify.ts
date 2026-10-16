@@ -1,9 +1,72 @@
 import assert from "node:assert/strict";
 import { hasSlop } from "./slop.ts";
 import { compileIntent } from "./compiler.ts";
+import { buildModel, repairAnalysis } from "./repair.ts";
+import { renderLockedAst, solveGalaxy } from "./galaxy.ts";
+import { SAMPLE_GALAXY } from "../../../apps/web/sample-galaxy.js";
+import type { IntentAnalysisResponse, NodeId, Stance } from "../../protocol/src/index.ts";
+
 assert.equal(hasSlop("提升用戶體驗"), true);
 assert.equal(hasSlop("負載平衡器只留 2 台"), false);
 const model = { version: "v1", feasibleVersion: "v1", validated: true as const, ids: ["N1", "N2", "N3"], feasibleMasks: [0, 2, 3, 4] };
 const resA = compileIntent({ model, base: ["include", "include", "neutral"], overrides: new Map([[2, "include"]]) });
 assert.equal(resA.status, "SAT");
+
+// 修復管線：示範星系必須無 error、無 fix
+const sample = repairAnalysis(SAMPLE_GALAXY);
+assert.equal(sample.ok, true, JSON.stringify(sample.findings));
+assert.deepEqual(sample.findings.filter(f => f.level !== "warning"), []);
+const a = sample.analysis as IntentAnalysisResponse;
+
+// V4 反轉律、V6 無向邊對稱化去重、V5 無效邊、V9 requires 閉包、V11 fatal 補入
+const broken = structuredClone(SAMPLE_GALAXY) as any;
+broken.nodes.N1.inverse_cell = broken.nodes.N1.cell;
+broken.edges.push({ type: "excludes", from: "N5", to: "N4", why: "反向重複" }, { type: "requires", from: "N3", to: "N3", why: "自環" });
+broken.archetypes.alpha.include = ["N1", "N3", "N4"];
+const fixed = repairAnalysis(broken);
+assert.equal(fixed.ok, true);
+const codes = fixed.findings.filter(f => f.level === "fix").map(f => f.code);
+for (const c of ["V4", "V5", "V6", "V9", "V11"]) assert.ok(codes.includes(c), `應產生 ${c} 修復：${codes}`);
+assert.notEqual(fixed.analysis!.nodes.N1.inverse_cell, fixed.analysis!.nodes.N1.cell);
+assert.equal(fixed.analysis!.edges.filter(e => e.type === "excludes" && e.from === "N4" && e.to === "N5").length, 1);
+assert.deepEqual(fixed.analysis!.archetypes.alpha.include, ["N1", "N3", "N4", "N8", "N10"]);
+assert.equal(SAMPLE_GALAXY.nodes.N1.inverse_cell !== SAMPLE_GALAXY.nodes.N1.cell, true, "repair 不可修改輸入");
+
+// V10 alpha 內部互斥無法修復 → error
+const unsat = structuredClone(SAMPLE_GALAXY) as any;
+unsat.archetypes.alpha.include.push("N5");
+unsat.archetypes.alpha.exclude = [];
+assert.equal(repairAnalysis(unsat).ok, false);
+assert.equal(repairAnalysis({ schema_version: "0.9" }).ok, false);
+
+// buildModel：excludes 與 requires 皆被遮罩空間遵守
+const m = buildModel(a);
+const bit = (id: string) => 1 << (Number(id.slice(1)) - 1);
+assert.ok(m.feasibleMasks.every(x => !((x & bit("N4")) && (x & bit("N5")))));
+assert.ok(m.feasibleMasks.every(x => !(x & bit("N1")) || (x & bit("N8"))));
+
+// solveGalaxy：每張卡皆 SAT，且顯示立場與卡片一致
+for (const key of ["alpha", "beta", "gamma"] as const) {
+  const sol = solveGalaxy(a, key, new Map());
+  assert.equal(sol.status, "SAT", key);
+  for (const id of a.archetypes[key]!.include) assert.equal(sol.nodes[id].stance, "include", `${key} ${id}`);
+}
+// 用戶手動採納 N5 → 與預設 N1/N4 互斥時，預設讓位（derived exclude）
+const remix = solveGalaxy(a, "alpha", new Map<NodeId, Stance>([["N5", "include"]]));
+assert.equal(remix.status, "SAT");
+assert.equal(remix.nodes.N5.stance, "include");
+assert.deepEqual([remix.nodes.N1.stance, remix.nodes.N1.src], ["exclude", "derived"]);
+// 兩個用戶決定互斥 → L3_UNSAT 並標出衝突核心
+const clash = solveGalaxy(a, "alpha", new Map<NodeId, Stance>([["N4", "include"], ["N5", "include"]]));
+assert.equal(clash.status, "L3_UNSAT");
+assert.deepEqual([...clash.conflicts].sort(), ["N4", "N5"]);
+
+// 極性映射：Q4 exclude → ACCEPTED RISK，絕不進 MUST NOT
+const risk = solveGalaxy(a, "alpha", new Map<NodeId, Stance>([["N4", "neutral"], ["N10", "exclude"], ["N9", "exclude"]]));
+const ast = renderLockedAst(a, risk, "alpha");
+const section = (title: string) => ast.split("\n## ").find(s => s.includes(title)) ?? "";
+assert.ok(section("ACCEPTED RISK").includes("[N10]"));
+assert.ok(!section("MUST NOT").includes("[N10]"));
+assert.ok(section("MUST NOT").includes("[N9]"));
+assert.ok(section("MUST NOT").includes("[N5]"));
 console.log("✅ libs/core verified!");
