@@ -66,6 +66,11 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 #cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:8px 10px; background:var(--panel); border-top:1px solid var(--border); }
 .card { background:#0b101b; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; cursor:pointer; font:inherit; color:inherit; text-align:left; }
 .card.active { border-color:var(--q1); background:rgba(56,189,248,.07); }
+.card.rec { border-color:rgba(245,158,11,.75); box-shadow:0 0 0 1px rgba(245,158,11,.2), 0 0 18px rgba(245,158,11,.12); }
+.card.rec.active { border-color:var(--q1); }
+.card .badges { display:flex; gap:4px; }
+.card .rec-badge { font-size:9.5px; padding:1px 6px; border-radius:4px; background:rgba(245,158,11,.2); color:#fcd34d; font-weight:700; white-space:nowrap; }
+.card .why { font-size:10.5px; color:#fcd34d; margin-top:2px; }
 .card.ghost { border-style:dashed; color:var(--muted); cursor:default; }
 .card .head { display:flex; justify-content:space-between; gap:6px; align-items:center; }
 .card .title { font-size:12px; font-weight:700; color:#fff; }
@@ -81,7 +86,25 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-size:10px; border:1px solid #334155; font-family:inherit; }
 #bar button { font:inherit; font-weight:700; padding:4px 10px; border-radius:6px; border:none; background:var(--q1); color:#080b11; cursor:pointer; }
 aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
+aside .head { display:flex; align-items:center; justify-content:space-between; }
 aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
+aside .head button { font:inherit; font-size:10.5px; padding:2px 8px; border-radius:5px; border:1px solid #334155; background:#111723; color:#94a3b8; cursor:pointer; }
+#summary { flex:1; overflow:auto; display:flex; flex-direction:column; gap:10px; min-height:0; }
+#summary .empty { color:var(--muted); font-size:11.5px; line-height:1.7; padding:6px 2px; }
+#summary .empty.unsat { color:#fb7185; }
+#summary .plan { padding:9px 11px; border-radius:9px; background:rgba(56,189,248,.07); border:1px solid rgba(56,189,248,.25); }
+#summary .plan b { display:block; font-size:13px; color:#fff; }
+#summary .plan span { display:block; font-size:11px; color:#94a3b8; margin-top:2px; }
+#summary section { border-left:3px solid var(--c); padding:2px 0 2px 10px; }
+#summary h3 { font-size:11.5px; color:var(--c); margin-bottom:5px; font-weight:700; }
+#summary h3 small { color:var(--muted); font-weight:400; margin-left:4px; }
+#summary .item { margin-bottom:6px; }
+#summary .item b { font-size:12px; color:#f1f5f9; }
+#summary .item .nid { font:10px ui-monospace,monospace; color:var(--muted); margin-right:5px; }
+#summary .item .tag { font-size:9.5px; color:#94a3b8; border:1px dashed #475569; border-radius:4px; padding:0 4px; margin-left:5px; }
+#summary .item p { font-size:11px; color:#94a3b8; margin-top:1px; }
+#summary .chips { display:flex; flex-wrap:wrap; gap:5px; }
+#summary .chips span { font-size:11px; padding:2px 7px; border-radius:5px; background:#1e293b; color:#cbd5e1; }
 aside pre { flex:1; overflow:auto; background:#070a10; border:1px solid var(--border); border-radius:8px; padding:10px; font:11px/1.5 ui-monospace,monospace; color:#cbd5e1; white-space:pre-wrap; }
 aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow:auto; }
 `;
@@ -89,7 +112,7 @@ aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow
 export class IntentGalaxyOverlay extends HTMLElement {
   #analysis = null; #draft = null; #galaxyId = 0; #findings = [];
   #baseKey = null; #overrides = new Map(); #seq = 0; #focus = 0;
-  #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null;
+  #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null; #showRaw = false;
 
   constructor() {
     super();
@@ -100,7 +123,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
       <footer id="bar"><span class="status"></span><span class="msg"></span>
         <span class="keys"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 主幹 · <kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> 導航 · <kbd>Space</kbd> 採納 · <kbd>x</kbd> 排除 · <kbd>r</kbd> 解衝突 · <kbd>u</kbd> 復原</span>
         <button type="button" id="lock">⏎ 鎖定並注入</button></footer>
-      <aside><h2>LIVE INTENT AST</h2><div class="findings"></div><pre></pre></aside></div>`;
+      <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
     root.addEventListener("click", () => this.focus({ preventScroll: true }));
@@ -108,6 +131,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#onNodeClick(e, "exclude"); });
     root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
     root.getElementById("lock").addEventListener("click", () => this.lock());
+    root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
     this.addEventListener("keydown", (e) => this.#onKey(e));
   }
 
@@ -305,24 +329,50 @@ export class IntentGalaxyOverlay extends HTMLElement {
       return `<path d="M ${x} ${y} Q ${(x + 500) / 2} ${y} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
     }).join("");
 
+    const rec = a?.recommend?.key;
     root.getElementById("cards").innerHTML = ARCH.map(([key, num]) => {
-      const c = archetypes[key];
+      const c = archetypes[key], isRec = rec === key;
       if (!c) return `<div class="card ghost"><div class="title">[${num}] ${draft ? "生成中…" : "—"}</div></div>`;
       const dist = Math.max(0, ...(c.include ?? []).map((id) => nodes[id]?.lateral?.dist ?? 0));
       const fatalKill = nodes[c.fatal]?.kill ?? "";
-      return `<button type="button" class="card ${this.#baseKey === key ? "active" : ""}" data-arch="${key}">
-        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span>${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</div>
+      const cls = ["card", this.#baseKey === key && "active", isRec && "rec"].filter(Boolean).join(" ");
+      return `<button type="button" class="${cls}" data-arch="${key}"${isRec ? ` title="主 Agent 推薦：${esc(a.recommend.why)}"` : ""}>
+        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge">★ 推薦</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
+        ${isRec && a.recommend.why ? `<div class="why">★ ${esc(clip(a.recommend.why, 30))}</div>` : ""}
         <div class="row">💸 代價：${esc(clip(renderSacrifice(c.sacrifice), 40))}</div>
         <div class="kill">⚡ 致死：${esc(clip(fatalKill, 30))}</div></button>`;
     }).join("");
 
     const status = root.querySelector("#bar .status");
     if (!sol) { status.className = "status wait"; status.textContent = draft ? `⋯ 串流中 ${Object.keys(nodes).length}/12` : "⋯ 等待星系"; }
-    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : "✦ 先發散：按 1/2/3 選主幹"; }
+    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : `✦ 先發散：按 1/2/3 選主幹${rec ? `（★ 推薦 ${ARCH.find(([k]) => k === rec)[1]}）` : ""}`; }
     else { status.className = "status unsat"; status.textContent = `✗ ${sol.status}${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}`; }
     root.querySelector("#bar .msg").textContent = this.#hint ? `g 直達：${this.#hint}` : this.#message;
-    root.querySelector("aside pre").textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
+    const pre = root.querySelector("aside pre"), summary = root.getElementById("summary");
+    pre.textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
+    pre.hidden = !this.#showRaw; summary.hidden = this.#showRaw;
+    root.getElementById("raw-toggle").textContent = this.#showRaw ? "摘要" : "原始 AST";
+    summary.innerHTML = this.#summaryHtml(a, sol, conflicts);
     root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
+  }
+
+  /** 右側摘要：把 LOCKED INTENT AST 的五個區塊改寫成人看得懂的分組卡片（極性規則同 renderLockedAst）。 */
+  #summaryHtml(a, sol, conflicts) {
+    if (!sol) return `<div class="empty">等待星系資料…</div>`;
+    if (sol.status !== "SAT") return `<div class="empty unsat">有互斥衝突${conflicts.size ? `：${[...conflicts].join(" ⊗ ")}` : ""}<br>按 <kbd>r</kbd> 保留較新決定，或改選其他節點。</div>`;
+    const picked = NODE_IDS.filter((id) => sol.nodes[id].stance !== "neutral");
+    if (!this.#baseKey && !picked.length) return `<div class="empty">先看完 12 顆節點，再按 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> 選一條主幹（或用 <kbd>Space</kbd> / <kbd>x</kbd> 自己挑）。<br><br>這裡會整理成：<br>✅ 要做　🛡 護欄　⛔ 不做　⚠ 承擔風險　💸 代價</div>`;
+    const arch = this.#baseKey ? a.archetypes[this.#baseKey] : null;
+    const pick = (q4, stance) => NODE_IDS.filter((id) => (quadrantOf(id) === "Q4") === q4 && sol.nodes[id].stance === stance);
+    const item = (id, desc) => { const n = a.nodes[id]; return `<div class="item"><span class="nid">${id}</span><b>${esc(n.label)}</b>${sol.nodes[id].src === "derived" ? `<span class="tag">推導</span>` : sol.nodes[id].src === "user" ? `<span class="tag">手動</span>` : ""}<p>${esc(desc(n))}</p></div>`; };
+    const group = (icon, name, hint, color, ids, desc) => ids.length ? `<section style="--c:${color}"><h3>${icon} ${name}<small>${hint}</small></h3>${ids.map((id) => item(id, desc)).join("")}</section>` : "";
+    const sacrifice = arch ? ["p", "v", "t", "l", "x"].map((k) => arch.sacrifice?.[k]).filter(Boolean) : [];
+    return `<div class="plan"><b>${esc(arch?.title ?? "自訂組合")}</b>${arch?.thesis ? `<span>${esc(arch.thesis)}</span>` : ""}</div>`
+      + group("✅", "要做", `${pick(false, "include").length} 項`, "#10b981", pick(false, "include"), (n) => n.claim)
+      + group("🛡", "護欄", "出現就停", "#f59e0b", pick(true, "include"), (n) => n.kill || n.claim)
+      + group("⛔", "不做", "明確排除", "#f43f5e", pick(false, "exclude"), (n) => n.claim)
+      + group("⚠", "承擔風險", "已知但接受", "#fb923c", pick(true, "exclude"), (n) => n.claim)
+      + (sacrifice.length ? `<section style="--c:#a855f7"><h3>💸 代價<small>選這條必然失去</small></h3><div class="chips">${sacrifice.map((x) => `<span>${esc(x)}</span>`).join("")}</div></section>` : "");
   }
 }
 

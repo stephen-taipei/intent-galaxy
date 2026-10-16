@@ -64,5 +64,6 @@ export const SAMPLE_GALAXY = {
       fatal: "N11", thesis: "暗池賞金鎖住頂尖用戶，百席守毛利", title: "設暗池賞金·百人閉門",
     },
   },
+  recommend: { key: "alpha", why: "30天千名種子戶靠裂變最快，算力熔斷兜底" },
   withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "核心依賴單一模型供應商", kill: "供應商漲價30%即作廢", label: "斷供單點" },
 };

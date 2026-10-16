@@ -18,6 +18,8 @@
 3. **[15s - 30s] 3 選 1 主幹收斂 (Archetype Convergence)**：
    - 畫面底部（或右側面板）並列呈現 3 張互斥的收斂策略卡（1/2/3）。
    - 每張卡濃縮為 3 行核心資訊：① 破局標題（內嵌跨界錨點，如「啟動暗池工單簿·終結過勞」）+ 距離徽章（◈D2/⬥D3/✦D4）、② 必然代價（sacrifice.rendered <= 40字）、③ 14天致死前提（fatal.kill <= 30字）。
+   - 主 Agent 推薦卡（`recommend.key`）以金色外框與「★ 推薦」標記並附一行推薦理由（`recommend.why` <= 24字），但不自動套用，保留「先發散」由用戶親手選擇。
+   - 右側面板以人類可讀的分組卡片呈現收斂結果（✅ 要做 / 🛡 護欄 / ⛔ 不做 / ⚠ 承擔風險 / 💸 代價，每項顯示節點標題與一句說明）；實際注入的 `LOCKED INTENT AST` 原文收在「原始 AST」切換檢視。
    - 當用戶點擊任一策略卡（或按數字鍵 1 / 2 / 3）時：星系圖瞬間點亮該策略所採納的 4~6 顆節點，並沿象限外側固定軌道繪製能量連線匯聚至中心主幹；其餘未選中的 neutral 節點自動退為 40% 透明度背景（不畫連線）。
 4. **[30s - 50s] 跨專家節點混音與矛盾合成 (Node Remix & TRIZ Collision)**：
    - 用戶在已點亮的主幹基礎上，看中其他專家象限的某顆節點時，可直接點擊或透過鍵盤流（h/j/k/l 導航，Space/I 納入、X 設為反義護欄/承擔風險、0/N 忽略）進行自由混音。
@@ -81,6 +83,7 @@ export interface IntentAnalysisResponse {
   };
   edges: Edge[];
   archetypes: { alpha: Archetype; beta?: Archetype; gamma?: Archetype };
+  recommend: { key: "alpha" | "beta" | "gamma"; why: string };
   withheld_kill: { attack: AttackClass; hits: AssumptionId; claim: string; kill: string; label: string };
 }
 
@@ -144,7 +147,8 @@ S5 archetypes (alpha=impact, beta=velocity, gamma=resilience):
 - sacrifice written in the world where the card SUCCEEDS (no 若/如果): nodes (N1..N9), p, v, t, l, x (each <=12字).
 - fatal = included Q4 node welded to card.
 - thesis <=24字, title <=14字 matching Verb+CrossDomainAnchor+Outcome.
-S6 withheld_kill: the 4th attack class not used in N10-12.
+S6 recommend: key = the archetype you would pick to hit core.metric, why <=24字 citing the metric or a scarce resource.
+S7 withheld_kill: the 4th attack class not used in N10-12.
 ```
 
 ---

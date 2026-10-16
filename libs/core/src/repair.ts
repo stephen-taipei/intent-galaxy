@@ -105,6 +105,9 @@ export function repairAnalysis(input: unknown): RepairResult {
   }
   for (const k of Object.keys(a.archetypes)) if (!(ARCHETYPE_KEYS as readonly string[]).includes(k)) { delete a.archetypes[k]; fix("V8", `移除未知策略卡 ${k}`); }
   if (!a.archetypes.alpha) return fail("V8", "缺少 archetypes.alpha");
+  // V19 recommend 必須指向現存策略卡；無效時移除（UI 只是不標示推薦）
+  if (a.recommend !== undefined && !(isObj(a.recommend) && a.archetypes[a.recommend.key])) { delete a.recommend; warn("V19", "recommend 未指向現存策略卡，已移除"); }
+  else if (a.recommend && typeof a.recommend.why !== "string") a.recommend.why = "";
 
   // V18 每張卡的 include/exclude 在可行解空間內可同時成立
   const model = buildModel(a as IntentAnalysisResponse);
