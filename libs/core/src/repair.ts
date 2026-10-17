@@ -3,7 +3,7 @@ import { ARCHETYPE_KEYS, NODE_IDS, quadrantOf } from "../../protocol/src/index.t
 import { hasSlop } from "./slop.ts";
 import type { Model } from "./compiler.ts";
 
-// Stage 1 → Stage 2 的確定性修復管線（V1–V18）。純函式、零 LLM、不修改輸入。
+// Stage 1 → Stage 2 的確定性修復管線（V1–V20）。純函式、零 LLM、不修改輸入。
 // fix = 已自動修復；warning = 違反 Spawner 規則但不影響編譯；error = 無法編譯。
 export type Finding = Readonly<{ code: string; level: "fix" | "warning" | "error"; msg: string }>;
 export type RepairResult = Readonly<{ ok: boolean; analysis: IntentAnalysisResponse | null; findings: readonly Finding[] }>;
@@ -145,6 +145,13 @@ function repairArchetype(key: ArchetypeKey, arch: any, edges: Edge[], requires: 
   // V8 include 與 exclude 不可重疊：include 優先
   const overlap = arch.exclude.filter((id: NodeId) => arch.include.includes(id));
   if (overlap.length) { arch.exclude = arch.exclude.filter((id: NodeId) => !overlap.includes(id)); fix("V8", `${key} 同時 include/exclude ${overlap.join(",")}，保留 include`); }
+  // V20 exclude 最多 3 顆：沒選的節點應保持中立，不該全列成 MUST NOT。優先保留與 include 有 excludes 邊的（真正互斥）。
+  if (arch.exclude.length > 3) {
+    const clash = (id: NodeId) => edges.some(e => e.type === "excludes" && ((e.from === id && arch.include.includes(e.to)) || (e.to === id && arch.include.includes(e.from))));
+    const keep: NodeId[] = [...arch.exclude.filter(clash), ...arch.exclude.filter((id: NodeId) => !clash(id))].slice(0, 3).sort((x, y) => idx(x) - idx(y));
+    fix("V20", `${key} exclude 有 ${arch.exclude.length} 顆（上限 3），只保留 ${keep.join(",")}，其餘改為中立`);
+    arch.exclude = keep;
+  }
   // V10 include 內部不可有 excludes 邊（無法確定性修復）
   const bad = edges.find(e => e.type === "excludes" && arch.include.includes(e.from) && arch.include.includes(e.to));
   if (bad) return `${key} include 內部互斥：${bad.from} ⊗ ${bad.to}`;

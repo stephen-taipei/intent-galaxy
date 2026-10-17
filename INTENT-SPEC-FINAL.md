@@ -37,7 +37,7 @@
 ```text
 packages/
   protocol/        # @intent-eng/protocol: 零依賴 Wire Types、JSON Schema (Draft 2020-12)、RFC 8785 JCS 雜湊
-  core/            # @intent-eng/core: 純 TS 驗證修復管線 (V1-V18)、Anti-Slop Regex、Bitmask 求解器與 compileIntent()
+  core/            # @intent-eng/core: 純 TS 驗證修復管線 (V1-V20)、Anti-Slop Regex、Bitmask 求解器與 compileIntent()
   epistemic/       # @intent-eng/epistemic: Master Spawner Prompt、TRIZ 合成 Prompt、IntentNdjsonSplitter、方案生成器
   galaxy-layout/   # @intent-eng/galaxy-layout: 純 TS 極座標扇形佈局表、外軌道連線分流路徑、h/j/k/l 最近鄰導航表
   galaxy-state/    # @intent-eng/galaxy-state: Angular 20+ Zoneless Signals 狀態機 (IntentStore)、Undo/Redo、IME-Safe Keymap
@@ -134,16 +134,18 @@ R3 INVERSION First pick inverse_cell (!== cell in the same dim), write inverse_p
 R4 BANNED    提升 加強 優化 完善 打造 賦能 整合 全面 有效 相關 確保 推動 強化 深化 落實 兼顧 平衡 增強 改善 提高 促進 可能面臨 需要注意 有一定風險 需要權衡 建議評估 視情況而定 或許 潛在 挑戰 取決於 適當 合理 長期 未來 逐步 and any comparative 更 without a baseline number.
 
 S0 _scratchpad: terms (3-8 from input), scarce (2 resources, >=1 not in terms), assumptions (A1-A4 with Aristotle cause and 若 X，則 T 內 Y), dims (D1-D4, 3 distinct concrete values each), fn_sig (verb｜flow｜constraints｜failure mode).
-S1 core: decision (你真正在決定的是： + core trade-off, <=35字), metric (number + deadline).
+S1 core: decision (你真正在決定的是： + core trade-off, <=35字), metric (one number + deadline, <=30字; no fee or exclusion clauses).
 S2 quadrants: Four scarred experts surrounding the user. Q1 Zero-Resetter, Q2 Bloodied Veteran, Q3 Border-Crosser, Q4 Coroner. scar <=16字, sacred <=8字.
 S3 nodes (N1-3 Q1, N4-6 Q2, N7-9 Q3, N10-12 Q4):
 - Q3 writes lateral FIRST (src Domain: Mechanism, dist 1..4 with >=2 distinct and >=1 dist>=2, drop).
 - Q4 writes falsifier FIRST (attack from sunk_cost|unit_economics|dark_incentive|single_point_failure, all 3 distinct; hits; wound).
 - Q4 kill <=30字 = self-contained 14-day observable failure condition (若 P 為假，14天內觀測到 O 即作廢).
-- label <=15字 written last (vivid verb + noun).
+- label <=15字 written last: plain everyday words the user would say (verb + object). No invented idioms, metaphors or classical phrasing.
+- blind: non-null on at most 3 nodes (what the user's input never mentions); null elsewhere.
 S4 edges: excludes, requires, before. >=4 of 6 quadrant pairs must share an excludes edge.
 S5 archetypes (alpha=impact, beta=velocity, gamma=resilience):
 - include 4-6 nodes (no internal excludes, requires-closed, >=1 Q3 dist>=2, >=1 Q4).
+- exclude 0-3 nodes, each sharing an excludes edge with an included node. Nodes not chosen stay neutral; do not list them.
 - sacrifice written in the world where the card SUCCEEDS (no 若/如果): nodes (N1..N9), p, v, t, l, x (each <=12字).
 - fatal = included Q4 node welded to card.
 - thesis <=24字, title <=14字 matching Verb+CrossDomainAnchor+Outcome.
