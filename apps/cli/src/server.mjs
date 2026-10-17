@@ -25,7 +25,8 @@ process.emitWarning = function (warning, ...rest) {
 };
 
 export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths = ["*"], log = () => {} }) {
-  let current = null, seq = 0, port = 0;
+  // 星系 id 從啟動時間起算：重新啟動後，瀏覽器手上的舊 id 不會剛好對到新程序的另一個星系（例如 MCP 正在等的那個）。
+  let current = null, seq = Date.now(), port = 0;
   const galaxies = new Map();
   const sseClients = new Set();
   const lockWaiters = new Map();
@@ -147,7 +148,8 @@ export function createGalaxyServer({ root, lockDir = process.cwd(), scopePaths =
         const file = path.join(lockDir, ".intent.lock.json");
         fs.writeFileSync(file, JSON.stringify(lock, null, 2) + "\n");
         log(`locked ${lock.specHash.slice(0, 12)} → ${file}`);
-        const waiter = lockWaiters.get(body.galaxyId) ?? (current && lockWaiters.get(current.id));
+        // 只解開「同一個星系」的等待：其他來源（例如瀏覽器擴充功能鎖定網頁 AI 生成的星系）不可回覆給正在等的 MCP 呼叫。
+        const waiter = lockWaiters.get(body.galaxyId);
         if (waiter) waiter(lock);
         return json(res, 200, { ok: true, file, specHash: lock.specHash, auditDueAt: lock.auditDueAt, ast: lock.payload.ast, hookInstalled: lock.hookInstalled });
       }

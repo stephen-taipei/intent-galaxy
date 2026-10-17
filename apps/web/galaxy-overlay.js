@@ -55,7 +55,7 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 #core { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(250px,34%); padding:10px 14px; border-radius:14px; background:rgba(15,23,42,.96); border:2px solid #475569; text-align:center; box-shadow:0 0 35px rgba(56,189,248,.14); z-index:10; }
 #core .sub { font-size:9.5px; letter-spacing:1px; color:var(--q1); margin-bottom:3px; }
 #core .goal { font-size:12.5px; font-weight:700; color:#fff; }
-#core .metric { font-size:10.5px; color:var(--gold); margin-top:4px; }
+#core .metric { font-size:10.5px; color:var(--gold); margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; cursor:help; }
 .node { position:absolute; transform:translate(-50%,-50%); padding:6px 10px; border-radius:9px; background:rgba(17,23,35,.94); border:1.5px solid #334155; color:var(--text); font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; transition:opacity .15s, border-color .15s, background .15s; z-index:5; min-width:118px; max-width:180px; text-align:left; }
 .node:hover, .node.focused { border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.2); z-index:20; }
 .node .nid { font-size:10px; opacity:.65; margin-right:4px; font-family:ui-monospace,monospace; }
@@ -92,7 +92,10 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 .status.wait { color:var(--q1); background:rgba(56,189,248,.12); }
 #bar .keys { margin-left:auto; }
 kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-size:10px; border:1px solid #334155; font-family:inherit; }
-#bar button { font:inherit; font-weight:700; padding:4px 10px; border-radius:6px; border:none; background:var(--q1); color:#080b11; cursor:pointer; }
+#bar button { white-space:nowrap; flex-shrink:0; font:inherit; font-weight:700; padding:4px 10px; border-radius:6px; border:none; background:var(--q1); color:#080b11; cursor:pointer; }
+#bar button#reset { background:transparent; color:var(--text); border:1px solid #475569; font-weight:600; }
+#bar button#reset:hover { border-color:#fff; }
+#bar button#reset:disabled { opacity:.35; cursor:default; }
 aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
 aside .head { display:flex; align-items:center; justify-content:space-between; }
 aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
@@ -137,7 +140,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
         <span class="keys">${KEY_HINTS.map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${label}</span>`).join(" · ")}</span>
-        <button type="button" id="lock"></button></footer>
+        <button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
       <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle" data-tip="切換檢視：摘要 ↔ 實際送給 AI 的原始指令文字（LOCKED INTENT AST）">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
@@ -146,6 +149,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#onNodeClick(e, "exclude"); });
     root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
     root.getElementById("lock").addEventListener("click", () => this.lock());
+    root.getElementById("reset").addEventListener("click", () => this.reset());
     root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
     // 統一 tooltip：任何帶 data-tip 的元素（節點、策略卡、按鍵說明、按鈕）滑過或鍵盤聚焦時顯示。
     const showTip = (e) => { const el = e.target.closest?.("[data-tip]"); if (el) this.#showTip(el); else this.#hideTip(); };
@@ -200,6 +204,15 @@ export class IntentGalaxyOverlay extends HTMLElement {
     this.#snapshot();
     this.#baseKey = key;
     if (clearOverrides) this.#overrides.clear();
+    this.#render();
+  }
+
+  /** 重設：清掉策略卡與所有手動調整，回到剛發散的星系（u 可復原）。 */
+  reset() {
+    if (!this.#analysis || (!this.#baseKey && !this.#overrides.size)) return;
+    this.#snapshot();
+    this.#baseKey = null; this.#overrides.clear();
+    this.#message = "已清空選擇（按 u 可復原）";
     this.#render();
   }
 
@@ -327,8 +340,12 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS).map(([q, label]) =>
       `<div class="q-tag ${q}" title="${esc(quadrants[q]?.scar)}">${label}${quadrants[q]?.sacred ? ` <small>· ${esc(quadrants[q].sacred)}</small>` : ""}</div>`).join("");
     root.querySelector("#core .goal").textContent = String(core.decision ?? "").replace(/^你真正在決定的是[:：]\s*/, "");
-    root.querySelector("#core .metric").textContent = core.metric ? `🎯 ${core.metric}` : "";
+    const metricEl = root.querySelector("#core .metric");
+    metricEl.textContent = core.metric ? `🎯 ${core.metric}` : "";
+    if (core.metric) metricEl.dataset.tip = `<b>成功指標</b><br>${esc(core.metric)}`; else delete metricEl.dataset.tip;
 
+    // ✦ 盲區最多標 3 顆，才看得出重點：優先 Q3 越界者（跨界的點子最常是原話沒想到的），再來 Q4、Q1、Q2。
+    const blindShown = new Set(["Q3", "Q4", "Q1", "Q2"].flatMap((q) => NODE_IDS.filter((id) => quadrantOf(id) === q && nodes[id]?.blind)).slice(0, 3));
     root.getElementById("nodes").innerHTML = NODE_IDS.map((id, i) => {
       const n = nodes[id], pos = COORDS[i], q = quadrantOf(id);
       const style = `left:${pos.x}%;top:${pos.y}%`;
@@ -339,7 +356,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
         : view.src === "user" ? `<span class="chip">📌 手動釘選</span>`
         : q === "Q4" && view.stance === "exclude" ? `<span class="chip">⚠ 明示承擔風險</span>` : "";
       const cls = ["node", dimmed && "dimmed", i === this.#focus && "focused", conflicts.has(id) && "conflict"].filter(Boolean).join(" ");
-      const blind = n.blind ? `<span class="blind" title="${esc(n.blind)}">✦ 盲區</span>` : "";
+      const blind = blindShown.has(id) ? `<span class="blind" title="${esc(n.blind)}">✦ 盲區</span>` : "";
       return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" data-tip="${esc(this.#nodeTip(id, n, q, view))}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
     }).join("");
 
@@ -378,6 +395,10 @@ export class IntentGalaxyOverlay extends HTMLElement {
     status.dataset.tip = !sol ? "星系資料還沒到齊。" : sol.status === "SAT"
       ? (this.#baseKey ? "目前的選擇彼此相容，可以確定方案。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
       : `選取的節點彼此矛盾（${esc(sol.status)}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。`;
+    const resetBtn = root.getElementById("reset");
+    resetBtn.textContent = "↺ 重設";
+    resetBtn.disabled = !a || (!this.#baseKey && !this.#overrides.size);
+    resetBtn.dataset.tip = "清掉選好的策略卡與所有手動調整，回到剛展開的星系。<br><span class=dim>按 u 可以復原。</span>";
     const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
     lockBtn.textContent = embedded ? "↵ 把方案填進對話框" : "📋 產生 AI 執行指令";
     lockBtn.dataset.tip = `<b>選好方案後按這裡（或 Enter）</b><br>把右側的方案轉成一段給 AI 的指令，`

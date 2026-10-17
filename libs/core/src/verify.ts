@@ -6,6 +6,7 @@ import { renderLockedAst, solveGalaxy } from "./galaxy.ts";
 import { buildIntentLock, LockError, requiresNumericKill } from "./lock.ts";
 import { specHash } from "../../protocol/src/jcs.ts";
 import { SAMPLE_GALAXY } from "../../../apps/web/sample-galaxy.js";
+import { NODE_IDS } from "../../protocol/src/index.ts";
 import type { IntentAnalysisResponse, NodeId, Stance } from "../../protocol/src/index.ts";
 
 assert.equal(hasSlop("提升用戶體驗"), true);
@@ -40,6 +41,16 @@ unsat.archetypes.alpha.include.push("N5");
 unsat.archetypes.alpha.exclude = [];
 assert.equal(repairAnalysis(unsat).ok, false);
 assert.equal(repairAnalysis({ schema_version: "0.9" }).ok, false);
+
+// V20 exclude 超過 3 顆：保留與 include 互斥的，其餘改為中立
+const wide = structuredClone(SAMPLE_GALAXY) as any;
+const inc = new Set(wide.archetypes.alpha.include);
+wide.archetypes.alpha.exclude = NODE_IDS.filter((id) => !inc.has(id));
+const clashing = wide.archetypes.alpha.exclude.filter((id: string) => wide.edges.some((e: any) => e.type === "excludes" && ((e.from === id && inc.has(e.to)) || (e.to === id && inc.has(e.from)))));
+const trimmed = repairAnalysis(wide);
+assert.ok(trimmed.ok && trimmed.findings.some((f) => f.code === "V20"));
+assert.equal(trimmed.analysis!.archetypes.alpha.exclude.length, 3);
+assert.ok(trimmed.analysis!.archetypes.alpha.exclude.every((id) => clashing.includes(id)) || clashing.length < 3, "優先保留真正互斥的節點");
 
 // buildModel：excludes 與 requires 皆被遮罩空間遵守
 const m = buildModel(a);

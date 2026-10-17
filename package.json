@@ -32,7 +32,8 @@
     "build:ext": "node tools/sync-extension.mjs",
     "build": "node tools/build.mjs",
     "prepare": "node tools/build.mjs",
-    "pack:ext": "node tools/sync-extension.mjs --zip"
+    "pack:ext": "node tools/sync-extension.mjs --zip",
+    "bench:latency": "node tools/bench-latency.mjs"
   },
   "engines": {
     "node": ">=22.18.0"

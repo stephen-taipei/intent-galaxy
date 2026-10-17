@@ -97,6 +97,13 @@ try {
   const noQ4 = await post("/api/lock", { galaxyId: galaxy.id, baseKey: "alpha", overrides: { N10: "exclude" } });
   assert.equal(noQ4.status, 422);
   assert.ok(!fs.existsSync(path.join(tmp, ".intent.lock.json")));
+  // 別的來源（擴充功能鎖定沒有登記的星系，galaxyId 0）不可解開正在等的 MCP 呼叫
+  let settled = false;
+  opened.then(() => { settled = true; });
+  const foreign = await post("/api/lock", { galaxyId: 0, analysis: SAMPLE_GALAXY, baseKey: "beta", overrides: {}, goal: "別的對話" });
+  assert.equal(foreign.status, 200);
+  await new Promise((r) => setTimeout(r, 200));
+  assert.equal(settled, false, "galaxyId 0 的鎖定不可回覆給 MCP");
   const lock = await post("/api/lock", { galaxyId: galaxy.id, baseKey: "alpha", overrides: { N11: "exclude" }, ast: "# 偽造的 AST 會被忽略" });
   assert.equal(lock.status, 200);
   const lockRes = await lock.json();
