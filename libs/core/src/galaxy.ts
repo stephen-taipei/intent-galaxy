@@ -47,7 +47,11 @@ export function solveGalaxy(a: IntentAnalysisResponse, baseKey: ArchetypeKey | n
  * Q1–Q3 include → MUST；Q1–Q3 exclude → MUST NOT；
  * Q4 include → GUARDRAILS；Q4 exclude → ACCEPTED RISK（明示承擔風險，絕不渲染為 MUST NOT）。
  */
-export function renderLockedAst(a: IntentAnalysisResponse, sol: GalaxySolution, baseKey: ArchetypeKey | null): string {
+/** AST 各段標題的在地語言說明（英文關鍵字 MUST / GUARDRAILS… 固定不變，給 AI 與 kill-gate 辨識）。預設繁體中文。 */
+export type AstLabels = Readonly<{ must: string; guard: string; mustNot: string; risk: string; sacrifice: string; forbid: string; accepted: string }>;
+export const AST_LABELS_ZH: AstLabels = { must: "採納機制", guard: "證偽護欄", mustNot: "排除反目標", risk: "明示承擔風險", sacrifice: "必然代價", forbid: "禁止", accepted: "已知並承擔" };
+
+export function renderLockedAst(a: IntentAnalysisResponse, sol: GalaxySolution, baseKey: ArchetypeKey | null, L: AstLabels = AST_LABELS_ZH): string {
   const arch = baseKey ? a.archetypes[baseKey] : undefined;
   const pick = (q4: boolean, stance: Stance) => NODE_IDS.filter(id => (quadrantOf(id) === "Q4") === q4 && sol.nodes[id].stance === stance);
   const tag = (id: NodeId) => sol.nodes[id].src === "derived" ? " (derived)" : "";
@@ -57,11 +61,11 @@ export function renderLockedAst(a: IntentAnalysisResponse, sol: GalaxySolution, 
     `# LOCKED INTENT AST (${arch?.title ?? "Custom"})`,
     `> ${a.core.decision}`,
     a.core.metric ? `> 🎯 ${a.core.metric}` : "",
-    `\n## 1. MUST 採納機制 (${must.length})`, ...must.map(id => `- [${id}] ${n(id).claim ?? n(id).label}${tag(id)}`),
-    `\n## 2. GUARDRAILS 證偽護欄 (${guard.length})`, ...guard.map(id => `- [${id}] ${n(id).claim ?? n(id).label} (kill: ${n(id).kill ?? "-"})${tag(id)}`),
-    `\n## 3. MUST NOT 排除反目標 (${mustNot.length})`, ...mustNot.map(id => `- [${id}] 禁止: ${n(id).claim ?? n(id).label}${tag(id)}`),
-    `\n## 4. ACCEPTED RISK 明示承擔風險 (${risk.length})`, ...risk.map(id => `- [${id}] 已知並承擔: ${n(id).claim ?? n(id).label} (kill: ${n(id).kill ?? "-"})`),
-    arch ? `\n## 5. SACRIFICE 必然代價\n- ${renderSacrifice(arch.sacrifice)}` : "",
+    `\n## 1. MUST ${L.must} (${must.length})`, ...must.map(id => `- [${id}] ${n(id).claim ?? n(id).label}${tag(id)}`),
+    `\n## 2. GUARDRAILS ${L.guard} (${guard.length})`, ...guard.map(id => `- [${id}] ${n(id).claim ?? n(id).label} (kill: ${n(id).kill ?? "-"})${tag(id)}`),
+    `\n## 3. MUST NOT ${L.mustNot} (${mustNot.length})`, ...mustNot.map(id => `- [${id}] ${L.forbid}: ${n(id).claim ?? n(id).label}${tag(id)}`),
+    `\n## 4. ACCEPTED RISK ${L.risk} (${risk.length})`, ...risk.map(id => `- [${id}] ${L.accepted}: ${n(id).claim ?? n(id).label} (kill: ${n(id).kill ?? "-"})`),
+    arch ? `\n## 5. SACRIFICE ${L.sacrifice}\n- ${renderSacrifice(arch.sacrifice)}` : "",
   ].filter(line => line !== "").join("\n");
 }
 

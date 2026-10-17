@@ -17,6 +17,12 @@ export function libSources(...names) {
     .map((f) => `libs/${name}/src/${f}`));
 }
 
+/** 介面多語系：apps/web/i18n.js 與產生好的 apps/web/locales/<語系>.js（tools/i18n.mjs 產生）。 */
+export function webLocaleSources() {
+  const dir = path.join(ROOT, "apps/web/locales");
+  return ["apps/web/i18n.js", ...fs.readdirSync(dir).filter((f) => f.endsWith(".js")).sort().map((f) => `apps/web/locales/${f}`)];
+}
+
 /** 把 ROOT 下的 rel 轉譯後寫到 outDir/rel（.ts 改名為 .js）。 */
 export function transpileTo(outDir, rel) {
   let code = fs.readFileSync(path.join(ROOT, rel), "utf8");

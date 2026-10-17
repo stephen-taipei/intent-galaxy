@@ -1,0 +1,98 @@
+{
+ "ct.pillDone": {
+  "zh-Hant-TW": " ✓ 星系完成",
+  "en": " ✓ Galaxy ready"
+ },
+ "ct.pillUnsent": {
+  "zh-Hant-TW": " ⋯ 待送出",
+  "en": " ⋯ Not sent"
+ },
+ "ct.pillGenerating": {
+  "zh-Hant-TW": " ⋯ 生成中",
+  "en": " ⋯ Generating"
+ },
+ "ct.pillFailed": {
+  "zh-Hant-TW": " ⚠",
+  "en": " ⚠"
+ },
+ "ct.pillTitle": {
+  "zh-Hant-TW": "Intent Galaxy：把輸入框裡的目標展開成星系，選好方案後填回對話框（Cmd/Ctrl+Shift+G）",
+  "en": "Intent Galaxy: expand the goal in the input box into a galaxy, then fill the chosen plan back into the chat box (Cmd/Ctrl+Shift+G)"
+ },
+ "ct.opacityTitle": {
+  "zh-Hant-TW": "面板透明度",
+  "en": "Panel opacity"
+ },
+ "ct.opacity": {
+  "zh-Hant-TW": "透明度",
+  "en": "Opacity"
+ },
+ "ct.maximizeTitle": {
+  "zh-Hant-TW": "放大／還原（也可雙擊標題列）",
+  "en": "Maximize / restore (or double-click the title bar)"
+ },
+ "ct.minimizeTitle": {
+  "zh-Hant-TW": "縮小到按鈕（生成會繼續）",
+  "en": "Minimize to the button (generation keeps running)"
+ },
+ "ct.closeTitle": {
+  "zh-Hant-TW": "關閉",
+  "en": "Close"
+ },
+ "ct.bannerPrompt": {
+  "zh-Hant-TW": "🌌 Intent Galaxy 分析提示詞：「{goal}」　（點一下展開）",
+  "en": "🌌 Intent Galaxy analysis prompt: “{goal}”  (click to expand)"
+ },
+ "ct.bannerDone": {
+  "zh-Hant-TW": "✅ 星系已生成　在 🌌 iG 面板查看　（點一下展開 JSON）",
+  "en": "✅ Galaxy generated. View it in the 🌌 iG panel  (click to expand the JSON)"
+ },
+ "ct.bannerFailed": {
+  "zh-Hant-TW": "⚠ 星系 JSON 讀取失敗　（點一下展開，可複製後貼到面板）",
+  "en": "⚠ Could not read the galaxy JSON  (click to expand; you can copy it and paste it into the panel)"
+ },
+ "ct.bannerWaiting": {
+  "zh-Hant-TW": "⚡ AI 正在生成星系…　（點一下展開）",
+  "en": "⚡ AI is generating the galaxy…  (click to expand)"
+ },
+ "ct.errIncompleteJson": {
+  "zh-Hant-TW": "AI 回覆的星系 JSON 不完整（{detail}）。可以重新生成，或請 AI 修正後貼上。",
+  "en": "The galaxy JSON in the AI's reply is incomplete ({detail}). You can regenerate, or ask the AI to fix it and paste it in."
+ },
+ "ct.errFormat": {
+  "zh-Hant-TW": "格式錯誤",
+  "en": "invalid format"
+ },
+ "ct.errNotSent": {
+  "zh-Hant-TW": "提示詞沒有送出（輸入框裡已經沒有它）。可以重新生成。",
+  "en": "The prompt was not sent (it is no longer in the input box). You can regenerate."
+ },
+ "ct.errTimeout": {
+  "zh-Hant-TW": "等了 {minutes} 分鐘仍沒有讀到星系 JSON。若 AI 已經回覆，請複製它的 JSON 後按「貼上 JSON」；也可以重新生成。",
+  "en": "No galaxy JSON found after waiting {minutes} minutes. If the AI has already replied, copy its JSON and click “Paste JSON”; or regenerate."
+ },
+ "ct.errBusy": {
+  "zh-Hant-TW": "上一個問題還在等 AI 回覆，這次沒有放進輸入框。請等它完成，或先放棄它再問。",
+  "en": "The previous question is still waiting for the AI's reply, so this one was not put into the input box. Wait for it to finish, or abandon it first and ask again."
+ },
+ "ct.errNoEditor": {
+  "zh-Hant-TW": "找不到這個網頁的輸入框，無法送出提示詞。",
+  "en": "Could not find this page's input box, so the prompt could not be sent."
+ },
+ "ct.errOtherChat": {
+  "zh-Hant-TW": "這個面板屬於另一個對話。請按 ✕ 關閉後，在這個對話重新按 iG。",
+  "en": "This panel belongs to another chat. Click ✕ to close it, then click iG again in this chat."
+ },
+ "ct.toggleSummaryTitle": {
+  "zh-Hant-TW": "顯示／收合右側的方案",
+  "en": "Show or hide the plan panel on the right"
+ },
+ "ct.toggleCardsTitle": {
+  "zh-Hant-TW": "顯示／收合底部的方案卡",
+  "en": "Show or hide the plan cards at the bottom"
+ },
+ "ct.extraNote": {
+  "zh-Hant-TW": "補充：{text}",
+  "en": "Notes: {text}"
+ }
+}

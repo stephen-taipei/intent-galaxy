@@ -12,6 +12,10 @@
   window.__intentGalaxyMounted = true;
 
   const api = globalThis.browser ?? globalThis.chrome;
+  // 介面多語系（galaxy/apps/web/i18n.js）：載入前先回傳 key，載入後重畫膠囊與橫幅。
+  let t = (key, vars) => key;
+  const i18n = import(api.runtime.getURL("galaxy/apps/web/i18n.js")).then(async (m) => { await m.ready; t = m.t; }).catch(() => {});
+  const escAttr = (v) => String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const alive = () => { try { return !!api.runtime?.id; } catch { return false; } };
   window.__intentGalaxyAlive = alive;
   const INSTANCE = crypto.randomUUID(); // 這個分頁的 content script；只有送出提示詞的分頁能判定逾時
@@ -79,9 +83,9 @@
     btn.type = "button";
     // 掛不進輸入框工具列時改成右下角浮動按鈕：寫出全名，避免被當成頁面本身的小圖示。
     const status = current?.status;
-    const badge = status === "done" && !frameVisible() ? " ✓ 星系完成" : status === "waiting" ? (current.unsent ? " ⋯ 待送出" : " ⋯ 生成中") : status === "failed" ? " ⚠" : "";
+    const badge = status === "done" && !frameVisible() ? t("ct.pillDone") : status === "waiting" ? (current.unsent ? t("ct.pillUnsent") : t("ct.pillGenerating")) : status === "failed" ? t("ct.pillFailed") : "";
     btn.textContent = (kind === "floating" ? "🌌 Intent Galaxy" : "🌌 iG") + badge;
-    btn.title = "Intent Galaxy：把輸入框裡的目標展開成星系，選好方案後填回對話框（Cmd/Ctrl+Shift+G）";
+    btn.title = t("ct.pillTitle");
     btn.dataset.kind = kind;
     btn.dataset.state = pillState();
     btn.dataset.owner = INSTANCE; // 舊版（已失效）留下的按鈕會被換掉
@@ -150,6 +154,8 @@
   function editorText(el) { return el ? ("value" in el && el.tagName !== "DIV" ? el.value : el.innerText).trim() : ""; }
   let lastAst = ""; // 這個分頁上次填回的 AST 原文：再次鎖定時精確移除它，其餘都是使用者自己打的字
   // 填回的 AST 每一行的樣子（找不到上次原文時的備援判斷）
+  // 填回時「補充：」這個前綴（依語系），再次鎖定時要去掉；繁中原文一併認得。
+  const extraPrefix = () => new RegExp(`^(?:補充：|${t("ct.extraNote", { text: "" }).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})\\s*`);
   const AST_LINE = /^(# LOCKED INTENT AST|> |## \d+\. |- \[N\d{1,2}\] |- 放棄|- .+·.+)/;
   /** 輸入框內容拆成：使用者的問題（AST 之前）、AST 之後另外打的字。擴充功能放進去的提示詞不算使用者的字。 */
   function userParts(el) {
@@ -157,7 +163,7 @@
     if (t.includes(PROBE)) return { before: "", after: "" };
     const exact = lastAst && t.indexOf(lastAst.trim());
     if (lastAst && exact >= 0) {
-      return { before: t.slice(0, exact).trim(), after: t.slice(exact + lastAst.trim().length).trim().replace(/^補充：/, "").trim() };
+      return { before: t.slice(0, exact).trim(), after: t.slice(exact + lastAst.trim().length).trim().replace(extraPrefix(), "").trim() };
     }
     const at = t.indexOf(AST_HEAD);
     if (at < 0) return { before: t, after: "" };
@@ -165,7 +171,7 @@
     const lines = t.slice(at).split("\n");
     let i = 0;
     while (i < lines.length && (lines[i].trim() === "" || AST_LINE.test(lines[i].trim()))) i++;
-    return { before: t.slice(0, at).trim(), after: lines.slice(i).join("\n").trim().replace(/^補充：/, "").trim() };
+    return { before: t.slice(0, at).trim(), after: lines.slice(i).join("\n").trim().replace(extraPrefix(), "").trim() };
   }
   const userText = (el) => userParts(el).before;
 
@@ -182,6 +188,7 @@
     header button { all: unset; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; color: #cbd5e1; font-size: 14px; }
     header button:hover { background: #1e293b; color: #fff; }
     header button.close:hover { background: #be123c; }
+    header button[aria-pressed="true"] { color: #38bdf8; }
     iframe { flex: 1; width: 100%; border: 0; background: #080b11; }
     :host(.dragging) iframe { pointer-events: none; }`;
 
@@ -207,6 +214,7 @@
   }
 
   async function openPanel() {
+    await i18n;
     if (frame && !panelBelongsHere() && !panelBusy) closePanel();
     await refresh(true); // 打開前先讀一次頁面：AI 可能在面板關著時已經回完
     // 縮小中的面板叫回來：iframe 一直活著（本機 CLI 生成、勾選中的方案都保留），把輸入框目前的問題交給面板決定要不要換題。
@@ -229,10 +237,12 @@
     frame = document.createElement("intent-galaxy-frame");
     const root = frame.attachShadow({ mode: "closed" });
     root.innerHTML = `<style>${FRAME_CSS}</style><header><span class="title">🌌 Intent Galaxy</span>
-      <label title="面板透明度">透明度 <input type="range" min="30" max="100" step="5"></label>
-      <button type="button" class="max" title="放大／還原（也可雙擊標題列）">⤢</button>
-      <button type="button" class="min" title="縮小到按鈕（生成會繼續）">—</button>
-      <button type="button" class="close" title="關閉">✕</button></header>`;
+      <label title="${escAttr(t("ct.opacityTitle"))}">${escAttr(t("ct.opacity"))} <input type="range" min="30" max="100" step="5"></label>
+      <button type="button" class="lay-summary" aria-pressed="false" title="${escAttr(t("ct.toggleSummaryTitle"))}"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="14" height="12" rx="2.5"/><rect x="9.5" y="3" width="3.5" height="8" rx="1" fill="currentColor" stroke="none"/></svg></button>
+      <button type="button" class="lay-cards" aria-pressed="true" title="${escAttr(t("ct.toggleCardsTitle"))}"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="14" height="12" rx="2.5"/><rect x="3" y="8" width="10" height="3" rx="1" fill="currentColor" stroke="none"/></svg></button>
+      <button type="button" class="max" title="${escAttr(t("ct.maximizeTitle"))}">⤢</button>
+      <button type="button" class="min" title="${escAttr(t("ct.minimizeTitle"))}">—</button>
+      <button type="button" class="close" title="${escAttr(t("ct.closeTitle"))}">✕</button></header>`;
     panel = document.createElement("iframe");
     panel.src = api.runtime.getURL(`panel.html?id=${panelId}`);
     panel.allow = "clipboard-write";
@@ -253,6 +263,10 @@
     wireDrag(root.querySelector("header"));
     root.querySelector(".max").addEventListener("click", toggleMaximize);
     root.querySelector(".min").addEventListener("click", minimizePanel);
+    // 版面切換（方案側欄、方案卡列）交給面板裡的星系元件；按下狀態由面板回報（intent-layout）。
+    root.querySelector(".lay-summary").addEventListener("click", () => sendPanel({ type: "ig-layout", toggle: "summary" }));
+    root.querySelector(".lay-cards").addEventListener("click", () => sendPanel({ type: "ig-layout", toggle: "cards" }));
+    frameLayoutButtons = { summary: root.querySelector(".lay-summary"), cards: root.querySelector(".lay-cards") };
     root.querySelector(".close").addEventListener("click", closePanel);
     // 只記錄使用者拖右下角造成的大小變化：與程式最後設定的實際尺寸相同（初次、還原、自動夾回）就不算。
     new ResizeObserver((entries) => {
@@ -516,10 +530,10 @@
   let cloakStyled = false;
   const shortGoal = (g) => (g.length > 30 ? `${g.slice(0, 30)}…` : g);
   function bannerFor(kind, run) {
-    if (kind === "prompt") return `🌌 Intent Galaxy 分析提示詞：「${shortGoal(run.goal)}」　（點一下展開）`;
-    if (run.status === "done") return `✅ 星系已生成　在 🌌 iG 面板查看　（點一下展開 JSON）`;
-    if (run.status === "failed") return `⚠ 星系 JSON 讀取失敗　（點一下展開，可複製後貼到面板）`;
-    return `⚡ AI 正在生成星系…　（點一下展開）`;
+    if (kind === "prompt") return t("ct.bannerPrompt", { goal: shortGoal(run.goal) });
+    if (run.status === "done") return t("ct.bannerDone");
+    if (run.status === "failed") return t("ct.bannerFailed");
+    return t("ct.bannerWaiting");
   }
   function cloakRuns(onPage) {
     const adapter = ADAPTERS.find((a) => a.match());
@@ -584,7 +598,7 @@
   async function finishRun(run, analysis) {
     let repaired = null;
     try { repaired = (await core()).repairAnalysis(analysis); } catch { /* 載入失敗時交給面板再驗一次 */ }
-    if (repaired && !repaired.ok) return failRun(run, `AI 回覆的星系 JSON 不完整（${repaired.findings.at(-1)?.msg ?? "格式錯誤"}）。可以重新生成，或請 AI 修正後貼上。`, JSON.stringify(analysis));
+    if (repaired && !repaired.ok) return failRun(run, t("ct.errIncompleteJson", { detail: repaired.findings.at(-1)?.msg ?? t("ct.errFormat") }), JSON.stringify(analysis));
     Object.assign(run, { status: "done", analysis, detail: "", unsent: false });
     await saveRun(run);
     toPanel(run.nonce, { type: "ig-galaxy", analysis, goal: run.goal });
@@ -602,7 +616,7 @@
         toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) });
       }
       else if (editorHas) run.lostSince = 0;
-      else if (isOwner(run) && now - (run.lostSince ||= now) > UNSENT_GRACE_MS) return failRun(run, "提示詞沒有送出（輸入框裡已經沒有它）。可以重新生成。");
+      else if (isOwner(run) && now - (run.lostSince ||= now) > UNSENT_GRACE_MS) return failRun(run, t("ct.errNotSent"));
       if (!anchor) return toPanel(run.nonce, { type: "ig-progress", elapsedSec: 0, unsent: true });
     }
     if (!anchor) return;
@@ -620,7 +634,7 @@
     const elapsedSec = Math.round((now - (run.sentAt ?? run.startedAt)) / 1000);
     // 送出的分頁定期寫心跳；只有它（或心跳已過期時接手的分頁）能判定逾時，避免沒看到回覆的舊分頁誤判。
     if (run.owner === INSTANCE && now - (run.beat ?? 0) > 30_000) { run.beat = now; saveRun(run); }
-    if (elapsedSec > MAX_WAIT_SEC && isOwner(run)) return failRun(run, "等了 30 分鐘仍沒有讀到星系 JSON。若 AI 已經回覆，請複製它的 JSON 後按「貼上 JSON」；也可以重新生成。");
+    if (elapsedSec > MAX_WAIT_SEC && isOwner(run)) return failRun(run, t("ct.errTimeout", { minutes: MAX_WAIT_SEC / 60 }));
     toPanel(run.nonce, { type: "ig-progress", elapsedSec, unsent: !!run.unsent });
   }
 
@@ -684,10 +698,10 @@
 
   async function startRun(goal, prompt) {
     await refresh(true);
-    if (current?.status === "waiting") { sendPanel({ type: "ig-chat-error", detail: "上一個問題還在等 AI 回覆，這次沒有放進輸入框。請等它完成，或先放棄它再問。", failed: true, nonce: "" }); return; }
+    if (current?.status === "waiting") { sendPanel({ type: "ig-chat-error", detail: t("ct.errBusy"), failed: true, nonce: "" }); return; }
     const editor = targetEditor?.isConnected ? targetEditor : findEditor();
     const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
-    if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { sendPanel({ type: "ig-chat-error", detail: "找不到這個網頁的輸入框，無法送出提示詞。", failed: true, nonce: "" }); return; }
+    if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { sendPanel({ type: "ig-chat-error", detail: t("ct.errNoEditor"), failed: true, nonce: "" }); return; }
     const now = Date.now();
     const run = { nonce, goal, status: "waiting", startedAt: now, owner: INSTANCE, beat: now, unsent: true, pathFrom: location.pathname };
     if (ephemeral()) run.ephemeral = true; // 無痕視窗、暫時對話：不寫進 storage
@@ -776,7 +790,12 @@
     if (!alive()) return teardown();
     onPanelMessage(m.msg);
   });
+  let frameLayoutButtons = null;
   async function onPanelMessage(msg) {
+    if (msg.type === "intent-layout" && frameLayoutButtons) {
+      frameLayoutButtons.summary.setAttribute("aria-pressed", String(!!msg.summary));
+      frameLayoutButtons.cards.setAttribute("aria-pressed", String(!!msg.cards));
+    }
     if (msg.type === "intent-close") minimizePanel();
     if (msg.type === "intent-busy") {
       panelBusy = !!msg.busy;
@@ -789,7 +808,7 @@
     }
     if (msg.type === "intent-chat-spawn" && typeof msg.prompt === "string") {
       if (panelBelongsHere()) startRun(String(msg.goal ?? ""), msg.prompt);
-      else sendPanel({ type: "ig-chat-error", detail: "這個面板屬於另一個對話。請按 ✕ 關閉後，在這個對話重新按 iG。", failed: true, nonce: "" });
+      else sendPanel({ type: "ig-chat-error", detail: t("ct.errOtherChat"), failed: true, nonce: "" });
     }
     // 面板手動貼上：記成那個 run 的結果（頁面上的識別碼會帶出它）。沒有 run 的星系（頁面上找到的、本機 CLI 的）不另外記錄。
     if (msg.type === "intent-adopt" && isGalaxy(msg.analysis) && msg.nonce) {
@@ -816,7 +835,7 @@
       const goal = String(msg.goal ?? openGoal).trim();
       const { before, after } = userParts(editor);
       const extra = [before !== goal ? before : "", after].filter(Boolean).join("\n");
-      const text = [goal, msg.ast, extra ? `補充：${extra}` : ""].filter(Boolean).join("\n\n");
+      const text = [goal, msg.ast, extra ? t("ct.extraNote", { text: extra }) : ""].filter(Boolean).join("\n\n");
       closePanel();
       lastAst = String(msg.ast ?? "");
       if (!writeToEditor(editor, text, "LOCKED INTENT AST")) navigator.clipboard?.writeText(text).catch(() => {});
@@ -844,6 +863,7 @@
   }
 
   mountPill();
+  i18n.then(() => { if (dead) return; mountPill(true); refresh(true).catch(() => {}); });
 
   // 工具列圖示（background.js）以 scripting.executeScript 在同一個 isolated world 呼叫；頁面腳本看不到這個全域。
   window.__intentGalaxyToggle = togglePanel;
