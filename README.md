@@ -29,10 +29,16 @@
 
 ```bash
 cd ~/code/some-repo
-npx @stephen.taipei/intent-galaxy          # 開啟 http://127.0.0.1:4787，輸入一句目標按 Enter 生成星系
-npx @stephen.taipei/intent-galaxy --port 4300 --no-open
-npx @stephen.taipei/intent-galaxy --provider gemini           # 指定預設 AI；網頁右上角也能切換
+npx @stephen.taipei/intent-galaxy
 ```
+
+開啟 http://127.0.0.1:4787，輸入一句目標按 Enter 生成星系。常用參數：
+
+| 參數 | 用途 |
+|---|---|
+| `--port 4300` | 改用其他 port（預設 4787） |
+| `--no-open` | 不自動開瀏覽器 |
+| `--provider gemini` | 指定預設 AI；網頁右上角也能切換 |
 
 - 只綁 `127.0.0.1`；每個請求檢查 Host（防 DNS rebinding）、POST 來源與路徑穿越。
 - 網頁頂部可選 AI 與模型，偵測不到的選項會標出缺什麼（例如「請設定 OPENAI_API_KEY」）。Claude CLI 預設 Opus，約需 3–4 分鐘。
