@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy៖ បើកកាឡាក់ស៊ីបំណងក្នុងការជជែក AI នេះ (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "បន្ថែមប៊ូតុង iG ទៅក្នុងការជជែក AI ដូចជា Claude, ChatGPT និង Gemini ដើម្បីដឹងច្បាស់ពីអ្វីដែលអ្នកចង់បានពិតៗក្នុងរយៈពេល 60 វិនាទី។"
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy ដំណើរការតែលើគេហទំព័រ AI ទាំងនេះ៖ $1"
+ }
+}

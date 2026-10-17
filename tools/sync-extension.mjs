@@ -5,9 +5,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
-import { ROOT, isMain, libSources, transpileTo, webLocaleSources } from "./transpile.mjs";
+import { ROOT, isMain, libSources, transpileTo, webLocaleSources, webSampleSources } from "./transpile.mjs";
 
-const SOURCES = ["apps/web/galaxy-overlay.js", "apps/web/sample-galaxy.js", ...webLocaleSources(), ...libSources("protocol", "core"), "libs/epistemic/src/prompt.ts"];
+const SOURCES = ["apps/web/galaxy-overlay.js", ...webSampleSources(), ...webLocaleSources(), ...libSources("protocol", "core"), "libs/epistemic/src/prompt.ts"];
 const SHARED = ["content.js", "background.js", "panel.html", "panel.js"];
 
 export function buildGalaxyBundle(outDir) {
@@ -20,7 +20,7 @@ if (isMain(import.meta.url)) {
   buildGalaxyBundle(chrome);
   buildGalaxyBundle(firefox);
   for (const f of SHARED) fs.copyFileSync(path.join(chrome, f), path.join(firefox, f));
-  for (const dir of ["icons", "samples"]) fs.cpSync(path.join(chrome, dir), path.join(firefox, dir), { recursive: true });
+  for (const dir of ["icons", "samples", "_locales"]) fs.cpSync(path.join(chrome, dir), path.join(firefox, dir), { recursive: true });
   console.log(`✅ synced ${SOURCES.length} galaxy modules → apps/extension, apps/extension-firefox`);
   if (process.argv.includes("--zip")) {
     const { version } = JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8"));

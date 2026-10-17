@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: a szándékgalaxis megnyitása ebben az MI-csevegésben (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "iG gombot ad az olyan MI-csevegőkhöz, mint a Claude, a ChatGPT és a Gemini, hogy 60 másodperc alatt tisztázd, mit akarsz valójában."
+ },
+ "unsupportedSite": {
+  "message": "Az Intent Galaxy csak ezeken az MI-oldalakon működik: $1"
+ }
+}

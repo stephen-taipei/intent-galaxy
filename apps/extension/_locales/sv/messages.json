@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: öppna avsiktsgalaxen i den här AI-chatten (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "Lägger till en iG-knapp i AI-chattar som Claude, ChatGPT och Gemini så att du på 60 sekunder reder ut vad du egentligen vill."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy fungerar bara på de här AI-webbplatserna: $1"
+ }
+}

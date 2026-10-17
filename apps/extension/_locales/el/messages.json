@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: άνοιγμα του γαλαξία προθέσεων σε αυτή τη συνομιλία ΤΝ (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "Προσθέτει κουμπί iG σε συνομιλίες ΤΝ όπως Claude, ChatGPT και Gemini, για να ξεκαθαρίσετε σε 60 δευτερόλεπτα τι θέλετε πραγματικά."
+ },
+ "unsupportedSite": {
+  "message": "Το Intent Galaxy λειτουργεί μόνο σε αυτούς τους ιστότοπους ΤΝ: $1"
+ }
+}

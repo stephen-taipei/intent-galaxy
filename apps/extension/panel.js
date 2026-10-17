@@ -3,10 +3,7 @@
 // 重新打開時：這個對話已生成（或正在生成）的星系優先顯示，不必重問。
 import "./galaxy/apps/web/galaxy-overlay.js";
 import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./galaxy/libs/epistemic/src/prompt.js";
-import { DISHWASHER_GALAXY } from "./samples/dishwasher.js";
-import { SWEET_SOUR_GALAXY } from "./samples/sweet-sour.js";
-import { SAMPLE_GALAXY } from "./galaxy/apps/web/sample-galaxy.js";
-import { t, ready, isRtl, onLocaleChange } from "./galaxy/apps/web/i18n.js";
+import { t, ready, isRtl, onLocaleChange, loadSample } from "./galaxy/apps/web/i18n.js";
 const setDocLang = (code) => { document.documentElement.lang = code; document.documentElement.dir = isRtl() ? "rtl" : "ltr"; };
 ready.then(setDocLang);
 onLocaleChange(setDocLang);
@@ -22,10 +19,10 @@ const toParent = (msg) => api.runtime.sendMessage({ type: "ig-to-content", id, m
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
 // 一般人用的示範題目（npm 網頁版保留工程題目）。
 const DEMOS = [
-  // label／goal 是翻譯鍵：語系載入後才用 t() 取字串。
-  { label: "pn.demoDishwasherLabel", goal: "pn.demoDishwasherGoal", galaxy: DISHWASHER_GALAXY },
-  { label: "pn.demoSweetSourLabel", goal: "pn.demoSweetSourGoal", galaxy: SWEET_SOUR_GALAXY },
-  { label: "pn.demoFrontendLabel", goal: "pn.demoFrontendGoal", galaxy: SAMPLE_GALAXY },
+  // label／goal 是翻譯鍵：語系載入後才用 t() 取字串；星系內容載入目前語系的版本（loadSample）。
+  { label: "pn.demoDishwasherLabel", goal: "pn.demoDishwasherGoal", base: new URL("./samples/dishwasher", import.meta.url).href },
+  { label: "pn.demoSweetSourLabel", goal: "pn.demoSweetSourGoal", base: new URL("./samples/sweet-sour", import.meta.url).href },
+  { label: "pn.demoFrontendLabel", goal: "pn.demoFrontendGoal", base: new URL("./galaxy/apps/web/sample-galaxy", import.meta.url).href },
 ];
 // 網頁版提示詞的第一行：先消除模型「自己開程式驗證字數」的動機（ChatGPT Pro 曾因此跑 200 多秒），再禁止呼叫工具。
 const RUNTIME_HEADER = "[RUNTIME] Reply with plain text only. Do not call any tool (code, browsing, canvas). Do not verify or count; the client validates and repairs all limits. Approximate lengths are acceptable. Start output immediately with the fenced block.";
@@ -65,7 +62,10 @@ function showCard(title, body, actions = []) {
 }
 function hideCard() { card.hidden = true; galaxy.focus(); }
 
-const demoActions = () => DEMOS.map((d) => [t(d.label), () => { setStrip(""); showGalaxy(d.galaxy, t(d.goal)); }]);
+let demoShown = null; // 目前顯示的示範題目：切換語系時換成該語系的版本
+const showDemo = async (d) => { const g = await loadSample(d.base); setStrip(""); if (showGalaxy(g, t(d.goal))) demoShown = d; };
+const demoActions = () => DEMOS.map((d) => [t(d.label), () => showDemo(d)]);
+onLocaleChange(() => { if (demoShown && shown === "galaxy" && card.hidden) showDemo(demoShown); });
 const fmt = (sec) => sec >= 60 ? t("pn.minSec", { m: Math.floor(sec / 60), s: sec % 60 }) : t("pn.sec", { s: sec });
 
 /** 頂部提示條：text 為說明文字；buttons 為 [label, handler]。只在內容改變時重建，按鈕才點得到、焦點不會跑掉。 */
@@ -86,6 +86,7 @@ const resetJob = () => { toParent({ type: "intent-reset", nonce }); nonce = ""; 
 function showGalaxy(analysis, g, { adopt = false, galaxyId = 0 } = {}) {
   // 先驗證：格式不對時保留原本的等待／失敗提示條與按鈕。
   if (!galaxy.setGalaxy(analysis, { goal: g || goal, galaxyId })) { galaxy.showMessage(t("pn.galaxyIncomplete")); return false; }
+  demoShown = null;
   hideCard();
   goal = g || goal;
   waiting = false;
@@ -176,10 +177,11 @@ function waitingStrip(elapsedSec, unsent) {
     slowShown ? t("pn.slowNote") : "");
 }
 /** 等待中先看示範：提示條保留「回到等待」；真的回覆到了會直接換成它的星系。 */
-function showDemoWhileWaiting(elapsedSec) {
+async function showDemoWhileWaiting(elapsedSec) {
   const g = goal, started = Date.now() - elapsedSec * 1000;
   waiting = false;
-  demoActions()[0][1]();
+  await showDemo(DEMOS[0]);
+  demoShown = null; // 提示條要保留「回到等待」，切換語系時不重載示範
   setStrip(t("pn.stillGenerating", { goal: g.slice(0, 20) }), [[t("pn.backToWaiting"), () => startWaiting(g, Math.round((Date.now() - started) / 1000))]]);
 }
 function startWaiting(g, elapsedSec = 0, unsent = false) {
@@ -295,7 +297,7 @@ async function open({ goal: text = "", site: host = t("pn.thisAi"), job = null, 
   if (job?.status === "waiting" && newGoal) return askWhileWaiting(job, goal);
   if (goal) return generate(job?.status === "done" && job.analysis ? [[t("pn.backToPrevGalaxy"), () => showDone(job)]] : [], reopen);
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
-  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在決定的是[:：]\s*/, "") ?? "");
+  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在[決决]定的是[:：]\s*/, "") ?? "");
   // 3. 本機 CLI 有最近生成的星系：不分對話，所以不自動顯示，只提供按鈕（可能是別的網站或 Claude Code 的決策）。
   const cur = await cliLatest();
   const local = cur ? [[t("pn.loadLocalLatest", { goal: `${cur.goal.slice(0, 20)}${cur.goal.length > 20 ? "…" : ""}` }), () => showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })]] : [];

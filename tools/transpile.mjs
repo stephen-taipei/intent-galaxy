@@ -23,6 +23,11 @@ export function webLocaleSources() {
   return ["apps/web/i18n.js", ...fs.readdirSync(dir).filter((f) => f.endsWith(".js")).sort().map((f) => `apps/web/locales/${f}`)];
 }
 
+/** 網頁版示範星系：繁中原檔與各語系版本 apps/web/sample-galaxy.<語系>.js。 */
+export function webSampleSources() {
+  return fs.readdirSync(path.join(ROOT, "apps/web")).filter((f) => /^sample-galaxy(\.[\w-]+)?\.js$/.test(f)).sort().map((f) => `apps/web/${f}`);
+}
+
 /** 把 ROOT 下的 rel 轉譯後寫到 outDir/rel（.ts 改名為 .js）。 */
 export function transpileTo(outDir, rel) {
   let code = fs.readFileSync(path.join(ROOT, rel), "utf8");
