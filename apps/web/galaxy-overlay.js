@@ -42,7 +42,11 @@ const STYLE = `
 * { box-sizing:border-box; margin:0; padding:0; }
 .wrap { display:grid; grid-template-columns:1fr 360px; grid-template-rows:1fr auto auto; height:100%; }
 :host([embedded]) .wrap { grid-template-columns:1fr; }
-:host([embedded]) aside { display:none; }
+:host([embedded]) aside { display:none; position:absolute; top:0; right:0; bottom:0; width:min(340px,50%); z-index:30; border-left:1px solid #38bdf8; box-shadow:-12px 0 30px rgba(0,0,0,.5); overflow:auto; }
+:host([embedded]) .summary-open aside { display:flex; }
+#bar button#summary-toggle { display:none; background:transparent; color:var(--text); border:1px solid #475569; font-weight:600; }
+:host([embedded]) #bar button#summary-toggle { display:inline-block; }
+#bar button#summary-toggle[aria-pressed="true"] { border-color:var(--q1); color:var(--q1); }
 #stage { position:relative; min-height:300px; overflow:hidden; background:radial-gradient(circle at 50% 50%, rgba(30,41,59,.45) 0%, rgba(8,11,17,1) 72%); }
 svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 .q-tag { position:absolute; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:6px; background:rgba(17,23,35,.92); border:1px solid var(--border); pointer-events:none; }
@@ -86,7 +90,7 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 .card .row { font-size:10.5px; color:#cbd5e1; margin-top:2px; }
 .card .kill { font-size:10.5px; color:#fda4af; margin-top:2px; }
 #bar { display:flex; align-items:center; gap:10px; padding:6px 10px; background:#0c111d; border-top:1px solid var(--border); font-size:11px; color:var(--muted); }
-#bar .status { font-weight:600; padding:2px 8px; border-radius:6px; }
+#bar .status { white-space:nowrap; flex-shrink:0; font-weight:600; padding:2px 8px; border-radius:6px; }
 .status.sat { color:#34d399; background:rgba(16,185,129,.12); }
 .status.unsat { color:#fb7185; background:rgba(244,63,94,.16); }
 .status.wait { color:var(--q1); background:rgba(56,189,248,.12); }
@@ -131,16 +135,17 @@ export class IntentGalaxyOverlay extends HTMLElement {
   #analysis = null; #draft = null; #galaxyId = 0; #findings = [];
   #baseKey = null; #overrides = new Map(); #seq = 0; #focus = 0;
   #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null; #showRaw = false;
+  #summaryOpen = false; #summaryShown = false; // 嵌入模式（擴充功能）的「已選方案」抽屜：第一次選策略卡時自動打開一次
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" }).innerHTML = `<style>${STYLE}</style><div class="wrap">
       <main id="stage"><svg viewBox="0 0 1000 600" preserveAspectRatio="none"></svg><div id="tags"></div>
-        <div id="core"><div class="sub">你真正在決定的是</div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></main>
+        <div id="core"><div class="sub" title="這是 AI 對你問題的解讀，不一定正確">AI 理解你要決定的是</div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></main>
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
         <span class="keys">${KEY_HINTS.map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${label}</span>`).join(" · ")}</span>
-        <button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
+        <button type="button" id="summary-toggle"></button><button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
       <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle" data-tip="切換檢視：摘要 ↔ 實際送給 AI 的原始指令文字（LOCKED INTENT AST）">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
@@ -150,6 +155,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
     root.getElementById("lock").addEventListener("click", () => this.lock());
     root.getElementById("reset").addEventListener("click", () => this.reset());
+    root.getElementById("summary-toggle").addEventListener("click", () => { this.#summaryOpen = !this.#summaryOpen; this.#render(); });
     root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
     // 統一 tooltip：任何帶 data-tip 的元素（節點、策略卡、按鍵說明、按鈕）滑過或鍵盤聚焦時顯示。
     const showTip = (e) => { const el = e.target.closest?.("[data-tip]"); if (el) this.#showTip(el); else this.#hideTip(); };
@@ -171,7 +177,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     this.#findings = repaired.findings;
     if (!repaired.ok) { this.#message = `星系資料無法編譯：${repaired.findings.at(-1)?.msg ?? ""}`; this.#render(); return false; }
     this.#analysis = repaired.analysis; this.#draft = null; this.#galaxyId = galaxyId; this.goal = goal;
-    this.#baseKey = null; this.#overrides.clear(); this.#undo = []; this.#redo = []; this.#message = "";
+    this.#baseKey = null; this.#overrides.clear(); this.#undo = []; this.#redo = []; this.#message = ""; this.#summaryOpen = false; this.#summaryShown = false;
     this.#render();
     return true;
   }
@@ -204,6 +210,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     this.#snapshot();
     this.#baseKey = key;
     if (clearOverrides) this.#overrides.clear();
+    if (!this.#summaryShown) { this.#summaryShown = true; this.#summaryOpen = true; }
     this.#render();
   }
 
@@ -360,11 +367,16 @@ export class IntentGalaxyOverlay extends HTMLElement {
       return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" data-tip="${esc(this.#nodeTip(id, n, q, view))}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
     }).join("");
 
-    // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。
+    // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。選了之後只畫「說明取捨」的線：
+    // 綠線＝採納的節點連回中心；紅色虛線＝被排除的節點和與它互斥的採納節點；橘色點線＝採納節點依賴的另一顆。
     root.querySelector("svg").innerHTML = !sol || !this.#baseKey ? "" : NODE_IDS.map((id, i) => {
       if (sol.nodes[id].stance !== "include") return "";
       const p = COORDS[i], x = p.x * 10, y = p.y * 6;
       return `<path d="M ${x} ${y} Q ${(x + 500) / 2} ${y} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
+    }).join("") + this.#reasons(sol).map(({ from, to, kind }) => {
+      const p = COORDS[NODE_IDS.indexOf(from)], q = COORDS[NODE_IDS.indexOf(to)];
+      const color = kind === "excludes" ? "#f43f5e" : "#f59e0b", dash = kind === "excludes" ? "7,5" : "2,4";
+      return `<line x1="${p.x * 10}" y1="${p.y * 6}" x2="${q.x * 10}" y2="${q.y * 6}" stroke="${color}" stroke-width="1.8" stroke-dasharray="${dash}" opacity=".85"/>`;
     }).join("");
 
     const rec = a?.recommend?.key;
@@ -375,14 +387,14 @@ export class IntentGalaxyOverlay extends HTMLElement {
       const fatalKill = nodes[c.fatal]?.kill ?? "";
       const cls = ["card", this.#baseKey === key && "active", isRec && "rec"].filter(Boolean).join(" ");
       const tip = `<b>[${num}] ${esc(c.title)}</b>${c.thesis ? `<br>${esc(c.thesis)}` : ""}`
-        + (isRec && a.recommend.why ? `<br><span class=g>★ 主 Agent 推薦：${esc(a.recommend.why)}</span>` : "")
+        + (isRec && a.recommend.why ? `<br><span class=g>★ 依目前條件推薦（AI 的判斷）：${esc(a.recommend.why)}</span>` : "")
         + `<br>採納：${(c.include ?? []).map((id) => esc(nodes[id]?.label ?? id)).join("、")}`
         + (c.exclude?.length ? `<br>排除：${c.exclude.map((id) => esc(nodes[id]?.label ?? id)).join("、")}` : "")
         + `<br>💸 代價：${esc(renderSacrifice(c.sacrifice))}`
         + (fatalKill ? `<br><span class=k>⚡ 致死前提：${esc(fatalKill)}</span>` : "")
         + `<br><span class=dim>點擊或按 ${num} 套用 · Shift+${num} 清掉手動調整後套用</span>`;
       return `<button type="button" class="${cls}" data-arch="${key}" data-tip="${esc(tip)}">
-        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge">★ 推薦</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
+        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge" title="依目前條件推薦：AI 的判斷，請自行確認">★ 依目前條件推薦</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
         ${isRec && a.recommend.why ? `<div class="why">★ ${esc(clip(a.recommend.why, 30))}</div>` : ""}
         <div class="row">💸 代價：${esc(clip(renderSacrifice(c.sacrifice), 40))}</div>
         <div class="kill">⚡ 致死：${esc(clip(fatalKill, 30))}</div></button>`;
@@ -390,16 +402,24 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
     const status = root.querySelector("#bar .status");
     if (!sol) { status.className = "status wait"; status.textContent = draft ? `⋯ 串流中 ${Object.keys(nodes).length}/12` : "⋯ 等待星系"; }
-    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ SAT 邏輯自洽" : `✦ 先發散：按 1/2/3 選主幹${rec ? `（★ 推薦 ${ARCH.find(([k]) => k === rec)[1]}）` : ""}`; }
+    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ 已選條件相容" : `✦ 先發散：按 1/2/3 選主幹${rec ? `（★ 推薦 ${ARCH.find(([k]) => k === rec)[1]}）` : ""}`; }
     else { status.className = "status unsat"; status.textContent = `✗ 有互斥${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}（按 r 解除）`; }
     status.dataset.tip = !sol ? "星系資料還沒到齊。" : sol.status === "SAT"
-      ? (this.#baseKey ? "目前的選擇彼此相容，可以確定方案。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
+      ? (this.#baseKey ? "已選的條件彼此沒有互斥、依賴也都補齊。這只檢查條件之間的關係，不保證內容正確或可行。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
       : `選取的節點彼此矛盾（${esc(sol.status)}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。`;
     const resetBtn = root.getElementById("reset");
     resetBtn.textContent = "↺ 重設";
     resetBtn.disabled = !a || (!this.#baseKey && !this.#overrides.size);
     resetBtn.dataset.tip = "清掉選好的策略卡與所有手動調整，回到剛展開的星系。<br><span class=dim>按 u 可以復原。</span>";
     const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
+    // 嵌入模式沒有右側欄：收斂結果改成蓋在星系右側的抽屜，回填前可以核對「最後選了什麼」。
+    const aside = root.querySelector("aside"), stage = root.getElementById("stage");
+    if (embedded && aside.parentElement !== stage) stage.append(aside);
+    stage.classList.toggle("summary-open", embedded && this.#summaryOpen);
+    const toggle = root.getElementById("summary-toggle");
+    toggle.textContent = this.#summaryOpen ? "✕ 收起方案" : "📋 已選方案";
+    toggle.setAttribute("aria-pressed", String(this.#summaryOpen));
+    toggle.dataset.tip = "打開／收起「已選方案」：要做、護欄、不做、承擔風險與代價。填回對話框前先核對。";
     lockBtn.textContent = embedded ? "↵ 把方案填進對話框" : "📋 產生 AI 執行指令";
     lockBtn.dataset.tip = `<b>選好方案後按這裡（或 Enter）</b><br>把右側的方案轉成一段給 AI 的指令，`
       + (embedded ? "直接填進這個 AI 網頁的輸入框，你檢查後按送出即可。" : "複製到剪貼簿，貼給 Claude Code 或 ChatGPT，AI 就會照「要做／不做／護欄」動手。")
@@ -413,12 +433,30 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
   }
 
+  /** 解釋目前取捨的邊：被排除的節點 ⊗ 與它互斥的採納節點；採納節點 → 它依賴、因此被一起加入的節點。 */
+  #reasons(sol) {
+    const edges = this.#analysis?.edges ?? [], st = (id) => sol.nodes[id]?.stance;
+    return edges.flatMap((e) => {
+      if (e.type === "excludes") {
+        const [x, inc] = st(e.from) === "exclude" && st(e.to) === "include" ? [e.from, e.to] : st(e.to) === "exclude" && st(e.from) === "include" ? [e.to, e.from] : [];
+        return x ? [{ from: x, to: inc, kind: "excludes", why: e.why }] : [];
+      }
+      if (e.type === "requires" && st(e.from) === "include" && st(e.to) === "include" && sol.nodes[e.to].src === "derived") return [{ from: e.from, to: e.to, kind: "requires", why: e.why }];
+      return [];
+    });
+  }
+
   #nodeTip(id, n, q, view) {
     const state = view.stance === "include" ? (q === "Q4" ? "🛡 已設為護欄" : "✅ 已採納") : view.stance === "exclude" ? (q === "Q4" ? "⚠ 已承擔此風險" : "⛔ 已排除") : "尚未選擇";
     const why = view.src === "derived" ? (view.stance === "include" ? "（因其他節點依賴它而自動加入）" : "（與已選節點互斥而自動讓位）") : view.src === "user" ? "（你手動設定）" : view.src === "default" ? "（來自策略卡）" : "";
     return `<b>${esc(id)} ${esc(n.label)}</b><br>${esc(n.claim)}`
       + (n.kill ? `<br><span class=k>⚡ 失效條件：${esc(n.kill)}</span>` : "")
       + (n.blind ? `<br><span class=g>✦ 盲區：${esc(n.blind)}</span>` : "")
+      + (this.#solution && this.#baseKey ? this.#reasons(this.#solution).filter((r) => r.from === id || r.to === id).map((r) => {
+        const other = r.from === id ? r.to : r.from, label = esc(this.#analysis.nodes[other]?.label ?? other);
+        const text = r.kind === "excludes" ? `⊗ 與 ${esc(other)}「${label}」互斥` : r.from === id ? `→ 需要 ${esc(other)}「${label}」` : `← ${esc(other)}「${label}」需要它`;
+        return `<br><span class=k>${text}${r.why ? `：${esc(r.why)}` : ""}</span>`;
+      }).join("") : "")
       + `<br><span class=dim>狀態：${state}${why}<br>左鍵（Space）採納 · 右鍵（x）排除 · 再按一次取消</span>`;
   }
 
