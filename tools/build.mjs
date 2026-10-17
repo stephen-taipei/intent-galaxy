@@ -3,7 +3,7 @@
 // dist/ 保留與原始碼相同的相對結構，CLI 的 ../../../libs 路徑不必改寫。
 import fs from "node:fs";
 import path from "node:path";
-import { ROOT, isMain, libSources, transpileTo, webLocaleSources } from "./transpile.mjs";
+import { ROOT, isMain, libSources, transpileTo, webLocaleSources, webSampleSources } from "./transpile.mjs";
 
 export function buildDist(outDir = path.join(ROOT, "dist")) {
   fs.rmSync(outDir, { recursive: true, force: true });
@@ -11,7 +11,7 @@ export function buildDist(outDir = path.join(ROOT, "dist")) {
     const dir = path.join(ROOT, "apps/cli", d);
     return fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith(".mjs")).map((f) => `apps/cli/${d}/${f}`) : [];
   });
-  const web = ["apps/web/index.html", "apps/web/galaxy-overlay.js", "apps/web/sample-galaxy.js", "apps/web/sample-galaxy.en.js", "apps/web/sample-galaxy.zh-Hans.js", ...webLocaleSources()];
+  const web = ["apps/web/index.html", "apps/web/galaxy-overlay.js", ...webSampleSources(), ...webLocaleSources()];
   const files = [...cli, ...web, ...libSources("protocol", "core", "epistemic")];
   for (const rel of files) transpileTo(outDir, rel);
   fs.chmodSync(path.join(outDir, "apps/cli/bin/intent-galaxy.mjs"), 0o755);
