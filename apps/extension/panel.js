@@ -215,7 +215,9 @@ function showFailed(detail) {
 
 function spawnViaChat() {
   const prompt = `${RUNTIME_HEADER}\n\n${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\n`
-    + "Put the JSON in one ```json code block.";
+    + "Put the JSON in one ```json code block.\n"
+    // 結尾再提醒一次：長提示詞的開頭容易被模型忽略。
+    + "[RUNTIME] Again: answer in plain text only. Do not run code or any tool; the client validates and repairs all limits.";
   toParent({ type: "intent-chat-spawn", prompt, goal });
   startWaiting(goal, 0, true);
 }

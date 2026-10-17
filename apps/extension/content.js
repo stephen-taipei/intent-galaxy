@@ -509,7 +509,10 @@
     [data-ig-cloak]::before { content: attr(data-ig-banner); position: absolute; left: 0; right: 0; top: 0; z-index: 3; box-sizing: border-box; height: 40px; display: flex; align-items: center;
       padding: 0 14px; border: 1px solid rgba(56,189,248,.55); border-radius: 12px; background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(139,92,246,.16)), #0b1220;
       color: #e2e8f0; font: 600 13px/1.2 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    [data-ig-cloak][data-ig-expanded="true"] { padding-top: 46px !important; }`;
+    [data-ig-cloak][data-ig-expanded="true"] { padding-top: 46px !important; }
+    [data-ig-cloak="more"]:not([data-ig-expanded="true"]) { display: none !important; }
+    [data-ig-cloak="more"]::before { content: none; }
+    [data-ig-cloak="more"][data-ig-expanded="true"] { padding-top: 0 !important; }`;
   let cloakStyled = false;
   const shortGoal = (g) => (g.length > 30 ? `${g.slice(0, 30)}…` : g);
   function bannerFor(kind, run) {
@@ -530,8 +533,10 @@
       const promptTurn = inner && turns.find((x) => x === inner || x.contains(inner));
       if (!promptTurn || adapter.role(promptTurn) !== "user") continue; // 認不出：不折疊
       setCloak(promptTurn, "prompt", run);
-      const reply = turns[turns.indexOf(promptTurn) + 1];
-      if (reply && adapter.role(reply) === "assistant") setCloak(reply, "response", run);
+      // AI 的回覆可能分成好幾則（ChatGPT 跑程式、思考、最後的 JSON 各一則）：到下一則使用者訊息前全部收進同一條橫幅。
+      for (let i = turns.indexOf(promptTurn) + 1, first = true; i < turns.length && adapter.role(turns[i]) !== "user"; i++, first = false) {
+        setCloak(turns[i], first ? "response" : "more", run);
+      }
     }
   }
   function setCloak(el, kind, run) {
@@ -543,15 +548,20 @@
     }
     const banner = bannerFor(kind, run);
     if (el.getAttribute("data-ig-cloak") !== kind) el.setAttribute("data-ig-cloak", kind);
+    if (el.getAttribute("data-ig-run") !== run.nonce) el.setAttribute("data-ig-run", run.nonce);
     if (el.getAttribute("data-ig-banner") !== banner) el.setAttribute("data-ig-banner", banner);
   }
   // 點擊：收合時點一下展開（只在收合時攔截，展開後網站自己的按鈕照常運作）；展開時點最上面那條橫幅收合。
   listen(document, "click", (e) => {
     const el = e.target instanceof Element ? e.target.closest("[data-ig-cloak]") : null;
     if (!el) return;
+    if (el.getAttribute("data-ig-cloak") === "more") return; // 跟著回覆的第一則一起展開／收合
     const expanded = el.getAttribute("data-ig-expanded") === "true";
-    if (!expanded) { el.setAttribute("data-ig-expanded", "true"); e.preventDefault(); e.stopPropagation(); return; }
-    if (e.clientY - el.getBoundingClientRect().top <= 42) { el.removeAttribute("data-ig-expanded"); e.preventDefault(); e.stopPropagation(); }
+    // 回覆的後續幾則（data-ig-cloak="more"）跟第一則同進退
+    const group = el.getAttribute("data-ig-cloak") === "response"
+      ? [el, ...document.querySelectorAll(`[data-ig-cloak="more"][data-ig-run="${CSS.escape(el.getAttribute("data-ig-run") ?? "")}"]`)] : [el];
+    if (!expanded) { group.forEach((x) => x.setAttribute("data-ig-expanded", "true")); e.preventDefault(); e.stopPropagation(); return; }
+    if (e.clientY - el.getBoundingClientRect().top <= 42) { group.forEach((x) => x.removeAttribute("data-ig-expanded")); e.preventDefault(); e.stopPropagation(); }
   }, true);
 
   // ── run 的生命週期 ──
