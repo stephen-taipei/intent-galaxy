@@ -1,0 +1,30 @@
+{
+ "ast.must": {
+  "zh-Hant-TW": "採納機制",
+  "en": "adopted mechanisms"
+ },
+ "ast.guard": {
+  "zh-Hant-TW": "證偽護欄",
+  "en": "falsification guardrails"
+ },
+ "ast.mustNot": {
+  "zh-Hant-TW": "排除反目標",
+  "en": "ruled-out anti-goals"
+ },
+ "ast.risk": {
+  "zh-Hant-TW": "明示承擔風險",
+  "en": "explicitly accepted risks"
+ },
+ "ast.sacrifice": {
+  "zh-Hant-TW": "必然代價",
+  "en": "unavoidable cost"
+ },
+ "ast.forbid": {
+  "zh-Hant-TW": "禁止",
+  "en": "Forbidden"
+ },
+ "ast.accepted": {
+  "zh-Hant-TW": "已知並承擔",
+  "en": "Known and accepted"
+ }
+}

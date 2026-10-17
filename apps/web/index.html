@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Intent Galaxy</title>
+<title data-i18n="web.pageTitle">Intent Galaxy</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='162 215.6 955.7 669.8'%3E%3Cpath fill='%230071FE' d='M162 215.6C338.5 215.8 510.9 275.4 660 368.3C739.1 417.6 820.3 464.8 908.3 496.6L892.9 512C812.7 500.5 737.1 481.4 660 453.6C498.5 395.6 334.1 365.9 162 374.4ZM162 885.4C338.5 885.2 510.9 825.5 660 732.7C739.1 683.4 820.3 636.2 908.3 604.4L892.9 589C812.7 600.5 737.1 619.6 660 647.4C498.5 705.4 334.1 735.1 162 726.6Z'/%3E%3Cpath fill='%237A3BF1' d='M162 476.4L877.4 533.6A48 48 0 0 0 877.4 567.4L162 624.6Z'/%3E%3Cpath fill='%237A3BF1' d='M995.9 448.7A20 20 0 0 1 1024.1 448.7L1111.8 536.4A20 20 0 0 1 1111.8 564.6L1024.1 652.3A20 20 0 0 1 995.9 652.3L908.2 564.6A20 20 0 0 1 908.2 536.4Z'/%3E%3C/svg%3E">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", sans-serif; }
@@ -40,35 +40,52 @@
 </head>
 <body>
 <header>
-  <div class="brand"><svg viewBox="162 215.6 955.7 669.8" aria-hidden="true"><path fill="#0071FE" d="M162 215.6C338.5 215.8 510.9 275.4 660 368.3C739.1 417.6 820.3 464.8 908.3 496.6L892.9 512C812.7 500.5 737.1 481.4 660 453.6C498.5 395.6 334.1 365.9 162 374.4ZM162 885.4C338.5 885.2 510.9 825.5 660 732.7C739.1 683.4 820.3 636.2 908.3 604.4L892.9 589C812.7 600.5 737.1 619.6 660 647.4C498.5 705.4 334.1 735.1 162 726.6Z"/><path fill="#7A3BF1" d="M162 476.4L877.4 533.6A48 48 0 0 0 877.4 567.4L162 624.6Z"/><path fill="#7A3BF1" d="M995.9 448.7A20 20 0 0 1 1024.1 448.7L1111.8 536.4A20 20 0 0 1 1111.8 564.6L1024.1 652.3A20 20 0 0 1 995.9 652.3L908.2 564.6A20 20 0 0 1 908.2 536.4Z"/></svg>Intent Galaxy<span class="badge" id="source-badge" title="目前星系的來源：示範資料、claude -p 生成，或 MCP 從 Claude Code 灌入">示範星系</span></div>
+  <div class="brand"><svg viewBox="162 215.6 955.7 669.8" aria-hidden="true"><path fill="#0071FE" d="M162 215.6C338.5 215.8 510.9 275.4 660 368.3C739.1 417.6 820.3 464.8 908.3 496.6L892.9 512C812.7 500.5 737.1 481.4 660 453.6C498.5 395.6 334.1 365.9 162 374.4ZM162 885.4C338.5 885.2 510.9 825.5 660 732.7C739.1 683.4 820.3 636.2 908.3 604.4L892.9 589C812.7 600.5 737.1 619.6 660 647.4C498.5 705.4 334.1 735.1 162 726.6Z"/><path fill="#7A3BF1" d="M162 476.4L877.4 533.6A48 48 0 0 0 877.4 567.4L162 624.6Z"/><path fill="#7A3BF1" d="M995.9 448.7A20 20 0 0 1 1024.1 448.7L1111.8 536.4A20 20 0 0 1 1111.8 564.6L1024.1 652.3A20 20 0 0 1 995.9 652.3L908.2 564.6A20 20 0 0 1 908.2 536.4Z"/></svg>Intent Galaxy<span class="badge" id="source-badge" data-i18n="web.badgeSample" data-i18n-title="web.badgeTitle" title="目前星系的來源：示範資料、claude -p 生成，或 MCP 從 Claude Code 灌入">示範星系</span></div>
   <form id="goal-form">
-    <input id="goal" type="text" autocomplete="off" placeholder="輸入一句模糊目標，按 Enter 用右邊選的 AI 生成 12 顆節點…">
-    <select id="provider" title="用哪個 AI 生成星系：本機已登入的 CLI（免 API key），或設定了 API key 的供應商"></select>
-    <input id="model" list="model-list" autocomplete="off" placeholder="模型（留空＝預設）" title="模型 ID；可從清單選，或直接輸入">
+    <input id="goal" type="text" autocomplete="off" data-i18n-placeholder="web.goalPlaceholder" placeholder="輸入一句模糊目標，按 Enter 用右邊選的 AI 生成 12 顆節點…">
+    <select id="provider" data-i18n-title="web.providerTitle" title="用哪個 AI 生成星系：本機已登入的 CLI（免 API key），或設定了 API key 的供應商"></select>
+    <input id="model" list="model-list" autocomplete="off" data-i18n-placeholder="web.modelPlaceholderDefault" data-i18n-title="web.modelTitle" placeholder="模型（留空＝預設）" title="模型 ID；可從清單選，或直接輸入">
     <datalist id="model-list"></datalist>
-    <button type="submit" id="spawn-btn" title="用選定的 AI 依你的目標生成新的 12 顆節點星系（通常 1–4 分鐘）">生成星系</button>
+    <button type="submit" id="spawn-btn" data-i18n="web.spawnButton" data-i18n-title="web.spawnTitle" title="用選定的 AI 依你的目標生成新的 12 顆節點星系（通常 1–4 分鐘）">生成星系</button>
   </form>
 </header>
 <intent-galaxy-overlay id="galaxy"></intent-galaxy-overlay>
 <dialog id="done" aria-labelledby="done-title">
   <h2 id="done-title"></h2>
-  <p class="sub">你選的方案已轉成一段 AI 看得懂的指令（LOCKED INTENT AST）。</p>
+  <p class="sub" data-i18n="web.doneSub">你選的方案已轉成一段 AI 看得懂的指令（LOCKED INTENT AST）。</p>
   <ol>
     <li id="done-copy"></li>
-    <li>貼到 <b>Claude Code</b> 或 ChatGPT 的對話框送出。<small>AI 會照「要做」動手、避開「不做」，遇到「護欄」條件就停下來回報，不會自己改方向。</small></li>
+    <li data-i18n="web.donePasteStep">貼到 <b>Claude Code</b> 或 ChatGPT 的對話框送出。<small>AI 會照「要做」動手、避開「不做」，遇到「護欄」條件就停下來回報，不會自己改方向。</small></li>
     <li id="done-lock"></li>
   </ol>
-  <details id="done-details"><summary>查看指令內容</summary><textarea id="done-ast" readonly></textarea></details>
-  <div class="actions"><button type="button" id="done-recopy">再複製一次</button><button type="button" class="primary" id="done-close">好，我去貼上</button></div>
+  <details id="done-details"><summary data-i18n="web.doneShowAst">查看指令內容</summary><textarea id="done-ast" readonly></textarea></details>
+  <div class="actions"><button type="button" id="done-recopy" data-i18n="web.doneRecopy">再複製一次</button><button type="button" class="primary" id="done-close" data-i18n="web.doneClose">好，我去貼上</button></div>
 </dialog>
 <script type="module">
+import { t, ready, onLocaleChange, isRtl } from "./i18n.js";
 import "./galaxy-overlay.js";
 import { SAMPLE_GALAXY } from "./sample-galaxy.js";
+/** 套用頁面上固定的文字；啟動時與手動切換語系時各跑一次。 */
+const localize = (code) => {
+  document.documentElement.lang = code;
+  document.documentElement.dir = isRtl() ? "rtl" : "ltr";
+  for (const el of document.querySelectorAll("[data-i18n]")) {
+    const s = t(el.dataset.i18n);
+    if (/<[a-z][\s\S]*>/i.test(s)) el.innerHTML = s; else el.textContent = s;
+  }
+  for (const el of document.querySelectorAll("[data-i18n-title]")) el.title = t(el.dataset.i18nTitle);
+  for (const el of document.querySelectorAll("[data-i18n-placeholder]")) el.placeholder = t(el.dataset.i18nPlaceholder);
+  badge.textContent = badgeText();
+};
+let source = "sample";
+const badgeText = () => source === "mcp" ? t("web.badgeMcp") : source === "spawn" ? t("web.badgeSpawn") : t("web.badgeSample");
 
 const galaxy = document.getElementById("galaxy");
 const badge = document.getElementById("source-badge");
 const served = location.protocol.startsWith("http");
-const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); badge.textContent = g.source === "mcp" ? "MCP 灌入" : g.source === "spawn" ? "AI 生成" : "示範星系"; galaxy.focus(); };
+const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); source = g.source; badge.textContent = badgeText(); galaxy.focus(); };
+localize(await ready);
+onLocaleChange(localize);
 
 galaxy.setGalaxy(SAMPLE_GALAXY);
 // ?base=alpha|beta|gamma：開啟時直接套用策略卡（分享示範連結、截圖用）。
@@ -87,17 +104,17 @@ async function loadModels() {
   const list = document.getElementById("model-list");
   list.innerHTML = "";
   const opt = providerSel.selectedOptions[0];
-  modelInput.placeholder = opt?.dataset.default ? `模型（預設 ${opt.dataset.default}）` : opt?.dataset.kind === "api" ? "模型 ID（必填）" : "模型（留空＝CLI 預設）";
+  modelInput.placeholder = opt?.dataset.default ? t("web.modelPlaceholderWithDefault", { model: opt.dataset.default }) : opt?.dataset.kind === "api" ? t("web.modelPlaceholderRequired") : t("web.modelPlaceholderCliDefault");
   const { models = [] } = await fetch(`/api/models?provider=${encodeURIComponent(providerSel.value)}`).then((r) => r.json()).catch(() => ({}));
   list.append(...models.map((m) => Object.assign(document.createElement("option"), { value: m })));
 }
 if (served) {
   fetch("/api/providers").then((r) => r.json()).then(({ providers, defaultProvider }) => {
-    const groups = { cli: "本機 CLI（免 API key）", api: "API（需 API key）" };
+    const groups = { cli: t("web.groupCli"), api: t("web.groupApi") };
     for (const [kind, label] of Object.entries(groups)) {
       const g = Object.assign(document.createElement("optgroup"), { label });
       for (const p of providers.filter((x) => x.kind === kind)) {
-        g.append(Object.assign(document.createElement("option"), { value: p.id, textContent: p.available ? p.label : `${p.label}（${p.hint}）`, disabled: !p.available }));
+        g.append(Object.assign(document.createElement("option"), { value: p.id, textContent: p.available ? p.label : t("web.providerUnavailable", { label: p.label, hint: p.hint }), disabled: !p.available }));
         Object.assign(g.lastChild.dataset, { kind: p.kind, default: p.defaultModel });
       }
       providerSel.append(g);
@@ -127,7 +144,7 @@ document.getElementById("goal-form").addEventListener("submit", async (e) => {
       let nl;
       while ((nl = buf.indexOf("\n")) >= 0) { const line = buf.slice(0, nl); buf = buf.slice(nl + 1); if (line.trim()) galaxy.applyStreamEvent(JSON.parse(line)); }
     }
-    badge.textContent = `${providerSel.selectedOptions[0]?.textContent ?? "AI"} 生成`;
+    badge.textContent = t("web.badgeGeneratedBy", { provider: providerSel.selectedOptions[0]?.textContent ?? "AI" });
   } catch (err) {
     galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message });
   } finally { btn.disabled = false; }
@@ -136,7 +153,7 @@ document.getElementById("goal-form").addEventListener("submit", async (e) => {
 const done = document.getElementById("done");
 const copyAst = (text) => navigator.clipboard?.writeText(text).then(() => true, () => false) ?? Promise.resolve(false);
 document.getElementById("done-close").addEventListener("click", () => done.close());
-document.getElementById("done-recopy").addEventListener("click", async (e) => { e.target.textContent = (await copyAst(document.getElementById("done-ast").value)) ? "已複製 ✓" : "複製失敗，請手動選取"; });
+document.getElementById("done-recopy").addEventListener("click", async (e) => { e.target.textContent = (await copyAst(document.getElementById("done-ast").value)) ? t("web.copied") : t("web.copyFailed"); });
 done.addEventListener("close", () => galaxy.focus());
 
 galaxy.addEventListener("intent-lock", async (e) => {
@@ -145,23 +162,23 @@ galaxy.addEventListener("intent-lock", async (e) => {
     // 示範星系沒有登記在伺服器（galaxyId 0），附上 analysis 讓伺服器重算並簽署鎖檔。
     const body = { ...e.detail, analysis: e.detail.galaxyId ? undefined : galaxy.analysis, goal: galaxy.goal };
     const res = await fetch("/api/lock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch((err) => ({ ok: false, error: err.message }));
-    if (!res.ok) { galaxy.showMessage(`鎖檔未寫入：${res.error}`); return; }
+    if (!res.ok) { galaxy.showMessage(t("web.lockFailed", { error: res.error })); return; }
     ast = res.ast; lock = res;
   }
   // 本機獨立頁面沒有輸入框可注入，改把指令複製到剪貼簿，並用「下一步」視窗說明怎麼用。
   const copied = await copyAst(ast);
-  const title = galaxy.analysis?.archetypes?.[e.detail.baseKey]?.title ?? "自訂組合";
-  document.getElementById("done-title").textContent = `✅ 方案已確定：${title}`;
+  const title = galaxy.analysis?.archetypes?.[e.detail.baseKey]?.title ?? t("web.customCombo");
+  document.getElementById("done-title").textContent = t("web.doneTitle", { title });
   document.getElementById("done-copy").innerHTML = copied
-    ? "<b>指令已複製到剪貼簿。</b>"
-    : "<b>請手動複製下方指令</b><small>瀏覽器沒有允許自動複製。</small>";
+    ? t("web.doneCopied")
+    : t("web.doneCopyManual");
   document.getElementById("done-lock").innerHTML = lock
-    ? `已存成 <code>.intent.lock.json</code>，記錄這次決定。<small>${lock.auditDueAt.slice(0, 10)}（14 天後）會提醒你驗收：護欄的失效條件有沒有發生。${lock.hookInstalled ? "" : "要自動提醒，請先在專案執行 <code>npx @stephen.taipei/intent-galaxy init-hook</code>。"}</small>`
-    : "14 天後回來檢查：護欄的失效條件有沒有發生。";
+    ? t("web.doneLockSaved", { date: lock.auditDueAt.slice(0, 10), hookHint: lock.hookInstalled ? "" : t("web.doneHookHint") })
+    : t("web.doneLockLater");
   document.getElementById("done-ast").value = ast;
   document.getElementById("done-details").open = !copied;
-  document.getElementById("done-recopy").textContent = "再複製一次";
-  galaxy.showMessage(copied ? "📋 指令已複製" : "指令未能自動複製");
+  document.getElementById("done-recopy").textContent = t("web.doneRecopy");
+  galaxy.showMessage(copied ? t("web.toastCopied") : t("web.toastCopyFailed"));
   done.showModal();
 });
 window.addEventListener("keydown", (e) => {

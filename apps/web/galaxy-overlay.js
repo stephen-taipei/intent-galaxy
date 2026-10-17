@@ -3,6 +3,9 @@
 // 事件：intent-lock {ast, baseKey, overrides, galaxyId}、intent-close、intent-synth-request {conflicts}。
 import { renderLockedAst, renderSacrifice, repairAnalysis, solveGalaxy } from "../../libs/core/src/index.ts";
 import { NODE_IDS, quadrantOf } from "../../libs/protocol/src/index.ts";
+import { t, ready, locale, preference, LOCALES, chooseLocale, languageName, onLocaleChange } from "./i18n.js";
+
+const astLabels = () => ({ must: t("ast.must"), guard: t("ast.guard"), mustNot: t("ast.mustNot"), risk: t("ast.risk"), sacrifice: t("ast.sacrifice"), forbid: t("ast.forbid"), accepted: t("ast.accepted") });
 
 const COORDS = [
   { x: 35, y: 17 }, { x: 50, y: 12 }, { x: 65, y: 17 },
@@ -10,20 +13,19 @@ const COORDS = [
   { x: 65, y: 83 }, { x: 50, y: 88 }, { x: 35, y: 83 },
   { x: 16, y: 68 }, { x: 13, y: 50 }, { x: 16, y: 32 },
 ];
-const QUADRANT_TAGS = {
-  Q1: "▲ Q1 歸零者（第一性原理）", Q2: "▶ Q2 老兵（實戰槓桿）",
-  Q3: "▼ Q3 越界者（跨界同構）", Q4: "◀ Q4 驗屍官（波普爾證偽）",
-};
+const QUADRANT_TAGS = () => ({
+  Q1: t("ov.q1"), Q2: t("ov.q2"), Q3: t("ov.q3"), Q4: t("ov.q4"),
+});
 const ARCH = [["alpha", "1"], ["beta", "2"], ["gamma", "3"]];
 const HINT_QUADRANT = { f: "Q1", d: "Q2", l: "Q3", p: "Q4" };
 const DIST_BADGE = { 1: "· D1", 2: "◈ D2", 3: "⬥ D3", 4: "✦ D4" };
-const KEY_HINTS = [
-  [["1", "2", "3"], "主幹", "套用第 1／2／3 張策略卡，一次點亮它採納的節點。<br><span class=dim>Shift+數字：先清掉你的手動調整再套用。</span>"],
-  [["h", "j", "k", "l"], "導航", "在 12 顆節點間移動焦點：h 左、j 下、k 上、l 右。<br><span class=dim>Tab 依序切換，g＋象限鍵＋數字可直達。</span>"],
-  [["Space"], "採納", "把目前焦點的節點加入方案（再按一次取消）。<br><span class=dim>滑鼠：左鍵點節點。</span>"],
-  [["x"], "排除", "明確標記「不做」這個節點（再按一次取消）。<br><span class=dim>Q4 驗屍官節點被排除時，代表你知道這個風險並選擇承擔。滑鼠：右鍵點節點。</span>"],
-  [["r"], "解除互斥", "有些節點彼此互斥（例如「零算力」與「API 帳單熔斷」不能同時成立）。同時選了互斥節點時，狀態會變紅。<br>按 r 會自動撤銷<b>較早</b>的手動選擇，保留你最新的決定，直到方案沒有矛盾。"],
-  [["u"], "復原", "復原上一步操作。<br><span class=dim>Ctrl+R 重做。</span>"],
+const KEY_HINTS = () => [
+  [["1", "2", "3"], t("ov.keyCards"), t("ov.keyCardsTip")],
+  [["h", "j", "k", "l"], t("ov.keyNav"), t("ov.keyNavTip")],
+  [["Space"], t("ov.keyInclude"), t("ov.keyIncludeTip")],
+  [["x"], t("ov.keyExclude"), t("ov.keyExcludeTip")],
+  [["r"], t("ov.keyResolve"), t("ov.keyResolveTip")],
+  [["u"], t("ov.keyUndo"), t("ov.keyUndoTip")],
 ];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
 const clip = (s, n) => { const a = [...String(s ?? "")]; return a.length > n ? a.slice(0, n - 1).join("") + "…" : a.join(""); };
@@ -42,12 +44,14 @@ const STYLE = `
 * { box-sizing:border-box; margin:0; padding:0; }
 .wrap { display:grid; grid-template-columns:1fr 360px; grid-template-rows:1fr auto auto; height:100%; }
 :host([embedded]) .wrap { grid-template-columns:1fr; }
-:host([embedded]) aside { display:none; position:absolute; top:0; right:0; bottom:0; width:min(340px,50%); z-index:30; border-left:1px solid #38bdf8; box-shadow:-12px 0 30px rgba(0,0,0,.5); overflow:auto; }
-:host([embedded]) .summary-open aside { display:flex; }
-#bar button#summary-toggle { display:none; background:transparent; color:var(--text); border:1px solid #475569; font-weight:600; }
-:host([embedded]) #bar button#summary-toggle { display:inline-block; }
-#bar button#summary-toggle[aria-pressed="true"] { border-color:var(--q1); color:var(--q1); }
-#stage { position:relative; min-height:300px; overflow:hidden; background:radial-gradient(circle at 50% 50%, rgba(30,41,59,.45) 0%, rgba(8,11,17,1) 72%); }
+:host([embedded]) aside { display:none; }
+:host([embedded]) #cards, :host([embedded]) #bar { grid-column:1 / -1; }
+/* 嵌入模式（擴充功能）的方案側欄：跟星系並排，星系仍可捲動、可邊看邊調；方案卡列可收合。 */
+:host([embedded]) .wrap.summary-open { grid-template-columns:1fr min(340px,45%); }
+:host([embedded]) .wrap.summary-open aside { display:flex; grid-column:2; grid-row:1; overflow:auto; border-left:1px solid #38bdf8; }
+.wrap.cards-hidden #cards { display:none; }
+#canvas { position:relative; width:100%; height:100%; min-width:720px; min-height:360px; }
+#stage { position:relative; min-height:200px; overflow:auto; background:radial-gradient(circle at 50% 50%, rgba(30,41,59,.45) 0%, rgba(8,11,17,1) 72%); }
 svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 .q-tag { position:absolute; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:6px; background:rgba(17,23,35,.92); border:1px solid var(--border); pointer-events:none; }
 .q-tag.Q1 { top:6px; left:50%; transform:translateX(-50%); color:var(--q1); }
@@ -100,6 +104,7 @@ kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-
 #bar button#reset { background:transparent; color:var(--text); border:1px solid #475569; font-weight:600; }
 #bar button#reset:hover { border-color:#fff; }
 #bar button#reset:disabled { opacity:.35; cursor:default; }
+#bar select#lang { flex-shrink:0; max-width:9em; font:inherit; padding:3px 4px; border-radius:6px; border:1px solid #475569; background:#0c111d; color:var(--text); cursor:pointer; }
 aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
 aside .head { display:flex; align-items:center; justify-content:space-between; }
 aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
@@ -135,27 +140,27 @@ export class IntentGalaxyOverlay extends HTMLElement {
   #analysis = null; #draft = null; #galaxyId = 0; #findings = [];
   #baseKey = null; #overrides = new Map(); #seq = 0; #focus = 0;
   #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null; #showRaw = false;
-  #summaryOpen = false; #summaryShown = false; // 嵌入模式（擴充功能）的「已選方案」抽屜：第一次選策略卡時自動打開一次
+  // 嵌入模式（擴充功能）的版面：方案側欄、方案卡列。summaryPref 為 null 時「第一次選策略卡自動打開一次」；使用者切換過就照他的。
+  #summaryOpen = false; #summaryShown = false; #summaryPref = null; #cardsOpen = true;
 
   constructor() {
     super();
     this.attachShadow({ mode: "open" }).innerHTML = `<style>${STYLE}</style><div class="wrap">
-      <main id="stage"><svg viewBox="0 0 1000 600" preserveAspectRatio="none"></svg><div id="tags"></div>
-        <div id="core"><div class="sub" title="這是 AI 對你問題的解讀，不一定正確">AI 理解你要決定的是</div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></main>
+      <main id="stage"><div id="canvas"><svg viewBox="0 0 1000 600" preserveAspectRatio="none"></svg><div id="tags"></div>
+        <div id="core"><div class="sub"></div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></div></main>
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
-        <span class="keys">${KEY_HINTS.map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${label}</span>`).join(" · ")}</span>
-        <button type="button" id="summary-toggle"></button><button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
-      <aside><div class="head"><h2>收斂結果</h2><button type="button" id="raw-toggle" data-tip="切換檢視：摘要 ↔ 實際送給 AI 的原始指令文字（LOCKED INTENT AST）">原始 AST</button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
+        <span class="keys"></span>
+        <select id="lang"></select><button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
+      <aside><div class="head"><h2></h2><button type="button" id="raw-toggle"></button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
     root.addEventListener("click", () => this.focus({ preventScroll: true }));
     root.getElementById("nodes").addEventListener("click", (e) => this.#onNodeClick(e, "include"));
     root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#onNodeClick(e, "exclude"); });
-    root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); });
+    root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); }); // 點卡片＝還原成卡片原始選擇；Shift 保留手動調整
     root.getElementById("lock").addEventListener("click", () => this.lock());
     root.getElementById("reset").addEventListener("click", () => this.reset());
-    root.getElementById("summary-toggle").addEventListener("click", () => { this.#summaryOpen = !this.#summaryOpen; this.#render(); });
     root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
     // 統一 tooltip：任何帶 data-tip 的元素（節點、策略卡、按鍵說明、按鈕）滑過或鍵盤聚焦時顯示。
     const showTip = (e) => { const el = e.target.closest?.("[data-tip]"); if (el) this.#showTip(el); else this.#hideTip(); };
@@ -164,6 +169,25 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.addEventListener("pointerleave", () => this.#hideTip(), true);
     root.addEventListener("pointerdown", () => this.#hideTip());
     this.addEventListener("keydown", (e) => this.#onKey(e));
+    root.getElementById("lang").addEventListener("change", (e) => chooseLocale(e.target.value));
+    ready.then(() => this.#render()); // 語系載入後重畫一次（載入前先用英文）
+    onLocaleChange(() => this.#render()); // 手動切換語系時重畫
+  }
+
+  /** 不隨狀態改變、只隨語系改變的文字：換語系時才重建。 */
+  #textLocale = "";
+  #localizeStatic(root) {
+    if (this.#textLocale === locale) return;
+    this.#textLocale = locale;
+    const sub = root.querySelector("#core .sub");
+    sub.textContent = t("ov.coreSub"); sub.title = t("ov.coreTip");
+    root.querySelector("#bar .keys").innerHTML = KEY_HINTS().map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${esc(label)}</span>`).join(" · ");
+    root.querySelector("aside h2").textContent = t("ov.summaryTitle");
+    root.getElementById("raw-toggle").dataset.tip = t("ov.rawTip");
+    const lang = root.getElementById("lang");
+    lang.title = t("ov.langTitle");
+    lang.setAttribute("aria-label", t("ov.langTitle"));
+    lang.innerHTML = `<option value="">${esc(t("ov.langAuto"))}</option>` + LOCALES.map((l) => `<option value="${l}" lang="${l}">${esc(languageName(l))}</option>`).join("");
   }
 
   connectedCallback() { if (!this.hasAttribute("tabindex")) this.tabIndex = 0; this.#render(); }
@@ -175,9 +199,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
   setGalaxy(value, { galaxyId = 0, goal = "" } = {}) {
     const repaired = repairAnalysis(value);
     this.#findings = repaired.findings;
-    if (!repaired.ok) { this.#message = `星系資料無法編譯：${repaired.findings.at(-1)?.msg ?? ""}`; this.#render(); return false; }
+    if (!repaired.ok) { this.#message = t("ov.cannotCompile", { detail: repaired.findings.at(-1)?.msg ?? "" }); this.#render(); return false; }
     this.#analysis = repaired.analysis; this.#draft = null; this.#galaxyId = galaxyId; this.goal = goal;
-    this.#baseKey = null; this.#overrides.clear(); this.#undo = []; this.#redo = []; this.#message = ""; this.#summaryOpen = false; this.#summaryShown = false;
+    this.#baseKey = null; this.#overrides.clear(); this.#undo = []; this.#redo = []; this.#message = ""; this.#summaryOpen = this.#summaryPref === true; this.#summaryShown = false;
     this.#render();
     return true;
   }
@@ -186,15 +210,15 @@ export class IntentGalaxyOverlay extends HTMLElement {
   beginStream(goal) {
     this.#analysis = null; this.#findings = []; this.goal = goal;
     this.#draft = { core: { decision: goal, metric: "" }, nodes: {}, archetypes: {} };
-    this.#message = "正在展開星系…"; this.#render();
+    this.#message = t("ov.expanding"); this.#render();
   }
 
   /** 套用 /api/spawn 的 NDJSON 事件，逐顆點亮節點。 */
   applyStreamEvent(ev) {
     if (ev.t === "repaired") { this.setGalaxy(ev.analysis, { galaxyId: ev.galaxyId ?? 0, goal: this.goal }); return; }
-    if (ev.t === "error") { this.#message = `生成失敗（${ev.code}）${ev.detail ? "：" + ev.detail : ""}`; this.#render(); return; }
+    if (ev.t === "error") { this.#message = ev.detail ? t("ov.genFailedDetail", { code: ev.code, detail: ev.detail }) : t("ov.genFailed", { code: ev.code }); this.#render(); return; }
     if (!this.#draft) this.beginStream(this.goal ?? "");
-    if (ev.t === "progress") { this.#message = ev.thinkingTokens != null ? `模型思考中 · 約 ${Number(ev.thinkingTokens).toLocaleString()} tokens` : `${ev.provider ?? "模型"} 生成中 · 已等待 ${ev.elapsedSec ?? 0} 秒`; this.#render(); return; }
+    if (ev.t === "progress") { this.#message = ev.thinkingTokens != null ? t("ov.thinking", { tokens: Number(ev.thinkingTokens).toLocaleString() }) : t("ov.generating", { provider: ev.provider ?? t("ov.model"), sec: ev.elapsedSec ?? 0 }); this.#render(); return; }
     if (ev.t === "skeleton") this.#message = "";
     if (ev.t === "skeleton" && ev.core) this.#draft.core = ev.core;
     else if (ev.t === "node") this.#draft.nodes[ev.id] = ev.node;
@@ -205,12 +229,13 @@ export class IntentGalaxyOverlay extends HTMLElement {
   /** 在狀態列顯示一則訊息（例如鎖檔被伺服器拒絕的原因）。 */
   showMessage(text) { this.#message = text; this.#render(); }
 
-  selectArchetype(key, clearOverrides = false) {
+  /** 選策略卡＝還原成這張卡的原始選擇（清掉手動調整）；keepOverrides（Shift）才保留手動調整。 */
+  selectArchetype(key, keepOverrides = false) {
     if (!this.#analysis?.archetypes[key]) return;
     this.#snapshot();
     this.#baseKey = key;
-    if (clearOverrides) this.#overrides.clear();
-    if (!this.#summaryShown) { this.#summaryShown = true; this.#summaryOpen = true; }
+    if (!keepOverrides) this.#overrides.clear();
+    if (!this.#summaryShown && this.#summaryPref === null) { this.#summaryShown = true; this.#summaryOpen = true; this.#emitLayout(); }
     this.#render();
   }
 
@@ -219,9 +244,25 @@ export class IntentGalaxyOverlay extends HTMLElement {
     if (!this.#analysis || (!this.#baseKey && !this.#overrides.size)) return;
     this.#snapshot();
     this.#baseKey = null; this.#overrides.clear();
-    this.#message = "已清空選擇（按 u 可復原）";
+    this.#message = t("ov.resetDone");
     this.#render();
   }
+
+  /** 版面：方案側欄、方案卡列。open 省略時切換；使用者主動切換的結果會記住（layout 事件通知外層保存）。 */
+  setLayout({ summary, cards } = {}, { user = false } = {}) {
+    if (summary !== undefined) { this.#summaryOpen = summary === "toggle" ? !this.#summaryOpen : !!summary; if (user) this.#summaryPref = this.#summaryOpen; }
+    if (cards !== undefined) this.#cardsOpen = cards === "toggle" ? !this.#cardsOpen : !!cards;
+    this.#render();
+    this.#emitLayout();
+  }
+  /** 外層（擴充功能面板）帶入記住的偏好。 */
+  restoreLayout({ summary = null, cards = true } = {}) {
+    this.#summaryPref = summary; this.#cardsOpen = cards !== false;
+    if (summary !== null) this.#summaryOpen = summary;
+    this.#render();
+  }
+  get layout() { return { summary: this.#summaryOpen, cards: this.#cardsOpen, summaryPref: this.#summaryPref }; }
+  #emitLayout() { this.dispatchEvent(new CustomEvent("intent-layout", { bubbles: true, composed: true, detail: this.layout })); }
 
   setStance(id, target) {
     if (!this.#analysis) return;
@@ -248,14 +289,14 @@ export class IntentGalaxyOverlay extends HTMLElement {
       if (!oldest) break;
       this.#overrides.delete(oldest);
     }
-    this.#message = "已保留較新決定解除衝突"; this.#render();
+    this.#message = t("ov.resolved"); this.#render();
   }
 
   lock() {
     const sol = this.#solution;
     if (!sol || !this.#analysis) return;
-    if (sol.status !== "SAT") { this.#message = "請先按 r 解除衝突（或 s 申請 TRIZ 合成）"; this.#render(); return; }
-    const ast = renderLockedAst(this.#analysis, sol, this.#baseKey);
+    if (sol.status !== "SAT") { this.#message = t("ov.resolveFirst"); this.#render(); return; }
+    const ast = renderLockedAst(this.#analysis, sol, this.#baseKey, astLabels());
     const overrides = Object.fromEntries([...this.#overrides].map(([id, o]) => [id, o.stance]));
     this.dispatchEvent(new CustomEvent("intent-lock", { bubbles: true, composed: true, detail: { ast, baseKey: this.#baseKey, overrides, galaxyId: this.#galaxyId } }));
   }
@@ -325,7 +366,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
       handled();
       const conflicts = this.#solution?.conflicts ?? [];
       this.dispatchEvent(new CustomEvent("intent-synth-request", { bubbles: true, composed: true, detail: { conflicts } }));
-      this.#message = conflicts.length ? "TRIZ 矛盾合成尚未接上 Stage 3 管線，先按 r 解除" : "目前沒有衝突";
+      this.#message = conflicts.length ? t("ov.trizPending") : t("ov.noConflict");
       this.#render();
     }
     else if (k === "u") { handled(); this.#restore(this.#undo, this.#redo); }
@@ -337,19 +378,21 @@ export class IntentGalaxyOverlay extends HTMLElement {
     const root = this.shadowRoot;
     if (!root) return;
     const a = this.#analysis, draft = this.#draft;
-    const core = a?.core ?? draft?.core ?? { decision: this.goal || "等待星系資料…", metric: "" };
+    const core = a?.core ?? draft?.core ?? { decision: this.goal || t("ov.waitingData"), metric: "" };
     const nodes = a?.nodes ?? draft?.nodes ?? {};
     const archetypes = a?.archetypes ?? draft?.archetypes ?? {};
     const quadrants = a?.quadrants ?? {};
+    this.#localizeStatic(root);
+    root.getElementById("lang").value = preference;
     const sol = this.#solution = a ? this.#solve() : null;
     const conflicts = new Set(sol?.conflicts ?? []);
 
-    root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS).map(([q, label]) =>
+    root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS()).map(([q, label]) =>
       `<div class="q-tag ${q}" title="${esc(quadrants[q]?.scar)}">${label}${quadrants[q]?.sacred ? ` <small>· ${esc(quadrants[q].sacred)}</small>` : ""}</div>`).join("");
     root.querySelector("#core .goal").textContent = String(core.decision ?? "").replace(/^你真正在決定的是[:：]\s*/, "");
     const metricEl = root.querySelector("#core .metric");
     metricEl.textContent = core.metric ? `🎯 ${core.metric}` : "";
-    if (core.metric) metricEl.dataset.tip = `<b>成功指標</b><br>${esc(core.metric)}`; else delete metricEl.dataset.tip;
+    if (core.metric) metricEl.dataset.tip = `<b>${t("ov.metric")}</b><br>${esc(core.metric)}`; else delete metricEl.dataset.tip;
 
     // ✦ 盲區最多標 3 顆，才看得出重點：優先 Q3 越界者（跨界的點子最常是原話沒想到的），再來 Q4、Q1、Q2。
     const blindShown = new Set(["Q3", "Q4", "Q1", "Q2"].flatMap((q) => NODE_IDS.filter((id) => quadrantOf(id) === q && nodes[id]?.blind)).slice(0, 3));
@@ -359,11 +402,11 @@ export class IntentGalaxyOverlay extends HTMLElement {
       if (!n) return `<button type="button" class="node ghost" style="${style}" tabindex="-1"><span class="nid">${id}</span>…</button>`;
       const view = sol?.nodes[id] ?? { stance: "neutral", src: "none" };
       const dimmed = this.#baseKey && view.stance === "neutral";
-      const chip = view.src === "derived" ? `<span class="chip">${view.stance === "include" ? "← 依賴推導" : "⊘ 互斥讓位"}</span>`
-        : view.src === "user" ? `<span class="chip">📌 手動釘選</span>`
-        : q === "Q4" && view.stance === "exclude" ? `<span class="chip">⚠ 明示承擔風險</span>` : "";
+      const chip = view.src === "derived" ? `<span class="chip">${view.stance === "include" ? t("ov.chipDerivedIn") : t("ov.chipDerivedOut")}</span>`
+        : view.src === "user" ? `<span class="chip">${t("ov.chipPinned")}</span>`
+        : q === "Q4" && view.stance === "exclude" ? `<span class="chip">${t("ov.chipRisk")}</span>` : "";
       const cls = ["node", dimmed && "dimmed", i === this.#focus && "focused", conflicts.has(id) && "conflict"].filter(Boolean).join(" ");
-      const blind = blindShown.has(id) ? `<span class="blind" title="${esc(n.blind)}">✦ 盲區</span>` : "";
+      const blind = blindShown.has(id) ? `<span class="blind" title="${esc(n.blind)}">${t("ov.blind")}</span>` : "";
       return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" data-tip="${esc(this.#nodeTip(id, n, q, view))}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
     }).join("");
 
@@ -382,53 +425,47 @@ export class IntentGalaxyOverlay extends HTMLElement {
     const rec = a?.recommend?.key;
     root.getElementById("cards").innerHTML = ARCH.map(([key, num]) => {
       const c = archetypes[key], isRec = rec === key;
-      if (!c) return `<div class="card ghost"><div class="title">[${num}] ${draft ? "生成中…" : "—"}</div></div>`;
+      if (!c) return `<div class="card ghost"><div class="title">[${num}] ${draft ? t("ov.cardGenerating") : "—"}</div></div>`;
       const dist = Math.max(0, ...(c.include ?? []).map((id) => nodes[id]?.lateral?.dist ?? 0));
       const fatalKill = nodes[c.fatal]?.kill ?? "";
       const cls = ["card", this.#baseKey === key && "active", isRec && "rec"].filter(Boolean).join(" ");
       const tip = `<b>[${num}] ${esc(c.title)}</b>${c.thesis ? `<br>${esc(c.thesis)}` : ""}`
-        + (isRec && a.recommend.why ? `<br><span class=g>★ 依目前條件推薦（AI 的判斷）：${esc(a.recommend.why)}</span>` : "")
-        + `<br>採納：${(c.include ?? []).map((id) => esc(nodes[id]?.label ?? id)).join("、")}`
-        + (c.exclude?.length ? `<br>排除：${c.exclude.map((id) => esc(nodes[id]?.label ?? id)).join("、")}` : "")
-        + `<br>💸 代價：${esc(renderSacrifice(c.sacrifice))}`
-        + (fatalKill ? `<br><span class=k>⚡ 致死前提：${esc(fatalKill)}</span>` : "")
-        + `<br><span class=dim>點擊或按 ${num} 套用 · Shift+${num} 清掉手動調整後套用</span>`;
+        + (isRec && a.recommend.why ? `<br><span class=g>${t("ov.recWhy", { why: esc(a.recommend.why) })}</span>` : "")
+        + `<br>${t("ov.cardInclude", { list: (c.include ?? []).map((id) => esc(nodes[id]?.label ?? id)).join(t("ov.listSep")) })}`
+        + (c.exclude?.length ? `<br>${t("ov.cardExclude", { list: c.exclude.map((id) => esc(nodes[id]?.label ?? id)).join(t("ov.listSep")) })}` : "")
+        + `<br>${t("ov.cost", { cost: esc(renderSacrifice(c.sacrifice)) })}`
+        + (fatalKill ? `<br><span class=k>${t("ov.fatalTip", { kill: esc(fatalKill) })}</span>` : "")
+        + `<br><span class=dim>${t("ov.cardHow", { num })}</span>`;
       return `<button type="button" class="${cls}" data-arch="${key}" data-tip="${esc(tip)}">
-        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge" title="依目前條件推薦：AI 的判斷，請自行確認">★ 依目前條件推薦</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
+        <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge" title="${esc(t("ov.recBadgeTip"))}">${t("ov.recBadge")}</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
         ${isRec && a.recommend.why ? `<div class="why">★ ${esc(clip(a.recommend.why, 30))}</div>` : ""}
-        <div class="row">💸 代價：${esc(clip(renderSacrifice(c.sacrifice), 40))}</div>
-        <div class="kill">⚡ 致死：${esc(clip(fatalKill, 30))}</div></button>`;
+        <div class="row">${t("ov.cost", { cost: esc(clip(renderSacrifice(c.sacrifice), 40)) })}</div>
+        <div class="kill">${t("ov.fatal", { kill: esc(clip(fatalKill, 30)) })}</div></button>`;
     }).join("");
 
     const status = root.querySelector("#bar .status");
-    if (!sol) { status.className = "status wait"; status.textContent = draft ? `⋯ 串流中 ${Object.keys(nodes).length}/12` : "⋯ 等待星系"; }
-    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? "✓ 已選條件相容" : `✦ 先發散：按 1/2/3 選主幹${rec ? `（★ 推薦 ${ARCH.find(([k]) => k === rec)[1]}）` : ""}`; }
-    else { status.className = "status unsat"; status.textContent = `✗ 有互斥${conflicts.size ? "：" + [...conflicts].join(" ⊗ ") : ""}（按 r 解除）`; }
-    status.dataset.tip = !sol ? "星系資料還沒到齊。" : sol.status === "SAT"
-      ? (this.#baseKey ? "已選的條件彼此沒有互斥、依賴也都補齊。這只檢查條件之間的關係，不保證內容正確或可行。" : "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。")
-      : `選取的節點彼此矛盾（${esc(sol.status)}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。`;
+    if (!sol) { status.className = "status wait"; status.textContent = draft ? t("ov.streaming", { n: Object.keys(nodes).length }) : t("ov.waitingGalaxy"); }
+    else if (sol.status === "SAT") { status.className = "status sat"; status.textContent = this.#baseKey ? t("ov.statusOk") : rec ? t("ov.statusPickRec", { num: ARCH.find(([k]) => k === rec)[1] }) : t("ov.statusPick"); }
+    else { status.className = "status unsat"; status.textContent = t("ov.statusConflict", { list: [...conflicts].join(" ⊗ ") }); }
+    status.dataset.tip = !sol ? t("ov.tipNoData") : sol.status === "SAT"
+      ? (this.#baseKey ? t("ov.tipOk") : t("ov.tipPick"))
+      : t("ov.tipConflict", { status: esc(sol.status) });
     const resetBtn = root.getElementById("reset");
-    resetBtn.textContent = "↺ 重設";
+    resetBtn.textContent = t("ov.reset");
     resetBtn.disabled = !a || (!this.#baseKey && !this.#overrides.size);
-    resetBtn.dataset.tip = "清掉選好的策略卡與所有手動調整，回到剛展開的星系。<br><span class=dim>按 u 可以復原。</span>";
+    resetBtn.dataset.tip = t("ov.resetTip");
     const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
-    // 嵌入模式沒有右側欄：收斂結果改成蓋在星系右側的抽屜，回填前可以核對「最後選了什麼」。
-    const aside = root.querySelector("aside"), stage = root.getElementById("stage");
-    if (embedded && aside.parentElement !== stage) stage.append(aside);
-    stage.classList.toggle("summary-open", embedded && this.#summaryOpen);
-    const toggle = root.getElementById("summary-toggle");
-    toggle.textContent = this.#summaryOpen ? "✕ 收起方案" : "📋 已選方案";
-    toggle.setAttribute("aria-pressed", String(this.#summaryOpen));
-    toggle.dataset.tip = "打開／收起「已選方案」：要做、護欄、不做、承擔風險與代價。填回對話框前先核對。";
-    lockBtn.textContent = embedded ? "↵ 把方案填進對話框" : "📋 產生 AI 執行指令";
-    lockBtn.dataset.tip = `<b>選好方案後按這裡（或 Enter）</b><br>把右側的方案轉成一段給 AI 的指令，`
-      + (embedded ? "直接填進這個 AI 網頁的輸入框，你檢查後按送出即可。" : "複製到剪貼簿，貼給 Claude Code 或 ChatGPT，AI 就會照「要做／不做／護欄」動手。")
-      + `<br><span class=dim>${embedded ? "" : "同時寫入 .intent.lock.json，14 天後提醒你驗收護欄。"}</span>`;
-    root.querySelector("#bar .msg").textContent = this.#hint ? `g 直達：${this.#hint}` : this.#message;
+    // 嵌入模式沒有固定的右側欄：方案側欄由外層（面板標題列的按鈕）開關，回填前可以核對「最後選了什麼」。
+    const wrap = root.querySelector(".wrap");
+    wrap.classList.toggle("summary-open", embedded && this.#summaryOpen);
+    wrap.classList.toggle("cards-hidden", !this.#cardsOpen);
+    lockBtn.textContent = embedded ? t("ov.lockEmbedded") : t("ov.lockWeb");
+    lockBtn.dataset.tip = embedded ? t("ov.lockTipEmbedded") : t("ov.lockTipWeb");
+    root.querySelector("#bar .msg").textContent = this.#hint ? t("ov.jump", { hint: this.#hint }) : this.#message;
     const pre = root.querySelector("aside pre"), summary = root.getElementById("summary");
-    pre.textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey) : "";
+    pre.textContent = sol?.status === "SAT" ? renderLockedAst(a, sol, this.#baseKey, astLabels()) : "";
     pre.hidden = !this.#showRaw; summary.hidden = this.#showRaw;
-    root.getElementById("raw-toggle").textContent = this.#showRaw ? "摘要" : "原始 AST";
+    root.getElementById("raw-toggle").textContent = this.#showRaw ? t("ov.summaryView") : t("ov.rawView");
     summary.innerHTML = this.#summaryHtml(a, sol, conflicts);
     root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
   }
@@ -447,17 +484,17 @@ export class IntentGalaxyOverlay extends HTMLElement {
   }
 
   #nodeTip(id, n, q, view) {
-    const state = view.stance === "include" ? (q === "Q4" ? "🛡 已設為護欄" : "✅ 已採納") : view.stance === "exclude" ? (q === "Q4" ? "⚠ 已承擔此風險" : "⛔ 已排除") : "尚未選擇";
-    const why = view.src === "derived" ? (view.stance === "include" ? "（因其他節點依賴它而自動加入）" : "（與已選節點互斥而自動讓位）") : view.src === "user" ? "（你手動設定）" : view.src === "default" ? "（來自策略卡）" : "";
+    const state = view.stance === "include" ? (q === "Q4" ? t("ov.stGuard") : t("ov.stIncluded")) : view.stance === "exclude" ? (q === "Q4" ? t("ov.stRisk") : t("ov.stExcluded")) : t("ov.stNone");
+    const why = view.src === "derived" ? (view.stance === "include" ? t("ov.whyPulled") : t("ov.whyGaveWay")) : view.src === "user" ? t("ov.whyUser") : view.src === "default" ? t("ov.whyCard") : "";
     return `<b>${esc(id)} ${esc(n.label)}</b><br>${esc(n.claim)}`
-      + (n.kill ? `<br><span class=k>⚡ 失效條件：${esc(n.kill)}</span>` : "")
-      + (n.blind ? `<br><span class=g>✦ 盲區：${esc(n.blind)}</span>` : "")
+      + (n.kill ? `<br><span class=k>${t("ov.killCond", { kill: esc(n.kill) })}</span>` : "")
+      + (n.blind ? `<br><span class=g>${t("ov.blindTip", { blind: esc(n.blind) })}</span>` : "")
       + (this.#solution && this.#baseKey ? this.#reasons(this.#solution).filter((r) => r.from === id || r.to === id).map((r) => {
         const other = r.from === id ? r.to : r.from, label = esc(this.#analysis.nodes[other]?.label ?? other);
-        const text = r.kind === "excludes" ? `⊗ 與 ${esc(other)}「${label}」互斥` : r.from === id ? `→ 需要 ${esc(other)}「${label}」` : `← ${esc(other)}「${label}」需要它`;
+        const text = t(r.kind === "excludes" ? "ov.relConflict" : r.from === id ? "ov.relNeeds" : "ov.relNeededBy", { id: esc(other), label });
         return `<br><span class=k>${text}${r.why ? `：${esc(r.why)}` : ""}</span>`;
       }).join("") : "")
-      + `<br><span class=dim>狀態：${state}${why}<br>左鍵（Space）採納 · 右鍵（x）排除 · 再按一次取消</span>`;
+      + `<br><span class=dim>${t("ov.nodeState", { state: state + why })}<br>${t("ov.nodeHow")}</span>`;
   }
 
   #tipTimer = 0;
@@ -478,21 +515,21 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
   /** 右側摘要：把 LOCKED INTENT AST 的五個區塊改寫成人看得懂的分組卡片（極性規則同 renderLockedAst）。 */
   #summaryHtml(a, sol, conflicts) {
-    if (!sol) return `<div class="empty">等待星系資料…</div>`;
-    if (sol.status !== "SAT") return `<div class="empty unsat">有互斥衝突${conflicts.size ? `：${[...conflicts].join(" ⊗ ")}` : ""}<br>按 <kbd>r</kbd> 保留較新決定，或改選其他節點。</div>`;
+    if (!sol) return `<div class="empty">${t("ov.waitingData")}</div>`;
+    if (sol.status !== "SAT") return `<div class="empty unsat">${t("ov.sumConflict", { list: [...conflicts].join(" ⊗ ") })}</div>`;
     const picked = NODE_IDS.filter((id) => sol.nodes[id].stance !== "neutral");
-    if (!this.#baseKey && !picked.length) return `<div class="empty">先看完 12 顆節點，再按 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> 選一條主幹（或用 <kbd>Space</kbd> / <kbd>x</kbd> 自己挑）。<br><br>這裡會整理成：<br>✅ 要做　🛡 護欄　⛔ 不做　⚠ 承擔風險　💸 代價</div>`;
+    if (!this.#baseKey && !picked.length) return `<div class="empty">${t("ov.sumEmpty")}</div>`;
     const arch = this.#baseKey ? a.archetypes[this.#baseKey] : null;
     const pick = (q4, stance) => NODE_IDS.filter((id) => (quadrantOf(id) === "Q4") === q4 && sol.nodes[id].stance === stance);
-    const item = (id, desc) => { const n = a.nodes[id]; return `<div class="item"><span class="nid">${id}</span><b>${esc(n.label)}</b>${sol.nodes[id].src === "derived" ? `<span class="tag">推導</span>` : sol.nodes[id].src === "user" ? `<span class="tag">手動</span>` : ""}<p>${esc(desc(n))}</p></div>`; };
+    const item = (id, desc) => { const n = a.nodes[id]; return `<div class="item"><span class="nid">${id}</span><b>${esc(n.label)}</b>${sol.nodes[id].src === "derived" ? `<span class="tag">${t("ov.tagDerived")}</span>` : sol.nodes[id].src === "user" ? `<span class="tag">${t("ov.tagUser")}</span>` : ""}<p>${esc(desc(n))}</p></div>`; };
     const group = (icon, name, hint, color, ids, desc) => ids.length ? `<section style="--c:${color}"><h3>${icon} ${name}<small>${hint}</small></h3>${ids.map((id) => item(id, desc)).join("")}</section>` : "";
     const sacrifice = arch ? ["p", "v", "t", "l", "x"].map((k) => arch.sacrifice?.[k]).filter(Boolean) : [];
-    return `<div class="plan"><b>${esc(arch?.title ?? "自訂組合")}</b>${arch?.thesis ? `<span>${esc(arch.thesis)}</span>` : ""}</div>`
-      + group("✅", "要做", `${pick(false, "include").length} 項`, "#10b981", pick(false, "include"), (n) => n.claim)
-      + group("🛡", "護欄", "出現就停", "#f59e0b", pick(true, "include"), (n) => n.kill || n.claim)
-      + group("⛔", "不做", "明確排除", "#f43f5e", pick(false, "exclude"), (n) => n.claim)
-      + group("⚠", "承擔風險", "已知但接受", "#fb923c", pick(true, "exclude"), (n) => n.claim)
-      + (sacrifice.length ? `<section style="--c:#a855f7"><h3>💸 代價<small>選這條必然失去</small></h3><div class="chips">${sacrifice.map((x) => `<span>${esc(x)}</span>`).join("")}</div></section>` : "");
+    return `<div class="plan"><b>${esc(arch?.title ?? t("ov.customPlan"))}</b>${arch?.thesis ? `<span>${esc(arch.thesis)}</span>` : ""}</div>`
+      + group("✅", t("ov.gDo"), t("ov.gDoCount", { n: pick(false, "include").length }), "#10b981", pick(false, "include"), (n) => n.claim)
+      + group("🛡", t("ov.gGuard"), t("ov.gGuardSub"), "#f59e0b", pick(true, "include"), (n) => n.kill || n.claim)
+      + group("⛔", t("ov.gDont"), t("ov.gDontSub"), "#f43f5e", pick(false, "exclude"), (n) => n.claim)
+      + group("⚠", t("ov.gRisk"), t("ov.gRiskSub"), "#fb923c", pick(true, "exclude"), (n) => n.claim)
+      + (sacrifice.length ? `<section style="--c:#a855f7"><h3>${t("ov.gCost")}<small>${t("ov.gCostSub")}</small></h3><div class="chips">${sacrifice.map((x) => `<span>${esc(x)}</span>`).join("")}</div></section>` : "");
   }
 }
 
