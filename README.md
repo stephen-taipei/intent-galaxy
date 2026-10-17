@@ -1,4 +1,11 @@
-# Intent Galaxy 🌌
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-logo-dark.svg">
+    <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-logo.svg" alt="Intent Galaxy" width="320">
+  </picture>
+</p>
+
+# Intent Galaxy
 
 把一句模糊目標展開成「中心命題 + 4 位敵對專家 + 12 顆思緒節點」的星系圖。先發散看見盲區，再用鍵盤 1 分鐘收斂，
 最後由**零 LLM 的純函式編譯器**產出確定性的 `LOCKED INTENT AST`，直接注入 Claude Code 或 AI 網頁的輸入框。
