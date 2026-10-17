@@ -78,10 +78,7 @@ export function repairAnalysis(input: unknown): RepairResult {
     if (e.type === "requires" && excl.has(pairKey(e.from, e.to))) { fix("V7", `${e.from}→${e.to} 同時 requires 與 excludes，移除 requires`); return false; }
     return true;
   });
-  // V15 至少 4 組象限對共享 excludes 邊
-  const qPairs = new Set(a.edges.filter((e: Edge) => e.type === "excludes" && quadrantOf(e.from) !== quadrantOf(e.to))
-    .map((e: Edge) => [quadrantOf(e.from), quadrantOf(e.to)].sort().join("-")));
-  if (qPairs.size < 4) warn("V15", `只有 ${qPairs.size} 組象限對共享 excludes 邊（規則要求 >= 4）`);
+  // V15（已停用）：互斥邊的數量由模型依問題判斷，不再要求至少 4 組象限對。
 
   // V12 Q3 跨界距離：至少 2 種不同值，且至少 1 個 >= 2
   const dists = (["N7", "N8", "N9"] as const).map(id => a.nodes[id].lateral?.dist).filter((d: unknown) => typeof d === "number");

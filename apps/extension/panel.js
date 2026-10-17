@@ -241,18 +241,18 @@ function showDone(job) {
 }
 
 /** 新問題：本機 CLI 在線就直接生成（ask 時先確認），否則請網頁上的 AI。 */
-async function generate(back = [], ask = false, reuse = true) {
-  if (!(await cliAlive())) return confirmChat(back);
+/** 新問題：預設請這個網頁上的 AI（它看得到這段對話的前文）；本機 CLI 在線時多一個「改用本機 AI」按鈕。 */
+async function generate(back = [], _ask = false, reuse = true) {
+  const local = await cliAlive();
   // 本機 CLI 最近生成的就是這個問題（例如鎖定後想再調整）：直接顯示，不重跑。
-  const cur = reuse ? await cliLatest() : null;
+  const cur = local && reuse ? await cliLatest() : null;
   if (cur && cur.goal === goal && showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })) {
     return setStrip("這是本機已生成的星系", [["重新生成", () => { const g = goal; generate([["回到星系", () => { goal = g; }]], true, false); }]]);
   }
-  if (goal.length > CLI_GOAL_MAX) return confirmChat(back);
-  if (!ask) return spawnViaCli().catch(cliError);
   const g = goal;
-  showCard("用本機 AI 生成星系", `目標：<b>${esc(g)}</b><br><br>本機的 Intent Galaxy 正在執行，會用它生成（不會出現在對話裡）。`,
-    [["開始生成", () => { goal = g; spawnViaCli().catch(cliError); }, true], ...back, ["改用網頁上的 AI", () => { goal = g; confirmChat(back); }]]);
+  const viaCli = local && goal.length <= CLI_GOAL_MAX
+    ? [["改用本機 AI（不進對話，但看不到前文）", () => { goal = g; spawnViaCli().catch(cliError); }]] : [];
+  return confirmChat([...back, ...viaCli]);
 }
 
 async function open({ goal: text = "", site: host = "這個 AI", job = null, pageGalaxy = null, reopen = false }) {

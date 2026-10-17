@@ -367,11 +367,16 @@ export class IntentGalaxyOverlay extends HTMLElement {
       return `<button type="button" class="${cls}" style="${style}" data-node="${id}" data-q="${q}" data-stance="${view.stance}" data-src="${view.src}" data-tip="${esc(this.#nodeTip(id, n, q, view))}"><span class="nid">${id}</span>${blind}<span class="lbl">${esc(clip(n.label, 15))}</span>${chip}</button>`;
     }).join("");
 
-    // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。
+    // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。選了之後只畫「說明取捨」的線：
+    // 綠線＝採納的節點連回中心；紅色虛線＝被排除的節點和與它互斥的採納節點；橘色點線＝採納節點依賴的另一顆。
     root.querySelector("svg").innerHTML = !sol || !this.#baseKey ? "" : NODE_IDS.map((id, i) => {
       if (sol.nodes[id].stance !== "include") return "";
       const p = COORDS[i], x = p.x * 10, y = p.y * 6;
       return `<path d="M ${x} ${y} Q ${(x + 500) / 2} ${y} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
+    }).join("") + this.#reasons(sol).map(({ from, to, kind }) => {
+      const p = COORDS[NODE_IDS.indexOf(from)], q = COORDS[NODE_IDS.indexOf(to)];
+      const color = kind === "excludes" ? "#f43f5e" : "#f59e0b", dash = kind === "excludes" ? "7,5" : "2,4";
+      return `<line x1="${p.x * 10}" y1="${p.y * 6}" x2="${q.x * 10}" y2="${q.y * 6}" stroke="${color}" stroke-width="1.8" stroke-dasharray="${dash}" opacity=".85"/>`;
     }).join("");
 
     const rec = a?.recommend?.key;
@@ -428,12 +433,30 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.querySelector("aside .findings").textContent = this.#findings.filter((f) => f.level !== "fix").map((f) => `${f.code} ${f.msg}`).join("\n");
   }
 
+  /** 解釋目前取捨的邊：被排除的節點 ⊗ 與它互斥的採納節點；採納節點 → 它依賴、因此被一起加入的節點。 */
+  #reasons(sol) {
+    const edges = this.#analysis?.edges ?? [], st = (id) => sol.nodes[id]?.stance;
+    return edges.flatMap((e) => {
+      if (e.type === "excludes") {
+        const [x, inc] = st(e.from) === "exclude" && st(e.to) === "include" ? [e.from, e.to] : st(e.to) === "exclude" && st(e.from) === "include" ? [e.to, e.from] : [];
+        return x ? [{ from: x, to: inc, kind: "excludes", why: e.why }] : [];
+      }
+      if (e.type === "requires" && st(e.from) === "include" && st(e.to) === "include" && sol.nodes[e.to].src === "derived") return [{ from: e.from, to: e.to, kind: "requires", why: e.why }];
+      return [];
+    });
+  }
+
   #nodeTip(id, n, q, view) {
     const state = view.stance === "include" ? (q === "Q4" ? "🛡 已設為護欄" : "✅ 已採納") : view.stance === "exclude" ? (q === "Q4" ? "⚠ 已承擔此風險" : "⛔ 已排除") : "尚未選擇";
     const why = view.src === "derived" ? (view.stance === "include" ? "（因其他節點依賴它而自動加入）" : "（與已選節點互斥而自動讓位）") : view.src === "user" ? "（你手動設定）" : view.src === "default" ? "（來自策略卡）" : "";
     return `<b>${esc(id)} ${esc(n.label)}</b><br>${esc(n.claim)}`
       + (n.kill ? `<br><span class=k>⚡ 失效條件：${esc(n.kill)}</span>` : "")
       + (n.blind ? `<br><span class=g>✦ 盲區：${esc(n.blind)}</span>` : "")
+      + (this.#solution && this.#baseKey ? this.#reasons(this.#solution).filter((r) => r.from === id || r.to === id).map((r) => {
+        const other = r.from === id ? r.to : r.from, label = esc(this.#analysis.nodes[other]?.label ?? other);
+        const text = r.kind === "excludes" ? `⊗ 與 ${esc(other)}「${label}」互斥` : r.from === id ? `→ 需要 ${esc(other)}「${label}」` : `← ${esc(other)}「${label}」需要它`;
+        return `<br><span class=k>${text}${r.why ? `：${esc(r.why)}` : ""}</span>`;
+      }).join("") : "")
       + `<br><span class=dim>狀態：${state}${why}<br>左鍵（Space）採納 · 右鍵（x）排除 · 再按一次取消</span>`;
   }
 
