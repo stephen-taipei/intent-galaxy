@@ -1,0 +1,14 @@
+{
+ "ext.actionTitle": {
+  "zh-Hant-TW": "Intent Galaxy：在這個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）",
+  "en": "Intent Galaxy: open the intent galaxy in this AI chat (Cmd/Ctrl+Shift+G)"
+ },
+ "ext.description": {
+  "zh-Hant-TW": "在 Claude、ChatGPT、Gemini 等 AI 對話加上 iG 膠囊，60 秒把你真正想要的整理成意圖星系。",
+  "en": "Adds an iG pill to AI chats like Claude, ChatGPT and Gemini to sort out what you really want in 60 seconds."
+ },
+ "ext.unsupportedSite": {
+  "zh-Hant-TW": "Intent Galaxy 只在這些 AI 網站運作：{sites}",
+  "en": "Intent Galaxy only works on these AI sites: {sites}"
+ }
+}

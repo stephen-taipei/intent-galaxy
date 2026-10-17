@@ -130,6 +130,7 @@ apps/extension-firefox/panel.js
 apps/extension-firefox/background.js
 apps/extension-firefox/icons/
 apps/extension-firefox/samples/
+apps/extension-firefox/_locales/
 dist-ext/
 
 # Claude Code local settings (dev-server preview config, personal permissions)

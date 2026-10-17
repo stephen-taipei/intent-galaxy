@@ -2,7 +2,8 @@
   "manifest_version": 3,
   "name": "Intent Galaxy (Multi-AI)",
   "version": "0.1.0",
-  "description": "Adds an iG (Intent Galaxy) pill to Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral and Kimi chat inputs for 60s visual intent alignment.",
+  "description": "__MSG_description__",
+  "default_locale": "en",
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",
@@ -10,7 +11,7 @@
     "128": "icons/icon-128.png"
   },
   "action": {
-    "default_title": "Intent Galaxy：在這個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）",
+    "default_title": "__MSG_actionTitle__",
     "default_icon": {
       "16": "icons/icon-16.png",
       "32": "icons/icon-32.png",

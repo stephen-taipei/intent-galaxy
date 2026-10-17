@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: obre la galàxia d’intencions en aquest xat d’IA (Cmd/Ctrl+Maj+G)"
+ },
+ "description": {
+  "message": "Afegeix un botó iG als xats d’IA com Claude, ChatGPT i Gemini per aclarir en 60 segons què vols de debò."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy només funciona en aquests llocs d’IA: $1"
+ }
+}

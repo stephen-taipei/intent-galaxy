@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: відкрити галактику намірів у цьому чаті з ШІ (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "Додає кнопку iG у чати з ШІ (Claude, ChatGPT, Gemini), щоб за 60 секунд з’ясувати, чого ви насправді хочете."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy працює лише на цих сайтах ШІ: $1"
+ }
+}

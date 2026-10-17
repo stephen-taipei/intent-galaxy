@@ -62,9 +62,12 @@
   <div class="actions"><button type="button" id="done-recopy" data-i18n="web.doneRecopy">再複製一次</button><button type="button" class="primary" id="done-close" data-i18n="web.doneClose">好，我去貼上</button></div>
 </dialog>
 <script type="module">
-import { t, ready, onLocaleChange, isRtl } from "./i18n.js";
+import { t, ready, onLocaleChange, isRtl, pickSample } from "./i18n.js";
 import "./galaxy-overlay.js";
 import { SAMPLE_GALAXY } from "./sample-galaxy.js";
+import { SAMPLE_GALAXY_EN } from "./sample-galaxy.en.js";
+import { SAMPLE_GALAXY_ZH_HANS } from "./sample-galaxy.zh-Hans.js";
+const SAMPLES = { "zh-Hant": SAMPLE_GALAXY, "zh-Hans": SAMPLE_GALAXY_ZH_HANS, en: SAMPLE_GALAXY_EN };
 /** 套用頁面上固定的文字；啟動時與手動切換語系時各跑一次。 */
 const localize = (code) => {
   document.documentElement.lang = code;
@@ -85,9 +88,15 @@ const badge = document.getElementById("source-badge");
 const served = location.protocol.startsWith("http");
 const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); source = g.source; badge.textContent = badgeText(); galaxy.focus(); };
 localize(await ready);
-onLocaleChange(localize);
+// 還在看示範星系時切換語系：換成該語系的示範版本（已選的方案會重設）。
+let sample = pickSample(SAMPLES);
+onLocaleChange((code) => {
+  localize(code);
+  const next = pickSample(SAMPLES);
+  if (source === "sample" && next !== sample) { sample = next; galaxy.setGalaxy(sample); }
+});
 
-galaxy.setGalaxy(SAMPLE_GALAXY);
+galaxy.setGalaxy(sample);
 // ?base=alpha|beta|gamma：開啟時直接套用策略卡（分享示範連結、截圖用）。
 const presetBase = new URLSearchParams(location.search).get("base");
 if (presetBase) galaxy.selectArchetype(presetBase);

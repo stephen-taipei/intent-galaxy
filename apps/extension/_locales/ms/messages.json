@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: buka galaksi niat dalam sembang AI ini (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "Menambah butang iG pada sembang AI seperti Claude, ChatGPT dan Gemini supaya anda tahu apa yang benar-benar dimahukan dalam 60 saat."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy hanya berfungsi di laman AI berikut: $1"
+ }
+}

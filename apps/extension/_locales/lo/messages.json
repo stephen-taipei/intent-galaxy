@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: ເປີດກາແລັກຊີເຈດຕະນາໃນແຊັດ AI ນີ້ (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "ເພີ່ມປຸ່ມ iG ໃນແຊັດ AI ເຊັ່ນ Claude, ChatGPT ແລະ Gemini ເພື່ອໃຫ້ຮູ້ວ່າທ່ານຕ້ອງການຫຍັງແທ້ ພາຍໃນ 60 ວິນາທີ"
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy ໃຊ້ໄດ້ສະເພາະເວັບໄຊ AI ເຫຼົ່ານີ້: $1"
+ }
+}

@@ -42,6 +42,8 @@ export let locale = "en";
 /** 使用者手動選的語系；"" 表示跟著瀏覽器語言。 */
 export let preference = "";
 export const isRtl = () => RTL.has(locale);
+/** 示範星系只有繁中、簡中、英文三版：中文語系用對應的中文版，其他語系用英文版。 */
+export const pickSample = (variants) => variants[locale === "zh-Hans" ? "zh-Hans" : locale.startsWith("zh") ? "zh-Hant" : "en"] ?? variants["zh-Hant"];
 
 const listeners = new Set();
 /** 語系換掉時呼叫 cb（手動切換，或擴充功能的另一個頁面切換了）。回傳取消訂閱的函式。 */

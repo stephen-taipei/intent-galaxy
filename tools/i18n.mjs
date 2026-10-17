@@ -49,10 +49,25 @@ export function check() {
   return problems;
 }
 
+// 擴充功能 manifest 與工具列提示用 chrome.i18n（跟著瀏覽器介面語言），語系目錄名稱照 Chrome 的寫法；zh-Hant 沒有對應，由 zh_TW 涵蓋。
+const CHROME_LOCALE = { "zh-Hant-TW": "zh_TW", "zh-Hant": null, "zh-Hant-HK": "zh_HK", "zh-Hans": "zh_CN", "es-MX": "es_419", pt: "pt_PT" };
+export const chromeLocale = (code) => (code in CHROME_LOCALE ? CHROME_LOCALE[code] : code.replace("-", "_"));
+const EXT_LOCALES = path.join(ROOT, "apps/extension/_locales");
+
 export function build() {
+  fs.rmSync(EXT_LOCALES, { recursive: true, force: true });
   for (const code of LOCALES) {
     const tr = translations(code);
     fs.writeFileSync(path.join(DIR, `${code}.js`), `// 由 tools/i18n.mjs 產生，請改 apps/web/locales/_parts 或 src/${code}.json。\nexport default ${JSON.stringify(tr, null, 1)};\n`);
+    const dir = chromeLocale(code);
+    if (!dir) continue;
+    // ext.xxx → messages.json 的 xxx；{sites} 之類的佔位符改成 chrome.i18n.getMessage 的 $1，字面上的 $ 要寫成 $$
+    const messages = Object.fromEntries(Object.entries(tr).filter(([k]) => k.startsWith("ext.")).map(([k, s]) => {
+      let n = 0;
+      return [k.slice(4), { message: s.replace(/\$/g, "$$$$").replace(/\{\w+\}/g, () => `$${++n}`) }];
+    }));
+    fs.mkdirSync(path.join(EXT_LOCALES, dir), { recursive: true });
+    fs.writeFileSync(path.join(EXT_LOCALES, dir, "messages.json"), JSON.stringify(messages, null, 1) + "\n");
   }
   return LOCALES.length;
 }

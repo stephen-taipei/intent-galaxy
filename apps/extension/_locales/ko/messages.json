@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: 이 AI 채팅에서 의도 은하 열기 (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "Claude, ChatGPT, Gemini 같은 AI 채팅에 iG 버튼을 추가해 60초 만에 정말 원하는 것을 정리해 줍니다."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy는 다음 AI 사이트에서만 작동합니다: $1"
+ }
+}
