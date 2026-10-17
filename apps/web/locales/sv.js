@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Ångra",
  "ov.keyUndoTip": "Ångra den senaste åtgärden.<br><span class=dim>Ctrl+R gör om den.</span>",
  "ov.killCond": "⚡ Faller om: {kill}",
+ "ov.langAuto": "🌐 Automatiskt (webbläsarspråk)",
+ "ov.langTitle": "Gränssnittsspråk",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Lägg planen i chatten",
  "ov.lockTipEmbedded": "<b>Klicka här (eller tryck på Enter) när du har valt</b><br>Gör om planen till en instruktion för AI:n och lägger den i sidans textruta. Granska den och tryck sedan på skicka.",

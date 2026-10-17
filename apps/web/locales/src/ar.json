@@ -75,6 +75,8 @@
  "ov.keyUndo": "تراجع",
  "ov.keyUndoTip": "تراجع عن الإجراء الأخير.<br><span class=dim>Ctrl+R لإعادة الإجراء.</span>",
  "ov.killCond": "⚡ يفشل إذا: {kill}",
+ "ov.langAuto": "🌐 تلقائي (لغة المتصفح)",
+ "ov.langTitle": "لغة الواجهة",
  "ov.listSep": "، ",
  "ov.lockEmbedded": "↵ ضع الخطة في مربع المحادثة",
  "ov.lockTipEmbedded": "<b>اضغط هنا (أو Enter) بمجرد اختيارك</b><br>يحوّل الخطة إلى توجيه للذكاء الاصطناعي ويضعه في مربع المحادثة في هذه الصفحة. راجعه، ثم اضغط إرسال.",

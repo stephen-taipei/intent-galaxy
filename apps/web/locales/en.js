@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Undo",
  "ov.keyUndoTip": "Undo the last action.<br><span class=dim>Ctrl+R redoes it.</span>",
  "ov.killCond": "⚡ Fails if: {kill}",
+ "ov.langAuto": "🌐 Auto (browser language)",
+ "ov.langTitle": "Interface language",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Put the plan in the chat box",
  "ov.lockTipEmbedded": "<b>Press this (or Enter) once you've chosen</b><br>Turns the plan into an instruction for the AI and puts it in this page's chat box. Check it, then press send.",

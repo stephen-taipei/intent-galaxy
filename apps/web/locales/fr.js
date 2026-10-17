@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Annuler",
  "ov.keyUndoTip": "Annuler la dernière action.<br><span class=dim>Ctrl+R rétablit l'action.</span>",
  "ov.killCond": "⚡ Échoue si : {kill}",
+ "ov.langAuto": "🌐 Auto (langue du navigateur)",
+ "ov.langTitle": "Langue de l'interface",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Insérer le plan dans la discussion",
  "ov.lockTipEmbedded": "<b>Cliquez ici (ou appuyez sur Enter) après avoir choisi</b><br>Transforme le plan en instruction pour l'IA et l'insère dans la zone de texte de cette page. Vérifiez-la, puis envoyez.",

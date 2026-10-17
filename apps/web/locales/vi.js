@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Hoàn tác",
  "ov.keyUndoTip": "Hoàn tác hành động gần nhất.<br><span class=dim>Ctrl+R để làm lại.</span>",
  "ov.killCond": "⚡ Thất bại nếu: {kill}",
+ "ov.langAuto": "🌐 Tự động (ngôn ngữ trình duyệt)",
+ "ov.langTitle": "Ngôn ngữ giao diện",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Đưa kế hoạch vào khung chat",
  "ov.lockTipEmbedded": "<b>Nhấn vào đây (hoặc Enter) sau khi chọn xong</b><br>Chuyển kế hoạch thành hướng dẫn cho AI và đưa vào khung chat của trang này. Kiểm tra lại rồi nhấn gửi.",

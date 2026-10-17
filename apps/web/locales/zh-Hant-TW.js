@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "復原",
  "ov.keyUndoTip": "復原上一步操作。<br><span class=dim>Ctrl+R 重做。</span>",
  "ov.killCond": "⚡ 失效條件：{kill}",
+ "ov.langAuto": "🌐 自動（瀏覽器語言）",
+ "ov.langTitle": "介面語言",
  "ov.listSep": "、",
  "ov.lockEmbedded": "↵ 把方案填進對話框",
  "ov.lockTipEmbedded": "<b>選好方案後按這裡（或 Enter）</b><br>把方案轉成一段給 AI 的指令，直接填進這個 AI 網頁的輸入框，你檢查後按送出即可。",

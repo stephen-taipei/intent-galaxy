@@ -75,6 +75,8 @@
  "ov.keyUndo": "撤销",
  "ov.keyUndoTip": "撤销上一步操作。<br><span class=dim>Ctrl+R 重做。</span>",
  "ov.killCond": "⚡ 失效条件：{kill}",
+ "ov.langAuto": "🌐 自动（跟随浏览器语言）",
+ "ov.langTitle": "界面语言",
  "ov.listSep": "、",
  "ov.lockEmbedded": "↵ 把方案填进对话框",
  "ov.lockTipEmbedded": "<b>选好方案后按这里（或 Enter）</b><br>把方案转成一段给 AI 的指令，直接填进当前 AI 网页的输入框，你检查后按发送即可。",

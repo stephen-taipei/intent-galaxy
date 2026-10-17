@@ -3,7 +3,7 @@
 // 事件：intent-lock {ast, baseKey, overrides, galaxyId}、intent-close、intent-synth-request {conflicts}。
 import { renderLockedAst, renderSacrifice, repairAnalysis, solveGalaxy } from "../../libs/core/src/index.ts";
 import { NODE_IDS, quadrantOf } from "../../libs/protocol/src/index.ts";
-import { t, ready, locale } from "./i18n.js";
+import { t, ready, locale, preference, LOCALES, chooseLocale, languageName, onLocaleChange } from "./i18n.js";
 
 const astLabels = () => ({ must: t("ast.must"), guard: t("ast.guard"), mustNot: t("ast.mustNot"), risk: t("ast.risk"), sacrifice: t("ast.sacrifice"), forbid: t("ast.forbid"), accepted: t("ast.accepted") });
 
@@ -104,6 +104,7 @@ kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-
 #bar button#reset { background:transparent; color:var(--text); border:1px solid #475569; font-weight:600; }
 #bar button#reset:hover { border-color:#fff; }
 #bar button#reset:disabled { opacity:.35; cursor:default; }
+#bar select#lang { flex-shrink:0; max-width:9em; font:inherit; padding:3px 4px; border-radius:6px; border:1px solid #475569; background:#0c111d; color:var(--text); cursor:pointer; }
 aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
 aside .head { display:flex; align-items:center; justify-content:space-between; }
 aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
@@ -150,7 +151,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
         <span class="keys"></span>
-        <button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
+        <select id="lang"></select><button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
       <aside><div class="head"><h2></h2><button type="button" id="raw-toggle"></button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
@@ -168,7 +169,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.addEventListener("pointerleave", () => this.#hideTip(), true);
     root.addEventListener("pointerdown", () => this.#hideTip());
     this.addEventListener("keydown", (e) => this.#onKey(e));
+    root.getElementById("lang").addEventListener("change", (e) => chooseLocale(e.target.value));
     ready.then(() => this.#render()); // 語系載入後重畫一次（載入前先用英文）
+    onLocaleChange(() => this.#render()); // 手動切換語系時重畫
   }
 
   /** 不隨狀態改變、只隨語系改變的文字：換語系時才重建。 */
@@ -181,6 +184,10 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.querySelector("#bar .keys").innerHTML = KEY_HINTS().map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${esc(label)}</span>`).join(" · ");
     root.querySelector("aside h2").textContent = t("ov.summaryTitle");
     root.getElementById("raw-toggle").dataset.tip = t("ov.rawTip");
+    const lang = root.getElementById("lang");
+    lang.title = t("ov.langTitle");
+    lang.setAttribute("aria-label", t("ov.langTitle"));
+    lang.innerHTML = `<option value="">${esc(t("ov.langAuto"))}</option>` + LOCALES.map((l) => `<option value="${l}" lang="${l}">${esc(languageName(l))}</option>`).join("");
   }
 
   connectedCallback() { if (!this.hasAttribute("tabindex")) this.tabIndex = 0; this.#render(); }
@@ -376,6 +383,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
     const archetypes = a?.archetypes ?? draft?.archetypes ?? {};
     const quadrants = a?.quadrants ?? {};
     this.#localizeStatic(root);
+    root.getElementById("lang").value = preference;
     const sol = this.#solution = a ? this.#solve() : null;
     const conflicts = new Set(sol?.conflicts ?? []);
 

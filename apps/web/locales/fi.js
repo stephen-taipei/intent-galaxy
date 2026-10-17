@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Kumoa",
  "ov.keyUndoTip": "Kumoa edellinen toiminto.<br><span class=dim>Ctrl+R tekee sen uudelleen.</span>",
  "ov.killCond": "⚡ Kaatuu jos: {kill}",
+ "ov.langAuto": "🌐 Automaattinen (selaimen kieli)",
+ "ov.langTitle": "Käyttöliittymän kieli",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Vie suunnitelma keskustelukenttään",
  "ov.lockTipEmbedded": "<b>Paina tätä (tai Enter) kun olet valmis</b><br>Muuntaa suunnitelman tekoälyn ohjeeksi ja vie sen tämän sivun keskustelukenttään. Tarkista se ja paina lähetä.",

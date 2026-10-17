@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Desfés",
  "ov.keyUndoTip": "Desfés l'última acció.<br><span class=dim>Ctrl+R la refà.</span>",
  "ov.killCond": "⚡ Falla si: {kill}",
+ "ov.langAuto": "🌐 Automàtic (idioma del navegador)",
+ "ov.langTitle": "Llengua de la interfície",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Introdueix el pla al quadre del xat",
  "ov.lockTipEmbedded": "<b>Prem aquí (o Enter) un cop hagis triat</b><br>Converteix el pla en una instrucció per a la IA i l'introdueix al quadre de text d'aquesta pàgina. Revisa-la i prem envia.",

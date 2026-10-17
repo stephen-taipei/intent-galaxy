@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "I-undo",
  "ov.keyUndoTip": "I-undo ang huling aksyon.<br><span class=dim>Inuulit ito ng Ctrl+R.</span>",
  "ov.killCond": "⚡ Papalya kung: {kill}",
+ "ov.langAuto": "🌐 Awtomatiko (wika ng browser)",
+ "ov.langTitle": "Wika ng interface",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Ilagay ang plano sa chat box",
  "ov.lockTipEmbedded": "<b>Pindutin ito (o Enter) kapag nakapili ka na</b><br>Ginagawang tagubilin para sa AI ang plano at inilalagay ito sa chat box ng page na ito. Suriin ito, pagkatapos ay pindutin ang send.",

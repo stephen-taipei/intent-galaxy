@@ -75,6 +75,8 @@
  "ov.keyUndo": "復原",
  "ov.keyUndoTip": "復原上一步操作。<br><span class=dim>Ctrl+R 可重做。</span>",
  "ov.killCond": "⚡ 失效條件：{kill}",
+ "ov.langAuto": "🌐 自動（跟隨瀏覽器語言）",
+ "ov.langTitle": "介面語言",
  "ov.listSep": "、",
  "ov.lockEmbedded": "↵ 將方案填入對話框",
  "ov.lockTipEmbedded": "<b>選定方案後點擊此處（或按 Enter）</b><br>將方案轉換為給 AI 的指令，直接填入此頁面的對話框。確認無誤後按發送即可。",

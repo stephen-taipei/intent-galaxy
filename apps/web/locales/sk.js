@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Späť",
  "ov.keyUndoTip": "Vrátiť späť poslednú akciu.<br><span class=dim>Ctrl+R ju zopakuje.</span>",
  "ov.killCond": "⚡ Zlyhá, ak: {kill}",
+ "ov.langAuto": "🌐 Automaticky (jazyk prehliadača)",
+ "ov.langTitle": "Jazyk rozhrania",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Vložiť plán do chatovacieho poľa",
  "ov.lockTipEmbedded": "<b>Po výbere stlačte toto (alebo Enter)</b><br>Prevedie plán na inštrukciu pre AI a vloží ju do chatovacieho poľa tejto stránky. Skontrolujte ju a stlačte odoslať.",

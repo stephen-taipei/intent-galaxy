@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Angre",
  "ov.keyUndoTip": "Angre forrige handling.<br><span class=dim>Ctrl+R gjør den på nytt.</span>",
  "ov.killCond": "⚡ Feiler hvis: {kill}",
+ "ov.langAuto": "🌐 Automatisk (nettleserspråk)",
+ "ov.langTitle": "Grensesnittspråk",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Legg planen inn i tekstfeltet",
  "ov.lockTipEmbedded": "<b>Trykk her (eller Enter) når du har valgt</b><br>Gjør planen om til en instruks for AI-en og legger den i tekstfeltet på denne siden. Se over den, og trykk send.",

@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "ביטול פעולה",
  "ov.keyUndoTip": "ביטול הפעולה האחרונה.<br><span class=dim>Ctrl+R מבצע אותה שוב.</span>",
  "ov.killCond": "⚡ ייכשל אם: {kill}",
+ "ov.langAuto": "🌐 אוטומטי (שפת הדפדפן)",
+ "ov.langTitle": "שפת הממשק",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ הזנת התוכנית לתיבת הצ'אט",
  "ov.lockTipEmbedded": "<b>לחץ כאן (או Enter) לאחר שבחרת</b><br>הופך את התוכנית להנחיה עבור ה-AI ומזין אותה לתיבת הצ'אט בדף זה. בדוק אותה, ואז לחץ על שלח.",

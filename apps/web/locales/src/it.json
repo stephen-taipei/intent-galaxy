@@ -75,6 +75,8 @@
  "ov.keyUndo": "Annulla",
  "ov.keyUndoTip": "Annulla l'ultima azione.<br><span class=dim>Ctrl+R la ripete.</span>",
  "ov.killCond": "⚡ Fallisce se: {kill}",
+ "ov.langAuto": "🌐 Automatico (lingua del browser)",
+ "ov.langTitle": "Lingua dell'interfaccia",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Inserisci il piano nella chat",
  "ov.lockTipEmbedded": "<b>Premi qui (o premi Invio) una volta scelto</b><br>Trasforma il piano in un'istruzione per l'IA e la inserisce nella casella di chat di questa pagina. Controllala, poi premi invio.",

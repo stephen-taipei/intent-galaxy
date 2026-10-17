@@ -39,18 +39,65 @@ export function pickLocale(langs = globalThis.navigator?.languages ?? [globalThi
 
 let dict = EN;
 export let locale = "en";
+/** 使用者手動選的語系；"" 表示跟著瀏覽器語言。 */
+export let preference = "";
 export const isRtl = () => RTL.has(locale);
+
+const listeners = new Set();
+/** 語系換掉時呼叫 cb（手動切換，或擴充功能的另一個頁面切換了）。回傳取消訂閱的函式。 */
+export function onLocaleChange(cb) { listeners.add(cb); return () => listeners.delete(cb); }
 
 /** 載入某個語系（失敗時維持英文）。 */
 export async function setLocale(code) {
   if (!LOCALES.includes(code)) code = "en";
+  const before = locale;
   try { dict = code === "en" ? EN : { ...EN, ...(await import(`./locales/${code}.js`)).default }; locale = code; }
   catch { dict = EN; locale = "en"; }
+  if (locale !== before) for (const cb of listeners) { try { cb(locale); } catch { /* 單一訂閱者失敗不影響其他 */ } }
   return locale;
 }
 
-/** 啟動時依瀏覽器語言載入；介面第一次畫面前 await 它。 */
-export const ready = setLocale(pickLocale());
+// 偏好存在哪：擴充功能（面板、AI 網頁上的內容腳本）用 storage.local，各頁共用；本機網頁版用 localStorage。
+const PREF_KEY = "ig:locale";
+const extStore = globalThis.browser?.storage?.local ?? globalThis.chrome?.storage?.local;
+async function loadPreference() {
+  try {
+    const v = extStore ? (await extStore.get(PREF_KEY))?.[PREF_KEY] : globalThis.localStorage?.getItem(PREF_KEY);
+    return LOCALES.includes(v) ? v : "";
+  } catch { return ""; }
+}
+
+/** 手動選語系（"" ＝跟著瀏覽器語言），並記住選擇。 */
+export async function chooseLocale(code) {
+  preference = LOCALES.includes(code) ? code : "";
+  try {
+    if (extStore) await (preference ? extStore.set({ [PREF_KEY]: preference }) : extStore.remove(PREF_KEY));
+    else if (preference) globalThis.localStorage?.setItem(PREF_KEY, preference);
+    else globalThis.localStorage?.removeItem(PREF_KEY);
+  } catch { /* 無法儲存時只在這一頁生效 */ }
+  return setLocale(preference || pickLocale());
+}
+
+// 擴充功能的另一個頁面改了偏好：這一頁也跟著換。
+(globalThis.browser?.storage ?? globalThis.chrome?.storage)?.onChanged?.addListener((changes, area) => {
+  if (area !== "local" || !(PREF_KEY in changes)) return;
+  const v = changes[PREF_KEY].newValue;
+  preference = LOCALES.includes(v) ? v : "";
+  setLocale(preference || pickLocale());
+});
+
+/** 語系的自稱名稱（例如 de → Deutsch），選單用。 */
+const NAMES = { "zh-Hant-TW": "繁體中文（台灣）", "zh-Hant": "繁體中文", "zh-Hant-HK": "繁體中文（香港）", "zh-Hans": "简体中文", id: "Bahasa Indonesia", ms: "Bahasa Melayu" };
+export function languageName(code) {
+  if (NAMES[code]) return NAMES[code];
+  try {
+    const name = new Intl.DisplayNames([code], { type: "language" }).of(code);
+    return name ? name.charAt(0).toLocaleUpperCase(code) + name.slice(1) : code;
+  } catch { return code; }
+}
+
+/** 啟動時載入：有手動選過就用它，否則依瀏覽器語言。介面第一次畫面前 await 它。 */
+export const ready = loadPreference().then((p) => { preference = p; return setLocale(p || pickLocale()); });
 
 export function t(key, vars) {
   const s = dict[key] ?? EN[key] ?? key;

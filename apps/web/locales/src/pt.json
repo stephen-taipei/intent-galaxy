@@ -75,6 +75,8 @@
  "ov.keyUndo": "Desfazer",
  "ov.keyUndoTip": "Desfaz a última ação.<br><span class=dim>Ctrl+R refaz a ação.</span>",
  "ov.killCond": "⚡ Falha se: {kill}",
+ "ov.langAuto": "🌐 Automático (idioma do navegador)",
+ "ov.langTitle": "Idioma da interface",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Colocar o plano na conversa",
  "ov.lockTipEmbedded": "<b>Prima aqui (ou Enter) assim que escolher</b><br>Converte o plano numa instrução para a IA e coloca-a na caixa de texto desta página. Verifique-a e prima enviar.",

@@ -6,8 +6,10 @@ import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./galaxy/libs/ep
 import { DISHWASHER_GALAXY } from "./samples/dishwasher.js";
 import { SWEET_SOUR_GALAXY } from "./samples/sweet-sour.js";
 import { SAMPLE_GALAXY } from "./galaxy/apps/web/sample-galaxy.js";
-import { t, ready, locale, isRtl } from "./galaxy/apps/web/i18n.js";
-ready.then(() => { document.documentElement.lang = locale; document.documentElement.dir = isRtl() ? "rtl" : "ltr"; });
+import { t, ready, isRtl, onLocaleChange } from "./galaxy/apps/web/i18n.js";
+const setDocLang = (code) => { document.documentElement.lang = code; document.documentElement.dir = isRtl() ? "rtl" : "ltr"; };
+ready.then(setDocLang);
+onLocaleChange(setDocLang);
 
 const api = globalThis.browser ?? globalThis.chrome;
 const CLI = "http://127.0.0.1:4787";

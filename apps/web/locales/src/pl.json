@@ -75,6 +75,8 @@
  "ov.keyUndo": "Cofnij",
  "ov.keyUndoTip": "Cofnij ostatnią akcję.<br><span class=dim>Ctrl+R ponawia.</span>",
  "ov.killCond": "⚡ Nie zadziała, jeśli: {kill}",
+ "ov.langAuto": "🌐 Automatycznie (język przeglądarki)",
+ "ov.langTitle": "Język interfejsu",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Wstaw plan do pola czatu",
  "ov.lockTipEmbedded": "<b>Kliknij tutaj (lub Enter) po dokonaniu wyboru</b><br>Przekształca plan w instrukcję dla AI i wstawia ją do pola czatu na tej stronie. Sprawdź ją i naciśnij Wyślij.",

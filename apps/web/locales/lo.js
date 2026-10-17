@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "ກັບຄືນ",
  "ov.keyUndoTip": "ກັບຄືນການກະທຳຫຼ້າສຸດ.<br><span class=dim>Ctrl+R ເພື່ອເຮັດຄືນ.</span>",
  "ov.killCond": "⚡ ລົ້ມເຫຼວຖ້າ: {kill}",
+ "ov.langAuto": "🌐 ອັດຕະໂນມັດ (ພາສາບຣາວເຊີ)",
+ "ov.langTitle": "ພາສາຂອງໜ້າຕາ",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ ໃສ່ແຜນການລົງໃນກ່ອງສົນທະນາ",
  "ov.lockTipEmbedded": "<b>ກົດປຸ່ມນີ້ (ຫຼື Enter) ເມື່ອທ່ານເລືອກແລ້ວ</b><br>ປ່ຽນແຜນການໃຫ້ເປັນຄຳສັ່ງສຳລັບ AI ແລະ ໃສ່ລົງໃນກ່ອງສົນທະນາຂອງໜ້ານີ້. ກວດສອບເບິ່ງ, ແລ້ວກົດສົ່ງ.",

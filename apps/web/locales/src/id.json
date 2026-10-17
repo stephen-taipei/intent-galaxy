@@ -75,6 +75,8 @@
  "ov.keyUndo": "Urungkan",
  "ov.keyUndoTip": "Urungkan tindakan terakhir.<br><span class=dim>Ctrl+R untuk mengulang (redo).</span>",
  "ov.killCond": "⚡ Gagal jika: {kill}",
+ "ov.langAuto": "🌐 Otomatis (bahasa browser)",
+ "ov.langTitle": "Bahasa antarmuka",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Masukkan rencana ke kotak obrolan",
  "ov.lockTipEmbedded": "<b>Klik ini (atau tekan Enter) setelah memilih</b><br>Mengubah rencana menjadi instruksi untuk AI dan memasukkannya ke kotak obrolan halaman ini. Periksa isinya, lalu kirim.",

@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Deshacer",
  "ov.keyUndoTip": "Deshaz la última acción.<br><span class=dim>Ctrl+R la rehace.</span>",
  "ov.killCond": "⚡ Falla si: {kill}",
+ "ov.langAuto": "🌐 Automático (idioma del navegador)",
+ "ov.langTitle": "Idioma de la interfaz",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Poner el plan en el chat",
  "ov.lockTipEmbedded": "<b>Pulsa aquí (o Enter) cuando hayas elegido</b><br>Convierte el plan en una instrucción para la IA y la introduce en el cuadro de chat de esta página. Revísala y pulsa enviar.",

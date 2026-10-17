@@ -75,6 +75,8 @@
  "ov.keyUndo": "Poništi",
  "ov.keyUndoTip": "Poništite zadnju radnju.<br><span class=dim>Ctrl+R ponavlja radnju.</span>",
  "ov.killCond": "⚡ Ne uspijeva ako: {kill}",
+ "ov.langAuto": "🌐 Automatski (jezik preglednika)",
+ "ov.langTitle": "Jezik sučelja",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Stavi plan u okvir za razgovor",
  "ov.lockTipEmbedded": "<b>Pritisnite ovo (ili Enter) kada odaberete</b><br>Pretvara plan u uputu za AI i stavlja je u okvir za razgovor na ovoj stranici. Pregledajte je, a zatim pritisnite pošalji.",

@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "เลิกทำ",
  "ov.keyUndoTip": "เลิกทำการกระทำล่าสุด<br><span class=dim>Ctrl+R เพื่อทำซ้ำ</span>",
  "ov.killCond": "⚡ ล้มเหลวหาก: {kill}",
+ "ov.langAuto": "🌐 อัตโนมัติ (ตามภาษาเบราว์เซอร์)",
+ "ov.langTitle": "ภาษาของส่วนต่อประสาน",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ ใส่แผนลงในช่องแชต",
  "ov.lockTipEmbedded": "<b>กดตรงนี้ (หรือกด Enter) เมื่อเลือกเสร็จแล้ว</b><br>แปลงแผนให้เป็นคำสั่งสำหรับ AI และใส่ลงในช่องแชตของหน้านี้ ให้คุณตรวจสอบแล้วกดส่งได้ทันที",

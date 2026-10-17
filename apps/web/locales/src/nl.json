@@ -75,6 +75,8 @@
  "ov.keyUndo": "Ongedaan maken",
  "ov.keyUndoTip": "Maak de laatste actie ongedaan.<br><span class=dim>Ctrl+R voert deze opnieuw uit.</span>",
  "ov.killCond": "⚡ Mislukt als: {kill}",
+ "ov.langAuto": "🌐 Automatisch (browsertaal)",
+ "ov.langTitle": "Interfacetaal",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Plaats het plan in het chatveld",
  "ov.lockTipEmbedded": "<b>Klik hier (of druk op Enter) zodra je gekozen hebt</b><br>Zet het plan om in een instructie voor de AI en plaatst deze in het chatveld van deze pagina. Controleer het en druk op verzenden.",

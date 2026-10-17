@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Geri al",
  "ov.keyUndoTip": "Son işlemi geri alın.<br><span class=dim>Ctrl+R işlemi yineler.</span>",
  "ov.killCond": "⚡ Başarısız olma koşulu: {kill}",
+ "ov.langAuto": "🌐 Otomatik (tarayıcı dili)",
+ "ov.langTitle": "Arayüz dili",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Planı sohbet kutusuna ekle",
  "ov.lockTipEmbedded": "<b>Seçiminizi yaptıktan sonra buraya (veya Enter tuşuna) basın</b><br>Planı AI için bir talimata dönüştürür ve bu sayfanın sohbet kutusuna yerleştirir. Kontrol edin, ardından göndere basın.",

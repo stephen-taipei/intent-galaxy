@@ -75,6 +75,8 @@
  "ov.keyUndo": "Buat asal",
  "ov.keyUndoTip": "Buat asal tindakan terakhir.<br><span class=dim>Ctrl+R untuk buat semula.</span>",
  "ov.killCond": "⚡ Gagal jika: {kill}",
+ "ov.langAuto": "🌐 Automatik (bahasa pelayar)",
+ "ov.langTitle": "Bahasa antara muka",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Masukkan pelan ke dalam kotak sembang",
  "ov.lockTipEmbedded": "<b>Tekan ini (atau Enter) setelah anda memilih</b><br>Menukar pelan menjadi arahan untuk AI dan memasukkannya ke dalam kotak sembang halaman ini. Semaknya, kemudian tekan hantar.",

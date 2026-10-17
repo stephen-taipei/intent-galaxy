@@ -62,23 +62,30 @@
   <div class="actions"><button type="button" id="done-recopy" data-i18n="web.doneRecopy">再複製一次</button><button type="button" class="primary" id="done-close" data-i18n="web.doneClose">好，我去貼上</button></div>
 </dialog>
 <script type="module">
-import { t, ready, locale, isRtl } from "./i18n.js";
+import { t, ready, onLocaleChange, isRtl } from "./i18n.js";
 import "./galaxy-overlay.js";
 import { SAMPLE_GALAXY } from "./sample-galaxy.js";
-await ready;
-document.documentElement.lang = locale;
-document.documentElement.dir = isRtl() ? "rtl" : "ltr";
-for (const el of document.querySelectorAll("[data-i18n]")) {
-  const s = t(el.dataset.i18n);
-  if (/<[a-z][\s\S]*>/i.test(s)) el.innerHTML = s; else el.textContent = s;
-}
-for (const el of document.querySelectorAll("[data-i18n-title]")) el.title = t(el.dataset.i18nTitle);
-for (const el of document.querySelectorAll("[data-i18n-placeholder]")) el.placeholder = t(el.dataset.i18nPlaceholder);
+/** 套用頁面上固定的文字；啟動時與手動切換語系時各跑一次。 */
+const localize = (code) => {
+  document.documentElement.lang = code;
+  document.documentElement.dir = isRtl() ? "rtl" : "ltr";
+  for (const el of document.querySelectorAll("[data-i18n]")) {
+    const s = t(el.dataset.i18n);
+    if (/<[a-z][\s\S]*>/i.test(s)) el.innerHTML = s; else el.textContent = s;
+  }
+  for (const el of document.querySelectorAll("[data-i18n-title]")) el.title = t(el.dataset.i18nTitle);
+  for (const el of document.querySelectorAll("[data-i18n-placeholder]")) el.placeholder = t(el.dataset.i18nPlaceholder);
+  badge.textContent = badgeText();
+};
+let source = "sample";
+const badgeText = () => source === "mcp" ? t("web.badgeMcp") : source === "spawn" ? t("web.badgeSpawn") : t("web.badgeSample");
 
 const galaxy = document.getElementById("galaxy");
 const badge = document.getElementById("source-badge");
 const served = location.protocol.startsWith("http");
-const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); badge.textContent = g.source === "mcp" ? t("web.badgeMcp") : g.source === "spawn" ? t("web.badgeSpawn") : t("web.badgeSample"); galaxy.focus(); };
+const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); source = g.source; badge.textContent = badgeText(); galaxy.focus(); };
+localize(await ready);
+onLocaleChange(localize);
 
 galaxy.setGalaxy(SAMPLE_GALAXY);
 // ?base=alpha|beta|gamma：開啟時直接套用策略卡（分享示範連結、截圖用）。

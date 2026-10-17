@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Zpět",
  "ov.keyUndoTip": "Vrátí poslední akci.<br><span class=dim>Ctrl+R ji provede znovu.</span>",
  "ov.killCond": "⚡ Selže, pokud: {kill}",
+ "ov.langAuto": "🌐 Automaticky (jazyk prohlížeče)",
+ "ov.langTitle": "Jazyk rozhraní",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Vložit plán do chatu",
  "ov.lockTipEmbedded": "<b>Až budete hotovi, klikněte sem (nebo stiskněte Enter)</b><br>Převede plán na instrukci pro AI a vloží ji do zadávacího pole na této stránce. Zkontrolujte ji a odešlete.",

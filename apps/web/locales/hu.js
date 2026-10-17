@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Visszavonás",
  "ov.keyUndoTip": "Az utolsó művelet visszavonása.<br><span class=dim>Ctrl+R újból elvégzi.</span>",
  "ov.killCond": "⚡ Megbukik, ha: {kill}",
+ "ov.langAuto": "🌐 Automatikus (böngésző nyelve)",
+ "ov.langTitle": "Felület nyelve",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Terv beillesztése a csevegőmezőbe",
  "ov.lockTipEmbedded": "<b>Kattints ide (vagy nyomj Entert), ha választottál</b><br>A tervet utasítássá alakítja az AI számára, és beilleszti az oldal csevegőmezőjébe. Ellenőrizd, majd kattints a küldésre.",

@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "실행 취소",
  "ov.keyUndoTip": "마지막 작업을 취소합니다.<br><span class=dim>Ctrl+R로 다시 실행합니다.</span>",
  "ov.killCond": "⚡ 실패 조건: {kill}",
+ "ov.langAuto": "🌐 자동 (브라우저 언어)",
+ "ov.langTitle": "인터페이스 언어",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ 대화창에 계획 입력",
  "ov.lockTipEmbedded": "<b>선택을 마친 후 여기(또는 Enter)를 누르세요</b><br>계획을 AI용 지시문으로 변환하여 현재 웹페이지의 대화창에 입력합니다. 확인 후 전송 버튼을 누르기만 하면 됩니다.",

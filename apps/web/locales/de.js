@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Rückgängig",
  "ov.keyUndoTip": "Letzte Aktion rückgängig machen.<br><span class=dim>Ctrl+R wiederholt sie.</span>",
  "ov.killCond": "⚡ Scheitert, wenn: {kill}",
+ "ov.langAuto": "🌐 Automatisch (Browsersprache)",
+ "ov.langTitle": "Oberflächensprache",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Plan in den Chat einfügen",
  "ov.lockTipEmbedded": "<b>Nach deiner Auswahl hier (oder Enter) drücken</b><br>Wandelt den Plan in eine Anweisung für die KI um und fügt sie ins Chat-Eingabefeld dieser Seite ein. Prüfe sie und klicke dann auf Senden.",

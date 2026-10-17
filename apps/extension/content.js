@@ -14,7 +14,7 @@
   const api = globalThis.browser ?? globalThis.chrome;
   // 介面多語系（galaxy/apps/web/i18n.js）：載入前先回傳 key，載入後重畫膠囊與橫幅。
   let t = (key, vars) => key;
-  const i18n = import(api.runtime.getURL("galaxy/apps/web/i18n.js")).then(async (m) => { await m.ready; t = m.t; }).catch(() => {});
+  const i18n = import(api.runtime.getURL("galaxy/apps/web/i18n.js")).then(async (m) => { await m.ready; t = m.t; m.onLocaleChange(() => { if (!dead) mountPill(true); }); }).catch(() => {});
   const escAttr = (v) => String(v).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
   const alive = () => { try { return !!api.runtime?.id; } catch { return false; } };
   window.__intentGalaxyAlive = alive;

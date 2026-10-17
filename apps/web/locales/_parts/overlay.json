@@ -398,5 +398,13 @@
  "ov.gCostSub": {
   "zh-Hant-TW": "選這條必然失去",
   "en": "what this choice gives up"
+ },
+ "ov.langTitle": {
+  "zh-Hant-TW": "介面語言",
+  "en": "Interface language"
+ },
+ "ov.langAuto": {
+  "zh-Hant-TW": "🌐 自動（瀏覽器語言）",
+  "en": "🌐 Auto (browser language)"
  }
 }

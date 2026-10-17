@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Fortryd",
  "ov.keyUndoTip": "Fortryd den seneste handling.<br><span class=dim>Ctrl+R gentager den.</span>",
  "ov.killCond": "⚡ Fejler hvis: {kill}",
+ "ov.langAuto": "🌐 Automatisk (browsersprog)",
+ "ov.langTitle": "Grænsefladesprog",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Indsæt planen i chatfeltet",
  "ov.lockTipEmbedded": "<b>Tryk her (eller på Enter), når du har valgt</b><br>Omdanner planen til en instruktion til AI'en og indsætter den i denne sides chatfelt. Tjek den, og tryk på send.",

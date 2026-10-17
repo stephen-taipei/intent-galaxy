@@ -75,6 +75,8 @@
  "ov.keyUndo": "元に戻す",
  "ov.keyUndoTip": "最後のアクションを元に戻します。<br><span class=dim>Ctrl+Rでやり直します。</span>",
  "ov.killCond": "⚡ 破綻条件：{kill}",
+ "ov.langAuto": "🌐 自動（ブラウザの言語）",
+ "ov.langTitle": "表示言語",
  "ov.listSep": "、",
  "ov.lockEmbedded": "↵ プランをチャット欄に入力",
  "ov.lockTipEmbedded": "<b>選択が終わったらここをクリック（またはEnter）</b><br>プランをAI向けの指示文に変換し、このページのチャット欄に入力します。内容を確認して送信してください。",

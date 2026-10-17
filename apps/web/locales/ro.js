@@ -76,6 +76,8 @@ export default {
  "ov.keyUndo": "Anulează",
  "ov.keyUndoTip": "Anulează ultima acțiune.<br><span class=dim>Ctrl+R reface acțiunea.</span>",
  "ov.killCond": "⚡ Eșuează dacă: {kill}",
+ "ov.langAuto": "🌐 Automat (limba browserului)",
+ "ov.langTitle": "Limba interfeței",
  "ov.listSep": ", ",
  "ov.lockEmbedded": "↵ Pune planul în căsuța de chat",
  "ov.lockTipEmbedded": "<b>Apasă aici (sau Enter) după ce ai ales</b><br>Transformă planul într-o instrucțiune pentru AI și o introduce în căsuța de chat a acestei pagini. Verific-o, apoi apasă trimite.",
