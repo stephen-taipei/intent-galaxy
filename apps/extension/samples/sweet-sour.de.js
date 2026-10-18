@@ -34,7 +34,7 @@ export const SWEET_SOUR_GALAXY_DE = {
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Der Ersatz ist auf Dauer zu teuer" } }),
     N11: node("D4", 1, 0, "Keine Großpacks", "Wer Essen und Getränke kistenweise kauft, um Versandkosten zu sparen oder einen Mengenrabatt mitzunehmen, isst umso mehr, je mehr im Haus ist", "Stoppen, wenn du innerhalb von 14 Tagen mehr als einmal kistenweise oder für den Mindestbestellwert einkaufst", "Süßes, das Freunde und Familie mitbringen, hast du nicht in der Hand",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Rabatte verleiten zu immer mehr Einkäufen" } }),
-    N12: node("D3", 0, 1, "Kein Equipment", "Wer erst einen Wassersprudler, Süßstoffe und jede Art von Ersatzprodukt kauft, bevor es losgeht, zwingt sich wegen des ausgegebenen Geldes Dinge rein, die er nicht mag, und gibt innerhalb von 2 Wochen auf", "Stoppen, wenn du innerhalb von 14 Tagen mehr als 1 Gerät oder Ersatzprodukt kaufst, das du gar nicht benutzt", null,
+    N12: node("D3", 0, 1, "Keine Gadgets", "Wer erst einen Wassersprudler, Süßstoffe und jede Art von Ersatzprodukt kauft, bevor es losgeht, zwingt sich wegen des ausgegebenen Geldes Dinge rein, die er nicht mag, und gibt innerhalb von 2 Wochen auf", "Stoppen, wenn du innerhalb von 14 Tagen mehr als 1 Gerät oder Ersatzprodukt kaufst, das du gar nicht benutzt", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Man würgt es runter, damit nichts verschwendet wird" } }),
   },
   edges: [

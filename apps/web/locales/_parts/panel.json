@@ -63,5 +63,5 @@
   "pn.keepWaiting": { "zh-Hant-TW": "繼續等待", "en": "Keep waiting" },
   "pn.giveUpAskNew": { "zh-Hant-TW": "放棄並改問新問題", "en": "Give up and ask the new question" },
   "pn.cancelledElsewhere": { "zh-Hant-TW": "這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。", "en": "This generation was cancelled in another tab. You can type a question in the input box, then press iG." },
-  "pn.lockNotWritten": { "zh-Hant-TW": "鎖檔未寫入：{detail}", "en": "Lock file not written: {detail}" }
+  "pn.lockNotWritten": { "zh-Hant-TW": "決定紀錄沒有存成功：{detail}", "en": "Couldn't save the decision record: {detail}" }
 }

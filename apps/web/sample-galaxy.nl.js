@@ -65,5 +65,5 @@ export const SAMPLE_GALAXY_NL = {
     },
   },
   recommend: { key: "alpha", why: "Met 100+ themes houdt alleen een configgestuurd ontwerp de onderhoudskosten in toom" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Elk theme erft van hetzelfde default-theme", kill: "Gaat de default stuk, dan breekt de layout van elk theme", label: "default-SPOF" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Elk theme erft van hetzelfde default-theme", kill: "Gaat de default stuk, dan breekt de layout van elk theme", label: "Default-uitval" },
 };

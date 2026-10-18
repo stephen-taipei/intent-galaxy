@@ -56,7 +56,7 @@ export const SWEET_SOUR_GALAXY_NB = {
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Ha kullsyrevann på lager i kjøleskapet", v: "Vent 15 minutter før du gir etter for suget", t: "Endre bare litt hver uke", l: "Sukkeret i måltidene er det samme", x: "Ikke lenger spise de gamle snacksene som vanlig" },
-      fatal: "N12", thesis: "Grip usøtet kullsyrevann når suget kommer, og test nye smaker i små mengder før du kjøper mer", title: "Bytt drikke først · kutt ned sakte",
+      fatal: "N12", thesis: "Ta et glass usøtet kullsyrevann når suget kommer, og test nye smaker i små mengder før du kjøper mer", title: "Bytt drikke først · kutt ned sakte",
     },
     gamma: {
       include: ["N3", "N5", "N7", "N8", "N11"], exclude: ["N1", "N4"],

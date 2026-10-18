@@ -65,5 +65,5 @@ export const SAMPLE_GALAXY_SV = {
     },
   },
   recommend: { key: "alpha", why: "Med 100+ teman är det bara config-styrd design som håller underhållskostnaden i schack" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Varje tema ärver från samma default-tema", kill: "Går default sönder, går varje temas layout sönder", label: "default-SPOF" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Varje tema ärver från samma default-tema", kill: "Går default sönder, går varje temas layout sönder", label: "Sårbar default" },
 };

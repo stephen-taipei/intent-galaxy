@@ -1,7 +1,7 @@
 // 擴充功能生活題示範星系（匈牙利文版）：第一次買洗碗機，要為機器改廚房還是挑放得進現有廚房的（IntentAnalysisResponse v1.0）。
 const dims = { D1: "Elhelyezés", D2: "Hogyan válassz", D3: "Mennyi átalakítás", D4: "Kapacitás és edények" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `A másik oldal a(z) „${dims[dim]}” tengelyt az ellenkező végletbe viszi`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `A másik oldal a(z) „${dims[dim]}” kérdésben az ellenkező végletig megy`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_HU = {
     Q1: { scar: "Vett mosogatógépet, mégis kézzel mosogat", sacred: "Előbb számold meg az edényeidet" },
     Q2: { scar: "Szerelés közben derült ki, hogy rövid a cső", sacred: "Mérj, mielőtt veszel" },
     Q3: { scar: "Netes toplistából vette, és nem fért be", sacred: "Lesd el más területek megoldásait" },
-    Q4: { scar: "Láttam már három mosogatógépet tányértartóvá válni", sacred: "Előbb tervezd meg a kudarcot" },
+    Q4: { scar: "Láttam már három mosogatógépet tányértartóvá válni", sacred: "Gondold végig, hogyan bukhat el" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Beépítés", "Szedd ki a mosogató melletti 45 vagy 60 cm-es szekrényt, és építsd be oda a gépet, így nem foglal pultot és nem állja el az utat", "Nem jó, ha a szekrény szélessége, magassága vagy mélysége kisebb a gép megadott beépítési méreténél", null),
@@ -26,15 +26,15 @@ export const DISHWASHER_GALAXY_HU = {
     N6: node("D3", 1, 2, "Előbb próba", "Vegyél szabadonálló és beépíthető módon is használható modellt, tartsd 30 teljes napig a mosogató mellett, és csak utána döntsd el, kiszeded-e a szekrényt, ne az első napon bonts", "Nem jó, ha a 30 napos próba alatt a gép elállja az utat vagy egy fiókot", null),
     N7: node("D3", 2, 1, "Tartályos gép", "Mint egy lakóautó saját víztartállyal: válassz kézzel feltölthető asztali modellt, csaptelep-bekötés és vízszerelés nélkül", "Nem jó, ha bármelyik héten 2-szer vagy többször kihagyod és kézzel mosogatsz, mert lusta voltál feltölteni", "A feltöltés macerásabb, mint gondolnád",
       { lateral: { src: "Kemping: beépített víztartály", dist: 2, drop: "Állandó csapbekötés" } }),
-    N8: node("D2", 1, 0, "Előbb mérj", "Mint a pilóta felszállás előtti ellenőrzőlistája: rendelés előtt mérd le a szélességet, mélységet és magasságot, aztán nézd meg a konnektort és a lefolyót; ha az 5-ből bármelyik hiányzik, ne rendelj", "Nem jó, ha valami nem stimmel, vagy megérkezés után nem lehet beszerelni", null,
+    N8: node("D2", 1, 0, "Előbb mérj", "Mint a pilóta felszállás előtti ellenőrzőlistája: rendelés előtt mérd le a szélességet, mélységet és magasságot, aztán nézd meg a konnektort és a lefolyót; ha az 5-ből bármelyik hiányzik, ne rendelj", "Nem jó, ha valamelyik méret nem stimmel, vagy megérkezés után nem lehet beszerelni", null,
       { lateral: { src: "Repülés: felszállás előtti ellenőrzés", dist: 3, drop: "Rendelés zsigerből" } }),
     N9: node("D4", 2, 0, "Gépbiztos edény", "Mint egy étterem, ahol csak gépben mosható edényt használnak: cserélj le minden lábast és tányért, amin az áll, hogy nem mosogatógépbe való, hogy semmi ne maradjon kézi mosogatásra", "Nem jó, ha a csere utáni 14 napban még mindig napi 3-nál több darabot mosogatsz kézzel", null,
       { lateral: { src: "Vendéglátás: professzionális edények", dist: 4, drop: "Vegyes régi edénykészlet otthon" } }),
-    N10: node("D2", 2, 0, "Nincs félig", "Ha félig sem telve indítod, majdnem annyi vizet és áramot fogyaszt, mint teli, így minden tányér több mint kétszer annyiba kerül", "Rendelés előtt 7 napig jegyezd fel az edényeket; ha átlagosan napi 6 terítéknél kevesebb, válts minire", "Az edény szagos lesz, amíg a teli töltetre vár",
+    N10: node("D2", 2, 0, "Nincs félig", "Ha félig sem telve indítod, majdnem annyi vizet és áramot fogyaszt, mint teli, így minden tányér elmosása több mint kétszer annyiba kerül", "Rendelés előtt 7 napig jegyezd fel az edényeket; ha átlagosan napi 6 terítéknél kevesebb, válts minire", "Az edény szagos lesz, amíg a teli töltetre vár",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Nagy gépet félüresen járatni nem éri meg" } }),
-    N11: node("D4", 1, 0, "Lábas nélkül", "Ha kényelemből wokot és fazekat zsúfolsz bele, a mini nem fogadja be egy körben az edényt, és megint kézzel mosogatsz", "Dobd el, ha 14 napon belül több mint 2-szer kényszerítenek a lábasok második körre", "Nem mindenki tartja be otthon a szabályt",
+    N11: node("D4", 1, 0, "Lábas nélkül", "Ha kényelemből wokot és fazekat zsúfolsz bele, a mini nem fogadja be egy körben az edényt, és megint kézzel mosogatsz", "Dobd el ezt a tervet, ha 14 napon belül több mint 2-szer kell a lábasok miatt második kört indítani", "Nem mindenki tartja be otthon a szabályt",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Kényelemből túltömött gép" } }),
-    N12: node("D3", 0, 1, "Nincs felújítás", "Ha a mosogatógép beépítése az egész konyha felújításává dagad, a munka elkezdése és a kifizetés után már végig kell vinned", "Ne kezdj bele, ha a szekrénybontás előtti árajánlat több mint a gép árának 2-szerese", null,
+    N12: node("D3", 0, 1, "Nincs felújítás", "Ha a mosogatógép beépítése az egész konyha felújításává dagad, a munka elkezdése és a kifizetés után már végig kell vinned", "Ne kezdj bele, ha a szekrénybontás előtti árajánlat több mint a gép árának kétszerese", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Ha elindult a munka, nincs visszaút" } }),
   },
   edges: [
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_HU = {
     },
   },
   recommend: { key: "alpha", why: "Háromfős vagy nagyobb háztartásban egy nagy gép egyetlen körben elviszi az egész napi edényt" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Az egész család edénye ezen az egy gépen múlik; ha elromlik, az egyetlen tartalék a kézi mosogatás", kill: "Dobd el, ha a javítás több mint 7 napig tart, és a család visszaáll a kézi mosogatásra", label: "Egyetlen gép" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Az egész család edénye ezen az egy gépen múlik; ha elromlik, az egyetlen tartalék a kézi mosogatás", kill: "Dobd el ezt a tervet, ha a javítás több mint 7 napig tart, és a család visszaáll a kézi mosogatásra", label: "Egyetlen gép" },
 };

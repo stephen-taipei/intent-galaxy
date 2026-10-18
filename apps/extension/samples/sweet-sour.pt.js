@@ -15,7 +15,7 @@ export const SWEET_SOUR_GALAXY_PT = {
     Q1: { scar: "Comi um saco inteiro de fruta desidratada a achar que era saudável", sacred: "O doce só vem da fruta inteira" },
     Q2: { scar: "Cortei no açúcar três vezes e cedi sempre na segunda semana", sacred: "Só conta se conseguir mesmo manter" },
     Q3: { scar: "Copiei um plano low carb e ao fim de três dias já estava farto", sacred: "Mude o método, não o sabor" },
-    Q4: { scar: "Já vi demasiada gente cortar no açúcar e voltar ao mesmo", sacred: "Regras valem mais do que força de vontade" },
+    Q4: { scar: "Já vi demasiada gente cortar no açúcar e voltar ao mesmo", sacred: "Crie regras em vez de confiar na força de vontade" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Fruta inteira", "Sempre que lhe apetecer algo doce, comer só fruta fresca inteira, como kiwi, ananás, frutos vermelhos ou laranja; sumos, fruta desidratada e fruta cristalizada não contam", "Falha se, em 14 dias, comprar sobremesa para matar a vontade em mais de 3 dias", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_PT = {
     { type: "excludes", from: "N1", to: "N5", why: "Se o doce só vem da fruta inteira, não dá para manter os snacks açucarados de que gosta" },
     { type: "excludes", from: "N4", to: "N11", why: "A fruta em casa depende de comprar uma caixa por semana; se proibir compras às caixas, esse plano de abastecimento cai por terra" },
     { type: "excludes", from: "N2", to: "N7", why: "Este caminho só muda as bebidas e deixa as refeições como estão, o que contradiz refazer o molho agridoce" },
-    { type: "excludes", from: "N2", to: "N10", why: "Este caminho só muda as bebidas e não compra snacks substitutos; um limite de gasto em substitutos pertence a outro caminho, por isso escolha um" },
+    { type: "excludes", from: "N2", to: "N10", why: "Este caminho só muda as bebidas e não compra snacks substitutos, por isso um limite de gasto em substitutos não se aplica; escolha um" },
     { type: "excludes", from: "N9", to: "N11", why: "Ter sempre água com gás em stock obriga a comprá-la às grades, o que choca de frente com não comprar em quantidade" },
     { type: "requires", from: "N1", to: "N8", why: "A fruta também tem açúcar; mesmo que seja o único miminho, precisa de um limite diário, senão comer demais também cobra o seu preço" },
     { type: "requires", from: "N4", to: "N10", why: "Comprar fruta e iogurte às caixas todas as semanas vai somando, por isso precisa de um limite de gasto, senão a carteira cede primeiro" },

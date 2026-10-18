@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_FR = {
     Q1: { scar: "A acheté un lave-vaisselle et fait encore tout à la main", sacred: "Compter sa vaisselle d'abord" },
     Q2: { scar: "A découvert en pleine pose que le tuyau était trop court", sacred: "Mesurer avant d'acheter" },
     Q3: { scar: "A acheté le n° 1 d'un comparatif en ligne, et il ne rentrait pas", sacred: "S'inspirer d'autres domaines" },
-    Q4: { scar: "A vu trois lave-vaisselle finir en égouttoir", sacred: "Prévoir l'échec d'abord" },
+    Q4: { scar: "A vu trois lave-vaisselle finir en égouttoir", sacred: "Réfléchir à comment ça pourrait échouer" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Encastré évier", "Retirer le meuble de 45 ou 60 cm à côté de l'évier et y encastrer la machine : elle ne prend pas de place sur le plan de travail et ne gêne pas le passage", "Inadapté si la largeur, la hauteur ou la profondeur du meuble est inférieure aux cotes d'encastrement de la machine", null),

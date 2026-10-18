@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_DE = {
     Q1: { scar: "Spülmaschine gekauft und trotzdem von Hand gespült", sacred: "Erst das Geschirr zählen" },
     Q2: { scar: "Erst beim Einbau gemerkt, dass der Schlauch zu kurz ist", sacred: "Erst messen, dann kaufen" },
     Q3: { scar: "Nach einer Online-Bestenliste gekauft und sie passte nicht", sacred: "Ideen aus anderen Bereichen leihen" },
-    Q4: { scar: "Dreimal gesehen, wie Spülmaschinen zum Abtropfgestell wurden", sacred: "Zuerst das Scheitern planen" },
+    Q4: { scar: "Dreimal gesehen, wie Spülmaschinen zum Abtropfgestell wurden", sacred: "Erst überlegen, was schiefgeht" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Einbau an Spüle", "Den 45- oder 60-cm-Unterschrank neben der Spüle ausbauen und die Maschine einbauen, damit sie keine Arbeitsfläche belegt und den Laufweg nicht blockiert", "Passt nicht, wenn Breite, Höhe oder Tiefe des Schranks kleiner sind als die angegebenen Einbaumaße", null),

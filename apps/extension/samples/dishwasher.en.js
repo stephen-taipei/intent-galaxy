@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_EN = {
     Q1: { scar: "Bought a dishwasher, still washing by hand", sacred: "Count your dishes first" },
     Q2: { scar: "Found out mid-install the hose was too short", sacred: "Measure before you buy" },
     Q3: { scar: "Bought from an online best-of list and it didn't fit", sacred: "Borrow ideas from other fields" },
-    Q4: { scar: "Seen three dishwashers end up as dish racks", sacred: "Plan for failure first" },
+    Q4: { scar: "Seen three dishwashers end up as dish racks", sacred: "Think through how it could fail" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Slot in by sink", "Pull out the 45 or 60 cm cabinet next to the sink and build the machine in, so it takes no counter space and doesn't block the walkway", "Not a fit if the cabinet's width, height or depth is smaller than the machine's listed built-in dimensions", null),
@@ -30,9 +30,9 @@ export const DISHWASHER_GALAXY_EN = {
       { lateral: { src: "Aviation: preflight checklist", dist: 3, drop: "Ordering on gut feel" } }),
     N9: node("D4", 2, 0, "Dishwasher-safe", "Like a restaurant that only uses dishwasher-proof ware, replace every pot and dish labeled not dishwasher-safe, leaving nothing for hand-washing", "Not a fit if, in the 14 days after swapping, you still hand-wash more than 3 items a day", null,
       { lateral: { src: "Restaurants: commercial-grade dishware", dist: 4, drop: "Mixed set of old dishes at home" } }),
-    N10: node("D2", 2, 0, "No half-loads", "If you run it less than half full, it uses about as much water and power as a full load, so each dish costs more than twice as much", "Log your dishes for 7 days before ordering; if you average under 6 place settings a day, switch to a mini", "Dishes start to stink while you wait for a full load",
+    N10: node("D2", 2, 0, "No half-loads", "If you run it less than half full, it uses about as much water and power as a full load, so each dish costs more than twice as much to wash", "Log your dishes for 7 days before ordering; if you average under 6 place settings a day, switch to a mini", "Dishes start to stink while you wait for a full load",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Running a big machine half-empty doesn't pay" } }),
-    N11: node("D4", 1, 0, "No pots inside", "If you cram woks and stockpots in for convenience, a mini can't fit the dishes in one load and you end up hand-washing again", "Scrap it if pots force a second load more than 2 times in 14 days", "Not everyone at home will follow the rule",
+    N11: node("D4", 1, 0, "No pots inside", "If you cram woks and stockpots in for convenience, a mini can't fit the dishes in one load and you end up hand-washing again", "Scrap this plan if, within 14 days, cramming in pots means running a second load more than 2 times", "Not everyone at home will follow the rule",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Overloading the machine for convenience" } }),
     N12: node("D3", 0, 1, "No kitchen redo", "If installing a dishwasher snowballs into redoing the whole kitchen, once work starts and money's paid, you're stuck seeing it through", "Don't start if the quote you get before pulling the cabinet is more than 2x the machine's price", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Once work starts, there's no backing out" } }),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_EN = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Cabinet removal and install labor", v: "One less cabinet for storage", t: "Wait for an installer to measure and fit", l: "Wait for half a load before running", x: "Give up the countertop mini" },
-      fatal: "N10", thesis: "Measure the cabinet, build in a big machine, run only when half full", title: "Built-in big machine, done once",
+      fatal: "N10", thesis: "Measure the cabinet, build in a big machine, and run it only once it's at least half full", title: "Built-in big machine, done once",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_EN = {
     },
   },
   recommend: { key: "alpha", why: "For a household of 3 or more, one big machine handles a whole day's dishes in a single load" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "The whole family's dishes depend on this one machine; if it breaks, the only backup is hand-washing", kill: "Scrap it if a repair takes more than 7 days and the family goes back to hand-washing", label: "Single machine" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "The whole family's dishes depend on this one machine; if it breaks, the only backup is hand-washing", kill: "Scrap this plan if a repair takes more than 7 days and the family goes back to hand-washing", label: "Single machine" },
 };

@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: открыть галактику намерений в этом чате с ИИ (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Добавляет кнопку iG в чаты с ИИ (Claude, ChatGPT, Gemini), чтобы за 60 секунд понять, чего вы на самом деле хотите."
+  "message": "Добавляет кнопку iG в чаты с ИИ, такие как Claude, ChatGPT и Gemini, чтобы за 60 секунд разобраться, чего вы на самом деле хотите."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy работает только на этих сайтах ИИ: $1"

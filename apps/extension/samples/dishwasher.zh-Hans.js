@@ -1,7 +1,7 @@
 // 擴充功能生活題示範星系（簡體中文版）：第一次買洗碗機，要為機器改廚房還是挑放得進現有廚房的（IntentAnalysisResponse v1.0）。
 const dims = { D1: "摆放位置", D2: "挑选依据", D3: "改装幅度", D4: "容量与餐具" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `反方主张 ${dims[dim]} 走另一极`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `反方看法：“${dims[dim]}”走完全相反的路`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_ZH_HANS = {
     Q1: { scar: "买了洗碗机却还在手洗", sacred: "先算碗盘量" },
     Q2: { scar: "装到一半才发现水管太短", sacred: "先量再买" },
     Q3: { scar: "照网上推荐清单买到不合用", sacred: "借鉴别的行业的做法" },
-    Q4: { scar: "见过三台洗碗机沦为碗柜", sacred: "先想怎么失败" },
+    Q4: { scar: "见过三台洗碗机沦为碗柜", sacred: "先想好会怎么失败" },
   },
   nodes: {
     N1: node("D1", 0, 2, "嵌进水槽旁橱柜", "拆掉水槽旁一格 45 或 60 厘米宽的柜子，把机器嵌进去，不占台面也不挡过道", "柜位的宽、高、深任一项小于机器标注的嵌入尺寸，就不适合", null),
@@ -30,12 +30,12 @@ export const DISHWASHER_GALAXY_ZH_HANS = {
       { lateral: { src: "航空: 飞行前检查单", dist: 3, drop: "凭感觉下单" } }),
     N9: node("D4", 2, 0, "换掉不能机洗的锅碗", "像餐厅只用耐得住机洗的餐具，把标注不可放洗碗机的锅碗换掉，一件都不留给手洗", "换完后 14 天内，每天仍有超过 3 件要手洗，就不适合", null,
       { lateral: { src: "餐饮: 餐厅耐洗备品", dist: 4, drop: "家里各式旧碗盘" } }),
-    N10: node("D2", 2, 0, "不满半篮不开机", "如果碗盘不到半篮就开机，水电用量和满篮差不多，每个碗分摊到的水电就超过满篮时的 2 倍", "下单前记7天碗盘，每天平均不到6套即改选小机", "等满篮时碗盘放到发臭",
-      { falsifier: { attack: "unit_economics", hits: "A2", wound: "大机半空洗不划算" } }),
-    N11: node("D4", 1, 0, "锅具不进洗碗机", "如果图方便把炒锅、汤锅也塞进去，小机一篮就放不下碗盘，最后又回到手洗", "14天内因塞锅具要洗第二轮超过2次即作废", "家人不一定照规则放",
-      { falsifier: { attack: "dark_incentive", hits: "A3", wound: "图方便塞爆机器" } }),
-    N12: node("D3", 0, 1, "不为它重做橱柜", "如果为了装洗碗机连带重做整套橱柜，一开工、付了钱，就只能硬着头皮做完", "拆柜前拿到的报价超过机器售价2倍即不动工", null,
-      { falsifier: { attack: "sunk_cost", hits: "A1", wound: "开工后骑虎难下" } }),
+    N10: node("D2", 2, 0, "不满半篮不开机", "如果碗盘不到半篮就开机，水电用量和满篮差不多，每个碗分摊到的水电就超过满篮时的 2 倍", "下单前先记 7 天的碗盘量，每天平均不到 6 套，就改买小机", "等满篮时碗盘放到发臭",
+      { falsifier: { attack: "unit_economics", hits: "A2", wound: "大机器半空着洗不划算" } }),
+    N11: node("D4", 1, 0, "锅具不进洗碗机", "如果图方便把炒锅、汤锅也塞进去，小机一篮就放不下碗盘，最后又回到手洗", "14 天内因为塞了锅具、得多洗一轮超过 2 次，这个方案就作废", "家人不一定照规则放",
+      { falsifier: { attack: "dark_incentive", hits: "A3", wound: "图方便把机器塞爆" } }),
+    N12: node("D3", 0, 1, "不为它重做橱柜", "如果为了装洗碗机连带重做整套橱柜，一开工、付了钱，就只能硬着头皮做完", "拆柜前拿到的报价超过机器售价 2 倍，就不动工", null,
+      { falsifier: { attack: "sunk_cost", hits: "A1", wound: "一开工就停不下来" } }),
   },
   edges: [
     { type: "excludes", from: "N4", to: "N5", why: "12 套以上的大机放不上台面，和台面小机只能二选一" },
@@ -50,8 +50,8 @@ export const DISHWASHER_GALAXY_ZH_HANS = {
   archetypes: {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
-      sacrifice: { nodes: ["N5"], p: "拆柜与安装人工费", v: "少一格橱柜收纳", t: "要等师傅上门测量安装", l: "要凑满半篮才洗", x: "放弃台面小机" },
-      fatal: "N10", thesis: "量好柜位嵌进大机，满半篮才开洗", title: "嵌入大机·一步到位",
+      sacrifice: { nodes: ["N5"], p: "拆柜与安装人工费", v: "少一格橱柜收纳", t: "要等师傅上门测量安装", l: "要等满半篮才洗", x: "放弃台面小机" },
+      fatal: "N10", thesis: "量好柜子尺寸嵌进大机，满半篮才开机", title: "嵌入大机·一步到位",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_ZH_HANS = {
     },
   },
   recommend: { key: "alpha", why: "3 人以上家庭，一台大机一次洗完一天的碗盘" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "全家碗盘只靠这一台机器，坏了除了手洗没有备用方案", kill: "报修后超过7天没修好，全家回到手洗即作废", label: "只靠一台机器" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "全家碗盘只靠这一台机器，坏了除了手洗没有备用方案", kill: "报修后超过 7 天还没修好、全家又回到手洗，这个方案就作废", label: "只靠一台机器" },
 };

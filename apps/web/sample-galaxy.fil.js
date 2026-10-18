@@ -20,10 +20,10 @@ export const SAMPLE_GALAXY_FIL = {
   nodes: {
     N1: node("D1", 0, 2, "Hatiin sa 3", "Hatiin ang mga component sa purong core, view na tagapag-ugnay, at theme na dahon; bawal mag-import ang core ng theme ID o route", "Mali kung may theme check na lumabas sa core sa loob ng 14 araw", null),
     N2: node("D2", 0, 1, "CSS vars lang", "Ipahayag ang bawat pagkakaiba ng theme gamit lang ang CSS custom properties, walang anumang branching sa component o layout", "Mali kung ang ika-3 theme ay nangangailangan na ng pagbabago sa component", "Hindi maipapahayag ang pagkakaiba ng layout sa kulay lang"),
-    N3: node("D1", 1, 0, "Lazy theme CSS", "Sa runtime, i-load lang ang iisang stylesheet ng aktibong theme sa halip na i-bundle lahat ng theme sa unang paint", "Mali kung lumampas sa 50KB ang CSS ng kahit isang theme sa loob ng 14 araw", null),
+    N3: node("D1", 1, 0, "CSS ng aktibo", "Sa runtime, i-load lang ang iisang stylesheet ng aktibong theme sa halip na i-bundle lahat ng theme sa unang paint", "Mali kung lumampas sa 50KB ang CSS ng kahit isang theme sa loob ng 14 araw", null),
     N4: node("D4", 0, 2, "Typed config", "Bawat theme ay may kumpletong TypeScript config object; anumang kulang na field ay magpapabagsak sa build", "Mali kung kailangan pa ring baguhin ang shared component para sa bagong theme", null),
     N5: node("D3", 2, 0, "Fork kada brand", "Kinokopya ng bawat theme ang component directory at binabago ito nang hiwalay, para hindi nagkakaapektuhan ang mga brand", "Mali kung, pagkatapos ng ika-10 theme, ang pag-ayos ng isang bug ay umaabot sa >10 lugar", "Isang bug fix ay katumbas ng pagtapal sa N kopya"),
-    N6: node("D3", 1, 2, "Canary themes", "Ilabas ang bawat bagong theme sa likod ng feature flag sa 5% ng tenant nang isang linggo; itaas sa 100% lang kapag pasok sa target ang error rate", "Mali kung lumampas sa 1% ang canary error rate", null),
+    N6: node("D3", 1, 2, "Sa 5% muna", "Ilabas ang bawat bagong theme sa likod ng feature flag sa 5% ng tenant nang isang linggo; itaas sa 100% lang kapag pasok sa target ang error rate", "Mali kung lumampas sa 1% ang error rate sa 5% na iyon", null),
     N7: node("D3", 2, 1, "Palit ng shell", "[D2 car platform] Ang layout ay parang katawan ng kotse: palitan ang buong shell habang nananatili ang shared chassis (view at core)", "Mali kung kailangan ng pagbabago sa core para magpalit ng layout", "Nagkakaiba-iba ang interaction sa bawat layout",
       { lateral: { src: "Automotive: platform chassis", dist: 2, drop: "Paggawa ulit ng bawat modelo ng kotse mula sa simula" } }),
     N8: node("D2", 1, 0, "Fixed slots", "[D3 LEGO bricks] Nagdedeklara ang layout ng fixed slots; puwede lang magsaksak ang theme ng component sa slot at bawal galawin ang istruktura sa labas nito", "Mali kung binago ang DOM sa labas ng slot kahit isang beses", null,
@@ -34,16 +34,16 @@ export const SAMPLE_GALAXY_FIL = {
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Mas magastos ang abstraction kaysa duplication" } }),
     N11: node("D4", 1, 0, "Bawal bypass", "Kung puwedeng hilingin ng negosyo ang brand check direkta sa shared component, guguho ang hangganan sa loob ng isang quarter", "Walang bisa kung may brand check na naidagdag sa shared component sa loob ng 14 araw", "Ipinagpapalit ang hangganan para sa deadline",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Ginagantimpalaan ng deadline pressure ang paglabag sa hangganan" } }),
-    N12: node("D3", 0, 1, "Bawal rewrite", "Kung kailangang i-migrate lahat ng 70 module bago may mailabas, ang sunk cost ang magpapahinto sa refactor sa kalagitnaan", "Tumigil kung hindi pa nailalabas ang unang module sa loob ng 14 araw", null,
+    N12: node("D3", 0, 1, "Bawal rewrite", "Kung kailangang i-migrate lahat ng 70 module bago may mailabas, ang nagastos nang oras at pera ang magpapatigil sa refactor sa kalagitnaan", "Tumigil kung hindi pa nailalabas ang unang module sa loob ng 14 araw", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Ang big-bang refactor ang humuhostage sa deadline" } }),
   },
   edges: [
     { type: "excludes", from: "N4", to: "N5", why: "Pagpipilian ang shared typed config at ang fork ng component bawat brand; isa lang" },
     { type: "excludes", from: "N1", to: "N5", why: "Hindi puwedeng magsabay ang shared na tatlong-layer na core at kopya ng component bawat brand" },
-    { type: "excludes", from: "N4", to: "N11", why: "Hinaharang na ng typed config ang bypass sa compile time, kaya sobrang gate na ang mano-manong review ng hangganan" },
+    { type: "excludes", from: "N4", to: "N11", why: "Hinaharang na ng typed config ang bypass habang nagbi-build, kaya dobleng trabaho na lang ang mano-manong pagsusuri ng hangganan" },
     { type: "excludes", from: "N2", to: "N7", why: "Kung CSS variables lang ang binabago ng theme, walang pagpapalit ng buong layout component" },
     { type: "excludes", from: "N2", to: "N10", why: "Walang config field na lolobo sa purong CSS variables; pumili ng isa" },
-    { type: "excludes", from: "N9", to: "N11", why: "Pinapayagan ng inheritance chain ang lokal na override, na salungat sa guardrail na walang bypass" },
+    { type: "excludes", from: "N9", to: "N11", why: "Pinapayagan ng inheritance chain ang lokal na override, na salungat sa patakarang bawal ang bypass" },
     { type: "requires", from: "N1", to: "N8", why: "Kapag nahati na sa tatlong layer, kailangang mag-customize ang theme sa pamamagitan ng fixed slots, kung hindi ay mabubutas ang view layer" },
     { type: "requires", from: "N4", to: "N10", why: "Kailangan ng typed config ng limit sa field, kung hindi ay lolobo ito hanggang config hell" },
   ],
@@ -56,7 +56,7 @@ export const SAMPLE_GALAXY_FIL = {
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Limitadong variation ng layout", v: "Mas kaunting kalayaan sa disenyo", t: "Maliliit na hakbang bawat linggo", l: "Hindi puwede ang komplikadong layout", x: "Walang customization ng istruktura" },
-      fatal: "N12", thesis: "Gumamit lang ng CSS variables at inheritance, at unti-unting ilabas ang theme sa likod ng canary", title: "Purong styling · unti-unti",
+      fatal: "N12", thesis: "Gumamit lang ng CSS variables at inheritance, at unti-unting ilabas ang theme, simula sa maliit na grupo ng user", title: "Purong styling · unti-unti",
     },
     gamma: {
       include: ["N3", "N5", "N7", "N8", "N11"], exclude: ["N1", "N4"],
@@ -65,5 +65,5 @@ export const SAMPLE_GALAXY_FIL = {
     },
   },
   recommend: { key: "alpha", why: "Sa 100+ theme, config-driven na disenyo lang ang makakapigil sa gastos sa maintenance" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Lahat ng theme ay nagmamana mula sa iisang default theme", kill: "Masira ang default at masisira ang layout ng lahat ng theme", label: "default SPOF" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Lahat ng theme ay nagmamana mula sa iisang default theme", kill: "Kapag nasira ang default, masisira ang layout ng lahat ng theme", label: "Iisang default" },
 };

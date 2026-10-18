@@ -1,59 +1,59 @@
 {
  "ov.q1": {
-  "zh-Hant-TW": "▲ Q1 歸零者（第一性原理）",
-  "en": "▲ Q1 Resetter (first principles)"
+  "zh-Hant-TW": "▲ Q1 歸零者（從零重想）",
+  "en": "▲ Q1 Resetter (rethink from scratch)"
  },
  "ov.q2": {
-  "zh-Hant-TW": "▶ Q2 老兵（實戰槓桿）",
-  "en": "▶ Q2 Veteran (battle-tested leverage)"
+  "zh-Hant-TW": "▶ Q2 老兵（過來人的做法）",
+  "en": "▶ Q2 Veteran (what has worked before)"
  },
  "ov.q3": {
-  "zh-Hant-TW": "▼ Q3 越界者（跨界同構）",
+  "zh-Hant-TW": "▼ Q3 越界者（借用別的領域）",
   "en": "▼ Q3 Border-crosser (ideas from other fields)"
  },
  "ov.q4": {
-  "zh-Hant-TW": "◀ Q4 驗屍官（波普爾證偽）",
+  "zh-Hant-TW": "◀ Q4 驗屍官（先想怎麼會失敗）",
   "en": "◀ Q4 Coroner (how it could fail)"
  },
  "ov.keyCards": {
-  "zh-Hant-TW": "主幹",
+  "zh-Hant-TW": "方案",
   "en": "Plans"
  },
  "ov.keyCardsTip": {
-  "zh-Hant-TW": "套用第 1／2／3 張策略卡，還原成這張卡原本的選擇。<br><span class=dim>Shift+數字：保留你的手動調整再套用。</span>",
+  "zh-Hant-TW": "套用第 1／2／3 張方案卡，還原成這張卡原本的選擇。<br><span class=dim>Shift+數字：保留你的手動調整再套用。</span>",
   "en": "Apply plan card 1, 2 or 3 and restore that card's original picks.<br><span class=dim>Shift+number: keep your manual changes while applying.</span>"
  },
  "ov.keyNav": {
-  "zh-Hant-TW": "導航",
+  "zh-Hant-TW": "移動",
   "en": "Move"
  },
  "ov.keyNavTip": {
-  "zh-Hant-TW": "在 12 顆節點間移動焦點：h 左、j 下、k 上、l 右。<br><span class=dim>Tab 依序切換，g＋象限鍵＋數字可直達。</span>",
-  "en": "Move focus between the 12 nodes: h left, j down, k up, l right.<br><span class=dim>Tab cycles through them; g + quadrant key + number jumps directly.</span>"
+  "zh-Hant-TW": "在 12 個觀點之間移動：h 左、j 下、k 上、l 右。<br><span class=dim>Tab 依序切換，g＋象限鍵＋數字可直接跳到。</span>",
+  "en": "Move between the 12 ideas: h left, j down, k up, l right.<br><span class=dim>Tab cycles through them; g + quadrant key + number jumps straight there.</span>"
  },
  "ov.keyInclude": {
   "zh-Hant-TW": "採納",
   "en": "Include"
  },
  "ov.keyIncludeTip": {
-  "zh-Hant-TW": "把目前焦點的節點加入方案（再按一次取消）。<br><span class=dim>滑鼠：左鍵點節點。</span>",
-  "en": "Add the focused node to your plan (press again to undo).<br><span class=dim>Mouse: left-click a node.</span>"
+  "zh-Hant-TW": "把目前的觀點加入方案（再按一次取消）。<br><span class=dim>滑鼠：左鍵點觀點。</span>",
+  "en": "Add the highlighted idea to your plan (press again to undo).<br><span class=dim>Mouse: left-click an idea.</span>"
  },
  "ov.keyExclude": {
   "zh-Hant-TW": "排除",
   "en": "Exclude"
  },
  "ov.keyExcludeTip": {
-  "zh-Hant-TW": "明確標記「不做」這個節點（再按一次取消）。<br><span class=dim>Q4 驗屍官節點被排除時，代表你知道這個風險並選擇承擔。滑鼠：右鍵點節點。</span>",
-  "en": "Mark this node as \"won't do\" (press again to undo).<br><span class=dim>Excluding a Q4 Coroner node means you know the risk and choose to accept it. Mouse: right-click a node.</span>"
+  "zh-Hant-TW": "把目前的觀點標成「不做」（再按一次取消）。<br><span class=dim>Q4 驗屍官的觀點被標成不做，代表你知道這個風險、仍決定承擔。滑鼠：右鍵點觀點。</span>",
+  "en": "Mark this idea as \"won't do\" (press again to undo).<br><span class=dim>Marking a Q4 Coroner idea as won't do means you know the risk and choose to live with it. Mouse: right-click an idea.</span>"
  },
  "ov.keyResolve": {
-  "zh-Hant-TW": "解除互斥",
-  "en": "Resolve"
+  "zh-Hant-TW": "解決衝突",
+  "en": "Fix conflicts"
  },
  "ov.keyResolveTip": {
-  "zh-Hant-TW": "有些節點彼此互斥，不能同時成立。同時選了互斥節點時，狀態會變紅。<br>按 r 會自動撤銷<b>較早</b>的手動選擇，保留你最新的決定，直到方案沒有矛盾。",
-  "en": "Some nodes conflict and can't both be true. If you pick conflicting nodes, the status turns red.<br>Press r to undo your <b>earlier</b> manual picks, keeping your latest decision, until the plan has no contradiction."
+  "zh-Hant-TW": "有些觀點彼此衝突，不能同時做。選到衝突的觀點時，狀態會變紅。<br>按 r 會自動取消你<b>較早</b>的手動選擇，保留最新的決定，直到方案沒有衝突。",
+  "en": "Some ideas clash and can't both be done. If you pick clashing ideas, the status turns red.<br>Press r to undo your <b>earlier</b> manual picks, keeping your latest decision, until nothing clashes."
  },
  "ov.keyUndo": {
   "zh-Hant-TW": "復原",
@@ -72,16 +72,16 @@
   "en": "What the AI thinks you're deciding"
  },
  "ov.summaryTitle": {
-  "zh-Hant-TW": "收斂結果",
+  "zh-Hant-TW": "你的方案",
   "en": "Your plan"
  },
  "ov.rawTip": {
-  "zh-Hant-TW": "切換檢視：摘要 ↔ 實際送給 AI 的原始指令文字（LOCKED INTENT AST）",
-  "en": "Switch view: summary ↔ the raw instruction text sent to the AI (LOCKED INTENT AST)"
+  "zh-Hant-TW": "切換檢視：摘要 ↔ 實際送給 AI 的完整指令",
+  "en": "Switch view: summary ↔ the full instructions sent to the AI"
  },
  "ov.cannotCompile": {
-  "zh-Hant-TW": "星系資料無法編譯：{detail}",
-  "en": "The galaxy data can't be compiled: {detail}"
+  "zh-Hant-TW": "星系資料有問題，無法整理成方案：{detail}",
+  "en": "The galaxy data has a problem and can't be turned into a plan: {detail}"
  },
  "ov.expanding": {
   "zh-Hant-TW": "正在展開星系…",
@@ -96,8 +96,8 @@
   "en": "Generation failed ({code}): {detail}"
  },
  "ov.thinking": {
-  "zh-Hant-TW": "模型思考中 · 約 {tokens} tokens",
-  "en": "Model is thinking · about {tokens} tokens"
+  "zh-Hant-TW": "AI 思考中 · 約 {tokens} tokens",
+  "en": "AI is thinking · about {tokens} tokens"
  },
  "ov.generating": {
   "zh-Hant-TW": "{provider} 生成中 · 已等待 {sec} 秒",
@@ -112,16 +112,16 @@
   "en": "Choices cleared (press u to undo)"
  },
  "ov.resolved": {
-  "zh-Hant-TW": "已保留較新決定解除衝突",
-  "en": "Conflict resolved by keeping your newer decision"
+  "zh-Hant-TW": "已保留你最新的選擇，衝突解決了",
+  "en": "Conflict fixed by keeping your latest choice"
  },
  "ov.resolveFirst": {
-  "zh-Hant-TW": "請先按 r 解除衝突（或 s 申請 TRIZ 合成）",
-  "en": "Press r to resolve the conflict first (or s to request a TRIZ synthesis)"
+  "zh-Hant-TW": "請先按 r 解決衝突",
+  "en": "Press r to fix the conflict first"
  },
  "ov.trizPending": {
-  "zh-Hant-TW": "TRIZ 矛盾合成尚未接上 Stage 3 管線，先按 r 解除",
-  "en": "TRIZ synthesis isn't connected yet; press r to resolve for now"
+  "zh-Hant-TW": "「兩全其美」的合成功能還沒推出，請先按 r 解決衝突",
+  "en": "The \"best of both\" merge isn't available yet; press r to fix the conflict for now"
  },
  "ov.noConflict": {
   "zh-Hant-TW": "目前沒有衝突",
@@ -136,20 +136,20 @@
   "en": "Success metric"
  },
  "ov.chipDerivedIn": {
-  "zh-Hant-TW": "← 依賴推導",
-  "en": "← pulled in"
+  "zh-Hant-TW": "← 其他選擇需要它，自動加入",
+  "en": "← added because another pick needs it"
  },
  "ov.chipDerivedOut": {
-  "zh-Hant-TW": "⊘ 互斥讓位",
-  "en": "⊘ gave way"
+  "zh-Hant-TW": "⊘ 和你的選擇衝突，自動取消",
+  "en": "⊘ dropped: conflicts with your picks"
  },
  "ov.chipPinned": {
-  "zh-Hant-TW": "📌 手動釘選",
-  "en": "📌 pinned by you"
+  "zh-Hant-TW": "📌 你手動選的",
+  "en": "📌 picked by you"
  },
  "ov.chipRisk": {
-  "zh-Hant-TW": "⚠ 明示承擔風險",
-  "en": "⚠ risk accepted"
+  "zh-Hant-TW": "⚠ 你接受的風險",
+  "en": "⚠ risk you accept"
  },
  "ov.blind": {
   "zh-Hant-TW": "✦ 盲區",
@@ -180,8 +180,8 @@
   "en": "💸 Cost: {cost}"
  },
  "ov.fatalTip": {
-  "zh-Hant-TW": "⚡ 致死前提：{kill}",
-  "en": "⚡ Deal-breaker: {kill}"
+  "zh-Hant-TW": "⚡ 這個方案最可能失敗的情況：{kill}",
+  "en": "⚡ Most likely way this plan fails: {kill}"
  },
  "ov.cardHow": {
   "zh-Hant-TW": "點擊或按 {num} 套用並還原卡片原本的選擇 · Shift+{num} 保留你的手動調整",
@@ -196,55 +196,55 @@
   "en": "★ Suggested"
  },
  "ov.fatal": {
-  "zh-Hant-TW": "⚡ 致死：{kill}",
+  "zh-Hant-TW": "⚡ 會失敗的情況：{kill}",
   "en": "⚡ Fails if: {kill}"
  },
  "ov.streaming": {
-  "zh-Hant-TW": "⋯ 串流中 {n}/12",
-  "en": "⋯ Streaming {n}/12"
+  "zh-Hant-TW": "⋯ 正在接收 {n}/12",
+  "en": "⋯ Receiving {n}/12"
  },
  "ov.waitingGalaxy": {
   "zh-Hant-TW": "⋯ 等待星系",
   "en": "⋯ Waiting for galaxy"
  },
  "ov.statusOk": {
-  "zh-Hant-TW": "✓ 已選條件相容",
-  "en": "✓ Choices are compatible"
+  "zh-Hant-TW": "✓ 選擇之間沒有衝突",
+  "en": "✓ No clashes between your picks"
  },
  "ov.statusPick": {
-  "zh-Hant-TW": "✦ 先發散：按 1/2/3 選主幹",
-  "en": "✦ Explore first: press 1/2/3 to pick a plan"
+  "zh-Hant-TW": "✦ 看完各種觀點後，按 1/2/3 選一個方案",
+  "en": "✦ Look over the ideas, then press 1/2/3 to pick a plan"
  },
  "ov.statusPickRec": {
-  "zh-Hant-TW": "✦ 先發散：按 1/2/3 選主幹（★ 推薦 {num}）",
-  "en": "✦ Explore first: press 1/2/3 to pick a plan (★ suggested: {num})"
+  "zh-Hant-TW": "✦ 看完各種觀點後，按 1/2/3 選一個方案（★ 推薦 {num}）",
+  "en": "✦ Look over the ideas, then press 1/2/3 to pick a plan (★ suggested: {num})"
  },
  "ov.statusConflict": {
-  "zh-Hant-TW": "✗ 有互斥：{list}（按 r 解除）",
-  "en": "✗ Conflict: {list} (press r to resolve)"
+  "zh-Hant-TW": "✗ 有衝突：{list}（按 r 自動解決）",
+  "en": "✗ Clash: {list} (press r to fix)"
  },
  "ov.tipNoData": {
   "zh-Hant-TW": "星系資料還沒到齊。",
   "en": "The galaxy data hasn't fully arrived yet."
  },
  "ov.tipOk": {
-  "zh-Hant-TW": "已選的條件彼此沒有互斥、依賴也都補齊。這只檢查條件之間的關係，不保證內容正確或可行。",
-  "en": "Your choices don't conflict and their dependencies are included. This only checks how the conditions relate; it doesn't guarantee the content is right or doable."
+  "zh-Hant-TW": "選的項目彼此不衝突，需要的項目也都加進來了。這裡只檢查項目之間的關係，不保證內容正確或做得到。",
+  "en": "Your picks don't clash and anything they need is included. This only checks how the picks relate; it doesn't guarantee the content is right or doable."
  },
  "ov.tipPick": {
-  "zh-Hant-TW": "先瀏覽 12 顆節點與 ✦ 盲區，再選一張策略卡收斂。",
-  "en": "Look over the 12 nodes and ✦ blind spots first, then pick a plan card to narrow down."
+  "zh-Hant-TW": "先看過 12 個觀點和 ✦ 盲區，再選一張方案卡。",
+  "en": "Look over the 12 ideas and ✦ blind spots first, then pick a plan card."
  },
  "ov.tipConflict": {
-  "zh-Hant-TW": "選取的節點彼此矛盾（{status}），方案無法成立。按 r 自動撤銷較早的手動選擇，或自己取消其中一個。",
-  "en": "Your picks contradict each other ({status}), so the plan can't hold. Press r to undo your earlier manual picks, or remove one yourself."
+  "zh-Hant-TW": "你選的觀點彼此衝突（{status}），方案做不到。按 r 自動取消較早的手動選擇，或自己取消其中一個。",
+  "en": "Your picks clash ({status}), so the plan can't work. Press r to undo your earlier manual picks, or remove one yourself."
  },
  "ov.reset": {
   "zh-Hant-TW": "↺ 重設",
   "en": "↺ Reset"
  },
  "ov.resetTip": {
-  "zh-Hant-TW": "清掉選好的策略卡與所有手動調整，回到剛展開的星系。<br><span class=dim>按 u 可以復原。</span>",
+  "zh-Hant-TW": "清掉選好的方案卡與所有手動調整，回到剛展開的星系。<br><span class=dim>按 u 可以復原。</span>",
   "en": "Clear the chosen plan card and all manual changes, back to the freshly spread-out galaxy.<br><span class=dim>Press u to undo.</span>"
  },
  "ov.lockEmbedded": {
@@ -272,8 +272,8 @@
   "en": "Summary"
  },
  "ov.rawView": {
-  "zh-Hant-TW": "原始 AST",
-  "en": "Raw AST"
+  "zh-Hant-TW": "完整指令",
+  "en": "Full instructions"
  },
  "ov.stGuard": {
   "zh-Hant-TW": "🛡 已設為護欄",
@@ -296,32 +296,32 @@
   "en": "Not chosen"
  },
  "ov.whyPulled": {
-  "zh-Hant-TW": "（因其他節點依賴它而自動加入）",
-  "en": " (added because another node needs it)"
+  "zh-Hant-TW": "（其他選項需要它，已自動加入）",
+  "en": " (added because another pick needs it)"
  },
  "ov.whyGaveWay": {
-  "zh-Hant-TW": "（與已選節點互斥而自動讓位）",
-  "en": " (dropped because it conflicts with a chosen node)"
+  "zh-Hant-TW": "（和你選的項目衝突，已自動取消）",
+  "en": " (dropped because it clashes with your picks)"
  },
  "ov.whyUser": {
   "zh-Hant-TW": "（你手動設定）",
   "en": " (set by you)"
  },
  "ov.whyCard": {
-  "zh-Hant-TW": "（來自策略卡）",
+  "zh-Hant-TW": "（來自方案卡）",
   "en": " (from the plan card)"
  },
  "ov.killCond": {
-  "zh-Hant-TW": "⚡ 失效條件：{kill}",
-  "en": "⚡ Fails if: {kill}"
+  "zh-Hant-TW": "⚡ 這樣就算失敗：{kill}",
+  "en": "⚡ Counts as failed if: {kill}"
  },
  "ov.blindTip": {
   "zh-Hant-TW": "✦ 盲區：{blind}",
   "en": "✦ Blind spot: {blind}"
  },
  "ov.relConflict": {
-  "zh-Hant-TW": "⊗ 與 {id}「{label}」互斥",
-  "en": "⊗ Conflicts with {id} “{label}”"
+  "zh-Hant-TW": "⊗ 和 {id}「{label}」衝突",
+  "en": "⊗ Clashes with {id} “{label}”"
  },
  "ov.relNeeds": {
   "zh-Hant-TW": "→ 需要 {id}「{label}」",
@@ -340,15 +340,15 @@
   "en": "Left-click (Space) include · right-click (x) exclude · press again to undo"
  },
  "ov.sumConflict": {
-  "zh-Hant-TW": "有互斥衝突：{list}<br>按 <kbd>r</kbd> 保留較新決定，或改選其他節點。",
-  "en": "Conflicting picks: {list}<br>Press <kbd>r</kbd> to keep your newer decision, or pick other nodes."
+  "zh-Hant-TW": "這些選擇彼此衝突：{list}<br>按 <kbd>r</kbd> 保留最新的決定，或改選其他觀點。",
+  "en": "These picks clash: {list}<br>Press <kbd>r</kbd> to keep your latest decision, or pick other ideas."
  },
  "ov.sumEmpty": {
-  "zh-Hant-TW": "先看完 12 顆節點，再按 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> 選一條主幹（或用 <kbd>Space</kbd> / <kbd>x</kbd> 自己挑）。<br><br>這裡會整理成：<br>✅ 要做　🛡 護欄　⛔ 不做　⚠ 承擔風險　💸 代價",
-  "en": "Look over the 12 nodes, then press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to pick a plan (or choose yourself with <kbd>Space</kbd> / <kbd>x</kbd>).<br><br>It will be summed up here as:<br>✅ Do　🛡 Guardrails　⛔ Don't　⚠ Accepted risks　💸 Cost"
+  "zh-Hant-TW": "先看完 12 個觀點，再按 <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> 選一個方案（或用 <kbd>Space</kbd> / <kbd>x</kbd> 自己挑）。<br><br>這裡會整理成：<br>✅ 要做　🛡 護欄　⛔ 不做　⚠ 接受的風險　💸 代價",
+  "en": "Look over the 12 ideas, then press <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> to pick a plan (or choose yourself with <kbd>Space</kbd> / <kbd>x</kbd>).<br><br>It will be summed up here as:<br>✅ Do　🛡 Guardrails　⛔ Don't　⚠ Accepted risks　💸 Cost"
  },
  "ov.tagDerived": {
-  "zh-Hant-TW": "推導",
+  "zh-Hant-TW": "自動",
   "en": "auto"
  },
  "ov.tagUser": {

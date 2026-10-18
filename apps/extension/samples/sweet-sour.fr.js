@@ -1,5 +1,5 @@
 // 擴充功能內建生活題示範星系（法文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
-const dims = { D1: "D'où vient le sucré", D2: "Exutoire à l'envie", D3: "Ampleur du changement", D4: "Ce qu'il y a à la maison" };
+const dims = { D1: "D'où vient le sucré", D2: "Comment gérer l'envie", D3: "Ampleur du changement", D4: "Ce qu'il y a à la maison" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
   dim, cell, inverse_cell, inverse_pos: `Le point de vue opposé pousse ${dims[dim]} à l'autre extrême`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_FR = {
   quadrants: {
     Q1: { scar: "A mangé tout un sachet de fruits secs en pensant que c'était sain", sacred: "Le sucré ne vient que des fruits entiers" },
     Q2: { scar: "A arrêté le sucre trois fois, et craqué la deuxième semaine à chaque fois", sacred: "Ça ne compte que si on peut vraiment tenir" },
-    Q3: { scar: "A copié un régime low-carb et s'en est lassé en trois jours", sacred: "Changer la méthode, pas le goût" },
-    Q4: { scar: "A vu trop de gens arrêter le sucre et replonger aussitôt", sacred: "Les règles battent la volonté" },
+    Q3: { scar: "A copié un régime pauvre en glucides et s'en est lassé en trois jours", sacred: "Changer la méthode, pas le goût" },
+    Q4: { scar: "A vu trop de gens arrêter le sucre et replonger aussitôt", sacred: "Se fixer des règles plutôt que compter sur la volonté" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Fruits entiers", "Dès qu'on a envie de sucré, ne manger que des fruits frais entiers, comme kiwi, ananas, fruits rouges ou oranges ; jus, fruits secs et fruits confits ne comptent pas", "Échoue si, en 14 jours, vous achetez un dessert pour calmer une envie plus de 3 jours", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_FR = {
     { type: "excludes", from: "N1", to: "N5", why: "Si le sucré ne vient que des fruits entiers, on ne peut pas garder les en-cas sucrés qu'on aime" },
     { type: "excludes", from: "N4", to: "N11", why: "Les fruits de la maison reposent sur l'achat d'un cageot chaque semaine ; interdire les achats par lots fait tomber ce plan d'approvisionnement" },
     { type: "excludes", from: "N2", to: "N7", why: "Cette piste ne change que les boissons et laisse les repas tels quels, ce qui contredit le fait de revoir la sauce aigre-douce" },
-    { type: "excludes", from: "N2", to: "N10", why: "Cette piste ne change que les boissons et n'achète aucun en-cas de substitution ; plafonner leur budget relève d'une autre piste, il faut choisir" },
+    { type: "excludes", from: "N2", to: "N10", why: "Cette piste ne change que les boissons et n'achète aucun en-cas de substitution , donc un plafond de dépenses pour ces substituts ne s'applique pas ; il faut choisir" },
     { type: "excludes", from: "N9", to: "N11", why: "Garder de l'eau pétillante en stock, c'est l'acheter par packs, ce qui heurte de front l'interdiction des achats par lots" },
     { type: "requires", from: "N1", to: "N8", why: "Les fruits contiennent aussi du sucre ; même s'ils sont votre seule douceur, il faut une limite quotidienne, sinon trop en manger pèse quand même" },
     { type: "requires", from: "N4", to: "N10", why: "Acheter fruits et yaourts au cageot chaque semaine finit par coûter cher : il faut un plafond de dépenses, sinon c'est le porte-monnaie qui lâche en premier" },

@@ -65,5 +65,5 @@ export const SAMPLE_GALAXY_NB = {
     },
   },
   recommend: { key: "alpha", why: "Med 100+ temaer er det bare config-styrt design som holder vedlikeholdskostnaden i sjakk" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Hvert tema arver fra det samme default-temaet", kill: "Går default i stykker, går layouten til hvert tema i stykker", label: "default-SPOF" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Hvert tema arver fra det samme default-temaet", kill: "Går default i stykker, går layouten til hvert tema i stykker", label: "Sårbar default" },
 };

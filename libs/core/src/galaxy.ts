@@ -49,7 +49,7 @@ export function solveGalaxy(a: IntentAnalysisResponse, baseKey: ArchetypeKey | n
  */
 /** AST 各段標題的在地語言說明（英文關鍵字 MUST / GUARDRAILS… 固定不變，給 AI 與 kill-gate 辨識）。預設繁體中文。 */
 export type AstLabels = Readonly<{ must: string; guard: string; mustNot: string; risk: string; sacrifice: string; forbid: string; accepted: string }>;
-export const AST_LABELS_ZH: AstLabels = { must: "採納機制", guard: "證偽護欄", mustNot: "排除反目標", risk: "明示承擔風險", sacrifice: "必然代價", forbid: "禁止", accepted: "已知並承擔" };
+export const AST_LABELS_ZH: AstLabels = { must: "要做的事", guard: "停下來的條件", mustNot: "不做的事", risk: "接受的風險", sacrifice: "要付出的代價", forbid: "禁止", accepted: "知道風險仍接受" };
 
 export function renderLockedAst(a: IntentAnalysisResponse, sol: GalaxySolution, baseKey: ArchetypeKey | null, L: AstLabels = AST_LABELS_ZH): string {
   const arch = baseKey ? a.archetypes[baseKey] : undefined;

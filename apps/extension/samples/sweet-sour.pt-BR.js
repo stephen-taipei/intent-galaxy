@@ -15,7 +15,7 @@ export const SWEET_SOUR_GALAXY_PT_BR = {
     Q1: { scar: "Comi um pacote inteiro de fruta desidratada achando que era saudável", sacred: "O doce só vem da fruta inteira" },
     Q2: { scar: "Cortei o açúcar três vezes e caí de novo na segunda semana em todas", sacred: "Só vale se você conseguir manter de verdade" },
     Q3: { scar: "Copiei uma dieta low carb e enjoei em três dias", sacred: "Mude o método, não o sabor" },
-    Q4: { scar: "Já vi gente demais cortar o açúcar e voltar tudo de novo", sacred: "Regra vence força de vontade" },
+    Q4: { scar: "Já vi gente demais cortar o açúcar e voltar tudo de novo", sacred: "Crie regras em vez de depender da força de vontade" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Fruta inteira", "Sempre que der vontade de doce, comer só fruta fresca inteira, como kiwi, abacaxi, frutas vermelhas ou laranja; suco, fruta desidratada e fruta cristalizada não contam", "Falha se, em 14 dias, você comprar sobremesa para matar a vontade em mais de 3 dias", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_PT_BR = {
     { type: "excludes", from: "N1", to: "N5", why: "Se o doce só vem da fruta inteira, não dá para manter os lanchinhos doces que você ama" },
     { type: "excludes", from: "N4", to: "N11", why: "A fruta em casa depende de comprar uma caixa toda semana; se você proíbe comprar em quantidade, esse plano de abastecimento desmorona" },
     { type: "excludes", from: "N2", to: "N7", why: "Esse caminho só muda as bebidas e deixa as refeições em paz, o que contradiz refazer o molho agridoce" },
-    { type: "excludes", from: "N2", to: "N10", why: "Esse caminho só muda as bebidas e não compra lanchinhos substitutos; um teto de gasto com substitutos é de outro caminho, então escolha um" },
+    { type: "excludes", from: "N2", to: "N10", why: "Esse caminho só muda as bebidas e não compra lanchinhos substitutos, então um teto de gasto com substitutos não se aplica; escolha um" },
     { type: "excludes", from: "N9", to: "N11", why: "Ter sempre água com gás em estoque significa comprar em fardo, o que bate de frente com não comprar em quantidade" },
     { type: "requires", from: "N1", to: "N8", why: "Fruta também tem açúcar; mesmo que fruta seja seu único doce, você precisa de um limite diário, senão comer demais também cobra seu preço" },
     { type: "requires", from: "N4", to: "N10", why: "Comprar fruta e iogurte por caixa toda semana vai somando, então você precisa de um teto de gasto, senão o bolso desiste primeiro" },

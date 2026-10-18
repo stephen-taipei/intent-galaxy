@@ -137,12 +137,12 @@ gemini mcp add intent-galaxy npx -y @stephen.taipei/intent-galaxy
 agy mcp add intent-galaxy npx -y @stephen.taipei/intent-galaxy
 ```
 
-在對話裡請它「用 intent galaxy 分析這個目標」。這條路由宿主 AI 自己生成，不額外呼叫其他模型：
+在對話裡請它「用 intent galaxy 分析這個目標」。星系由你正在用的這個 AI（Claude Code、Codex 等）自己生成，不會另外呼叫其他模型：
 
 ```mermaid
 sequenceDiagram
     actor U as 你
-    participant H as 宿主 AI
+    participant H as 你正在用的 AI
     participant M as intent-galaxy MCP
     participant B as 瀏覽器星系
     U->>H: 用 intent galaxy 分析這個目標

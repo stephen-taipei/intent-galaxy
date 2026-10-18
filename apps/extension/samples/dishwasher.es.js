@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_ES = {
     Q1: { scar: "Compré un lavavajillas y sigo fregando a mano", sacred: "Primero cuenta tus platos" },
     Q2: { scar: "A mitad de instalación vi que la manguera no llegaba", sacred: "Mide antes de comprar" },
     Q3: { scar: "Lo compré por un ranking de internet y no cabía", sacred: "Coge ideas de otros campos" },
-    Q4: { scar: "He visto tres lavavajillas acabar de escurreplatos", sacred: "Planifica primero el fallo" },
+    Q4: { scar: "He visto tres lavavajillas acabar de escurreplatos", sacred: "Piensa bien en cómo podría fallar" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Integrable", "Quitar el módulo de 45 o 60 cm junto al fregadero e integrar ahí el lavavajillas, para que no ocupe encimera ni estorbe al pasar", "No encaja si el hueco del mueble es más pequeño en ancho, alto o fondo que las medidas de integración del aparato", null),
@@ -27,12 +27,12 @@ export const DISHWASHER_GALAXY_ES = {
     N7: node("D3", 2, 1, "Con depósito", "Como una autocaravana con su propio depósito de agua, elegir un modelo de sobremesa que se llena a mano: sin conectar al grifo ni tocar fontanería", "No encaja si alguna semana te lo saltas y friegas a mano 2 o más veces por pereza de llenarlo", "Llenarlo da más pereza de lo que parece",
       { lateral: { src: "Camping: depósito de agua integrado", dist: 2, drop: "Toma de agua fija al grifo" } }),
     N8: node("D2", 1, 0, "Medir antes", "Como la lista de comprobación de un piloto antes de despegar, medir ancho, fondo y alto antes de pedirlo, y luego comprobar dónde están el enchufe y el desagüe; si falta alguno de los 5, no se pide", "No encaja si algo no cuadra o no se puede instalar cuando llega", null,
-      { lateral: { src: "Aviación: checklist prevuelo", dist: 3, drop: "Pedir a ojo" } }),
+      { lateral: { src: "Aviación: revisión antes de despegar", dist: 3, drop: "Pedir a ojo" } }),
     N9: node("D4", 2, 0, "Vajilla apta", "Como un restaurante que solo usa vajilla apta para lavavajillas, sustituir toda olla y plato marcado como no apto, para que no quede nada que fregar a mano", "No encaja si en los 14 días tras el cambio sigues fregando a mano más de 3 piezas al día", null,
       { lateral: { src: "Hostelería: vajilla profesional", dist: 4, drop: "Vajilla vieja mezclada de casa" } }),
-    N10: node("D2", 2, 0, "Sin media carga", "Si lo pones a menos de media carga, gasta casi la misma agua y luz que lleno, así que cada plato sale más del doble de caro", "Apunta tus platos 7 días antes de pedirlo; si sale una media de menos de 6 servicios al día, pásate a un mini", "Los platos empiezan a oler mientras esperas a llenarlo",
+    N10: node("D2", 2, 0, "Sin media carga", "Si lo pones a menos de media carga, gasta casi la misma agua y luz que lleno, así que lavar cada plato sale más del doble de caro", "Apunta tus platos 7 días antes de pedirlo; si sale una media de menos de 6 servicios al día, pásate a un mini", "Los platos empiezan a oler mientras esperas a llenarlo",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Poner una máquina grande medio vacía no compensa" } }),
-    N11: node("D4", 1, 0, "Ollas fuera", "Si metes woks y ollas grandes por comodidad, en un mini no cabe la vajilla en una tanda y acabas fregando a mano otra vez", "Se descarta si en 14 días las ollas obligan a una segunda tanda más de 2 veces", "No todos en casa van a cumplir la norma",
+    N11: node("D4", 1, 0, "Ollas fuera", "Si metes woks y ollas grandes por comodidad, en un mini no cabe la vajilla en una tanda y acabas fregando a mano otra vez", "Descarta este plan si en 14 días, por meter ollas, tienes que poner una segunda tanda más de 2 veces", "No todos en casa van a cumplir la norma",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Sobrecargar la máquina por comodidad" } }),
     N12: node("D3", 0, 1, "Sin reforma", "Si instalar un lavavajillas acaba en reformar toda la cocina, una vez empezada la obra y pagado el dinero, no te queda otra que terminarla", "No empieces si el presupuesto que te dan antes de quitar el módulo supera 2 veces el precio del aparato", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Empezada la obra, ya no hay vuelta atrás" } }),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_ES = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Desmontaje del módulo y mano de obra de instalación", v: "Un armario menos para guardar cosas", t: "Esperar a que el instalador mida y monte", l: "Esperar a media carga para ponerlo", x: "Renunciar al mini de sobremesa" },
-      fatal: "N10", thesis: "Medir el hueco, integrar una máquina grande y ponerla solo a partir de media carga", title: "Integrado grande, de una vez",
+      fatal: "N10", thesis: "Medir el hueco, integrar una máquina grande y ponerla solo cuando esté al menos medio llena", title: "Integrado grande, de una vez",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_ES = {
     },
   },
   recommend: { key: "alpha", why: "En un hogar de 3 o más personas, una máquina grande se encarga de los platos de todo el día en una sola tanda" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Los platos de toda la familia dependen de este único aparato; si se estropea, la única alternativa es fregar a mano", kill: "Se descarta si una reparación tarda más de 7 días y la familia vuelve a fregar a mano", label: "Aparato único" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Los platos de toda la familia dependen de este único aparato; si se estropea, la única alternativa es fregar a mano", kill: "Descarta este plan si una reparación tarda más de 7 días y la familia vuelve a fregar a mano", label: "Aparato único" },
 };

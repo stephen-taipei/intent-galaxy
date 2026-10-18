@@ -1,30 +1,30 @@
 {
  "ast.must": {
-  "zh-Hant-TW": "採納機制",
-  "en": "adopted mechanisms"
+  "zh-Hant-TW": "要做的事",
+  "en": "what to do"
  },
  "ast.guard": {
-  "zh-Hant-TW": "證偽護欄",
-  "en": "falsification guardrails"
+  "zh-Hant-TW": "停下來的條件",
+  "en": "stop conditions"
  },
  "ast.mustNot": {
-  "zh-Hant-TW": "排除反目標",
-  "en": "ruled-out anti-goals"
+  "zh-Hant-TW": "不做的事",
+  "en": "what not to do"
  },
  "ast.risk": {
-  "zh-Hant-TW": "明示承擔風險",
-  "en": "explicitly accepted risks"
+  "zh-Hant-TW": "接受的風險",
+  "en": "risks accepted on purpose"
  },
  "ast.sacrifice": {
-  "zh-Hant-TW": "必然代價",
-  "en": "unavoidable cost"
+  "zh-Hant-TW": "要付出的代價",
+  "en": "what it will cost"
  },
  "ast.forbid": {
   "zh-Hant-TW": "禁止",
   "en": "Forbidden"
  },
  "ast.accepted": {
-  "zh-Hant-TW": "已知並承擔",
+  "zh-Hant-TW": "知道風險仍接受",
   "en": "Known and accepted"
  }
 }

@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_DA = {
     Q1: { scar: "Købte en opvaskemaskine og vaskede stadig op i hånden", sacred: "Tæl dit service først" },
     Q2: { scar: "Opdagede midt i installationen, at slangen var for kort", sacred: "Mål, før du køber" },
     Q3: { scar: "Købte fra en online topliste, og den passede ikke", sacred: "Lån idéer fra andre områder" },
-    Q4: { scar: "Har set tre opvaskemaskiner ende som tallerkenstativ", sacred: "Planlæg efter fiasko først" },
+    Q4: { scar: "Har set tre opvaskemaskiner ende som tallerkenstativ", sacred: "Tænk først over, hvad der kan gå galt" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Indbyg ved vask", "Tag underskabet på 45 eller 60 cm ved siden af vasken ud og byg maskinen ind, så den ikke optager bordplads eller spærrer gangarealet", "Passer ikke, hvis skabets bredde, højde eller dybde er mindre end maskinens oplyste indbygningsmål", null),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_DA = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Skab ud og montørløn", v: "Ét skab mindre til opbevaring", t: "Vent på en montør til opmåling og montering", l: "Vent med at køre til en halv fyldning", x: "Opgiv bordmodellen" },
-      fatal: "N10", thesis: "Mål skabet, byg en stor maskine ind, og kør kun når den er halvfuld", title: "Stor indbygget maskine, gjort én gang",
+      fatal: "N10", thesis: "Mål skabet, byg en stor maskine ind, og kør kun når den er halvfuld", title: "Stor indbygget maskine, rigtigt fra start",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],

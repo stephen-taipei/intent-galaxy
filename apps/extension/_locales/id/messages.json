@@ -1,9 +1,9 @@
 {
  "actionTitle": {
-  "message": "Intent Galaxy: buka galaksi niat di obrolan AI ini (Cmd/Ctrl+Shift+G)"
+  "message": "Intent Galaxy: buka galaksi di obrolan AI ini (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Menambahkan tombol iG ke obrolan AI seperti Claude, ChatGPT, dan Gemini agar Anda tahu keinginan sebenarnya dalam 60 detik."
+  "message": "Menambahkan tombol iG ke obrolan AI seperti Claude, ChatGPT, dan Gemini untuk membantumu memperjelas apa yang benar-benar kamu inginkan dalam 60 detik."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy hanya berfungsi di situs AI berikut: $1"

@@ -1,6 +1,6 @@
 {
  "actionTitle": {
-  "message": "Intent Galaxy: mở thiên hà ý định trong cuộc trò chuyện AI này (Cmd/Ctrl+Shift+G)"
+  "message": "Intent Galaxy: mở thiên hà trong cuộc trò chuyện AI này (Cmd/Ctrl+Shift+G)"
  },
  "description": {
   "message": "Thêm nút iG vào các cuộc trò chuyện AI như Claude, ChatGPT, Gemini để làm rõ điều bạn thật sự muốn trong 60 giây."

@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_NL = {
     Q1: { scar: "Vaatwasser gekocht en toch nog met de hand afgewassen", sacred: "Tel eerst je vaat" },
     Q2: { scar: "Halverwege de installatie ontdekt dat de slang te kort was", sacred: "Eerst meten, dan kopen" },
     Q3: { scar: "Gekocht van een online toplijstje en hij paste niet", sacred: "Leen ideeën uit andere vakgebieden" },
-    Q4: { scar: "Drie vaatwassers als afdruiprek zien eindigen", sacred: "Plan eerst op mislukking" },
+    Q4: { scar: "Drie vaatwassers als afdruiprek zien eindigen", sacred: "Bedenk eerst wat er misgaat" },
   },
   nodes: {
     N1: node("D1", 0, 2, "In de onderkast", "Haal het onderkastje van 45 of 60 cm naast de spoelbak eruit en bouw de machine in, zodat hij geen aanrechtruimte inneemt en de looproute vrij blijft", "Past niet als breedte, hoogte of diepte van de kast kleiner is dan de opgegeven inbouwmaten", null),
@@ -44,7 +44,7 @@ export const DISHWASHER_GALAXY_NL = {
     { type: "excludes", from: "N2", to: "N7", why: "Na elke maaltijd draaien betekent drie keer per dag de tank met de hand vullen, en dat hou je moeilijk vol" },
     { type: "excludes", from: "N2", to: "N10", why: "Na elke maaltijd draaien is vaak minder dan een halve lading, wat botst met de regel nooit half vol" },
     { type: "excludes", from: "N9", to: "N11", why: "Het punt van vaatwasbestendige pannen en borden is dat ze erin gaan, dat botst met pannen eruit houden" },
-    { type: "requires", from: "N1", to: "N8", why: "1 cm ernaast en hij schuift de kast niet in, dus alles meten voordat je bestelt" },
+    { type: "requires", from: "N1", to: "N8", why: "1 cm ernaast en hij past niet in de kast, dus alles meten voordat je bestelt" },
     { type: "requires", from: "N4", to: "N10", why: "Een grote machine die half leeg draait verbruikt nog steeds water en stroom voor een volle lading, dus houd je aan nooit half vol" },
   ],
   archetypes: {
