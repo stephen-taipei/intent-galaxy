@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: Absichtsgalaxie in diesem KI-Chat öffnen (Cmd/Strg+Umschalt+G)"
+ },
+ "description": {
+  "message": "Fügt KI-Chats wie Claude, ChatGPT und Gemini einen iG-Button hinzu, damit du in 60 Sekunden klärst, was du wirklich willst."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy funktioniert nur auf diesen KI-Websites: $1"
+ }
+}

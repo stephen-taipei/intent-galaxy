@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: avaa aikomusgalaksi tässä tekoälychatissa (Cmd/Ctrl+Vaihto+G)"
+ },
+ "description": {
+  "message": "Lisää iG-painikkeen tekoälychatteihin, kuten Claude, ChatGPT ja Gemini, jotta selvität 60 sekunnissa, mitä oikeasti haluat."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy toimii vain näillä tekoälysivustoilla: $1"
+ }
+}

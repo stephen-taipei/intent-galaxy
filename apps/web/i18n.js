@@ -42,6 +42,13 @@ export let locale = "en";
 /** 使用者手動選的語系；"" 表示跟著瀏覽器語言。 */
 export let preference = "";
 export const isRtl = () => RTL.has(locale);
+/** 示範星系的檔名後綴：繁中（台灣與通用）用原檔 <名稱>.js，其他語系是 <名稱>.<語系>.js。 */
+export const sampleSuffix = (code = locale) => code === "zh-Hant-TW" || code === "zh-Hant" ? "" : `.${code}`;
+/** 載入示範星系的目前語系版本；base 是原檔不含 .js 的完整 URL。載入失敗時用原檔。 */
+export async function loadSample(base) {
+  const first = (m) => Object.values(m)[0];
+  try { return first(await import(`${base}${sampleSuffix()}.js`)); } catch { return first(await import(`${base}.js`)); }
+}
 
 const listeners = new Set();
 /** 語系換掉時呼叫 cb（手動切換，或擴充功能的另一個頁面切換了）。回傳取消訂閱的函式。 */

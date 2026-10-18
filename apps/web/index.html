@@ -62,9 +62,9 @@
   <div class="actions"><button type="button" id="done-recopy" data-i18n="web.doneRecopy">再複製一次</button><button type="button" class="primary" id="done-close" data-i18n="web.doneClose">好，我去貼上</button></div>
 </dialog>
 <script type="module">
-import { t, ready, onLocaleChange, isRtl } from "./i18n.js";
+import { t, ready, onLocaleChange, isRtl, loadSample } from "./i18n.js";
 import "./galaxy-overlay.js";
-import { SAMPLE_GALAXY } from "./sample-galaxy.js";
+const SAMPLE = new URL("./sample-galaxy", import.meta.url).href;
 /** 套用頁面上固定的文字；啟動時與手動切換語系時各跑一次。 */
 const localize = (code) => {
   document.documentElement.lang = code;
@@ -85,9 +85,14 @@ const badge = document.getElementById("source-badge");
 const served = location.protocol.startsWith("http");
 const show = (g) => { galaxy.setGalaxy(g.analysis, { galaxyId: g.id, goal: g.goal }); source = g.source; badge.textContent = badgeText(); galaxy.focus(); };
 localize(await ready);
-onLocaleChange(localize);
+// 還在看示範星系時切換語系：換成該語系的示範版本（已選的方案會重設）。
+onLocaleChange(async (code) => {
+  localize(code);
+  const next = await loadSample(SAMPLE);
+  if (source === "sample") galaxy.setGalaxy(next);
+});
 
-galaxy.setGalaxy(SAMPLE_GALAXY);
+galaxy.setGalaxy(await loadSample(SAMPLE));
 // ?base=alpha|beta|gamma：開啟時直接套用策略卡（分享示範連結、截圖用）。
 const presetBase = new URLSearchParams(location.search).get("base");
 if (presetBase) galaxy.selectArchetype(presetBase);

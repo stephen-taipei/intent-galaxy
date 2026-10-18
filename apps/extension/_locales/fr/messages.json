@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy : ouvrir la galaxie d’intentions dans ce chat IA (Cmd/Ctrl+Maj+G)"
+ },
+ "description": {
+  "message": "Ajoute un bouton iG aux chats IA comme Claude, ChatGPT et Gemini pour clarifier en 60 secondes ce que vous voulez vraiment."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy ne fonctionne que sur ces sites d’IA : $1"
+ }
+}

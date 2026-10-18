@@ -5,6 +5,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildGalaxyBundle } from "./sync-extension.mjs";
+import { LOCALES } from "./i18n.mjs";
+import { sampleSuffix } from "../apps/web/i18n.js";
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -23,6 +25,19 @@ try {
     const repaired = core.repairAnalysis(galaxy);
     assert.deepEqual(repaired.findings, [], `${file}: ${JSON.stringify(repaired.findings)}`);
     for (const key of ["alpha", "beta", "gamma"]) assert.equal(core.solveGalaxy(repaired.analysis, key, new Map()).status, "SAT", `${file} ${key}`);
+  }
+  // 示範星系的各語系版本：每個語系都要有，結構（節點、邊、策略卡）必須與繁中原版一致，只有文字不同
+  const KEEP = new Set(["schema_version", "dim", "type", "from", "to", "fatal", "key", "attack", "hits"]);
+  const shape = (v, k) => Array.isArray(v) ? v.map((x) => shape(x)) : v && typeof v === "object"
+    ? Object.fromEntries(Object.entries(v).map(([kk, x]) => [kk, shape(x, kk)])) : typeof v === "string" && !KEEP.has(k) ? "" : v;
+  const suffixes = [...new Set(LOCALES.map((code) => sampleSuffix(code)))].filter(Boolean);
+  const groups = ["apps/web/sample-galaxy", "apps/extension/samples/dishwasher", "apps/extension/samples/sweet-sour"].map((b) => [b, ".js", ...suffixes.map((s) => `${s}.js`)]);
+  for (const [base, ...exts] of groups) {
+    const [orig, ...variants] = await Promise.all(exts.map(async (e) => Object.values(await import(path.join(ROOT_DIR, base + e)))[0]));
+    for (const [i, g] of variants.entries()) {
+      assert.deepEqual(shape(g), shape(orig), `${base}${exts[i + 1]} 結構與繁中版不同`);
+      assert.deepEqual(core.repairAnalysis(g).findings, [], `${base}${exts[i + 1]}`);
+    }
   }
   console.log("✅ tools/sync-extension verified!");
 } finally {

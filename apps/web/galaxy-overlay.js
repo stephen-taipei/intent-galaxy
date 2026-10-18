@@ -389,7 +389,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
     root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS()).map(([q, label]) =>
       `<div class="q-tag ${q}" title="${esc(quadrants[q]?.scar)}">${label}${quadrants[q]?.sacred ? ` <small>· ${esc(quadrants[q].sacred)}</small>` : ""}</div>`).join("");
-    root.querySelector("#core .goal").textContent = String(core.decision ?? "").replace(/^你真正在決定的是[:：]\s*/, "");
+    root.querySelector("#core .goal").textContent = String(core.decision ?? "").replace(/^你真正在[決决]定的是[:：]\s*/, "");
     const metricEl = root.querySelector("#core .metric");
     metricEl.textContent = core.metric ? `🎯 ${core.metric}` : "";
     if (core.metric) metricEl.dataset.tip = `<b>${t("ov.metric")}</b><br>${esc(core.metric)}`; else delete metricEl.dataset.tip;

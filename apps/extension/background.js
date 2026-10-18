@@ -2,13 +2,14 @@
 // 分頁若在安裝擴充功能前就已開啟（content script 尚未注入），先注入再開啟（host_permissions 只含支援的 AI 網站）。
 const api = globalThis.browser ?? globalThis.chrome;
 const SITES = ["claude.ai", "chatgpt.com", "grok.com", "gemini.google.com", "chat.deepseek.com", "chat.qwen.ai", "www.perplexity.ai", "copilot.microsoft.com", "chat.mistral.ai", "www.kimi.com"];
+const siteList = () => { try { return new Intl.ListFormat(api.i18n.getUILanguage(), { type: "unit" }).format(SITES); } catch { return SITES.join(", "); } };
 const supported = (url) => { try { const u = new URL(url); return u.protocol === "https:" && SITES.includes(u.hostname); } catch { return false; } };
 
 api.action.onClicked.addListener(async (tab) => {
   if (!tab?.id) return;
   if (!supported(tab.url ?? "")) {
     await api.action.setBadgeText({ tabId: tab.id, text: "?" });
-    await api.action.setTitle({ tabId: tab.id, title: `Intent Galaxy 只在這些 AI 網站運作：${SITES.join("、")}` });
+    await api.action.setTitle({ tabId: tab.id, title: api.i18n.getMessage("unsupportedSite", [siteList()]) });
     return;
   }
   const target = { tabId: tab.id };

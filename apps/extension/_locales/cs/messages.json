@@ -1,0 +1,11 @@
+{
+ "actionTitle": {
+  "message": "Intent Galaxy: otevřít galaxii záměrů v tomto AI chatu (Cmd/Ctrl+Shift+G)"
+ },
+ "description": {
+  "message": "Přidá tlačítko iG do AI chatů jako Claude, ChatGPT a Gemini, abyste si za 60 sekund ujasnili, co opravdu chcete."
+ },
+ "unsupportedSite": {
+  "message": "Intent Galaxy funguje jen na těchto AI webech: $1"
+ }
+}
