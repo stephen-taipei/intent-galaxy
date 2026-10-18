@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "mitä ei tehdä",
  "ast.risk": "tietoisesti hyväksytyt riskit",
  "ast.sacrifice": "mitä se maksaa",
- "ct.bannerDone": "✅ Galaksi luotu. Tarkastele sitä 🌌 iG -paneelissa (napsauta laajentaaksesi JSONin)",
+ "ct.bannerDone": "✅ Galaksi luotu. Tarkastele sitä iG -paneelissa (napsauta laajentaaksesi JSONin)",
  "ct.bannerFailed": "⚠ Galaksin JSONia ei voitu lukea (napsauta laajentaaksesi; voit kopioida sen ja liittää paneeliin)",
  "ct.bannerPrompt": "🌌 Intent Galaxy -analyysikehote: ”{goal}” (napsauta laajentaaksesi)",
  "ct.bannerWaiting": "⚡ Tekoäly luo galaksia… (napsauta laajentaaksesi)",

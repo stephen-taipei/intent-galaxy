@@ -44,8 +44,8 @@
   "en": "🌌 Intent Galaxy analysis prompt: “{goal}”  (click to expand)"
  },
  "ct.bannerDone": {
-  "zh-Hant-TW": "✅ 星系已生成　在 🌌 iG 面板查看　（點一下展開 JSON）",
-  "en": "✅ Galaxy generated. View it in the 🌌 iG panel  (click to expand the JSON)"
+  "zh-Hant-TW": "✅ 星系已生成　在 iG 面板查看　（點一下展開 JSON）",
+  "en": "✅ Galaxy generated. View it in the iG panel  (click to expand the JSON)"
  },
  "ct.bannerFailed": {
   "zh-Hant-TW": "⚠ 星系 JSON 讀取失敗　（點一下展開，可複製後貼到面板）",

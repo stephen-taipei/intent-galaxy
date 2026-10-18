@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "yapılmayacaklar",
  "ast.risk": "bilerek kabul edilen riskler",
  "ast.sacrifice": "ödenecek bedel",
- "ct.bannerDone": "✅ Galaksi oluşturuldu. 🌌 iG panelinde görüntüleyin (JSON'u genişletmek için tıklayın)",
+ "ct.bannerDone": "✅ Galaksi oluşturuldu. iG panelinde görüntüleyin (JSON'u genişletmek için tıklayın)",
  "ct.bannerFailed": "⚠ Galaksi JSON'u okunamadı (genişletmek için tıklayın; kopyalayıp panele yapıştırabilirsiniz)",
  "ct.bannerPrompt": "🌌 Intent Galaxy analiz istemi: “{goal}” (genişletmek için tıklayın)",
  "ct.bannerWaiting": "⚡ AI galaksiyi oluşturuyor… (genişletmek için tıklayın)",

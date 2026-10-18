@@ -6,7 +6,7 @@
  "ast.mustNot": "ce qu'il ne faut pas faire",
  "ast.risk": "risques assumés en connaissance de cause",
  "ast.sacrifice": "ce que cela va coûter",
- "ct.bannerDone": "✅ Galaxie générée. Affichez-la dans le panneau 🌌 iG  (cliquez pour développer le JSON)",
+ "ct.bannerDone": "✅ Galaxie générée. Affichez-la dans le panneau iG  (cliquez pour développer le JSON)",
  "ct.bannerFailed": "⚠ Impossible de lire le JSON de la galaxie  (cliquez pour développer ; vous pouvez le copier et le coller dans le panneau)",
  "ct.bannerPrompt": "🌌 Prompt d'analyse Intent Galaxy : « {goal} »  (cliquez pour développer)",
  "ct.bannerWaiting": "⚡ L'IA génère la galaxie…  (cliquez pour développer)",

@@ -6,7 +6,7 @@
  "ast.mustNot": "què no s'ha de fer",
  "ast.risk": "riscos acceptats a consciència",
  "ast.sacrifice": "què costarà",
- "ct.bannerDone": "✅ Galàxia generada. Consulta-la al panell 🌌 iG (fes clic per desplegar el JSON)",
+ "ct.bannerDone": "✅ Galàxia generada. Consulta-la al panell iG (fes clic per desplegar el JSON)",
  "ct.bannerFailed": "⚠ No s'ha pogut llegir el JSON de la galàxia (fes clic per desplegar-lo; pots copiar-lo i enganxar-lo al panell)",
  "ct.bannerPrompt": "🌌 Indicació d'anàlisi d'Intent Galaxy: «{goal}» (fes clic per desplegar)",
  "ct.bannerWaiting": "⚡ La IA està generant la galàxia… (fes clic per desplegar)",

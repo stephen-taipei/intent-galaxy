@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "što ne činiti",
  "ast.risk": "svjesno prihvaćeni rizici",
  "ast.sacrifice": "kolika je cijena",
- "ct.bannerDone": "✅ Galaksija je generirana. Pogledajte je na ploči 🌌 iG  (kliknite za proširivanje JSON-a)",
+ "ct.bannerDone": "✅ Galaksija je generirana. Pogledajte je na ploči iG  (kliknite za proširivanje JSON-a)",
  "ct.bannerFailed": "⚠ Čitanje JSON-a galaksije nije uspjelo  (kliknite za proširivanje; možete ga kopirati i zalijepiti u ploču)",
  "ct.bannerPrompt": "🌌 Intent Galaxy upit za analizu: „{goal}”  (kliknite za proširivanje)",
  "ct.bannerWaiting": "⚡ AI generira galaksiju…  (kliknite za proširivanje)",

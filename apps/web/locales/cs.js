@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "co nedělat",
  "ast.risk": "vědomě přijatá rizika",
  "ast.sacrifice": "co to bude stát",
- "ct.bannerDone": "✅ Galaxie je vygenerována. Prohlédněte si ji v panelu 🌌 iG  (kliknutím rozbalíte JSON)",
+ "ct.bannerDone": "✅ Galaxie je vygenerována. Prohlédněte si ji v panelu iG  (kliknutím rozbalíte JSON)",
  "ct.bannerFailed": "⚠ Nepodařilo se načíst JSON galaxie  (kliknutím rozbalíte; můžete jej zkopírovat a vložit do panelu)",
  "ct.bannerPrompt": "🌌 Analytický prompt Intent Galaxy: „{goal}“  (kliknutím rozbalíte)",
  "ct.bannerWaiting": "⚡ AI generuje galaxii…  (kliknutím rozbalíte)",

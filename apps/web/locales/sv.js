@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "det som inte ska göras",
  "ast.risk": "risker som medvetet accepteras",
  "ast.sacrifice": "vad det kostar",
- "ct.bannerDone": "✅ Galaxen har skapats. Visa den i 🌌 iG-panelen  (klicka för att fälla ut JSON)",
+ "ct.bannerDone": "✅ Galaxen har skapats. Visa den i iG-panelen  (klicka för att fälla ut JSON)",
  "ct.bannerFailed": "⚠ Kunde inte läsa galaxens JSON  (klicka för att fälla ut; du kan kopiera och klistra in i panelen)",
  "ct.bannerPrompt": "🌌 Intent Galaxy-analysprompt: ”{goal}”  (klicka för att fälla ut)",
  "ct.bannerWaiting": "⚡ AI skapar galaxen…  (klicka för att fälla ut)",

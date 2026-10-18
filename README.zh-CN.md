@@ -43,7 +43,7 @@
 | ---- | ---- | ---- | :--: |
 | **CLI** | 工程师 | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 星系服务器，可选 Claude、Codex、Gemini、agy CLI 或 12 家 API 生成 | ✅ |
 | **MCP** | 工程师 | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`，Claude Code、Codex、Gemini CLI、agy 都能接入 | ✅ |
-| **Extension** | 普通用户 | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 输入框旁加上 `🌌 iG` 胶囊，直接让该网页的 AI 生成星系 | ✅ |
+| **Extension** | 普通用户 | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 输入框旁加上 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** 胶囊，直接让该网页的 AI 生成星系 | ✅ |
 | **Kill-gate** | 工程师 | `.intent.lock.json`（RFC 8785 JCS + SHA-256）与 14 天后的 commit 验尸守门员 | ✅ |
 
 <br>
@@ -230,11 +230,11 @@ npm run build:ext    # 同步到 apps/extension 与 apps/extension-firefox，可
 npm run pack:ext     # 另外生成 dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip 用于上架
 ```
 
-在输入框里写下一件你正在犹豫的事，点击 `🌌 iG`（或工具栏图标、`Cmd/Ctrl+Shift+G`）：
+在输入框里写下一件你正在犹豫的事，点击 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG**（或工具栏图标、`Cmd/Ctrl+Shift+G`）：
 
 ```mermaid
 flowchart LR
-    A["点击 🌌 iG"] --> B{"这个对话<br/>生成过？"}
+    A["点击 iG"] --> B{"这个对话<br/>生成过？"}
     B -- 是 --> C["直接显示星系"]
     B -- 否 --> D["提示词放进输入框<br/>由你点击发送"]
     D --> E["网页 AI 回复 JSON"]

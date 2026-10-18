@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "mit ne tégy",
  "ast.risk": "tudatosan vállalt kockázatok",
  "ast.sacrifice": "mibe fog kerülni",
- "ct.bannerDone": "✅ Galaxis elkészült. Nézd meg a 🌌 iG panelen  (kattints a JSON kibontásához)",
+ "ct.bannerDone": "✅ Galaxis elkészült. Nézd meg a iG panelen  (kattints a JSON kibontásához)",
  "ct.bannerFailed": "⚠ Nem sikerült beolvasni a galaxis JSON-t  (kattints a kibontáshoz; kimásolhatod és beillesztheted a panelre)",
  "ct.bannerPrompt": "🌌 Intent Galaxy elemző kérés: „{goal}”  (kattints a kibontáshoz)",
  "ct.bannerWaiting": "⚡ Az AI generálja a galaxist…  (kattints a kibontáshoz)",

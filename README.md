@@ -43,7 +43,7 @@ then a **zero-LLM pure-function compiler** produces a deterministic `LOCKED INTE
 | ---- | ---- | ---- | :--: |
 | **CLI** | Engineers | `npx @stephen.taipei/intent-galaxy`: galaxy server on 127.0.0.1, generates with the Claude, Codex, Gemini or agy CLI, or 12 APIs | ✅ |
 | **MCP** | Engineers | Stdio MCP server: `intent_spawner_prompt` → `intent_open_galaxy`; works with Claude Code, Codex, Gemini CLI and agy | ✅ |
-| **Extension** | Everyone | Chrome / Firefox: adds a `🌌 iG` pill next to the chat box on Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral and Kimi, and asks that site's own AI to generate the galaxy | ✅ |
+| **Extension** | Everyone | Chrome / Firefox: adds a <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** pill next to the chat box on Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral and Kimi, and asks that site's own AI to generate the galaxy | ✅ |
 | **Kill-gate** | Engineers | `.intent.lock.json` (RFC 8785 JCS + SHA-256) plus a commit post-mortem gate 14 days later | ✅ |
 
 <br>
@@ -230,11 +230,11 @@ npm run build:ext    # sync into apps/extension and apps/extension-firefox, read
 npm run pack:ext     # also produce dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip for store upload
 ```
 
-Type something you're torn about in the chat box, then click `🌌 iG` (or the toolbar icon, `Cmd/Ctrl+Shift+G`):
+Type something you're torn about in the chat box, then click <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** (or the toolbar icon, `Cmd/Ctrl+Shift+G`):
 
 ```mermaid
 flowchart LR
-    A["Click 🌌 iG"] --> B{"Generated in this<br/>conversation before?"}
+    A["Click iG"] --> B{"Generated in this<br/>conversation before?"}
     B -- Yes --> C["Show the galaxy"]
     B -- No --> D["Prompt goes into the chat box<br/>you press send"]
     D --> E["Site AI replies with JSON"]

@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "czego nie robić",
  "ast.risk": "ryzyka przyjęte świadomie",
  "ast.sacrifice": "jaka będzie cena",
- "ct.bannerDone": "✅ Galaktyka wygenerowana. Zobacz ją w panelu 🌌 iG (kliknij, aby rozwinąć JSON)",
+ "ct.bannerDone": "✅ Galaktyka wygenerowana. Zobacz ją w panelu iG (kliknij, aby rozwinąć JSON)",
  "ct.bannerFailed": "⚠ Nie udało się odczytać JSON galaktyki (kliknij, aby rozwinąć; możesz go skopiować i wkleić do panelu)",
  "ct.bannerPrompt": "🌌 Prompt analityczny Intent Galaxy: „{goal}” (kliknij, aby rozwinąć)",
  "ct.bannerWaiting": "⚡ AI generuje galaktykę… (kliknij, aby rozwinąć)",

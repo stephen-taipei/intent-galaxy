@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "yang tidak dilakukan",
  "ast.risk": "risiko yang sengaja diterima",
  "ast.sacrifice": "harga yang harus dibayar",
- "ct.bannerDone": "✅ Galaksi berhasil dibuat. Lihat di panel 🌌 iG  (klik untuk membuka JSON)",
+ "ct.bannerDone": "✅ Galaksi berhasil dibuat. Lihat di panel iG  (klik untuk membuka JSON)",
  "ct.bannerFailed": "⚠ Gagal membaca JSON galaksi  (klik untuk membuka; kamu bisa menyalin dan menempelkannya ke panel)",
  "ct.bannerPrompt": "🌌 Prompt analisis Intent Galaxy: “{goal}”  (klik untuk membuka)",
  "ct.bannerWaiting": "⚡ AI sedang membuat galaksi…  (klik untuk membuka)",

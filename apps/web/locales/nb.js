@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "det som ikke skal gjøres",
  "ast.risk": "risikoer som bevisst godtas",
  "ast.sacrifice": "hva det koster",
- "ct.bannerDone": "✅ Galaksen er generert. Se den i 🌌 iG-panelet  (klikk for å utvide JSON)",
+ "ct.bannerDone": "✅ Galaksen er generert. Se den i iG-panelet  (klikk for å utvide JSON)",
  "ct.bannerFailed": "⚠ Kunne ikke lese galakse-JSON  (klikk for å utvide; du kan kopiere den og lime inn i panelet)",
  "ct.bannerPrompt": "🌌 Intent Galaxy-analyseprompt: «{goal}»  (klikk for å utvide)",
  "ct.bannerWaiting": "⚡ AI genererer galaksen…  (klikk for å utvide)",

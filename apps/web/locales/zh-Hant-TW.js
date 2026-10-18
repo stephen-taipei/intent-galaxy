@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "不做的事",
  "ast.risk": "接受的風險",
  "ast.sacrifice": "要付出的代價",
- "ct.bannerDone": "✅ 星系已生成　在 🌌 iG 面板查看　（點一下展開 JSON）",
+ "ct.bannerDone": "✅ 星系已生成　在 iG 面板查看　（點一下展開 JSON）",
  "ct.bannerFailed": "⚠ 星系 JSON 讀取失敗　（點一下展開，可複製後貼到面板）",
  "ct.bannerPrompt": "🌌 Intent Galaxy 分析提示詞：「{goal}」　（點一下展開）",
  "ct.bannerWaiting": "⚡ AI 正在生成星系…　（點一下展開）",

@@ -1,4 +1,4 @@
-// Content Script：在 Claude / ChatGPT / Gemini / Grok / DeepSeek / Qwen / Perplexity / Copilot / Mistral / Kimi 輸入框工具列（或 Claude Code Mod 狀態列）掛載 `🌌 iG` 膠囊，
+// Content Script：在 Claude / ChatGPT / Gemini / Grok / DeepSeek / Qwen / Perplexity / Copilot / Mistral / Kimi 輸入框工具列（或 Claude Code Mod 狀態列）掛載 `iG` logo 膠囊，
 // 點擊或按 Cmd/Ctrl+Shift+G 於輸入框上方展開星系面板（擴充功能 iframe），Enter 鎖定後把 LOCKED INTENT AST 寫回輸入框。
 //
 // 每次「用網頁上的 AI 生成」都是一筆 run：提示詞結尾帶唯一識別碼 [ig:<nonce>]，記錄存在 storage（ig:run:<nonce>）。
@@ -77,6 +77,28 @@
     return { parent: document.body, before: null, kind: "floating" };
   }
 
+  // 品牌 logo（docs/brand/intent-galaxy-mark.svg）：用 createElementNS 建立，Trusted Types 網站（如 Gemini）也不會擋。
+  // 按鈕是品牌藍紫實心底（淺色與深色網站上白字都清楚），logo 用白色。
+  const MARK_PATHS = [
+    "M162 215.6C338.5 215.8 510.9 275.4 660 368.3C739.1 417.6 820.3 464.8 908.3 496.6L892.9 512C812.7 500.5 737.1 481.4 660 453.6C498.5 395.6 334.1 365.9 162 374.4ZM162 885.4C338.5 885.2 510.9 825.5 660 732.7C739.1 683.4 820.3 636.2 908.3 604.4L892.9 589C812.7 600.5 737.1 619.6 660 647.4C498.5 705.4 334.1 735.1 162 726.6Z",
+    "M162 476.4L877.4 533.6A48 48 0 0 0 877.4 567.4L162 624.6Z",
+    "M995.9 448.7A20 20 0 0 1 1024.1 448.7L1111.8 536.4A20 20 0 0 1 1111.8 564.6L1024.1 652.3A20 20 0 0 1 995.9 652.3L908.2 564.6A20 20 0 0 1 908.2 536.4Z",
+  ];
+  function logoMark() {
+    const NS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(NS, "svg");
+    svg.setAttribute("viewBox", "162 215.6 955.7 669.8");
+    svg.setAttribute("aria-hidden", "true");
+    svg.style.cssText = `all:unset; display:inline-block; vertical-align:-2px; height:1.05em; width:${(1.05 * 955.7 / 669.8).toFixed(2)}em; margin-right:5px;`;
+    for (const d of MARK_PATHS) {
+      const path = document.createElementNS(NS, "path");
+      path.setAttribute("fill", "#fff");
+      path.setAttribute("d", d);
+      svg.append(path);
+    }
+    return svg;
+  }
+
   function makePill(kind) {
     const btn = document.createElement("button");
     btn.id = PILL_ID;
@@ -84,14 +106,14 @@
     // 掛不進輸入框工具列時改成右下角浮動按鈕：寫出全名，避免被當成頁面本身的小圖示。
     const status = current?.status;
     const badge = status === "done" && !frameVisible() ? t("ct.pillDone") : status === "waiting" ? (current.unsent ? t("ct.pillUnsent") : t("ct.pillGenerating")) : status === "failed" ? t("ct.pillFailed") : "";
-    btn.textContent = (kind === "floating" ? "🌌 Intent Galaxy" : "🌌 iG") + badge;
+    btn.append(logoMark(), (kind === "floating" ? "Intent Galaxy" : "iG") + badge);
     btn.title = t("ct.pillTitle");
     btn.dataset.kind = kind;
     btn.dataset.state = pillState();
     btn.dataset.owner = INSTANCE; // 舊版（已失效）留下的按鈕會被換掉
     btn.style.cssText = "all:unset; box-sizing:border-box; cursor:pointer; font:600 11.5px/1 -apple-system,BlinkMacSystemFont,sans-serif; padding:5px 9px; margin:0 4px; border-radius:6px; color:#fff;"
-      + " background:linear-gradient(135deg,rgba(56,189,248,.35),rgba(168,85,247,.35)); border:1px solid #38bdf8; box-shadow:0 0 10px rgba(56,189,248,.25); white-space:nowrap;"
-      + (kind === "floating" ? " position:fixed; bottom:18px; right:18px; z-index:2147483646; font-size:13px; padding:9px 14px; border-radius:999px; background:linear-gradient(135deg,#0ea5e9,#8b5cf6);" : "");
+      + " background:linear-gradient(135deg,#0071FE,#7A3BF1); border:1px solid rgba(255,255,255,.18); box-shadow:0 1px 6px rgba(0,113,254,.3); white-space:nowrap;"
+      + (kind === "floating" ? " position:fixed; bottom:18px; right:18px; z-index:2147483646; font-size:13px; padding:9px 14px; border-radius:999px;" : "");
     btn.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); togglePanel(); });
     return btn;
   }
