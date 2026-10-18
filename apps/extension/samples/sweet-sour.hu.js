@@ -1,7 +1,7 @@
 // 擴充功能內建生活題示範星系（匈牙利文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
 const dims = { D1: "Honnan jön az édes", D2: "Hová vezesd a sóvárgást", D3: "Mekkora változás", D4: "Mi van otthon" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `Az ellentétes nézet a(z) „${dims[dim]}” tengelyt a másik végletbe viszi`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `Az ellentétes nézet a(z) „${dims[dim]}” kérdésben a másik végletig megy`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_HU = {
   quadrants: {
     Q1: { scar: "Megevett egy egész zacskó aszalt gyümölcsöt, mert egészséges nasinak hitte", sacred: "Az édesség csak egész gyümölcsből jöhet" },
     Q2: { scar: "Háromszor hagyta abba a cukrot, és mindig a második héten tört meg", sacred: "Csak az számít, amit tényleg tartani tudsz" },
-    Q3: { scar: "Lemásolt egy low-carb étrendet, és három nap alatt megunta", sacred: "A módszert cseréld, ne az ízt" },
-    Q4: { scar: "Túl sok embert láttam leszokni a cukorról, aztán rögtön visszacsúszni", sacred: "A szabály erősebb az akaratnál" },
+    Q3: { scar: "Lemásolt egy szénhidrátszegény étrendet, és három nap alatt megunta", sacred: "A módszert cseréld, ne az ízt" },
+    Q4: { scar: "Túl sok embert láttam leszokni a cukorról, aztán rögtön visszacsúszni", sacred: "Szabályokra támaszkodj, ne az akaraterőre" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Csak gyümölcs", "Ha valami édesre vágysz, csak egész friss gyümölcsöt egyél, például kivit, ananászt, bogyós gyümölcsöt vagy narancsot; a gyümölcslé, az aszalt és a kandírozott gyümölcs nem számít", "Elbukik, ha 14 napon belül több mint 3 napon veszel desszertet a sóvárgás ellen", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_HU = {
     { type: "excludes", from: "N1", to: "N5", why: "Ha az édesség csak egész gyümölcsből jöhet, nem tarthatod meg a kedvenc cukros nasijaidat" },
     { type: "excludes", from: "N4", to: "N11", why: "Az otthoni gyümölcs a heti rekeszen múlik; tiltsd meg a tálcaszám vásárlást, és a készletterv összeomlik" },
     { type: "excludes", from: "N2", to: "N7", why: "Ez az út csak az italokon változtat és az étkezéseket békén hagyja, ami ellentmond az édes-savanyú szósz átdolgozásának" },
-    { type: "excludes", from: "N2", to: "N10", why: "Ez az út csak az italokon változtat és nem vesz pótlék-nasit; a pótlékok költségplafonja egy másik úthoz tartozik, válassz egyet" },
+    { type: "excludes", from: "N2", to: "N10", why: "Ez az út csak az italokon változtat és nem vesz pótlék-nasit, így a pótlékok költségplafonjának itt nincs értelme; válassz egyet" },
     { type: "excludes", from: "N9", to: "N11", why: "A szódakészlet tálcaszám vásárlást jelent, ami egyenesen ütközik a „nincs nagyker” szabállyal" },
     { type: "requires", from: "N1", to: "N8", why: "A gyümölcsben is van cukor; még ha csak gyümölcs is az édesség, kell napi limit, különben a túlevés így is megterhel" },
     { type: "requires", from: "N4", to: "N10", why: "A heti rekesz gyümölcs és joghurt összeadódik, ezért kell költségplafon, különben előbb a pénztárcád adja fel" },

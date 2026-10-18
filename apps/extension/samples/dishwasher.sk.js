@@ -1,7 +1,7 @@
 // 擴充功能生活題示範星系（斯洛伐克文版）：第一次買洗碗機，要為機器改廚房還是挑放得進現有廚房的（IntentAnalysisResponse v1.0）。
 const dims = { D1: "Umiestnenie", D2: "Ako vyberať", D3: "Rozsah úprav", D4: "Kapacita a riad" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `Druhá strana — ${dims[dim]}: opačný extrém`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `Druhá strana dovádza „${dims[dim]}“ do opačného extrému`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -13,9 +13,9 @@ export const DISHWASHER_GALAXY_SK = {
   },
   quadrants: {
     Q1: { scar: "Kúpil umývačku a aj tak umýva ručne", sacred: "Najprv spočítaj riad" },
-    Q2: { scar: "Pri montáži zistil, že hadica je krátka", sacred: "Meraj, kým kúpiš" },
+    Q2: { scar: "Pri montáži zistil, že hadica je krátka", sacred: "Odmeraj, skôr než kúpiš" },
     Q3: { scar: "Kúpil podľa rebríčka z internetu a nezmestila sa", sacred: "Požičiavaj si nápady z iných odborov" },
-    Q4: { scar: "Videl tri umývačky skončiť ako odkvapkávač na riad", sacred: "Najprv naplánuj zlyhanie" },
+    Q4: { scar: "Videl tri umývačky skončiť ako odkvapkávač na riad", sacred: "Premysli, ako by to mohlo zlyhať" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Do skrinky", "Vyber 45 alebo 60 cm skrinku vedľa drezu a umývačku tam zabuduj, aby nezaberala linku a neprekážala v prechode", "Nesedí, ak je šírka, výška alebo hĺbka skrinky menšia ako uvádzané rozmery na zabudovanie", null),
@@ -26,13 +26,13 @@ export const DISHWASHER_GALAXY_SK = {
     N6: node("D3", 1, 2, "Najprv skúška", "Kúp model, ktorý môže stáť voľne aj zabudovaný, nechaj ho celých 30 dní pri dreze a až potom rozhodni o vybratí skrinky, namiesto toho, aby si ju vytrhol hneď prvý deň", "Nesedí, ak umývačka počas 30-dňovej skúšky blokuje prechod alebo zásuvku", null),
     N7: node("D3", 2, 1, "Vlastná nádrž", "Ako obytné auto s vlastnou nádržou na vodu: vyber umývačku na linku, do ktorej vodu lievaš ručne, bez napojenia na batériu a bez úprav rozvodov", "Nesedí, ak ju v ktoromkoľvek týždni 2× a viackrát vynecháš a umyješ to ručne, lebo sa ti nechcelo liať vodu", "Lievanie vody je otravnejšie, než sa zdá",
       { lateral: { src: "Kempovanie: zabudovaná nádrž na vodu", dist: 2, drop: "Pevné napojenie na batériu" } }),
-    N8: node("D2", 1, 0, "Najprv odmeraj", "Ako predletový checklist pilota: pred objednávkou odmeraj šírku, hĺbku a výšku, potom skontroluj zásuvku a odpad; ak chýba ktorákoľvek z 5 položiek, neobjednávaj", "Nesedí, ak niečo nesúhlasí alebo ju po doručení nejde nainštalovať", null,
-      { lateral: { src: "Letectvo: predletový checklist", dist: 3, drop: "Objednávanie od oka" } }),
+    N8: node("D2", 1, 0, "Najprv odmeraj", "Ako kontrolný zoznam pilota pred letom: pred objednávkou odmeraj šírku, hĺbku a výšku, potom skontroluj zásuvku a odpad; ak chýba ktorákoľvek z 5 položiek, neobjednávaj", "Nesedí, ak niečo nesúhlasí alebo ju po doručení nejde nainštalovať", null,
+      { lateral: { src: "Letectvo: kontrolný zoznam", dist: 3, drop: "Objednávanie od oka" } }),
     N9: node("D4", 2, 0, "Odolný riad", "Ako reštaurácia, ktorá používa iba riad odolný v umývačke: vymeň každý hrniec a tanier s označením „neumývať v umývačke“, aby nič nezostalo na ručné umývanie", "Nesedí, ak ešte 14 dní po výmene umývaš ručne viac ako 3 kusy denne", null,
       { lateral: { src: "Gastro: profesionálny riad", dist: 4, drop: "Doma zmes starého riadu" } }),
-    N10: node("D2", 2, 0, "Nie poloprázdna", "Keď umývačku pustíš menej ako do polovice plnú, spotrebuje skoro toľko vody a elektriny ako plná, takže umytie jedného kusu vyjde viac ako dvakrát drahšie", "Pred objednávkou si 7 dní zapisuj riad; ak vychádza priemerne menej ako 6 súprav denne, prejdi na mini", "Kým sa naplní celá umývačka, riad začne zapáchať",
+    N10: node("D2", 2, 0, "Nie poloprázdna", "Keď umývačku pustíš menej ako do polovice plnú, spotrebuje skoro toľko vody a elektriny ako plná, takže umytie každého kusu vyjde viac ako dvakrát drahšie", "Pred objednávkou si 7 dní zapisuj riad; ak vychádza priemerne menej ako 6 súprav denne, prejdi na mini", "Kým sa naplní celá umývačka, riad začne zapáchať",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Veľká umývačka pustená poloprázdna sa neoplatí" } }),
-    N11: node("D4", 1, 0, "Bez hrncov", "Keď tam z pohodlnosti napcháš woky a veľké hrnce, mini riad na jedno umývanie nepoberie a zase skončíš pri dreze", "Zahoď, ak hrnce za 14 dní viac ako 2× vynútia druhé umývanie", "Nie každý doma bude pravidlo dodržiavať",
+    N11: node("D4", 1, 0, "Bez hrncov", "Keď tam z pohodlnosti napcháš woky a veľké hrnce, mini riad na jedno umývanie nepoberie a zase skončíš pri dreze", "Zahoď tento plán, ak za 14 dní napchávanie hrncov viac ako 2× vynúti druhé umývanie", "Nie každý doma bude pravidlo dodržiavať",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Preplňovanie umývačky z pohodlnosti" } }),
     N12: node("D3", 0, 1, "Bez prestavby", "Ak sa z inštalácie umývačky vykľuje prestavba celej kuchyne, len čo práce začnú a peniaze sú vonku, už musíš ísť až do konca", "Nezačínaj, ak je cenová ponuka pred vybratím skrinky viac ako 2× drahšia než umývačka", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Keď sa raz začne, niet cesty späť" } }),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_SK = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Demontáž skrinky a práca na inštalácii", v: "O jednu úložnú skrinku menej", t: "Čakanie na remeselníka na zameranie a montáž", l: "Púšťať až od polovice náplne", x: "Vzdať sa mini na linku" },
-      fatal: "N10", thesis: "Odmeraj skrinku, zabuduj veľkú umývačku a púšťaj ju až od polovice náplne", title: "Veľká zabudovaná, raz a dobre",
+      fatal: "N10", thesis: "Odmeraj skrinku, zabuduj veľkú umývačku a púšťaj ju, až keď je aspoň do polovice plná", title: "Veľká zabudovaná, raz a dobre",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_SK = {
     },
   },
   recommend: { key: "alpha", why: "V domácnosti s 3 a viac ľuďmi zvládne jedna veľká umývačka riad z celého dňa na jedno umývanie" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Riad celej rodiny visí na jedinom stroji; keď sa pokazí, jedinou zálohou je ručné umývanie", kill: "Zahoď, ak oprava trvá dlhšie ako 7 dní a rodina sa vráti k ručnému umývaniu", label: "Jediný stroj" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Riad celej rodiny visí na jedinom stroji; keď sa pokazí, jedinou zálohou je ručné umývanie", kill: "Zahoď tento plán, ak oprava trvá dlhšie ako 7 dní a rodina sa vráti k ručnému umývaniu", label: "Jediný stroj" },
 };

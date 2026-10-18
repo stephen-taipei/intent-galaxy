@@ -15,7 +15,7 @@ export const SWEET_SOUR_GALAXY_EN = {
     Q1: { scar: "Ate a whole bag of dried fruit thinking it was a health snack", sacred: "Sweetness only comes from whole fruit" },
     Q2: { scar: "Quit sugar three times and caved in week two every time", sacred: "It only counts if you can actually stick to it" },
     Q3: { scar: "Copied a low-carb meal plan and got sick of it in three days", sacred: "Change the method, not the flavor" },
-    Q4: { scar: "Seen too many people quit sugar and slide right back", sacred: "Rules beat willpower" },
+    Q4: { scar: "Seen too many people quit sugar and slide right back", sacred: "Set rules instead of relying on willpower" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Eat whole fruit", "Whenever you want something sweet, eat only whole fresh fruit, like kiwi, pineapple, berries or oranges; juice, dried fruit and candied fruit don't count", "Fails if, within 14 days, you buy dessert to fix a craving on more than 3 days", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_EN = {
     { type: "excludes", from: "N1", to: "N5", why: "If sweetness only comes from whole fruit, you can't keep the sugary snacks you love" },
     { type: "excludes", from: "N4", to: "N11", why: "The fruit at home depends on buying a box every week; ban buying by the case and that stocking plan falls apart" },
     { type: "excludes", from: "N2", to: "N7", why: "This path changes only the drinks and leaves meals alone, which contradicts reworking the sweet-and-sour sauce" },
-    { type: "excludes", from: "N2", to: "N10", why: "This path changes only the drinks and buys no substitute snacks; a spending cap on substitute snacks belongs to a different path, so pick one" },
+    { type: "excludes", from: "N2", to: "N10", why: "This path changes only the drinks and buys no substitute snacks, so a spending cap on substitute snacks doesn't apply; pick one" },
     { type: "excludes", from: "N9", to: "N11", why: "Keeping sparkling water stocked means buying it by the case, which clashes directly with not buying in bulk" },
     { type: "requires", from: "N1", to: "N8", why: "Fruit has sugar too; even if fruit is your only treat, you need a daily limit, or eating too much still takes a toll" },
     { type: "requires", from: "N4", to: "N10", why: "Buying fruit and yogurt by the box every week adds up, so you need a spending cap or your wallet gives out first" },

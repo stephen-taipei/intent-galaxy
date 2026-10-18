@@ -1,9 +1,9 @@
 {
  "actionTitle": {
-  "message": "Intent Galaxy: buksan ang galaxy ng intensyon sa AI chat na ito (Cmd/Ctrl+Shift+G)"
+  "message": "Intent Galaxy: buksan ang galaxy sa AI chat na ito (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Nagdadagdag ng iG na button sa mga AI chat gaya ng Claude, ChatGPT at Gemini para malaman sa 60 segundo ang tunay mong gusto."
+  "message": "Nagdadagdag ng iG button sa mga AI chat gaya ng Claude, ChatGPT at Gemini para malinawan mo sa loob ng 60 segundo kung ano talaga ang gusto mo."
  },
  "unsupportedSite": {
   "message": "Gumagana lang ang Intent Galaxy sa mga AI site na ito: $1"

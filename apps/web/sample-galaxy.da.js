@@ -65,5 +65,5 @@ export const SAMPLE_GALAXY_DA = {
     },
   },
   recommend: { key: "alpha", why: "Med 100+ temaer er det kun config-styret design, der holder vedligeholdelsesomkostningerne nede" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Alle temaer arver fra det samme default-tema", kill: "Går default i stykker, går alle temaers layout i stykker", label: "default-SPOF" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Alle temaer arver fra det samme default-tema", kill: "Går default i stykker, går alle temaers layout i stykker", label: "Sårbar default" },
 };

@@ -1,5 +1,5 @@
 // 擴充功能內建生活題示範星系（加泰隆尼亞文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
-const dims = { D1: "D'on ve el dolç", D2: "Vàlvula per al desig", D3: "Quant canviar", D4: "Què hi ha a casa" };
+const dims = { D1: "D'on ve el dolç", D2: "Com gestionar les ganes", D3: "Quant canviar", D4: "Què hi ha a casa" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
   dim, cell, inverse_cell, inverse_pos: `La visió contrària porta ${dims[dim]} a l'altre extrem`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_CA = {
   quadrants: {
     Q1: { scar: "Es va menjar una bossa sencera de fruita seca pensant que era un snack sa", sacred: "El dolç només ve de la fruita sencera" },
     Q2: { scar: "Ha deixat el sucre tres cops i ha recaigut la segona setmana cada vegada", sacred: "Només compta si de debò ho pots mantenir" },
-    Q3: { scar: "Va copiar una dieta low-carb i se'n va cansar en tres dies", sacred: "Canviar el mètode, no el gust" },
-    Q4: { scar: "Ha vist massa gent deixar el sucre i tornar-hi de seguida", sacred: "Les normes guanyen a la voluntat" },
+    Q3: { scar: "Va copiar una dieta baixa en hidrats i se'n va cansar en tres dies", sacred: "Canviar el mètode, no el gust" },
+    Q4: { scar: "Ha vist massa gent deixar el sucre i tornar-hi de seguida", sacred: "Posar-se normes en lloc de confiar en la voluntat" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Fruita sencera", "Quan et vingui de gust alguna cosa dolça, menja només fruita fresca sencera, com kiwi, pinya, fruits vermells o taronges; sucs, fruita seca i fruita confitada no compten", "Falla si, en 14 dies, compres postres per calmar el desig més de 3 dies", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_CA = {
     { type: "excludes", from: "N1", to: "N5", why: "Si el dolç només ve de la fruita sencera, no et pots quedar els snacks ensucrats que t'agraden" },
     { type: "excludes", from: "N4", to: "N11", why: "La fruita de casa depèn de comprar-ne una caixa cada setmana; prohibeix comprar per caixes i aquest pla d'estoc s'enfonsa" },
     { type: "excludes", from: "N2", to: "N7", why: "Aquest camí només canvia les begudes i deixa els àpats com estan, cosa que contradiu refer la salsa agredolça" },
-    { type: "excludes", from: "N2", to: "N10", why: "Aquest camí només canvia les begudes i no compra snacks substituts; un topall de despesa en substituts és d'un altre camí, així que tria'n un" },
+    { type: "excludes", from: "N2", to: "N10", why: "Aquest camí només canvia les begudes i no compra snacks substituts, així que un topall de despesa en substituts no hi té sentit; tria'n un" },
     { type: "excludes", from: "N9", to: "N11", why: "Tenir estoc d'aigua amb gas vol dir comprar-la per caixes, cosa que xoca de ple amb no comprar a l'engròs" },
     { type: "requires", from: "N1", to: "N8", why: "La fruita també té sucre; encara que sigui el teu únic dolç, cal un límit diari, o menjar-ne massa també passa factura" },
     { type: "requires", from: "N4", to: "N10", why: "Comprar fruita i iogurt per caixes cada setmana surt car, així que cal un topall de despesa o la cartera cedirà primer" },

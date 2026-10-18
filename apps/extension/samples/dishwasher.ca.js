@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_CA = {
     Q1: { scar: "Es va comprar un rentaplats i encara renta a mà", sacred: "Primer compta la teva vaixella" },
     Q2: { scar: "Va descobrir a mitja instal·lació que la mànega era massa curta", sacred: "Mesura abans de comprar" },
     Q3: { scar: "Va comprar el primer d'un rànquing en línia i no hi cabia", sacred: "Agafar idees d'altres camps" },
-    Q4: { scar: "Ha vist tres rentaplats acabar fent d'escorreplats", sacred: "Planifica primer el fracàs" },
+    Q4: { scar: "Ha vist tres rentaplats acabar fent d'escorreplats", sacred: "Pensa com podria fallar" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Encastat pica", "Treure el moble de 45 o 60 cm del costat de la pica i encastar-hi la màquina, així no ocupa taulell ni fa nosa al pas", "No encaixa si l'amplada, l'alçada o la fondària del moble són inferiors a les mides d'encastament de la màquina", null),

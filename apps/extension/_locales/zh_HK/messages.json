@@ -3,9 +3,9 @@
   "message": "Intent Galaxy：喺呢個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）"
  },
  "description": {
-  "message": "喺 Claude、ChatGPT、Gemini 等 AI 對話加上 iG 膠囊，60 秒將你真正想要嘅整理成意圖星系。"
+  "message": "喺 Claude、ChatGPT、Gemini 等 AI 對話加個 iG 按鈕，60 秒幫你理清自己真正想要乜。"
  },
  "unsupportedSite": {
-  "message": "Intent Galaxy 只喺以下 AI 網站運作：$1"
+  "message": "Intent Galaxy 只可以喺以下 AI 網站用：$1"
  }
 }

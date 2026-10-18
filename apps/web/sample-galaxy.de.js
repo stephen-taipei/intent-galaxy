@@ -32,7 +32,7 @@ export const SAMPLE_GALAXY_DE = {
       { lateral: { src: "Typografie: Schriftschnitte einer Familie", dist: 4, drop: "Komplette Kopie pro Theme" } }),
     N10: node("D2", 2, 0, "Config deckeln", "Wenn jeder Anpassungswunsch ein Config-Feld hinzufügt, kostet die Pflege der Config zwangsläufig mehr als ein Fork", "Keine Felder mehr hinzufügen, sobald ein Config-Interface mehr als 40 Felder hat", "Config-Hölle",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Abstraktion kostet mehr als Duplikation" } }),
-    N11: node("D4", 1, 0, "Bypass sperren", "Wenn das Business Markenabfragen direkt in gemeinsamen Komponenten durchsetzen kann, fällt die Grenze innerhalb eines Quartals", "Hinfällig, wenn innerhalb von 14 Tagen eine Markenabfrage in gemeinsame Komponenten wandert", "Grenzen gegen Deadlines eintauschen",
+    N11: node("D4", 1, 0, "Bypass sperren", "Wenn das Business Markenabfragen direkt in gemeinsamen Komponenten durchsetzen kann, fällt die Grenze innerhalb eines Quartals", "Gescheitert, wenn innerhalb von 14 Tagen eine Markenabfrage in gemeinsame Komponenten wandert", "Grenzen gegen Deadlines eintauschen",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Deadline-Druck belohnt Grenzverletzungen" } }),
     N12: node("D3", 0, 1, "Kein Big-Bang", "Wenn alle 70 Module migriert sein müssen, bevor irgendetwas live geht, bleibt das Refactoring wegen der Sunk Costs auf halber Strecke stecken", "Abbrechen, wenn das erste Modul nicht innerhalb von 14 Tagen live ist", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Big-Bang-Refactoring nimmt Deadlines als Geisel" } }),
@@ -65,5 +65,5 @@ export const SAMPLE_GALAXY_DE = {
     },
   },
   recommend: { key: "alpha", why: "Bei 100+ Themes hält nur ein konfigurationsgesteuertes Design die Wartungskosten im Griff" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Jedes Theme erbt vom selben Default-Theme", kill: "Geht der Default kaputt, bricht das Layout jedes Themes", label: "Default-SPOF" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Jedes Theme erbt vom selben Default-Theme", kill: "Geht der Default kaputt, bricht das Layout jedes Themes", label: "Default-Ausfall" },
 };

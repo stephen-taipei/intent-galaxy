@@ -297,7 +297,7 @@ async function open({ goal: text = "", site: host = t("pn.thisAi"), job = null, 
   if (job?.status === "waiting" && newGoal) return askWhileWaiting(job, goal);
   if (goal) return generate(job?.status === "done" && job.analysis ? [[t("pn.backToPrevGalaxy"), () => showDone(job)]] : [], reopen);
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
-  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在[決决]定的是[:：]\s*/, "") ?? "");
+  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在[決决]定(?:的是|嘅係)[:：]\s*/, "") ?? "");
   // 3. 本機 CLI 有最近生成的星系：不分對話，所以不自動顯示，只提供按鈕（可能是別的網站或 Claude Code 的決策）。
   const cur = await cliLatest();
   const local = cur ? [[t("pn.loadLocalLatest", { goal: `${cur.goal.slice(0, 20)}${cur.goal.length > 20 ? "…" : ""}` }), () => showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })]] : [];

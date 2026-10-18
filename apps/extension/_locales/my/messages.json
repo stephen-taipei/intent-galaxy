@@ -1,9 +1,9 @@
 {
  "actionTitle": {
-  "message": "Intent Galaxy: ဤ AI ချတ်တွင် ရည်ရွယ်ချက်ဂလက်ဆီကို ဖွင့်ရန် (Cmd/Ctrl+Shift+G)"
+  "message": "Intent Galaxy: ဤ AI ချတ်တွင် ဂလက်ဆီကို ဖွင့်ရန် (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Claude၊ ChatGPT၊ Gemini ကဲ့သို့ AI ချတ်များတွင် iG ခလုတ်ထည့်ပေးပြီး သင်တကယ်လိုချင်တာကို စက္ကန့် 60 အတွင်း ရှင်းလင်းစေသည်။"
+  "message": "Claude၊ ChatGPT၊ Gemini ကဲ့သို့ AI ချတ်များတွင် iG ခလုတ်ကို ထည့်ပေးပြီး သင်တကယ်လိုချင်တာကို စက္ကန့် 60 အတွင်း ရှင်းရှင်းလင်းလင်း စီစဉ်ပေးသည်။"
  },
  "unsupportedSite": {
   "message": "Intent Galaxy သည် ဤ AI ဝက်ဘ်ဆိုက်များတွင်သာ အလုပ်လုပ်သည်- $1"

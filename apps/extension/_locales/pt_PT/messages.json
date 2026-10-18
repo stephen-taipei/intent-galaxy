@@ -1,9 +1,9 @@
 {
  "actionTitle": {
-  "message": "Intent Galaxy: abrir a galáxia de intenções neste chat de IA (Cmd/Ctrl+Shift+G)"
+  "message": "Intent Galaxy: abrir a galáxia nesta conversa com IA (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Adiciona um botão iG aos chats de IA como Claude, ChatGPT e Gemini para clarificar em 60 segundos o que quer realmente."
+  "message": "Adiciona um botão iG às conversas com IA como o Claude, o ChatGPT e o Gemini para ficar a saber, em 60 segundos, o que quer realmente."
  },
  "unsupportedSite": {
   "message": "O Intent Galaxy só funciona nestes sites de IA: $1"

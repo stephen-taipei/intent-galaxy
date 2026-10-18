@@ -1,5 +1,5 @@
 // 擴充功能內建生活題示範星系（羅馬尼亞文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
-const dims = { D1: "De unde vine dulcele", D2: "Supapa poftei", D3: "Cât de mult schimbi", D4: "Ce ai în casă" };
+const dims = { D1: "De unde vine dulcele", D2: "Cum îți gestionezi pofta", D3: "Cât de mult schimbi", D4: "Ce ai în casă" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
   dim, cell, inverse_cell, inverse_pos: `Viziunea opusă duce ${dims[dim]} la cealaltă extremă`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_RO = {
   quadrants: {
     Q1: { scar: "A mâncat o pungă întreagă de fructe uscate crezând că e o gustare sănătoasă", sacred: "Dulcele vine doar din fructe întregi" },
     Q2: { scar: "S-a lăsat de zahăr de trei ori și a cedat de fiecare dată în a doua săptămână", sacred: "Contează doar dacă chiar poți să te ții" },
-    Q3: { scar: "A copiat o dietă low-carb și s-a săturat de ea în trei zile", sacred: "Schimbi metoda, nu gustul" },
-    Q4: { scar: "A văzut prea mulți lăsându-se de zahăr și revenind imediat", sacred: "Regulile bat voința" },
+    Q3: { scar: "A copiat o dietă săracă în carbohidrați și s-a săturat de ea în trei zile", sacred: "Schimbi metoda, nu gustul" },
+    Q4: { scar: "A văzut prea mulți lăsându-se de zahăr și revenind imediat", sacred: "Îți pui reguli în loc să te bazezi pe voință" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Fructe întregi", "Când ai poftă de ceva dulce, mănâncă doar fructe proaspete întregi, ca kiwi, ananas, fructe de pădure sau portocale; sucurile, fructele uscate și cele confiate nu se pun", "Eșuează dacă, în 14 zile, cumperi desert ca să-ți potolești pofta în mai mult de 3 zile", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_RO = {
     { type: "excludes", from: "N1", to: "N5", why: "Dacă dulcele vine doar din fructe întregi, nu poți păstra gustările dulci care-ți plac" },
     { type: "excludes", from: "N4", to: "N11", why: "Fructele din casă depind de cumpărarea unei lăzi pe săptămână; interzici cumpăratul la bax și planul de aprovizionare se prăbușește" },
     { type: "excludes", from: "N2", to: "N7", why: "Drumul ăsta schimbă doar băuturile și lasă mesele în pace, ceea ce contrazice refacerea sosului dulce-acrișor" },
-    { type: "excludes", from: "N2", to: "N10", why: "Drumul ăsta schimbă doar băuturile și nu cumpără gustări de înlocuire; un plafon de cost pentru înlocuitori ține de alt drum, deci alegi unul" },
+    { type: "excludes", from: "N2", to: "N10", why: "Drumul ăsta schimbă doar băuturile și nu cumpără gustări de înlocuire, deci un plafon de cost pentru înlocuitori nu are rost; alegi unul" },
     { type: "excludes", from: "N9", to: "N11", why: "Să ai stoc de apă minerală înseamnă s-o cumperi la bax, ceea ce se bate direct cap în cap cu a nu cumpăra en-gros" },
     { type: "requires", from: "N1", to: "N8", why: "Și fructele au zahăr; chiar dacă sunt singurul tău dulce, ai nevoie de o limită zilnică, altfel prea multe tot se simt" },
     { type: "requires", from: "N4", to: "N10", why: "Fructe și iaurt luate la ladă în fiecare săptămână se adună, deci ai nevoie de un plafon de cost, altfel cedează întâi portofelul" },

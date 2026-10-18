@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_MS = {
     Q1: { scar: "Dah beli mesin basuh pinggan, masih basuh dengan tangan", sacred: "Kira pinggan mangkuk dulu" },
     Q2: { scar: "Baru tahu hos tak cukup panjang masa pemasangan", sacred: "Ukur dulu, baru beli" },
     Q3: { scar: "Beli ikut senarai terbaik dalam talian, tapi tak muat", sacred: "Pinjam idea dari bidang lain" },
-    Q4: { scar: "Tiga kali tengok mesin basuh pinggan jadi rak pinggan", sacred: "Rancang untuk kegagalan dulu" },
+    Q4: { scar: "Tiga kali tengok mesin basuh pinggan jadi rak pinggan", sacred: "Fikir betul-betul bagaimana ia boleh gagal" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Masuk kabinet", "Buka kabinet 45 atau 60 cm di sebelah sinki dan pasang mesin secara terbina dalam, supaya ia tak ambil ruang kaunter dan tak halang laluan", "Tak sesuai jika lebar, tinggi atau dalam kabinet lebih kecil daripada ukuran terbina dalam mesin", null),
@@ -27,12 +27,12 @@ export const DISHWASHER_GALAXY_MS = {
     N7: node("D3", 2, 1, "Tangki air", "Macam karavan dengan tangki air sendiri, pilih model atas kaunter yang diisi air dengan tangan: tak perlu sambung paip, tak ubah paip", "Tak sesuai jika, dalam mana-mana minggu, anda malas isi air dan basuh dengan tangan 2 kali atau lebih", "Mengisi air lebih leceh daripada yang anda sangka",
       { lateral: { src: "Perkhemahan: tangki air terbina", dist: 2, drop: "Sambungan paip kekal" } }),
     N8: node("D2", 1, 0, "Ukur dulu", "Macam senarai semak juruterbang sebelum terbang, ukur lebar, dalam dan tinggi sebelum memesan, kemudian semak kedudukan soket dan longkang; jika salah satu daripada 5 itu tiada, jangan pesan", "Tak sesuai jika ada yang tak padan atau tak boleh dipasang bila sampai", null,
-      { lateral: { src: "Penerbangan: senarai semak pra-terbang", dist: 3, drop: "Memesan ikut gerak hati" } }),
+      { lateral: { src: "Penerbangan: senarai semak sebelum terbang", dist: 3, drop: "Memesan ikut gerak hati" } }),
     N9: node("D4", 2, 0, "Selamat mesin", "Macam restoran yang hanya guna pinggan tahan mesin, ganti semua periuk dan pinggan yang berlabel tak selamat untuk mesin basuh, supaya tiada lagi yang perlu dibasuh tangan", "Tak sesuai jika, dalam 14 hari selepas menukar, anda masih basuh lebih 3 barang sehari dengan tangan", null,
-      { lateral: { src: "Restoran: pinggan gred komersial", dist: 4, drop: "Set pinggan lama bercampur di rumah" } }),
-    N10: node("D2", 2, 0, "Jangan separuh", "Jika dijalankan kurang separuh penuh, ia guna air dan elektrik hampir sama seperti muatan penuh, jadi kos setiap pinggan lebih dua kali ganda", "Catat pinggan anda selama 7 hari sebelum memesan; jika purata bawah 6 set sehari, tukar ke model mini", "Pinggan mula berbau sementara menunggu muatan penuh",
+      { lateral: { src: "Restoran: pinggan jenis kedai makan", dist: 4, drop: "Set pinggan lama bercampur di rumah" } }),
+    N10: node("D2", 2, 0, "Jangan separuh", "Jika dijalankan kurang separuh penuh, ia guna air dan elektrik hampir sama seperti muatan penuh, jadi kos membasuh setiap pinggan jadi lebih dua kali ganda", "Catat pinggan anda selama 7 hari sebelum memesan; jika purata bawah 6 set sehari, tukar ke model mini", "Pinggan mula berbau sementara menunggu muatan penuh",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Mesin besar yang separuh kosong tak berbaloi" } }),
-    N11: node("D4", 1, 0, "Tiada periuk", "Jika anda sumbat kuali dan periuk besar demi senang, model mini tak dapat muatkan pinggan sekali basuh dan anda kembali basuh dengan tangan", "Batalkan jika periuk memaksa basuhan kedua lebih 2 kali dalam 14 hari", "Bukan semua orang di rumah akan ikut peraturan",
+    N11: node("D4", 1, 0, "Tiada periuk", "Jika anda sumbat kuali dan periuk besar demi senang, model mini tak dapat muatkan pinggan sekali basuh dan anda kembali basuh dengan tangan", "Batalkan pelan ini jika, dalam 14 hari, periuk yang disumbat memaksa basuhan kedua lebih 2 kali", "Bukan semua orang di rumah akan ikut peraturan",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Menyumbat mesin demi senang" } }),
     N12: node("D3", 0, 1, "Jangan reno", "Jika memasang mesin basuh pinggan merebak menjadi ubah suai seluruh dapur, sebaik kerja bermula dan duit dibayar, anda terpaksa teruskan", "Jangan mula jika sebut harga sebelum buka kabinet lebih 2x harga mesin", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Sebaik kerja bermula, tiada jalan berundur" } }),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_MS = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Upah buka kabinet dan pemasangan", v: "Kurang satu kabinet untuk simpanan", t: "Tunggu tukang datang ukur dan pasang", l: "Tunggu separuh muatan sebelum basuh", x: "Lepaskan model mini atas kaunter" },
-      fatal: "N10", thesis: "Ukur kabinet, pasang mesin besar terbina dalam, basuh hanya bila separuh penuh", title: "Mesin besar terbina, sekali siap",
+      fatal: "N10", thesis: "Ukur kabinet, pasang mesin besar terbina dalam, dan basuh hanya bila sekurang-kurangnya separuh penuh", title: "Mesin besar terbina, sekali siap",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_MS = {
     },
   },
   recommend: { key: "alpha", why: "Untuk isi rumah 3 orang atau lebih, satu mesin besar boleh basuh pinggan sehari suntuk dalam sekali jalan" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Pinggan seluruh keluarga bergantung pada satu mesin ini; jika rosak, satu-satunya sandaran ialah basuh tangan", kill: "Batalkan jika pembaikan lebih 7 hari dan keluarga kembali basuh dengan tangan", label: "Satu mesin" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Pinggan seluruh keluarga bergantung pada satu mesin ini; jika rosak, satu-satunya sandaran ialah basuh tangan", kill: "Batalkan pelan ini jika pembaikan lebih 7 hari dan keluarga kembali basuh dengan tangan", label: "Satu mesin" },
 };

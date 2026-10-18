@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_SV = {
     Q1: { scar: "Köpte en diskmaskin och diskade ändå för hand", sacred: "Räkna disken först" },
     Q2: { scar: "Upptäckte mitt i installationen att slangen var för kort", sacred: "Mät innan du köper" },
     Q3: { scar: "Köpte från en topplista på nätet och den fick inte plats", sacred: "Låna idéer från andra områden" },
-    Q4: { scar: "Sett tre diskmaskiner sluta som diskställ", sacred: "Planera för misslyckande först" },
+    Q4: { scar: "Sett tre diskmaskiner sluta som diskställ", sacred: "Tänk först på vad som kan gå fel" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Inbyggd vid ho", "Ta bort underskåpet på 45 eller 60 cm bredvid diskhon och bygg in maskinen, så att den inte tar bänkyta eller blockerar gången", "Passar inte om skåpets bredd, höjd eller djup är mindre än maskinens angivna inbyggnadsmått", null),
@@ -32,7 +32,7 @@ export const DISHWASHER_GALAXY_SV = {
       { lateral: { src: "Restauranger: storköksporslin", dist: 4, drop: "Hopplock av gammalt porslin" } }),
     N10: node("D2", 2, 0, "Aldrig halvfull", "Kör du den mindre än halvfull drar den nästan lika mycket vatten och el som en full omgång, så varje tallrik kostar mer än dubbelt så mycket", "Anteckna din disk i 7 dagar innan du beställer; ligger du i snitt under 6 kuvert om dagen, byt till en bänkmodell", "Disken börjar lukta medan du väntar på en full maskin",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Det lönar sig inte att köra en stor maskin halvtom" } }),
-    N11: node("D4", 1, 0, "Kastruller ute", "Trycker du av bekvämlighet in wokpannor och grytor får en bänkmodell inte in disken i en omgång, och du står och diskar för hand igen", "Släpp det om kastruller tvingar fram en andra omgång mer än 2 gånger på 14 dagar", "Alla i hushållet följer inte regeln",
+    N11: node("D4", 1, 0, "Kastruller ute", "Trycker du av bekvämlighet in wokpannor och grytor får en bänkmodell inte in disken i en omgång, och du står och diskar för hand igen", "Skippa det om kastruller tvingar fram en andra omgång mer än 2 gånger på 14 dagar", "Alla i hushållet följer inte regeln",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Överlasta maskinen av bekvämlighet" } }),
     N12: node("D3", 0, 1, "Ingen ombyggnad", "Om installationen av en diskmaskin växer till en ombyggnad av hela köket sitter du fast så fort arbetet har börjat och pengarna är betalda", "Börja inte om offerten innan skåpet tas bort är mer än 2x maskinens pris", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "När arbetet väl har börjat finns ingen väg tillbaka" } }),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_SV = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Skåp bort och montörskostnad", v: "Ett skåp mindre för förvaring", t: "Vänta på en montör för mätning och installation", l: "Vänta med att köra tills den är halvfull", x: "Ge upp bänkmodellen" },
-      fatal: "N10", thesis: "Mät skåpet, bygg in en stor maskin och kör bara när den är halvfull", title: "Stor inbyggd maskin, gjort en gång",
+      fatal: "N10", thesis: "Mät skåpet, bygg in en stor maskin och kör bara när den är halvfull", title: "Stor inbyggd maskin, rätt från början",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_SV = {
     },
   },
   recommend: { key: "alpha", why: "För ett hushåll på 3 eller fler klarar en stor maskin en hel dags disk i en enda omgång" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Hela familjens disk hänger på den här enda maskinen; går den sönder är handdisk den enda reserven", kill: "Släpp det om en reparation tar mer än 7 dagar och familjen går tillbaka till handdisk", label: "En enda maskin" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "Hela familjens disk hänger på den här enda maskinen; går den sönder är handdisk den enda reserven", kill: "Skippa det om en reparation tar mer än 7 dagar och familjen går tillbaka till handdisk", label: "En enda maskin" },
 };

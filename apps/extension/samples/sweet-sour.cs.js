@@ -1,7 +1,7 @@
 // 擴充功能內建生活題示範星系（捷克文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
 const dims = { D1: "Odkud sladkost", D2: "Kam s chutí na sladké", D3: "Jak velká změna", D4: "Co máš doma" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `Opačný názor — ${dims[dim]}: druhý pól`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `Opačný názor dovádí „${dims[dim]}“ do druhého extrému`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_CS = {
   quadrants: {
     Q1: { scar: "Snědl celý sáček sušeného ovoce v domnění, že je to zdravá svačina", sacred: "Sladkost jen z celého ovoce" },
     Q2: { scar: "Třikrát se vzdal cukru a pokaždé povolil ve druhém týdnu", sacred: "Platí jen to, co se dá vydržet" },
-    Q3: { scar: "Okopíroval low-carb jídelníček a po třech dnech ho měl plné zuby", sacred: "Změň metodu, ne chuť" },
-    Q4: { scar: "Viděl příliš mnoho lidí vzdát se cukru a hned zase sklouznout zpátky", sacred: "Pravidla porazí vůli" },
+    Q3: { scar: "Okopíroval jídelníček s minimem sacharidů a po třech dnech ho měl plné zuby", sacred: "Změň metodu, ne chuť" },
+    Q4: { scar: "Viděl příliš mnoho lidí vzdát se cukru a hned zase sklouznout zpátky", sacred: "Nastav si pravidla, nespoléhej na vůli" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Celé ovoce", "Kdykoli máš chuť na sladké, jez jen celé čerstvé ovoce, třeba kiwi, ananas, borůvky nebo pomeranče; džusy, sušené a kandované ovoce se nepočítají", "Selže, pokud si do 14 dnů víc než 3 dny koupíš dezert, abys zahnal chuť", null),
@@ -26,7 +26,7 @@ export const SWEET_SOUR_GALAXY_CS = {
     N6: node("D3", 1, 2, "Testuj nápoje", "Každou novou příchuť neslazeného nápoje kup v nejmenším balení a pij ji 3 dny po sobě; celé balení kupuj, jen když ti chutná, nikdy nedělej zásoby najednou", "Selže, pokud je příchuť koupená po testu ve velkém balení po 14 dnech pořád víc než z poloviny plná", null),
     N7: node("D3", 2, 1, "Vyměň omáčku", "Jako když vyměníš obal na mobil místo mobilu: nech hlavní suroviny kuřete nebo ryby na sladkokyselo, ale omáčku si udělej sám z rajčat, ananasu a octa, s polovinou obvyklého cukru", "Selže, pokud po 2 pokusech s novou omáčkou během 14 dnů všichni doma řeknou, že nechutná", "V restauraci ani u jídla s sebou omáčku nezměníš",
       { lateral: { src: "Technika: výměna obalu na mobil", dist: 2, drop: "Úplně vyškrtnout jídlo z jídelníčku" } }),
-    N8: node("D2", 1, 0, "Max 3 porce", "Jako limit zavazadel v letadle: nejvýš 3 porce ovoce a sladkokyselých svačin dohromady denně, každá zhruba velikosti pěsti; co je navíc, počká na zítřek, místo spoléhání na okamžitou vůli", "Selže, pokud víc než 2 dny v týdnu sníš přes 3 porce", null,
+    N8: node("D2", 1, 0, "Nejvýš 3 porce", "Jako limit zavazadel v letadle: nejvýš 3 porce ovoce a sladkokyselých svačin dohromady denně, každá zhruba velikosti pěsti; co je navíc, počká na zítřek, místo abys spoléhal na momentální vůli", "Selže, pokud víc než 2 dny v týdnu sníš přes 3 porce", null,
       { lateral: { src: "Letecké společnosti: váhový limit zavazadel", dist: 3, drop: "Jíst kdykoli bez omezení" } }),
     N9: node("D4", 2, 0, "Zásoba vody", "Doplňuj jako večerka, než zboží dojde: v lednici měj vždy balení neslazené perlivé vody a síťku citronů a nové balení kup, když zbývají 3 plechovky, aby tě chuť nikdy nevyhnala pro limonádu nebo slazenou kávu s sebou", "Selže, pokud si do 14 dnů pořád koupíš víc než 3 slazené nápoje s sebou", null,
       { lateral: { src: "Maloobchod: doplnit dřív, než se vyprodá", dist: 4, drop: "Kupovat pití, až když máš chuť" } }),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_CS = {
     { type: "excludes", from: "N1", to: "N5", why: "Když má sladkost pocházet jen z celého ovoce, oblíbené sladké pochutiny si nenecháš" },
     { type: "excludes", from: "N4", to: "N11", why: "Ovoce doma stojí na nákupu bedny každý týden; zákaz nákupů ve velkém tenhle plán zásob rozbije" },
     { type: "excludes", from: "N2", to: "N7", why: "Tahle cesta mění jen nápoje a jídla nechává být, což odporuje předělávání sladkokyselé omáčky" },
-    { type: "excludes", from: "N2", to: "N10", why: "Tahle cesta mění jen nápoje a nekupuje náhradní svačiny; strop výdajů za náhrady patří k jiné cestě, tak si vyber jednu" },
+    { type: "excludes", from: "N2", to: "N10", why: "Tahle cesta mění jen nápoje a nekupuje náhradní svačiny, takže strop výdajů za náhrady tu nemá smysl; vyber si jedno" },
     { type: "excludes", from: "N9", to: "N11", why: "Stálá zásoba perlivé vody znamená kupovat ji po kartonech, což se přímo bije se zákazem nákupů ve velkém" },
     { type: "requires", from: "N1", to: "N8", why: "I ovoce obsahuje cukr; i když je to tvá jediná sladkost, potřebuješ denní limit, jinak přejídání stejně zatíží tělo" },
     { type: "requires", from: "N4", to: "N10", why: "Týdenní bedny ovoce a jogurtu se nasčítají, takže potřebuješ strop výdajů, jinak to jako první vzdá peněženka" },

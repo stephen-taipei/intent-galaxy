@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_RO = {
     Q1: { scar: "Și-a luat mașină de spălat vase și tot spală de mână", sacred: "Numără-ți întâi vasele" },
     Q2: { scar: "A aflat în mijlocul montajului că furtunul e prea scurt", sacred: "Măsori înainte să cumperi" },
     Q3: { scar: "A cumpărat-o pe prima dintr-un top online și n-a încăput", sacred: "Împrumută idei din alte domenii" },
-    Q4: { scar: "A văzut trei mașini de spălat vase ajunse uscătoare de vase", sacred: "Plănuiește întâi eșecul" },
+    Q4: { scar: "A văzut trei mașini de spălat vase ajunse uscătoare de vase", sacred: "Gândește-te cum ar putea eșua" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Încorporată", "Scoate corpul de 45 sau 60 cm de lângă chiuvetă și încorporează mașina acolo, ca să nu ocupe blatul și să nu încurce trecerea", "Nu se potrivește dacă lățimea, înălțimea sau adâncimea corpului sunt mai mici decât cotele de încorporare ale mașinii", null),

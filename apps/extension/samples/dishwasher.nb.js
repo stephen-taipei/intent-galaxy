@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_NB = {
     Q1: { scar: "Kjøpte oppvaskmaskin og tok fortsatt oppvasken for hånd", sacred: "Tell oppvasken først" },
     Q2: { scar: "Oppdaget midt i monteringen at slangen var for kort", sacred: "Mål før du kjøper" },
     Q3: { scar: "Kjøpte fra en toppliste på nett, og den fikk ikke plass", sacred: "Lån ideer fra andre fagfelt" },
-    Q4: { scar: "Har sett tre oppvaskmaskiner ende som tørkestativ", sacred: "Planlegg for fiasko først" },
+    Q4: { scar: "Har sett tre oppvaskmaskiner ende som tørkestativ", sacred: "Tenk først på hva som kan gå galt" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Inn i skapet", "Ta ut underskapet på 45 eller 60 cm ved siden av vasken og bygg inn maskinen, så den ikke tar benkeplass eller sperrer gangen", "Passer ikke hvis skapets bredde, høyde eller dybde er mindre enn maskinens oppgitte innbyggingsmål", null),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_NB = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Skap ut og montørkostnad", v: "Ett skap mindre til oppbevaring", t: "Vent på en montør for oppmåling og montering", l: "Vent med å kjøre til den er halvfull", x: "Gi opp benkemodellen" },
-      fatal: "N10", thesis: "Mål skapet, bygg inn en stor maskin og kjør bare når den er halvfull", title: "Stor innebygd maskin, gjort én gang",
+      fatal: "N10", thesis: "Mål skapet, bygg inn en stor maskin og kjør bare når den er halvfull", title: "Stor innebygd maskin, riktig fra start",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],

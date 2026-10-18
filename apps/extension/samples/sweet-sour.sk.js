@@ -1,7 +1,7 @@
 // 擴充功能內建生活題示範星系（斯洛伐克文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
 const dims = { D1: "Odkiaľ sladkosť", D2: "Kam s chuťou na sladké", D3: "Aká veľká zmena", D4: "Čo máš doma" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `Opačný názor — ${dims[dim]}: druhý pól`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `Opačný názor dovádza „${dims[dim]}“ do druhého extrému`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_SK = {
   quadrants: {
     Q1: { scar: "Zjedol celé vrecko sušeného ovocia v domnení, že je to zdravá desiata", sacred: "Sladkosť iba z celého ovocia" },
     Q2: { scar: "Trikrát sa vzdal cukru a zakaždým povolil v druhom týždni", sacred: "Platí iba to, čo sa dá vydržať" },
-    Q3: { scar: "Skopíroval low-carb jedálniček a po troch dňoch ho mal plné zuby", sacred: "Zmeň metódu, nie chuť" },
-    Q4: { scar: "Videl priveľa ľudí vzdať sa cukru a hneď sa k nemu vrátiť", sacred: "Pravidlá porazia vôľu" },
+    Q3: { scar: "Skopíroval jedálniček s minimom sacharidov a po troch dňoch ho mal plné zuby", sacred: "Zmeň metódu, nie chuť" },
+    Q4: { scar: "Videl priveľa ľudí vzdať sa cukru a hneď sa k nemu vrátiť", sacred: "Nastav si pravidlá, nespoliehaj sa na vôľu" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Celé ovocie", "Kedykoľvek máš chuť na sladké, jedz iba celé čerstvé ovocie, napríklad kiwi, ananás, čučoriedky alebo pomaranče; džúsy, sušené a kandizované ovocie sa nerátajú", "Zlyhá, ak si do 14 dní viac ako 3 dni kúpiš dezert, aby si zahnal chuť", null),
@@ -26,9 +26,9 @@ export const SWEET_SOUR_GALAXY_SK = {
     N6: node("D3", 1, 2, "Testuj nápoje", "Každú novú príchuť nesladeného nápoja kúp v najmenšom balení a pi ju 3 dni po sebe; celé balenie kupuj, iba keď ti chutí, nikdy si nerob zásoby naraz", "Zlyhá, ak je príchuť kúpená po teste vo veľkom balení po 14 dňoch stále viac ako z polovice plná", null),
     N7: node("D3", 2, 1, "Vymeň omáčku", "Ako keď vymeníš obal na mobil namiesto mobilu: nechaj hlavné suroviny sladkokyslého kurčaťa alebo ryby, ale omáčku si urob sám z paradajok, ananásu a octu, s polovicou bežného cukru", "Zlyhá, ak po 2 pokusoch s novou omáčkou počas 14 dní všetci doma povedia, že nechutí", "V reštaurácii ani pri jedle so sebou omáčku nezmeníš",
       { lateral: { src: "Technika: výmena obalu na mobil", dist: 2, drop: "Úplne vyškrtnúť jedlo z jedálnička" } }),
-    N8: node("D2", 1, 0, "Max 3 porcie", "Ako limit batožiny v lietadle: najviac 3 porcie ovocia a sladkokyslých maškŕt spolu denne, každá zhruba veľkosti päste; čo je navyše, počká do zajtra, namiesto spoliehania sa na okamžitú vôľu", "Zlyhá, ak viac ako 2 dni v týždni zješ cez 3 porcie", null,
+    N8: node("D2", 1, 0, "Do 3 porcií", "Ako limit batožiny v lietadle: najviac 3 porcie ovocia a sladkokyslých maškŕt spolu denne, každá zhruba veľkosti päste; čo je navyše, počká do zajtra, namiesto toho, aby si sa spoliehal na momentálnu vôľu", "Zlyhá, ak viac ako 2 dni v týždni zješ cez 3 porcie", null,
       { lateral: { src: "Letecké spoločnosti: hmotnostný limit batožiny", dist: 3, drop: "Jesť kedykoľvek bez obmedzenia" } }),
-    N9: node("D4", 2, 0, "Zásoba vody", "Dopĺňaj ako večierka, kým tovar dôjde: v chladničke maj vždy balenie nesladenej perlivej vody a sieťku citrónov a nové balenie kúp, keď zostávajú 3 plechovky, aby ťa chuť nikdy nevyhnala po limonádu či sladenú kávu so sebou", "Zlyhá, ak si do 14 dní stále kúpiš viac ako 3 sladené nápoje so sebou", null,
+    N9: node("D4", 2, 0, "Zásoba vody", "Dopĺňaj ako večierka, skôr ako tovar dôjde: v chladničke maj vždy balenie nesladenej perlivej vody a sieťku citrónov a nové balenie kúp, keď zostávajú 3 plechovky, aby ťa chuť nikdy nevyhnala po limonádu či sladenú kávu so sebou", "Zlyhá, ak si do 14 dní stále kúpiš viac ako 3 sladené nápoje so sebou", null,
       { lateral: { src: "Maloobchod: doplniť skôr, ako sa vypredá", dist: 4, drop: "Kupovať nápoj, až keď máš chuť" } }),
     N10: node("D2", 2, 0, "Strop nákladov", "Ak náhradné maškrty ako ovocie a nesladený jogurt stoja viac ako dvojnásobok toho, čo si predtým týždenne minul na maškrty, do mesiaca to vzdáš a vrátiš sa k starým maškrtám", "Stop, ak do 14 dní náhrady stoja viac ako dvojnásobok pôvodného rozpočtu na maškrty", "Ceny ovocia sa počas sezóny dosť menia",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Náhrady sú na dlhodobé udržanie pridrahé" } }),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_SK = {
     { type: "excludes", from: "N1", to: "N5", why: "Keď má sladkosť pochádzať iba z celého ovocia, obľúbené sladkosti si nenecháš" },
     { type: "excludes", from: "N4", to: "N11", why: "Ovocie doma stojí na nákupe debničky každý týždeň; zákaz nákupov vo veľkom tento plán zásob rozbije" },
     { type: "excludes", from: "N2", to: "N7", why: "Táto cesta mení iba nápoje a jedlá necháva tak, čo odporuje prerábaniu sladkokyslej omáčky" },
-    { type: "excludes", from: "N2", to: "N10", why: "Táto cesta mení iba nápoje a nekupuje náhradné maškrty; strop výdavkov na náhrady patrí k inej ceste, tak si vyber jednu" },
+    { type: "excludes", from: "N2", to: "N10", why: "Táto cesta mení iba nápoje a nekupuje náhradné maškrty, takže strop výdavkov na náhrady tu nemá zmysel; vyber si jedno" },
     { type: "excludes", from: "N9", to: "N11", why: "Stála zásoba perlivej vody znamená kupovať ju po kartónoch, čo sa priamo bije so zákazom nákupov vo veľkom" },
     { type: "requires", from: "N1", to: "N8", why: "Aj ovocie obsahuje cukor; aj keď je to tvoja jediná sladkosť, potrebuješ denný limit, inak prejedanie aj tak zaťaží telo" },
     { type: "requires", from: "N4", to: "N10", why: "Týždenné debničky ovocia a jogurtu sa nasčítajú, takže potrebuješ strop výdavkov, inak to ako prvá vzdá peňaženka" },
@@ -55,8 +55,8 @@ export const SWEET_SOUR_GALAXY_SK = {
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
-      sacrifice: { nodes: ["N5"], p: "Stála zásoba perlivej vody v chladničke", v: "15 minút čakania, kým podľahneš chuti", t: "Každý týždeň meníš len trochu", l: "Cukor v jedlách zostáva rovnaký", x: "Koniec s jedením starých maškŕt ako predtým" },
-      fatal: "N12", thesis: "Pri chuti na sladké siahni po nesladenej perlivej vode a nové príchute skúšaj v malom, kým kúpiš viac", title: "Najprv nápoje · pomaly menej",
+      sacrifice: { nodes: ["N5"], p: "Stála zásoba perlivej vody v chladničke", v: "15 minút čakania, skôr ako podľahneš chuti", t: "Každý týždeň meníš len trochu", l: "Cukor v jedlách zostáva rovnaký", x: "Koniec s jedením starých maškŕt ako predtým" },
+      fatal: "N12", thesis: "Pri chuti na sladké siahni po nesladenej perlivej vode a nové príchute skúšaj v malom, skôr ako kúpiš viac", title: "Najprv nápoje · pomaly menej",
     },
     gamma: {
       include: ["N3", "N5", "N7", "N8", "N11"], exclude: ["N1", "N4"],

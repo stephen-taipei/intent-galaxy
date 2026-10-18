@@ -1,7 +1,7 @@
 // 擴充功能內建生活題示範星系（波蘭文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
 const dims = { D1: "Skąd słodycz", D2: "Ujście dla zachcianek", D3: "Skala zmiany", D4: "Co trzymasz w domu" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
-  dim, cell, inverse_cell, inverse_pos: `Przeciwny pogląd — ${dims[dim]}: drugi biegun`, claim, kill, blind,
+  dim, cell, inverse_cell, inverse_pos: `Przeciwny pogląd doprowadza „${dims[dim]}” do drugiej skrajności`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
 });
 
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_PL = {
   quadrants: {
     Q1: { scar: "Zjadł całą paczkę suszonych owoców, myśląc, że to zdrowa przekąska", sacred: "Słodycz tylko z całych owoców" },
     Q2: { scar: "Trzy razy rzucał cukier i za każdym razem pękał w drugim tygodniu", sacred: "Liczy się tylko to, czego da się trzymać" },
-    Q3: { scar: "Skopiował jadłospis low-carb i miał go dość po trzech dniach", sacred: "Zmień metodę, nie smak" },
-    Q4: { scar: "Widział zbyt wielu, którzy rzucili cukier i szybko do niego wrócili", sacred: "Zasady wygrywają z silną wolą" },
+    Q3: { scar: "Skopiował jadłospis z małą ilością węglowodanów i miał go dość po trzech dniach", sacred: "Zmień metodę, nie smak" },
+    Q4: { scar: "Widział zbyt wielu, którzy rzucili cukier i szybko do niego wrócili", sacred: "Ustal zasady, zamiast liczyć na silną wolę" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Całe owoce", "Gdy masz ochotę na coś słodkiego, jedz tylko całe świeże owoce, jak kiwi, ananas, borówki czy pomarańcze; soki, suszone i kandyzowane owoce się nie liczą", "Porażka, jeśli w ciągu 14 dni w więcej niż 3 dni kupisz deser, żeby zaspokoić zachciankę", null),
@@ -26,7 +26,7 @@ export const SWEET_SOUR_GALAXY_PL = {
     N6: node("D3", 1, 2, "Testuj napoje", "Każdy nowy smak niesłodzonego napoju kup w najmniejszym opakowaniu i pij 3 dni z rzędu; zgrzewkę kupuj dopiero, gdy ci smakuje, nigdy nie rób zapasów na raz", "Porażka, jeśli smak kupiony na zgrzewkę po teście po 14 dniach wciąż jest w ponad połowie pełny", null),
     N7: node("D3", 2, 1, "Zmień sos", "Jak zmiana etui zamiast telefonu: zostaw główne składniki kurczaka czy ryby w sosie słodko-kwaśnym, ale sos zrób sam z pomidorów, ananasa i octu, z połową zwykłego cukru", "Porażka, jeśli po 2 próbach z nowym sosem w ciągu 14 dni wszyscy w domu mówią, że nie smakuje", "W restauracji ani na dowóz sosu nie zmienisz",
       { lateral: { src: "Technologia: zmiana etui telefonu", dist: 2, drop: "Całkowite skreślenie dania z menu" } }),
-    N8: node("D2", 1, 0, "Max 3 porcje", "Jak limit bagażu w samolocie: najwyżej 3 porcje owoców i słodko-kwaśnych przekąsek łącznie dziennie, każda mniej więcej wielkości pięści; nadwyżka czeka do jutra, zamiast polegać na silnej woli w danej chwili", "Porażka, jeśli w więcej niż 2 dni w tygodniu zjesz ponad 3 porcje", null,
+    N8: node("D2", 1, 0, "Do 3 porcji", "Jak limit bagażu w samolocie: najwyżej 3 porcje owoców i słodko-kwaśnych przekąsek łącznie dziennie, każda mniej więcej wielkości pięści; nadwyżka czeka do jutra, zamiast polegać na silnej woli w danej chwili", "Porażka, jeśli w więcej niż 2 dni w tygodniu zjesz ponad 3 porcje", null,
       { lateral: { src: "Linie lotnicze: limit wagi bagażu", dist: 3, drop: "Jedzenie bez limitu, kiedy chcesz" } }),
     N9: node("D4", 2, 0, "Zapas wody", "Uzupełniaj jak sklep osiedlowy, zanim towar się skończy: zawsze trzymaj w lodówce zgrzewkę niesłodzonej wody gazowanej i siatkę cytryn, a nową zgrzewkę kupuj przy 3 ostatnich puszkach, żeby zachcianka nigdy nie wygnała cię po colę czy słodką kawę na wynos", "Porażka, jeśli w ciągu 14 dni nadal kupisz więcej niż 3 słodzone napoje na wynos", null,
       { lateral: { src: "Handel: uzupełnianie przed wyprzedaniem", dist: 4, drop: "Kupowanie napoju dopiero, gdy masz ochotę" } }),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_PL = {
     { type: "excludes", from: "N1", to: "N5", why: "Jeśli słodycz ma pochodzić tylko z całych owoców, nie zostawisz sobie ulubionych słodkich przekąsek" },
     { type: "excludes", from: "N4", to: "N11", why: "Owoce w domu opierają się na kupowaniu skrzynki co tydzień; zakaz kupowania hurtem rozwala ten plan zapasów" },
     { type: "excludes", from: "N2", to: "N7", why: "Ta ścieżka zmienia tylko napoje i nie rusza posiłków, co przeczy przerabianiu sosu słodko-kwaśnego" },
-    { type: "excludes", from: "N2", to: "N10", why: "Ta ścieżka zmienia tylko napoje i nie kupuje zamienników przekąsek; limit wydatków na zamienniki należy do innej ścieżki, więc wybierz jedną" },
+    { type: "excludes", from: "N2", to: "N10", why: "Ta ścieżka zmienia tylko napoje i nie kupuje zamienników przekąsek, więc limit wydatków na zamienniki nie ma tu sensu; wybierz jedną" },
     { type: "excludes", from: "N9", to: "N11", why: "Stały zapas wody gazowanej oznacza kupowanie jej na zgrzewki, co wprost kłóci się z niekupowaniem hurtem" },
     { type: "requires", from: "N1", to: "N8", why: "Owoce też mają cukier; nawet jeśli to twoja jedyna słodycz, potrzebujesz dziennego limitu, bo nadmiar i tak obciąża organizm" },
     { type: "requires", from: "N4", to: "N10", why: "Cotygodniowe skrzynki owoców i jogurtu się sumują, więc potrzebujesz limitu wydatków, inaczej portfel podda się pierwszy" },

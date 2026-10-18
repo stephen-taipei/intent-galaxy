@@ -1,5 +1,5 @@
 // 擴充功能內建生活題示範星系（義大利文版）：喜歡又甜又酸的食物，又不想讓身體負擔太大，有哪些吃法？
-const dims = { D1: "Da dove arriva il dolce", D2: "Sfogo per la voglia", D3: "Quanto cambiare", D4: "Cosa c'è in casa" };
+const dims = { D1: "Da dove arriva il dolce", D2: "Come gestire la voglia", D3: "Quanto cambiare", D4: "Cosa c'è in casa" };
 const node = (dim, cell, inverse_cell, label, claim, kill, blind, extra = {}) => ({
   dim, cell, inverse_cell, inverse_pos: `La visione opposta porta ${dims[dim]} all'altro estremo`, claim, kill, blind,
   scores: { i: 1, v: 1, r: 0 }, label, ...extra,
@@ -14,8 +14,8 @@ export const SWEET_SOUR_GALAXY_IT = {
   quadrants: {
     Q1: { scar: "Ha mangiato un intero sacchetto di frutta secca credendolo uno snack sano", sacred: "Il dolce arriva solo dalla frutta intera" },
     Q2: { scar: "Ha smesso con lo zucchero tre volte e ha ceduto ogni volta alla seconda settimana", sacred: "Conta solo se riesci davvero a mantenerlo" },
-    Q3: { scar: "Ha copiato una dieta low-carb e si è stufato in tre giorni", sacred: "Cambia il metodo, non il sapore" },
-    Q4: { scar: "Ha visto troppa gente smettere con lo zucchero e ricaderci subito", sacred: "Le regole battono la forza di volontà" },
+    Q3: { scar: "Ha copiato una dieta povera di carboidrati e si è stufato in tre giorni", sacred: "Cambia il metodo, non il sapore" },
+    Q4: { scar: "Ha visto troppa gente smettere con lo zucchero e ricaderci subito", sacred: "Darsi regole invece di contare sulla forza di volontà" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Frutta intera", "Quando hai voglia di dolce, mangia solo frutta fresca intera, come kiwi, ananas, frutti di bosco o arance; succhi, frutta secca e canditi non contano", "Fallisce se, entro 14 giorni, compri un dolce per toglierti la voglia più di 3 giorni", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_IT = {
     { type: "excludes", from: "N1", to: "N5", why: "Se il dolce arriva solo dalla frutta intera, non puoi tenerti gli snack zuccherati che ami" },
     { type: "excludes", from: "N4", to: "N11", why: "La frutta in casa dipende dal comprarne una cassetta ogni settimana; vieta gli acquisti a casse e quel piano di scorte crolla" },
     { type: "excludes", from: "N2", to: "N7", why: "Questa strada cambia solo le bevande e lascia stare i pasti, il che contraddice il rifare la salsa agrodolce" },
-    { type: "excludes", from: "N2", to: "N10", why: "Questa strada cambia solo le bevande e non compra snack sostitutivi; un tetto di spesa sui sostituti appartiene a un'altra strada, quindi scegline una" },
+    { type: "excludes", from: "N2", to: "N10", why: "Questa strada cambia solo le bevande e non compra snack sostitutivi, quindi un tetto di spesa sui sostituti non c'entra; scegline una" },
     { type: "excludes", from: "N9", to: "N11", why: "Tenere scorta di acqua frizzante significa comprarla a casse, il che si scontra in pieno con il non comprare all'ingrosso" },
     { type: "requires", from: "N1", to: "N8", why: "Anche la frutta ha zucchero; anche se è il tuo unico dolce, serve un limite giornaliero, o mangiarne troppa pesa comunque" },
     { type: "requires", from: "N4", to: "N10", why: "Comprare frutta e yogurt a cassette ogni settimana costa, quindi serve un tetto di spesa o il portafoglio cede per primo" },

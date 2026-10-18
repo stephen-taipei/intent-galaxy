@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_IT = {
     Q1: { scar: "Ha comprato la lavastoviglie e lava ancora a mano", sacred: "Prima conta le tue stoviglie" },
     Q2: { scar: "Ha scoperto durante l'installazione che il tubo era troppo corto", sacred: "Misura prima di comprare" },
     Q3: { scar: "Ha comprato la prima di una classifica online e non ci stava", sacred: "Prendere idee da altri settori" },
-    Q4: { scar: "Ha visto tre lavastoviglie finire a fare da scolapiatti", sacred: "Pianifica prima il fallimento" },
+    Q4: { scar: "Ha visto tre lavastoviglie finire a fare da scolapiatti", sacred: "Pensa a come potrebbe andare storto" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Incasso lavello", "Togliere il mobile da 45 o 60 cm accanto al lavello e incassarci la macchina, così non occupa il piano di lavoro e non intralcia il passaggio", "Non va bene se larghezza, altezza o profondità del vano sono inferiori alle misure da incasso della macchina", null),

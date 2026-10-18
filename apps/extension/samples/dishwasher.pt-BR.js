@@ -15,7 +15,7 @@ export const DISHWASHER_GALAXY_PT_BR = {
     Q1: { scar: "Comprei a máquina e continuo lavando louça à mão", sacred: "Primeiro conte sua louça" },
     Q2: { scar: "No meio da instalação, descobri que a mangueira não alcançava", sacred: "Meça antes de comprar" },
     Q3: { scar: "Comprei pela lista de recomendações da internet e não cabia", sacred: "Busque ideias em outras áreas" },
-    Q4: { scar: "Vi três máquinas acabarem como escorredor de louça", sacred: "Planeje primeiro a falha" },
+    Q4: { scar: "Vi três máquinas acabarem como escorredor de louça", sacred: "Pense bem em como pode dar errado" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Embutir", "Tirar o armário de 45 ou 60 cm ao lado da pia e embutir lá a máquina, para não ocupar bancada nem atrapalhar a passagem", "Não serve se a largura, altura ou profundidade do armário forem menores do que as medidas de embutir indicadas pela máquina", null),
@@ -26,13 +26,13 @@ export const DISHWASHER_GALAXY_PT_BR = {
     N6: node("D3", 1, 2, "Testar primeiro", "Comprar um modelo que funcione de livre instalação ou embutido, deixar ao lado da pia 30 dias inteiros e só depois decidir se vale tirar o armário, em vez de desmontar já no primeiro dia", "Não serve se, durante os 30 dias de teste, a máquina atrapalhar a passagem ou bloquear uma gaveta", null),
     N7: node("D3", 2, 1, "Reservatório", "Como um motorhome com reservatório de água próprio, escolher um modelo de bancada que se enche à mão: sem ligar à torneira nem mexer no encanamento", "Não serve se, em alguma semana, você pular a máquina e lavar à mão 2 ou mais vezes por preguiça de encher", "Encher dá mais trabalho do que parece",
       { lateral: { src: "Camping: reservatório de água próprio", dist: 2, drop: "Ligação fixa à torneira" } }),
-    N8: node("D2", 1, 0, "Medir antes", "Como o checklist de um piloto antes de decolar, medir largura, profundidade e altura antes de fazer o pedido, e depois confirmar onde ficam a tomada e o ralo; se faltar algum dos 5, não faça o pedido", "Não serve se alguma coisa não bater ou não der para instalar quando chegar", null,
-      { lateral: { src: "Aviação: checklist pré-voo", dist: 3, drop: "Pedir no olhômetro" } }),
+    N8: node("D2", 1, 0, "Medir antes", "Como a lista de checagem de um piloto antes de decolar, medir largura, profundidade e altura antes de fazer o pedido, e depois confirmar onde ficam a tomada e o ralo; se faltar algum dos 5, não faça o pedido", "Não serve se alguma coisa não bater ou não der para instalar quando chegar", null,
+      { lateral: { src: "Aviação: checagem antes de decolar", dist: 3, drop: "Pedir no olhômetro" } }),
     N9: node("D4", 2, 0, "Louça apta", "Como um restaurante que só usa louça própria para máquina, substituir todas as panelas e pratos marcados como não aptos, para não sobrar nada para lavar à mão", "Não serve se, nos 14 dias após a troca, você ainda lavar à mão mais de 3 peças por dia", null,
       { lateral: { src: "Restaurantes: louça profissional", dist: 4, drop: "Louça velha e desparelhada de casa" } }),
-    N10: node("D2", 2, 0, "Sem meia carga", "Se você ligar com menos de meia carga, gasta quase tanta água e eletricidade como cheia, então cada prato sai mais que o dobro do preço", "Anote sua louça durante 7 dias antes de fazer o pedido; se a média for inferior a 6 serviços por dia, troque por uma mini", "A louça começa a cheirar mal enquanto espera pela carga completa",
+    N10: node("D2", 2, 0, "Sem meia carga", "Se você ligar com menos de meia carga, gasta quase tanta água e eletricidade como cheia, então lavar cada prato sai mais que o dobro do preço", "Anote sua louça durante 7 dias antes de fazer o pedido; se a média for inferior a 6 serviços por dia, troque por uma mini", "A louça começa a cheirar mal enquanto espera pela carga completa",
       { falsifier: { attack: "unit_economics", hits: "A2", wound: "Uma máquina grande meio vazia não compensa" } }),
-    N11: node("D4", 1, 0, "Panelas fora", "Se você enfiar woks e panelas grandes lá dentro por comodidade, uma mini não leva a louça em uma só lavagem e acaba lavando à mão de novo", "Descarte se, em 14 dias, as panelas obrigarem a uma segunda lavagem mais de 2 vezes", "Nem todo mundo em casa vai cumprir a regra",
+    N11: node("D4", 1, 0, "Panelas fora", "Se você enfiar woks e panelas grandes lá dentro por comodidade, uma mini não leva a louça em uma só lavagem e acaba lavando à mão de novo", "Abandone este plano se, em 14 dias, por enfiar panelas, precisar fazer uma segunda lavagem mais de 2 vezes", "Nem todo mundo em casa vai cumprir a regra",
       { falsifier: { attack: "dark_incentive", hits: "A3", wound: "Encher a máquina demais por comodidade" } }),
     N12: node("D3", 0, 1, "Sem reforma", "Se instalar a máquina virar uma reforma da cozinha inteira, depois de começar a obra e pagar, não tem mais volta e você precisa ir até o fim", "Não comece se o orçamento feito antes de tirar o armário for mais do dobro do preço da máquina", null,
       { falsifier: { attack: "sunk_cost", hits: "A1", wound: "Começou a obra, não tem mais volta" } }),
@@ -51,7 +51,7 @@ export const DISHWASHER_GALAXY_PT_BR = {
     alpha: {
       include: ["N1", "N3", "N4", "N8", "N10"], exclude: ["N5"],
       sacrifice: { nodes: ["N5"], p: "Remoção do armário e mão de obra da instalação", v: "Um armário a menos para guardar coisas", t: "Esperar o técnico medir e instalar", l: "Esperar por meia carga para lavar", x: "Abrir mão da mini de bancada" },
-      fatal: "N10", thesis: "Medir o armário, embutir uma máquina grande e só lavar a partir de meia carga", title: "Embutida grande, de uma vez",
+      fatal: "N10", thesis: "Medir o armário, embutir uma máquina grande e só ligar quando estiver pelo menos meio cheia", title: "Embutida grande, de uma vez",
     },
     beta: {
       include: ["N2", "N3", "N6", "N9", "N12"], exclude: ["N5"],
@@ -65,5 +65,5 @@ export const DISHWASHER_GALAXY_PT_BR = {
     },
   },
   recommend: { key: "alpha", why: "Em uma casa com 3 ou mais pessoas, uma máquina grande dá conta da louça do dia inteiro em uma só lavagem" },
-  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "A louça da família inteira depende desta única máquina; se quebrar, a única alternativa é lavar à mão", kill: "Descarte se um conserto demorar mais de 7 dias e a família voltar a lavar à mão", label: "Máquina única" },
+  withheld_kill: { attack: "single_point_failure", hits: "A4", claim: "A louça da família inteira depende desta única máquina; se quebrar, a única alternativa é lavar à mão", kill: "Abandone este plano se um conserto demorar mais de 7 dias e a família voltar a lavar à mão", label: "Máquina única" },
 };

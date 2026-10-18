@@ -15,7 +15,7 @@ export const SWEET_SOUR_GALAXY_ES_MX = {
     Q1: { scar: "Me comí una bolsa entera de fruta deshidratada creyendo que era sano", sacred: "El dulce solo sale de la fruta entera" },
     Q2: { scar: "Dejé el azúcar tres veces y recaí siempre en la segunda semana", sacred: "Solo cuenta si de verdad puedes mantenerlo" },
     Q3: { scar: "Copié un menú bajo en carbohidratos y a los tres días estaba harto", sacred: "Cambia el método, no el sabor" },
-    Q4: { scar: "He visto a demasiada gente dejar el azúcar y volver a caer", sacred: "Las reglas ganan a la fuerza de voluntad" },
+    Q4: { scar: "He visto a demasiada gente dejar el azúcar y volver a caer", sacred: "Ponte reglas en lugar de depender de la fuerza de voluntad" },
   },
   nodes: {
     N1: node("D1", 0, 2, "Fruta entera", "Cada vez que se te antoje algo dulce, comer solo fruta fresca entera, como kiwi, piña, frutos rojos o naranjas; el jugo, la fruta deshidratada y la fruta confitada no cuentan", "Falla si en 14 días compras algún postre para quitarte el antojo más de 3 días", null),
@@ -42,7 +42,7 @@ export const SWEET_SOUR_GALAXY_ES_MX = {
     { type: "excludes", from: "N1", to: "N5", why: "Si el dulce solo sale de la fruta entera, no puedes quedarte con los snacks azucarados que te gustan" },
     { type: "excludes", from: "N4", to: "N11", why: "La fruta de casa depende de comprar una caja cada semana; si prohíbes comprar por cajas, ese plan de compra se cae" },
     { type: "excludes", from: "N2", to: "N7", why: "Este camino solo cambia las bebidas y deja las comidas en paz, lo que choca con rehacer la salsa agridulce" },
-    { type: "excludes", from: "N2", to: "N10", why: "Este camino solo cambia las bebidas y no compra snacks sustitutos; un tope de gasto en sustitutos es de otro camino, así que elige uno" },
+    { type: "excludes", from: "N2", to: "N10", why: "Este camino solo cambia las bebidas y no compra snacks sustitutos, así que un tope de gasto en sustitutos no aplica aquí; elige uno" },
     { type: "excludes", from: "N9", to: "N11", why: "Tener siempre agua mineral implica comprarla por cajas, lo que choca de frente con no comprar a granel" },
     { type: "requires", from: "N1", to: "N8", why: "La fruta también tiene azúcar; aunque sea tu único capricho, necesitas un límite diario o comer demasiado también pasa factura" },
     { type: "requires", from: "N4", to: "N10", why: "Comprar fruta y yogur por cajas cada semana suma, así que necesitas un tope de gasto o la cartera se rinde antes" },
