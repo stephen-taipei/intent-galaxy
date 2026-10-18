@@ -6,7 +6,7 @@
  "ast.mustNot": "apa yang tidak dibuat",
  "ast.risk": "risiko yang sengaja diterima",
  "ast.sacrifice": "apa yang perlu dikorbankan",
- "ct.bannerDone": "✅ Galaksi telah dijana. Lihatnya dalam panel 🌌 iG  (klik untuk kembangkan JSON)",
+ "ct.bannerDone": "✅ Galaksi telah dijana. Lihatnya dalam panel iG  (klik untuk kembangkan JSON)",
  "ct.bannerFailed": "⚠ Tidak dapat membaca JSON galaksi  (klik untuk kembangkan; anda boleh salin dan tampalkannya ke dalam panel)",
  "ct.bannerPrompt": "🌌 Prom analisis Intent Galaxy: “{goal}”  (klik untuk kembangkan)",
  "ct.bannerWaiting": "⚡ AI sedang menjana galaksi…  (klik untuk kembangkan)",

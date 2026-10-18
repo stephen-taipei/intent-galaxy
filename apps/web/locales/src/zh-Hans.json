@@ -6,7 +6,7 @@
  "ast.mustNot": "不做的事",
  "ast.risk": "接受的风险",
  "ast.sacrifice": "要付出的代价",
- "ct.bannerDone": "✅ 星系已生成　在 🌌 iG 面板查看　（点击展开 JSON）",
+ "ct.bannerDone": "✅ 星系已生成　在 iG 面板查看　（点击展开 JSON）",
  "ct.bannerFailed": "⚠ 星系 JSON 读取失败　（点击展开，可复制后粘贴到面板）",
  "ct.bannerPrompt": "🌌 Intent Galaxy 分析提示词：“{goal}”　（点击展开）",
  "ct.bannerWaiting": "⚡ AI 正在生成星系…　（点击展开）",

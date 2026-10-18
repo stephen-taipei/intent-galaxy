@@ -6,7 +6,7 @@
  "ast.mustNot": "唔做嘅事",
  "ast.risk": "刻意接受嘅風險",
  "ast.sacrifice": "要付出嘅代價",
- "ct.bannerDone": "✅ 星系整好咗　喺 🌌 iG 面板睇　（點一下展開 JSON）",
+ "ct.bannerDone": "✅ 星系整好咗　喺 iG 面板睇　（點一下展開 JSON）",
  "ct.bannerFailed": "⚠ 讀唔到星系 JSON　（點一下展開，可以複製再貼去面板）",
  "ct.bannerPrompt": "🌌 Intent Galaxy 分析提示詞：「{goal}」　（點一下展開）",
  "ct.bannerWaiting": "⚡ AI 整緊星系…　（點一下展開）",

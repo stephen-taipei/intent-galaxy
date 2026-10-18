@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "was nicht zu tun ist",
  "ast.risk": "bewusst in Kauf genommene Risiken",
  "ast.sacrifice": "was es kostet",
- "ct.bannerDone": "✅ Galaxie erstellt. Im 🌌 iG-Panel ansehen (klicken zum Aufklappen des JSON)",
+ "ct.bannerDone": "✅ Galaxie erstellt. Im iG-Panel ansehen (klicken zum Aufklappen des JSON)",
  "ct.bannerFailed": "⚠ Galaxie-JSON konnte nicht gelesen werden (klicken zum Aufklappen; du kannst es kopieren und ins Panel einfügen)",
  "ct.bannerPrompt": "🌌 Intent Galaxy-Analyse-Prompt: „{goal}“ (klicken zum Aufklappen)",
  "ct.bannerWaiting": "⚡ KI erstellt die Galaxie… (klicken zum Aufklappen)",

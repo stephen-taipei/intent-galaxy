@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "wat je niet moet doen",
  "ast.risk": "bewust aanvaarde risico's",
  "ast.sacrifice": "wat het kost",
- "ct.bannerDone": "✅ Sterrenstelsel gegenereerd. Bekijk het in het 🌌 iG-paneel  (klik om de JSON uit te vouwen)",
+ "ct.bannerDone": "✅ Sterrenstelsel gegenereerd. Bekijk het in het iG-paneel  (klik om de JSON uit te vouwen)",
  "ct.bannerFailed": "⚠ Kon de JSON van het sterrenstelsel niet lezen  (klik om uit te vouwen; je kunt deze kopiëren en in het paneel plakken)",
  "ct.bannerPrompt": "🌌 Intent Galaxy-analyseprompt: “{goal}”  (klik om uit te vouwen)",
  "ct.bannerWaiting": "⚡ AI genereert het sterrenstelsel…  (klik om uit te vouwen)",

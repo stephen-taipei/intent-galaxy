@@ -6,7 +6,7 @@
  "ast.mustNot": "mga hindi gagawin",
  "ast.risk": "mga peligrong sadyang tinanggap",
  "ast.sacrifice": "ang magiging kapalit",
- "ct.bannerDone": "✅ Nagawa na ang galaxy. Tingnan sa 🌌 iG panel  (i-click para i-expand ang JSON)",
+ "ct.bannerDone": "✅ Nagawa na ang galaxy. Tingnan sa iG panel  (i-click para i-expand ang JSON)",
  "ct.bannerFailed": "⚠ Hindi mabasa ang galaxy JSON  (i-click para i-expand; puwede mong kopyahin at i-paste sa panel)",
  "ct.bannerPrompt": "🌌 Intent Galaxy analysis prompt: “{goal}”  (i-click para i-expand)",
  "ct.bannerWaiting": "⚡ Ginagawa ng AI ang galaxy…  (i-click para i-expand)",

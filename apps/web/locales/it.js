@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "cosa non fare",
  "ast.risk": "rischi accettati consapevolmente",
  "ast.sacrifice": "quanto costerà",
- "ct.bannerDone": "✅ Galassia generata. Visualizzala nel pannello 🌌 iG  (fai clic per espandere il JSON)",
+ "ct.bannerDone": "✅ Galassia generata. Visualizzala nel pannello iG  (fai clic per espandere il JSON)",
  "ct.bannerFailed": "⚠ Impossibile leggere il JSON della galassia  (fai clic per espandere; puoi copiarlo e incollarlo nel pannello)",
  "ct.bannerPrompt": "🌌 Prompt di analisi di Intent Galaxy: \"{goal}\"  (fai clic per espandere)",
  "ct.bannerWaiting": "⚡ L'IA sta generando la galassia…  (fai clic per espandere)",

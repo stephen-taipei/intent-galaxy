@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "やらないこと",
  "ast.risk": "あえて受け入れるリスク",
  "ast.sacrifice": "払う代償",
- "ct.bannerDone": "✅ 銀河が生成されました。🌌 iGパネルで確認（クリックでJSONを展開）",
+ "ct.bannerDone": "✅ 銀河が生成されました。iGパネルで確認（クリックでJSONを展開）",
  "ct.bannerFailed": "⚠ 銀河のJSONを読み込めませんでした（クリックで展開。コピーしてパネルに貼り付けられます）",
  "ct.bannerPrompt": "🌌 Intent Galaxy 分析プロンプト：「{goal}」（クリックで展開）",
  "ct.bannerWaiting": "⚡ AIが銀河を生成中…（クリックで展開）",

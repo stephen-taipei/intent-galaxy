@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "việc không làm",
  "ast.risk": "rủi ro chấp nhận có chủ ý",
  "ast.sacrifice": "cái giá phải trả",
- "ct.bannerDone": "✅ Đã tạo thiên hà. Xem trong bảng 🌌 iG  (nhấp để mở rộng JSON)",
+ "ct.bannerDone": "✅ Đã tạo thiên hà. Xem trong bảng iG  (nhấp để mở rộng JSON)",
  "ct.bannerFailed": "⚠ Không thể đọc JSON thiên hà  (nhấp để mở rộng; bạn có thể sao chép và dán vào bảng điều khiển)",
  "ct.bannerPrompt": "🌌 Lời nhắc phân tích Intent Galaxy: “{goal}”  (nhấp để mở rộng)",
  "ct.bannerWaiting": "⚡ AI đang tạo thiên hà…  (nhấp để mở rộng)",

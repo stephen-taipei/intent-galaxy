@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "מה לא לעשות",
  "ast.risk": "סיכונים שמקבלים בכוונה",
  "ast.sacrifice": "מה זה יעלה",
- "ct.bannerDone": "✅ הגלקסיה נוצרה. צפה בה בלוח 🌌 iG (לחץ כדי להרחיב את ה-JSON)",
+ "ct.bannerDone": "✅ הגלקסיה נוצרה. צפה בה בלוח iG (לחץ כדי להרחיב את ה-JSON)",
  "ct.bannerFailed": "⚠ לא ניתן לקרוא את ה-JSON של הגלקסיה (לחץ להרחבה; ניתן להעתיק ולהדביק אותו בלוח)",
  "ct.bannerPrompt": "🌌 פרומפט ניתוח של Intent Galaxy: “{goal}” (לחץ להרחבה)",
  "ct.bannerWaiting": "⚡ ה-AI יוצר את הגלקסיה… (לחץ להרחבה)",

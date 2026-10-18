@@ -6,7 +6,7 @@
  "ast.mustNot": "ce nu trebuie făcut",
  "ast.risk": "riscuri asumate în cunoștință de cauză",
  "ast.sacrifice": "ce va costa",
- "ct.bannerDone": "✅ Galaxie generată. O poți vedea în panoul 🌌 iG  (apasă pentru a extinde JSON-ul)",
+ "ct.bannerDone": "✅ Galaxie generată. O poți vedea în panoul iG  (apasă pentru a extinde JSON-ul)",
  "ct.bannerFailed": "⚠ Nu s-a putut citi JSON-ul galaxiei  (apasă pentru a extinde; îl poți copia și lipi în panou)",
  "ct.bannerPrompt": "🌌 Prompt de analiză Intent Galaxy: „{goal}”  (apasă pentru a extinde)",
  "ct.bannerWaiting": "⚡ AI-ul generează galaxia…  (apasă pentru a extinde)",

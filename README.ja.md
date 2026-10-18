@@ -43,7 +43,7 @@
 | ---- | ---- | ---- | :--: |
 | **CLI** | エンジニア | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 の星系サーバー。生成には Claude、Codex、Gemini、agy CLI または 12 社の API を選択可能 | ✅ |
 | **MCP** | エンジニア | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`。Claude Code、Codex、Gemini CLI、agy から利用可能 | ✅ |
-| **Extension** | 一般ユーザー | Chrome / Firefox：Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi の入力欄の横に `🌌 iG` カプセルを追加し、そのサイトの AI に星系を生成させる | ✅ |
+| **Extension** | 一般ユーザー | Chrome / Firefox：Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi の入力欄の横に <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** カプセルを追加し、そのサイトの AI に星系を生成させる | ✅ |
 | **Kill-gate** | エンジニア | `.intent.lock.json`（RFC 8785 JCS + SHA-256）と、14 日後の commit を検証するゲートキーパー | ✅ |
 
 <br>
@@ -230,11 +230,11 @@ npm run build:ext    # apps/extension と apps/extension-firefox に同期。そ
 npm run pack:ext     # ストア公開用に dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip も生成
 ```
 
-入力欄に迷っていることを一文書いて、`🌌 iG`（またはツールバーのアイコン、`Cmd/Ctrl+Shift+G`）をクリック：
+入力欄に迷っていることを一文書いて、<img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG**（またはツールバーのアイコン、`Cmd/Ctrl+Shift+G`）をクリック：
 
 ```mermaid
 flowchart LR
-    A["🌌 iG をクリック"] --> B{"この会話で<br/>生成済み？"}
+    A["iG をクリック"] --> B{"この会話で<br/>生成済み？"}
     B -- はい --> C["星系をそのまま表示"]
     B -- いいえ --> D["プロンプトを入力欄に挿入<br/>送信はユーザーが行う"]
     D --> E["Web の AI が JSON を返答"]

@@ -7,7 +7,7 @@ export default {
  "ast.mustNot": "what not to do",
  "ast.risk": "risks accepted on purpose",
  "ast.sacrifice": "what it will cost",
- "ct.bannerDone": "✅ Galaxy generated. View it in the 🌌 iG panel  (click to expand the JSON)",
+ "ct.bannerDone": "✅ Galaxy generated. View it in the iG panel  (click to expand the JSON)",
  "ct.bannerFailed": "⚠ Could not read the galaxy JSON  (click to expand; you can copy it and paste it into the panel)",
  "ct.bannerPrompt": "🌌 Intent Galaxy analysis prompt: “{goal}”  (click to expand)",
  "ct.bannerWaiting": "⚡ AI is generating the galaxy…  (click to expand)",

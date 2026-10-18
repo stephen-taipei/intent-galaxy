@@ -43,7 +43,7 @@
 | ---- | ---- | ---- | :--: |
 | **CLI** | 엔지니어 | `npx @stephen.taipei/intent-galaxy`: 127.0.0.1 성계 서버. 생성에 Claude, Codex, Gemini, agy CLI 또는 12개 API 중 선택 가능 | ✅ |
 | **MCP** | 엔지니어 | Stdio MCP Server: `intent_spawner_prompt` → `intent_open_galaxy`. Claude Code, Codex, Gemini CLI, agy에 모두 연결 가능 | ✅ |
-| **Extension** | 일반 사용자 | Chrome / Firefox: Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral, Kimi 입력창 옆에 `🌌 iG` 캡슐을 추가해 해당 사이트의 AI가 바로 성계를 생성 | ✅ |
+| **Extension** | 일반 사용자 | Chrome / Firefox: Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral, Kimi 입력창 옆에 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** 캡슐을 추가해 해당 사이트의 AI가 바로 성계를 생성 | ✅ |
 | **Kill-gate** | 엔지니어 | `.intent.lock.json`(RFC 8785 JCS + SHA-256)과 14일 후 commit을 검증하는 게이트키퍼 | ✅ |
 
 <br>
@@ -230,11 +230,11 @@ npm run build:ext    # apps/extension과 apps/extension-firefox에 동기화. �
 npm run pack:ext     # 스토어 등록용 dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip도 생성
 ```
 
-입력창에 고민 중인 일을 한 문장 적고 `🌌 iG`(또는 툴바 아이콘, `Cmd/Ctrl+Shift+G`)를 클릭하세요:
+입력창에 고민 중인 일을 한 문장 적고 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG**(또는 툴바 아이콘, `Cmd/Ctrl+Shift+G`)를 클릭하세요:
 
 ```mermaid
 flowchart LR
-    A["🌌 iG 클릭"] --> B{"이 대화에서<br/>생성한 적 있음?"}
+    A["iG 클릭"] --> B{"이 대화에서<br/>생성한 적 있음?"}
     B -- 예 --> C["성계를 바로 표시"]
     B -- 아니요 --> D["프롬프트를 입력창에 삽입<br/>전송은 사용자가 직접"]
     D --> E["웹 AI가 JSON으로 응답"]
