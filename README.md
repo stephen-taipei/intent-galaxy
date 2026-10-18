@@ -264,7 +264,7 @@ flowchart LR
 
 ### 發版
 
-1. 更新 `package.json` 版本與 [`CHANGELOG.md`](CHANGELOG.md)（新增 `## X.Y.Z — 日期` 段落），合併到 `main`
+1. 更新 `package.json` 版本與 [`CHANGELOG.md`](CHANGELOG.md)（新增 `## X.Y.Z — 日期` 段落），執行 `npm run build:ext` 讓擴充功能 manifest 版號跟著對齊（`npm test` 會檢查），合併到 `main`
 2. 在 `main` 上 `npm publish --access public`
 3. `git tag vX.Y.Z && git push origin vX.Y.Z`：[Release workflow](.github/workflows/release.yml) 會確認 tag、`package.json` 與 npm 版本一致，再以 CHANGELOG 該段建立 GitHub Release（不會發佈 npm）
 

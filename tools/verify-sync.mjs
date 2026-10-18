@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildGalaxyBundle } from "./sync-extension.mjs";
+import { buildGalaxyBundle, packageVersion } from "./sync-extension.mjs";
 import { LOCALES } from "./i18n.mjs";
 import { sampleSuffix } from "../apps/web/i18n.js";
 
@@ -38,6 +38,11 @@ try {
       assert.deepEqual(shape(g), shape(orig), `${base}${exts[i + 1]} 結構與繁中版不同`);
       assert.deepEqual(core.repairAnalysis(g).findings, [], `${base}${exts[i + 1]}`);
     }
+  }
+  // 擴充功能版號必須與 npm 套件一致（npm run build:ext 會自動對齊）
+  for (const dir of ["apps/extension", "apps/extension-firefox"]) {
+    const { version } = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, dir, "manifest.json"), "utf8"));
+    assert.equal(version, packageVersion(), `${dir}/manifest.json version ${version} ≠ package.json；請執行 npm run build:ext`);
   }
   console.log("✅ tools/sync-extension verified!");
 } finally {
