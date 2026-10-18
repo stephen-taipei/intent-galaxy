@@ -262,6 +262,12 @@ flowchart LR
 
 架構與資料結構以 [`INTENT-SPEC-FINAL.md`](INTENT-SPEC-FINAL.md) 為準。
 
+### 發版
+
+1. 更新 `package.json` 版本與 [`CHANGELOG.md`](CHANGELOG.md)（新增 `## X.Y.Z — 日期` 段落），合併到 `main`
+2. 在 `main` 上 `npm publish --access public`
+3. `git tag vX.Y.Z && git push origin vX.Y.Z`：[Release workflow](.github/workflows/release.yml) 會確認 tag、`package.json` 與 npm 版本一致，再以 CHANGELOG 該段建立 GitHub Release（不會發佈 npm）
+
 <br>
 
 ---
