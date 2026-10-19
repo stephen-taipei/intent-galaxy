@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Mostrar ou ocultar os cartões de plano na parte inferior",
  "ct.toggleSummaryTitle": "Mostrar ou ocultar o painel do plano à direita",
  "ext.actionTitle": "Intent Galaxy: abrir a galáxia nesta conversa com IA (Cmd/Ctrl+Shift+G)",
- "ext.description": "Adiciona um botão iG às conversas com IA como o Claude, o ChatGPT e o Gemini para ficar a saber, em 60 segundos, o que quer realmente.",
+ "ext.description": "Adiciona um botão iG a conversas com IA como o Claude, o ChatGPT e o Gemini para perceber, em 60 segundos, o que quer realmente.",
  "ext.unsupportedSite": "O Intent Galaxy só funciona nestes sites de IA: {sites}",
  "ov.blind": "✦ ponto cego",
  "ov.blindTip": "✦ Ponto cego: {blind}",

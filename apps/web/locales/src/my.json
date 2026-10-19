@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "အောက်ခြေရှိ အစီအစဉ်ကတ်များကို ပြမည် သို့မဟုတ် ဝှက်မည်",
  "ct.toggleSummaryTitle": "ညာဘက်ရှိ အစီအစဉ် panel ကို ပြမည် သို့မဟုတ် ဝှက်မည်",
  "ext.actionTitle": "Intent Galaxy: ဤ AI ချတ်တွင် ဂလက်ဆီကို ဖွင့်ရန် (Cmd/Ctrl+Shift+G)",
- "ext.description": "Claude၊ ChatGPT၊ Gemini ကဲ့သို့ AI ချတ်များတွင် iG ခလုတ်ကို ထည့်ပေးပြီး သင်တကယ်လိုချင်တာကို စက္ကန့် 60 အတွင်း ရှင်းရှင်းလင်းလင်း စီစဉ်ပေးသည်။",
+ "ext.description": "Claude၊ ChatGPT၊ Gemini စသည့် AI ချတ်များတွင် iG ခလုတ်ထည့်ပေးပြီး သင်တကယ်လိုချင်တာကို စက္ကန့် 60 အတွင်း ရှင်းအောင် စီစဉ်ပေးသည်။",
  "ext.unsupportedSite": "Intent Galaxy သည် ဤ AI ဝက်ဘ်ဆိုက်များတွင်သာ အလုပ်လုပ်သည်- {sites}",
  "ov.blind": "✦ သတိမမူမိသောအချက်",
  "ov.blindTip": "✦ သတိမမူမိသောအချက်- {blind}",
