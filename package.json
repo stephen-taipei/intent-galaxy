@@ -1,6 +1,6 @@
 {
   "name": "@stephen.taipei/intent-galaxy",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "60-second visual decision galaxy & deterministic intent AST compiler for local repos, Claude Code Mods, and browser extensions.",
   "keywords": [
     "intent",
