@@ -26,5 +26,21 @@
  "ast.accepted": {
   "zh-Hant-TW": "知道風險仍接受",
   "en": "Known and accepted"
+ },
+ "ast.title": {
+  "zh-Hant-TW": "我的決定",
+  "en": "My decision"
+ },
+ "ast.deciding": {
+  "zh-Hant-TW": "我真正在決定的是",
+  "en": "What I'm really deciding"
+ },
+ "ast.goal": {
+  "zh-Hant-TW": "目標",
+  "en": "Goal"
+ },
+ "ast.closing": {
+  "zh-Hant-TW": "請照這些決定回答：做「{must}」、避開「{mustNot}」；碰到「{guard}」就先停下來告訴我。",
+  "en": "Please answer according to these decisions: do the \"{must}\", avoid the \"{mustNot}\", and if any of the \"{guard}\" comes up, stop and tell me first."
  }
 }

@@ -11,16 +11,16 @@
   header { background: #111723; border-bottom: 1px solid #1e293b; display: flex; align-items: center; gap: 14px; padding: 0 18px; }
   .brand { font-weight: 700; font-size: 14px; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
   .brand svg { width: 26px; height: auto; flex: none; }
-  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(56,189,248,0.15); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); margin-left: 8px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: rgba(0,113,254,0.15); color: #7fb4ff; border: 1px solid rgba(0,113,254,0.4); margin-left: 8px; }
   #goal-form { flex: 1; display: flex; gap: 8px; }
   #goal { flex: 1; background: #0b101b; border: 1px solid #334155; border-radius: 8px; padding: 7px 12px; color: #f4f4f5; font-size: 12.5px; outline: none; }
-  #goal:focus { border-color: #38bdf8; }
-  header button { padding: 6px 14px; border-radius: 8px; border: none; background: #38bdf8; color: #080b11; font-weight: 700; font-size: 12px; cursor: pointer; }
+  #goal:focus { border-color: #0071FE; }
+  header button { padding: 6px 14px; border-radius: 8px; border: none; background: linear-gradient(135deg, #0071FE, #7A3BF1); color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; box-shadow: 0 1px 6px rgba(0,113,254,.3); }
   header button:disabled { opacity: .5; cursor: wait; }
   #provider, #model { background: #0b101b; border: 1px solid #334155; border-radius: 8px; padding: 6px 8px; color: #e2e8f0; font-size: 12px; outline: none; }
   #provider { max-width: 190px; }
   #model { width: 170px; }
-  #provider:focus, #model:focus { border-color: #38bdf8; }
+  #provider:focus, #model:focus { border-color: #0071FE; }
   intent-galaxy-overlay { min-height: 0; }
   /* 產生指令後的「下一步」視窗 */
   #done { margin: auto; width: min(560px, calc(100vw - 32px)); background: #111723; color: #e2e8f0; border: 1px solid #334155; border-radius: 14px; padding: 20px 22px; box-shadow: 0 24px 60px rgba(0,0,0,.6); }
@@ -35,7 +35,7 @@
   #done textarea { width: 100%; height: 180px; margin-top: 8px; background: #070a10; color: #cbd5e1; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; font: 11px/1.5 ui-monospace, monospace; resize: vertical; }
   #done .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
   #done button { padding: 7px 14px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-weight: 600; font-size: 12px; cursor: pointer; }
-  #done button.primary { background: #38bdf8; border-color: #38bdf8; color: #080b11; }
+  #done button.primary { background: linear-gradient(135deg, #0071FE, #7A3BF1); border-color: transparent; color: #fff; }
 </style>
 </head>
 <body>

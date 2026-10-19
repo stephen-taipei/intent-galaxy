@@ -1,19 +1,19 @@
 {
  "ov.q1": {
-  "zh-Hant-TW": "▲ Q1 歸零者（從零重想）",
-  "en": "▲ Q1 Resetter (rethink from scratch)"
+  "zh-Hant-TW": "▲ 從零重想",
+  "en": "▲ Rethink from scratch"
  },
  "ov.q2": {
-  "zh-Hant-TW": "▶ Q2 老兵（過來人的做法）",
-  "en": "▶ Q2 Veteran (what has worked before)"
+  "zh-Hant-TW": "▶ 過來人的做法",
+  "en": "▶ What has worked before"
  },
  "ov.q3": {
-  "zh-Hant-TW": "▼ Q3 越界者（借用別的領域）",
-  "en": "▼ Q3 Border-crosser (ideas from other fields)"
+  "zh-Hant-TW": "▼ 借用別的領域",
+  "en": "▼ Ideas from other fields"
  },
  "ov.q4": {
-  "zh-Hant-TW": "◀ Q4 驗屍官（先想怎麼會失敗）",
-  "en": "◀ Q4 Coroner (how it could fail)"
+  "zh-Hant-TW": "◀ 先想怎麼會失敗",
+  "en": "◀ How it could fail"
  },
  "ov.keyCards": {
   "zh-Hant-TW": "方案",
@@ -406,5 +406,9 @@
  "ov.langAuto": {
   "zh-Hant-TW": "🌐 自動（瀏覽器語言）",
   "en": "🌐 Auto (browser language)"
+ },
+ "ov.keysHelp": {
+  "zh-Hant-TW": "鍵盤快捷鍵",
+  "en": "Keyboard shortcuts"
  }
 }

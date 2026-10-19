@@ -3,6 +3,7 @@
 // 重新打開時：這個對話已生成（或正在生成）的星系優先顯示，不必重問。
 import "./galaxy/apps/web/galaxy-overlay.js";
 import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./galaxy/libs/epistemic/src/prompt.js";
+import { stripDecisionPrefix } from "./galaxy/libs/core/src/index.js";
 import { t, ready, isRtl, onLocaleChange, loadSample } from "./galaxy/apps/web/i18n.js";
 const setDocLang = (code) => { document.documentElement.lang = code; document.documentElement.dir = isRtl() ? "rtl" : "ltr"; };
 ready.then(setDocLang);
@@ -221,7 +222,8 @@ function showFailed(detail) {
 }
 
 function spawnViaChat() {
-  const prompt = `${RUNTIME_HEADER}\n\n${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\n`
+  // 第一行用使用者的語言說明這段是什麼（送出前會留在輸入框裡，一般人看到一大段英文會猶豫）。
+  const prompt = `${t("pn.promptPreamble")}\n\n${RUNTIME_HEADER}\n\n${SPAWNER_SYSTEM_PROMPT}\n\n---\n\n${buildSpawnerUserMessage(goal)}\n`
     + "Put the JSON in one ```json code block.\n"
     // 結尾再提醒一次：長提示詞的開頭容易被模型忽略。
     + "[RUNTIME] Again: answer in plain text only. Do not run code or any tool; the client validates and repairs all limits.";
@@ -242,6 +244,7 @@ function confirmChat(extra = [], beforeStart = null) {
 function showDone(job) {
   if (!showGalaxy(job.analysis, job.goal)) return;
   bindNonce(job.nonce);
+  if (job.picks) galaxy.restorePicks(job.picks); // 上次填回的方案與調整
   // 「回到星系」只關掉卡片：星系一直在下面，已選的方案和節點立場都保留。
   setStrip(t("pn.doneStrip"), [[t("pn.regenerate"), () => { const g = goal; confirmChat([[t("pn.backToGalaxy"), () => { goal = g; }]]); }]]);
 }
@@ -297,7 +300,7 @@ async function open({ goal: text = "", site: host = t("pn.thisAi"), job = null, 
   if (job?.status === "waiting" && newGoal) return askWhileWaiting(job, goal);
   if (goal) return generate(job?.status === "done" && job.analysis ? [[t("pn.backToPrevGalaxy"), () => showDone(job)]] : [], reopen);
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
-  if (pageGalaxy) return showGalaxy(pageGalaxy, pageGalaxy.core?.decision?.replace(/^你真正在[決决]定(?:的是|嘅係)[:：]\s*/, "") ?? "");
+  if (pageGalaxy) return showGalaxy(pageGalaxy, stripDecisionPrefix(pageGalaxy.core?.decision));
   // 3. 本機 CLI 有最近生成的星系：不分對話，所以不自動顯示，只提供按鈕（可能是別的網站或 Claude Code 的決策）。
   const cur = await cliLatest();
   const local = cur ? [[t("pn.loadLocalLatest", { goal: `${cur.goal.slice(0, 20)}${cur.goal.length > 20 ? "…" : ""}` }), () => showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })]] : [];
@@ -347,7 +350,7 @@ galaxy.addEventListener("intent-lock", async (e) => {
     const res = await fetch(`${CLI}/api/lock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch(() => null);
     if (res && !res.ok) { galaxy.showMessage(t("pn.lockNotWritten", { detail: res.error })); return; }
   }
-  toParent({ type: "intent-lock", ast: e.detail.ast, goal: galaxy.goal || goal });
+  toParent({ type: "intent-lock", ast: e.detail.ast, plain: e.detail.plain, baseKey: e.detail.baseKey, overrides: e.detail.overrides, goal: galaxy.goal || goal, nonce });
 });
 galaxy.addEventListener("intent-close", () => toParent({ type: "intent-close" }));
 // 版面（方案側欄、方案卡列）：記在擴充功能自己的 localStorage，下次打開照舊；狀態回報給標題列按鈕。

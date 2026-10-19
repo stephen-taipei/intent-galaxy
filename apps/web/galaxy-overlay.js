@@ -1,11 +1,12 @@
 // <intent-galaxy-overlay>：純正星系版 UI 的 Shadow DOM Web Component。
 // 同一份元件用於 CLI 網頁（apps/web/index.html）與瀏覽器擴充功能（內嵌於 AI 網頁輸入框上方）。
 // 事件：intent-lock {ast, baseKey, overrides, galaxyId}、intent-close、intent-synth-request {conflicts}。
-import { renderLockedAst, renderSacrifice, repairAnalysis, solveGalaxy } from "../../libs/core/src/index.ts";
+import { renderLockedAst, renderPlainIntent, renderSacrifice, repairAnalysis, solveGalaxy, stripDecisionPrefix } from "../../libs/core/src/index.ts";
 import { NODE_IDS, quadrantOf } from "../../libs/protocol/src/index.ts";
 import { t, ready, locale, preference, LOCALES, chooseLocale, languageName, onLocaleChange } from "./i18n.js";
 
-const astLabels = () => ({ must: t("ast.must"), guard: t("ast.guard"), mustNot: t("ast.mustNot"), risk: t("ast.risk"), sacrifice: t("ast.sacrifice"), forbid: t("ast.forbid"), accepted: t("ast.accepted") });
+const astLabels = () => ({ must: t("ast.must"), guard: t("ast.guard"), mustNot: t("ast.mustNot"), risk: t("ast.risk"), sacrifice: t("ast.sacrifice"), forbid: t("ast.forbid"), accepted: t("ast.accepted"),
+  title: t("ast.title"), deciding: t("ast.deciding"), goal: t("ast.goal"), closing: t("ast.closing", { must: t("ast.must"), mustNot: t("ast.mustNot"), guard: t("ast.guard") }) });
 
 const COORDS = [
   { x: 35, y: 17 }, { x: 50, y: 12 }, { x: 65, y: 17 },
@@ -28,7 +29,14 @@ const KEY_HINTS = () => [
   [["u"], t("ov.keyUndo"), t("ov.keyUndoTip")],
 ];
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" })[c]);
-const clip = (s, n) => { const a = [...String(s ?? "")]; return a.length > n ? a.slice(0, n - 1).join("") + "…" : a.join(""); };
+// 截字長度以「中文字寬」計：CJK／全形算 1，其他字算 0.5，英文等拉丁語系才不會截得太短。
+const CJK = /[\u1100-\u11ff\u2e80-\u9fff\uac00-\ud7af\uf900-\ufaff\ufe30-\ufe4f\uff00-\uffef]/;
+const clip = (s, n) => {
+  const a = [...String(s ?? "")];
+  let w = 0, i = 0;
+  for (; i < a.length; i++) { w += CJK.test(a[i]) ? 1 : 0.5; if (w > n) break; }
+  return i < a.length ? a.slice(0, Math.max(0, i - 1)).join("") + "…" : a.join("");
+};
 
 // 中文 IME 相容（CLAUDE.md 鐵律 3）：注音／倉頡開啟時 e.key 為 "Process" 或非 ASCII，改讀 e.code。
 export function normalizeKey(e) {
@@ -40,50 +48,56 @@ export function normalizeKey(e) {
 
 const STYLE = `
 :host { --bg:#080b11; --panel:#111723; --border:#1e293b; --text:#e2e8f0; --muted:#64748b; --q1:#38bdf8; --q2:#10b981; --q3:#a855f7; --q4:#f43f5e; --gold:#f59e0b;
-  display:block; position:relative; color:var(--text); background:var(--bg); font:12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang TC","Noto Sans TC",sans-serif; outline:none; overflow:hidden; }
+  --brand:#0071FE; --brand2:#7A3BF1; --brand-grad:linear-gradient(135deg,#0071FE,#7A3BF1);
+  display:block; position:relative; color:var(--text); background:var(--bg); font:12.5px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang TC","Noto Sans TC",sans-serif; outline:none; overflow:hidden; }
 * { box-sizing:border-box; margin:0; padding:0; }
-.wrap { display:grid; grid-template-columns:1fr 360px; grid-template-rows:1fr auto auto; height:100%; }
-:host([embedded]) .wrap { grid-template-columns:1fr; }
+/* 欄寬用 minmax(0,1fr)：方案卡列與狀態列的內容再長也不能把整個版面撐得比視窗寬。 */
+.wrap { display:grid; grid-template-columns:minmax(0,1fr) 360px; grid-template-rows:minmax(0,1fr) auto auto; height:100%; }
+:host([embedded]) .wrap { grid-template-columns:minmax(0,1fr); }
 :host([embedded]) aside { display:none; }
 :host([embedded]) #cards, :host([embedded]) #bar { grid-column:1 / -1; }
 /* 嵌入模式（擴充功能）的方案側欄：跟星系並排，星系仍可捲動、可邊看邊調；方案卡列可收合。 */
-:host([embedded]) .wrap.summary-open { grid-template-columns:1fr min(340px,45%); }
-:host([embedded]) .wrap.summary-open aside { display:flex; grid-column:2; grid-row:1; overflow:auto; border-left:1px solid #38bdf8; }
+:host([embedded]) .wrap.summary-open { grid-template-columns:minmax(0,1fr) min(320px,40%); }
+:host([embedded]) .wrap.summary-open aside { display:flex; grid-column:2; grid-row:1; overflow:auto; border-left:1px solid var(--brand); }
 .wrap.cards-hidden #cards { display:none; }
-#canvas { position:relative; width:100%; height:100%; min-width:720px; min-height:360px; }
-#stage { position:relative; min-height:200px; overflow:auto; background:radial-gradient(circle at 50% 50%, rgba(30,41,59,.45) 0%, rgba(8,11,17,1) 72%); }
+/* 嵌入模式（一般大眾）：藏起工程記號（N 編號、D 距離徽章、鍵盤提示列）；鍵盤說明收進 ? 按鈕。 */
+:host([embedded]) .nid, :host([embedded]) .card .badge, :host([embedded]) #bar .keys { display:none; }
+:host(:not([embedded])) #keys-help { display:none; }
+#canvas { position:relative; width:100%; height:100%; min-width:640px; min-height:360px; }
+#stage { position:relative; min-width:0; min-height:200px; overflow:auto; background:radial-gradient(circle at 50% 50%, rgba(30,41,59,.45) 0%, rgba(8,11,17,1) 72%); }
 svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
 .q-tag { position:absolute; font-size:10.5px; font-weight:600; padding:3px 8px; border-radius:6px; background:rgba(17,23,35,.92); border:1px solid var(--border); pointer-events:none; }
 .q-tag.Q1 { top:6px; left:50%; transform:translateX(-50%); color:var(--q1); }
-.q-tag.Q2, .q-tag.Q4 { top:34px; }
+.q-tag.Q2, .q-tag.Q4 { top:6px; max-width:30%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .q-tag.Q2 { right:8px; color:var(--q2); }
 .q-tag.Q3 { bottom:6px; left:50%; transform:translateX(-50%); color:#c084fc; }
 .q-tag.Q4 { left:8px; color:#fb7185; }
 .q-tag small { color:var(--muted); font-weight:400; }
 #core { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(250px,34%); padding:10px 14px; border-radius:14px; background:rgba(15,23,42,.96); border:2px solid #475569; text-align:center; box-shadow:0 0 35px rgba(56,189,248,.14); z-index:10; }
 #core .sub { font-size:9.5px; letter-spacing:1px; color:var(--q1); margin-bottom:3px; }
-#core .goal { font-size:12.5px; font-weight:700; color:#fff; }
+#core .goal { font-size:13.5px; font-weight:700; color:#fff; }
 #core .metric { font-size:10.5px; color:var(--gold); margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; cursor:help; }
-.node { position:absolute; transform:translate(-50%,-50%); padding:6px 10px; border-radius:9px; background:rgba(17,23,35,.94); border:1.5px solid #334155; color:var(--text); font:inherit; font-size:11.5px; font-weight:600; cursor:pointer; transition:opacity .15s, border-color .15s, background .15s; z-index:5; min-width:118px; max-width:180px; text-align:left; }
+.node { position:absolute; transform:translate(-50%,-50%); padding:6px 10px; border-radius:9px; background:rgba(17,23,35,.94); border:1.5px solid #334155; color:var(--text); font:inherit; font-size:12px; font-weight:600; cursor:pointer; transition:opacity .15s, border-color .15s, background .15s; z-index:5; min-width:118px; max-width:190px; text-align:left; }
 .node:hover, .node.focused { border-color:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.2); z-index:20; }
 .node .nid { font-size:10px; opacity:.65; margin-right:4px; font-family:ui-monospace,monospace; }
 .node .blind { float:right; font-size:10px; color:var(--gold); margin-left:4px; }
 .node .chip { display:block; font-size:9.5px; font-weight:400; color:#94a3b8; margin-top:2px; }
 .node.ghost { border-style:dashed; color:var(--muted); cursor:default; animation:pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { opacity:.45; } }
-.node.dimmed { opacity:.4; }
-.node[data-stance="include"] { background:rgba(16,185,129,.16); border-color:var(--q2); color:#ecfdf5; opacity:1; }
-.node[data-stance="exclude"] { background:rgba(244,63,94,.14); border-color:var(--q4); color:#ffe4e6; opacity:1; }
+.node.dimmed { opacity:.6; }
+/* 採納／排除用不透明底色：連線畫在節點底下，不會透出來像刪除線。 */
+.node[data-stance="include"] { background:#113132; border-color:var(--q2); color:#ecfdf5; opacity:1; }
+.node[data-stance="exclude"] { background:#311d2b; border-color:var(--q4); color:#ffe4e6; opacity:1; }
 .node[data-stance="exclude"] .lbl { text-decoration:line-through; }
 .node[data-q="Q4"][data-stance="exclude"] .lbl { text-decoration:none; }
 .node[data-src="user"] { outline:2px solid #fff; outline-offset:2px; }
 .node[data-src="derived"] { border-style:dashed; }
 .node.conflict { border-color:var(--q4) !important; background:rgba(244,63,94,.32) !important; }
-#cards { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:8px 10px; background:var(--panel); border-top:1px solid var(--border); }
-.card { background:#0b101b; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; cursor:pointer; font:inherit; color:inherit; text-align:left; }
-.card.active { border-color:var(--q1); background:rgba(56,189,248,.07); }
+#cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:8px 10px; min-width:0; background:var(--panel); border-top:1px solid var(--border); }
+.card { background:#0b101b; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; cursor:pointer; font:inherit; color:inherit; text-align:left; min-width:0; overflow:hidden; }
+.card.active { border-color:var(--brand); background:rgba(0,113,254,.1); box-shadow:0 0 0 1px rgba(0,113,254,.35); }
 .card.rec { border-color:rgba(245,158,11,.75); box-shadow:0 0 0 1px rgba(245,158,11,.2), 0 0 18px rgba(245,158,11,.12); }
-.card.rec.active { border-color:var(--q1); }
+.card.rec.active { border-color:var(--brand); }
 .card .badges { display:flex; gap:4px; }
 .card .rec-badge { font-size:9.5px; padding:1px 6px; border-radius:4px; background:rgba(245,158,11,.2); color:#fcd34d; font-weight:700; white-space:nowrap; }
 .card .why { font-size:10.5px; color:#fcd34d; margin-top:2px; }
@@ -93,18 +107,21 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 .card .badge { font-size:9.5px; padding:1px 5px; border-radius:4px; background:rgba(168,85,247,.18); color:#d8b4fe; white-space:nowrap; }
 .card .row { font-size:10.5px; color:#cbd5e1; margin-top:2px; }
 .card .kill { font-size:10.5px; color:#fda4af; margin-top:2px; }
-#bar { display:flex; align-items:center; gap:10px; padding:6px 10px; background:#0c111d; border-top:1px solid var(--border); font-size:11px; color:var(--muted); }
+#bar { display:flex; align-items:center; gap:10px; padding:6px 10px; background:#0c111d; border-top:1px solid var(--border); font-size:11px; color:var(--muted); min-height:38px; min-width:0; overflow:hidden; }
+#bar .msg { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#keys-help { all:unset; cursor:help; width:22px; height:22px; border-radius:50%; border:1px solid #475569; color:#cbd5e1; display:grid; place-items:center; font-weight:700; flex-shrink:0; }
+#keys-help:hover { border-color:#fff; color:#fff; }
 #bar .status { white-space:nowrap; flex-shrink:0; font-weight:600; padding:2px 8px; border-radius:6px; }
 .status.sat { color:#34d399; background:rgba(16,185,129,.12); }
 .status.unsat { color:#fb7185; background:rgba(244,63,94,.16); }
 .status.wait { color:var(--q1); background:rgba(56,189,248,.12); }
-#bar .keys { margin-left:auto; }
+#bar .keys { margin-left:auto; white-space:nowrap; min-width:0; overflow:hidden; text-overflow:ellipsis; } /* 空間不夠時先截掉按鍵說明，按鈕一定看得到 */
 kbd { background:#1e293b; color:#cbd5e1; padding:0 5px; border-radius:4px; font-size:10px; border:1px solid #334155; font-family:inherit; }
-#bar button { white-space:nowrap; flex-shrink:0; font:inherit; font-weight:700; padding:4px 10px; border-radius:6px; border:none; background:var(--q1); color:#080b11; cursor:pointer; }
+#bar button { white-space:nowrap; flex-shrink:0; font:inherit; font-weight:700; padding:5px 12px; border-radius:6px; border:none; background:var(--brand-grad); color:#fff; cursor:pointer; box-shadow:0 1px 6px rgba(0,113,254,.3); }
 #bar button#reset { background:transparent; color:var(--text); border:1px solid #475569; font-weight:600; }
 #bar button#reset:hover { border-color:#fff; }
 #bar button#reset:disabled { opacity:.35; cursor:default; }
-#bar select#lang { flex-shrink:0; max-width:9em; font:inherit; padding:3px 4px; border-radius:6px; border:1px solid #475569; background:#0c111d; color:var(--text); cursor:pointer; }
+#bar select#lang { flex-shrink:0; max-width:12em; font:inherit; padding:3px 4px; border-radius:6px; border:1px solid #475569; background:#0c111d; color:var(--text); cursor:pointer; }
 aside { grid-column:2; grid-row:1 / 4; display:flex; flex-direction:column; padding:12px; gap:8px; background:#0c111d; border-left:1px solid var(--border); min-height:0; }
 aside .head { display:flex; align-items:center; justify-content:space-between; }
 aside h2 { font-size:11px; letter-spacing:.8px; color:var(--q1); }
@@ -112,7 +129,7 @@ aside .head button { font:inherit; font-size:10.5px; padding:2px 8px; border-rad
 #summary { flex:1; overflow:auto; display:flex; flex-direction:column; gap:10px; min-height:0; }
 #summary .empty { color:var(--muted); font-size:11.5px; line-height:1.7; padding:6px 2px; }
 #summary .empty.unsat { color:#fb7185; }
-#summary .plan { padding:9px 11px; border-radius:9px; background:rgba(56,189,248,.07); border:1px solid rgba(56,189,248,.25); }
+#summary .plan { padding:9px 11px; border-radius:9px; background:rgba(0,113,254,.08); border:1px solid rgba(0,113,254,.35); }
 #summary .plan b { display:block; font-size:13px; color:#fff; }
 #summary .plan span { display:block; font-size:11px; color:#94a3b8; margin-top:2px; }
 #summary section { border-left:3px solid var(--c); padding:2px 0 2px 10px; }
@@ -150,7 +167,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
         <div id="core"><div class="sub"></div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></div></main>
       <section id="cards"></section>
       <footer id="bar"><span class="status"></span><span class="msg"></span>
-        <span class="keys"></span>
+        <span class="keys"></span><button type="button" id="keys-help">?</button>
         <select id="lang"></select><button type="button" id="reset"></button><button type="button" id="lock"></button></footer>
       <aside><div class="head"><h2></h2><button type="button" id="raw-toggle"></button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
@@ -171,6 +188,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
     this.addEventListener("keydown", (e) => this.#onKey(e));
     root.getElementById("lang").addEventListener("change", (e) => chooseLocale(e.target.value));
     ready.then(() => this.#render()); // 語系載入後重畫一次（載入前先用英文）
+    // 面板縮放後節點的外框（像素）相對畫布的比例會變：重畫一次，連線才會停在新的邊框上。
+    let raf = 0;
+    new ResizeObserver(() => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (this.#solution && this.#baseKey) this.#render(); }); }).observe(this);
     onLocaleChange(() => this.#render()); // 手動切換語系時重畫
   }
 
@@ -182,6 +202,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
     const sub = root.querySelector("#core .sub");
     sub.textContent = t("ov.coreSub"); sub.title = t("ov.coreTip");
     root.querySelector("#bar .keys").innerHTML = KEY_HINTS().map(([keys, label, tip]) => `<span data-tip="${esc(tip)}">${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${esc(label)}</span>`).join(" · ");
+    const help = root.getElementById("keys-help");
+    help.title = t("ov.keysHelp");
+    help.dataset.tip = `<b>${esc(t("ov.keysHelp"))}</b>` + KEY_HINTS().map(([keys, label]) => `<br>${keys.map((k) => `<kbd>${k}</kbd>`).join("")} ${esc(label)}`).join("");
     root.querySelector("aside h2").textContent = t("ov.summaryTitle");
     root.getElementById("raw-toggle").dataset.tip = t("ov.rawTip");
     const lang = root.getElementById("lang");
@@ -236,6 +259,16 @@ export class IntentGalaxyOverlay extends HTMLElement {
     this.#baseKey = key;
     if (!keepOverrides) this.#overrides.clear();
     if (!this.#summaryShown && this.#summaryPref === null) { this.#summaryShown = true; this.#summaryOpen = true; this.#emitLayout(); }
+    this.#render();
+  }
+
+  /** 重開面板時還原上次填回的選擇（方案卡＋手動調整）。 */
+  restorePicks({ baseKey = null, overrides = {} } = {}) {
+    if (!this.#analysis) return;
+    this.#baseKey = baseKey && this.#analysis.archetypes[baseKey] ? baseKey : null;
+    this.#overrides = new Map(Object.entries(overrides ?? {}).filter(([id, s]) => NODE_IDS.includes(id) && ["include", "exclude", "neutral"].includes(s)).map(([id, s]) => [id, { stance: s, seq: ++this.#seq }]));
+    this.#undo = []; this.#redo = [];
+    if (this.#baseKey && this.#summaryPref === null) { this.#summaryShown = true; this.#summaryOpen = true; this.#emitLayout(); }
     this.#render();
   }
 
@@ -297,8 +330,9 @@ export class IntentGalaxyOverlay extends HTMLElement {
     if (!sol || !this.#analysis) return;
     if (sol.status !== "SAT") { this.#message = t("ov.resolveFirst"); this.#render(); return; }
     const ast = renderLockedAst(this.#analysis, sol, this.#baseKey, astLabels());
+    const plain = renderPlainIntent(this.#analysis, sol, this.#baseKey, astLabels()); // 白話版：擴充功能填回聊天網站用
     const overrides = Object.fromEntries([...this.#overrides].map(([id, o]) => [id, o.stance]));
-    this.dispatchEvent(new CustomEvent("intent-lock", { bubbles: true, composed: true, detail: { ast, baseKey: this.#baseKey, overrides, galaxyId: this.#galaxyId } }));
+    this.dispatchEvent(new CustomEvent("intent-lock", { bubbles: true, composed: true, detail: { ast, plain, baseKey: this.#baseKey, overrides, galaxyId: this.#galaxyId } }));
   }
 
   #solve() {
@@ -389,7 +423,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
     root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS()).map(([q, label]) =>
       `<div class="q-tag ${q}" title="${esc(quadrants[q]?.scar)}">${label}${quadrants[q]?.sacred ? ` <small>· ${esc(quadrants[q].sacred)}</small>` : ""}</div>`).join("");
-    root.querySelector("#core .goal").textContent = String(core.decision ?? "").replace(/^你真正在[決决]定(?:的是|嘅係)[:：]\s*/, "");
+    root.querySelector("#core .goal").textContent = stripDecisionPrefix(core.decision);
     const metricEl = root.querySelector("#core .metric");
     metricEl.textContent = core.metric ? `🎯 ${core.metric}` : "";
     if (core.metric) metricEl.dataset.tip = `<b>${t("ov.metric")}</b><br>${esc(core.metric)}`; else delete metricEl.dataset.tip;
@@ -412,14 +446,28 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
     // Anti-Spaghetti Rule：未選 3 選 1 前不畫任何連線。選了之後只畫「說明取捨」的線：
     // 綠線＝採納的節點連回中心；紅色虛線＝被排除的節點和與它互斥的採納節點；橘色點線＝採納節點依賴的另一顆。
-    root.querySelector("svg").innerHTML = !sol || !this.#baseKey ? "" : NODE_IDS.map((id, i) => {
+    // 連線只畫到節點邊框為止，不穿過文字：量每顆節點（與中心卡）的實際外框，換算成 viewBox 座標。
+    const canvas = root.getElementById("canvas"), cbox = canvas.getBoundingClientRect();
+    const boxOf = (el) => { const r = el.getBoundingClientRect(); return cbox.width && cbox.height ? { x: (r.left - cbox.left) / cbox.width * 1000, y: (r.top - cbox.top) / cbox.height * 600, w: r.width / cbox.width * 1000, h: r.height / cbox.height * 600 } : null; };
+    const boxes = Object.fromEntries([...root.querySelectorAll("#nodes [data-node]")].map((el) => [el.dataset.node, boxOf(el)]));
+    const coreBox = boxOf(root.getElementById("core"));
+    const centerOf = (id) => { const b = boxes[id], i = NODE_IDS.indexOf(id); return b ? { x: b.x + b.w / 2, y: b.y + b.h / 2 } : { x: COORDS[i].x * 10, y: COORDS[i].y * 6 }; };
+    // 從 from 往 to 的射線，離開 from 外框（加 4 單位邊距）的交點。
+    const edgeOf = (box, from, to) => {
+      if (!box) return from;
+      const dx = to.x - from.x, dy = to.y - from.y, hw = box.w / 2 + 4, hh = box.h / 2 + 4;
+      const k = Math.min(dx ? hw / Math.abs(dx) : Infinity, dy ? hh / Math.abs(dy) : Infinity);
+      return Number.isFinite(k) ? { x: from.x + dx * k, y: from.y + dy * k } : from;
+    };
+    const center = coreBox ? { x: coreBox.x + coreBox.w / 2, y: coreBox.y + coreBox.h / 2 } : { x: 500, y: 300 };
+    root.querySelector("svg").innerHTML = !sol || !this.#baseKey ? "" : NODE_IDS.map((id) => {
       if (sol.nodes[id].stance !== "include") return "";
-      const p = COORDS[i], x = p.x * 10, y = p.y * 6;
-      return `<path d="M ${x} ${y} Q ${(x + 500) / 2} ${y} 500 300" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
+      const c = centerOf(id), p = edgeOf(boxes[id], c, center), q = edgeOf(coreBox, center, c);
+      return `<path d="M ${p.x.toFixed(1)} ${p.y.toFixed(1)} Q ${((p.x + q.x) / 2).toFixed(1)} ${p.y.toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)}" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
     }).join("") + this.#reasons(sol).map(({ from, to, kind }) => {
-      const p = COORDS[NODE_IDS.indexOf(from)], q = COORDS[NODE_IDS.indexOf(to)];
+      const a1 = centerOf(from), b1 = centerOf(to), p = edgeOf(boxes[from], a1, b1), q = edgeOf(boxes[to], b1, a1);
       const color = kind === "excludes" ? "#f43f5e" : "#f59e0b", dash = kind === "excludes" ? "7,5" : "2,4";
-      return `<line x1="${p.x * 10}" y1="${p.y * 6}" x2="${q.x * 10}" y2="${q.y * 6}" stroke="${color}" stroke-width="1.8" stroke-dasharray="${dash}" opacity=".85"/>`;
+      return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="${color}" stroke-width="1.8" stroke-dasharray="${dash}" opacity=".85"/>`;
     }).join("");
 
     const rec = a?.recommend?.key;

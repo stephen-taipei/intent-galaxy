@@ -179,6 +179,9 @@
   // 填回時「補充：」這個前綴（依語系），再次鎖定時要去掉；繁中原文一併認得。
   const extraPrefix = () => new RegExp(`^(?:補充：|${t("ct.extraNote", { text: "" }).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})\\s*`);
   const AST_LINE = /^(# LOCKED INTENT AST|> |## \d+\. |- \[N\d{1,2}\] |- 放棄|- .+·.+)/;
+  // 白話版的開頭（「我的決定」那一行）與結尾（給 AI 的那一句）：找不到上次原文時用它們圈出填回的那一段。
+  const plainHead = () => `${t("ast.title")}`;
+  const plainTail = () => t("ast.closing", { must: t("ast.must"), mustNot: t("ast.mustNot"), guard: t("ast.guard") });
   /** 輸入框內容拆成：使用者的問題（AST 之前）、AST 之後另外打的字。擴充功能放進去的提示詞不算使用者的字。 */
   function userParts(el) {
     const t = editorText(el).replace(/\r/g, "");
@@ -186,6 +189,12 @@
     const exact = lastAst && t.indexOf(lastAst.trim());
     if (lastAst && exact >= 0) {
       return { before: t.slice(0, exact).trim(), after: t.slice(exact + lastAst.trim().length).trim().replace(extraPrefix(), "").trim() };
+    }
+    // 白話版：從標題行到結尾句之間都是填回的內容。
+    const headAt = t.search(new RegExp(`^${plainHead().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "m"));
+    const tailStr = plainTail(), tailAt = headAt >= 0 ? t.indexOf(tailStr, headAt) : -1;
+    if (headAt >= 0 && tailAt >= 0) {
+      return { before: t.slice(0, headAt).trim(), after: t.slice(tailAt + tailStr.length).trim().replace(extraPrefix(), "").trim() };
     }
     const at = t.indexOf(AST_HEAD);
     if (at < 0) return { before: t, after: "" };
@@ -200,21 +209,22 @@
   // ── 星系面板：可拖曳、縮放、調透明度的浮動視窗；內容是擴充功能來源的 iframe（與頁面 CSS / CSP 隔離）──
   const FRAME_CSS = `
     :host { all: initial; box-sizing: border-box; position: fixed; z-index: 2147483647; display: flex; flex-direction: column; min-width: 420px; min-height: 300px;
-      border: 1px solid #38bdf8; border-radius: 14px; background: #080b11; box-shadow: 0 18px 60px rgba(0,0,0,.55); overflow: hidden; resize: both; color-scheme: dark; }
+      border: 1px solid #0071FE; border-radius: 14px; background: #080b11; box-shadow: 0 18px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(122,59,241,.25); overflow: hidden; resize: both; color-scheme: dark; }
     :host([hidden]) { display: none; }
     header { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; background: #111723; border-bottom: 1px solid #1e293b; cursor: move; user-select: none;
       font: 600 12px/1 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; color: #e2e8f0; }
-    header .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    header .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
+    header .title svg { height: 14px; width: auto; flex: none; }
     header label { display: flex; align-items: center; gap: 4px; color: #94a3b8; font-weight: 400; font-size: 11px; cursor: default; }
-    header input { width: 70px; accent-color: #38bdf8; cursor: pointer; }
+    header input { width: 70px; accent-color: #0071FE; cursor: pointer; }
     header button { all: unset; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; color: #cbd5e1; font-size: 14px; }
     header button:hover { background: #1e293b; color: #fff; }
     header button.close:hover { background: #be123c; }
-    header button[aria-pressed="true"] { color: #38bdf8; }
+    header button[aria-pressed="true"] { color: #60a5fa; background: rgba(0,113,254,.18); }
     iframe { flex: 1; width: 100%; border: 0; background: #080b11; }
     :host(.dragging) iframe { pointer-events: none; }`;
 
-  const runInfo = (r) => r && { goal: r.goal, nonce: r.nonce, status: r.status, elapsedSec: Math.round((Date.now() - (r.sentAt ?? r.startedAt)) / 1000), analysis: r.analysis ?? null, detail: r.detail ?? "", unsent: !!r.unsent };
+  const runInfo = (r) => r && { goal: r.goal, nonce: r.nonce, status: r.status, elapsedSec: Math.round((Date.now() - (r.sentAt ?? r.startedAt)) / 1000), analysis: r.analysis ?? null, detail: r.detail ?? "", unsent: !!r.unsent, picks: r.picks ?? null };
   const sendPanel = (msg) => { if (panel) api.runtime.sendMessage({ ...msg, id: panelId }).catch?.(() => {}); };
   /** 關於某個 run 的通知：只送給正在顯示這個 run（或還沒綁定 run）的面板。 */
   const toPanel = (nonce, msg) => { if (panel && (!panelNonce || panelNonce === nonce)) sendPanel({ ...msg, nonce }); };
@@ -258,13 +268,17 @@
     panelBusy = false;
     frame = document.createElement("intent-galaxy-frame");
     const root = frame.attachShadow({ mode: "closed" });
-    root.innerHTML = `<style>${FRAME_CSS}</style><header><span class="title">🌌 Intent Galaxy</span>
+    root.innerHTML = `<style>${FRAME_CSS}</style><header><span class="title">Intent Galaxy</span>
       <label title="${escAttr(t("ct.opacityTitle"))}">${escAttr(t("ct.opacity"))} <input type="range" min="30" max="100" step="5"></label>
       <button type="button" class="lay-summary" aria-pressed="false" title="${escAttr(t("ct.toggleSummaryTitle"))}"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="14" height="12" rx="2.5"/><rect x="9.5" y="3" width="3.5" height="8" rx="1" fill="currentColor" stroke="none"/></svg></button>
       <button type="button" class="lay-cards" aria-pressed="true" title="${escAttr(t("ct.toggleCardsTitle"))}"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="14" height="12" rx="2.5"/><rect x="3" y="8" width="10" height="3" rx="1" fill="currentColor" stroke="none"/></svg></button>
       <button type="button" class="max" title="${escAttr(t("ct.maximizeTitle"))}">⤢</button>
       <button type="button" class="min" title="${escAttr(t("ct.minimizeTitle"))}">—</button>
       <button type="button" class="close" title="${escAttr(t("ct.closeTitle"))}">✕</button></header>`;
+    const titleEl = root.querySelector(".title"), mark = logoMark();
+    mark.style.cssText = "all:unset; display:inline-block; height:14px; width:20px;";
+    mark.querySelectorAll("path").forEach((pth, i) => pth.setAttribute("fill", i === 0 ? "#0071FE" : "#7A3BF1"));
+    titleEl.prepend(mark);
     panel = document.createElement("iframe");
     panel.src = api.runtime.getURL(`panel.html?id=${panelId}`);
     panel.allow = "clipboard-write";
@@ -318,10 +332,11 @@
     const vw = window.innerWidth, vh = window.innerHeight;
     let { left, top, width, height } = saved ?? {};
     if (!width || !height) {
+      // 預設盡量大：星系要一眼看得全（12 個觀點＋3 張方案卡＋中心問題）。寬至少 1000（或視窗的 85%），高到輸入框上緣。
       const rect = (targetEditor?.isConnected ? targetEditor : findEditor())?.getBoundingClientRect();
-      width = Math.min(Math.max(rect?.width ?? 0, 780), vw - 24);
+      width = Math.min(Math.max(rect?.width ?? 0, 1000, vw * 0.85), vw - 24);
       const bottom = rect ? Math.max(12, vh - rect.top + 10) : 80;
-      height = Math.max(360, Math.min(600, vh - bottom - 12));
+      height = Math.max(420, vh - bottom - 12);
       left = (rect ? rect.left + rect.width / 2 : vw / 2) - width / 2;
       top = vh - bottom - height;
     }
@@ -541,6 +556,7 @@
   const CLOAK_CSS = `
     [data-ig-cloak] { position: relative !important; }
     [data-ig-cloak]:not([data-ig-expanded="true"]) { max-height: 46px !important; overflow: hidden !important; cursor: pointer !important; }
+    [data-ig-cloak]:not([data-ig-expanded="true"]) { color: transparent !important; }
     [data-ig-cloak]:not([data-ig-expanded="true"]) > * { opacity: .03 !important; pointer-events: none !important; }
     [data-ig-cloak]::before { content: attr(data-ig-banner); position: absolute; left: 0; right: 0; top: 0; z-index: 3; box-sizing: border-box; height: 40px; display: flex; align-items: center;
       padding: 0 14px; border: 1px solid rgba(56,189,248,.55); border-radius: 12px; background: linear-gradient(135deg, rgba(14,165,233,.16), rgba(139,92,246,.16)), #0b1220;
@@ -857,10 +873,17 @@
       const goal = String(msg.goal ?? openGoal).trim();
       const { before, after } = userParts(editor);
       const extra = [before !== goal ? before : "", after].filter(Boolean).join("\n");
-      const text = [goal, msg.ast, extra ? t("ct.extraNote", { text: extra }) : ""].filter(Boolean).join("\n\n");
+      // 填回的是白話版（沒有 AST／MUST／[N#] 這類記號）；工程師版 AST 只留在 CLI 與鎖檔。
+      const body = String(msg.plain || msg.ast || "");
+      const text = [goal, body, extra ? t("ct.extraNote", { text: extra }) : ""].filter(Boolean).join("\n\n");
       closePanel();
-      lastAst = String(msg.ast ?? "");
-      if (!writeToEditor(editor, text, "LOCKED INTENT AST")) navigator.clipboard?.writeText(text).catch(() => {});
+      lastAst = body;
+      if (!writeToEditor(editor, text, body.split("\n")[0])) navigator.clipboard?.writeText(text).catch(() => {});
+      // 記住這次的選擇：下次在同一個對話重開面板，方案卡與手動調整會還原。
+      if (msg.nonce) {
+        const run = cache.get(msg.nonce) ?? ((await loadMany(runKey(msg.nonce)))[runKey(msg.nonce)] ?? null);
+        if (run) { run.picks = { baseKey: msg.baseKey ?? null, overrides: msg.overrides ?? {} }; await saveRun(run); }
+      }
     }
   }
 

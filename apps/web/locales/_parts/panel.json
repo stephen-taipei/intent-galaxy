@@ -1,67 +1,266 @@
 {
-  "pn.demoDishwasherLabel": { "zh-Hant-TW": "示範：怎麼挑洗碗機", "en": "Demo: choosing a dishwasher" },
-  "pn.demoDishwasherGoal": { "zh-Hant-TW": "如何挑選洗碗機？", "en": "How do I choose a dishwasher?" },
-  "pn.demoSweetSourLabel": { "zh-Hant-TW": "示範：酸甜又不負擔的食物", "en": "Demo: sweet-and-sour food that's easy on the body" },
-  "pn.demoSweetSourGoal": { "zh-Hant-TW": "我喜歡又甜又酸的食物，但又不想吃了會讓身體太有負擔，有哪些選擇適合我？", "en": "I love food that's both sweet and sour, but I don't want it to be too heavy on my body. What options suit me?" },
-  "pn.demoFrontendLabel": { "zh-Hant-TW": "示範：多主題前端架構", "en": "Demo: multi-theme front-end architecture" },
-  "pn.demoFrontendGoal": { "zh-Hant-TW": "多版型、多主題的前端系統該怎麼設計？", "en": "How should a front-end system with multiple layouts and themes be designed?" },
-  "pn.minSec": { "zh-Hant-TW": "{m} 分 {s} 秒", "en": "{m} min {s} s" },
-  "pn.sec": { "zh-Hant-TW": "{s} 秒", "en": "{s} s" },
-  "pn.galaxyIncomplete": { "zh-Hant-TW": "星系格式不完整，請再生成一次，或貼上修正後的 JSON", "en": "The galaxy is incomplete. Generate it again, or paste corrected JSON" },
-  "pn.galaxyShown": { "zh-Hant-TW": "這是「{goal}」的星系。按 1／2／3 選方案，再按 Enter 填回對話框。", "en": "This is the galaxy for \"{goal}\". Press 1/2/3 to pick a plan, then Enter to fill it into the chat box." },
-  "pn.pasteTitle": { "zh-Hant-TW": "貼上 AI 回覆的 JSON", "en": "Paste the JSON from the AI's reply" },
-  "pn.pasteBody": { "zh-Hant-TW": "在對話裡找到 AI 回覆的 JSON 程式碼區塊，按它的「複製」按鈕，再貼到下面。", "en": "Find the JSON code block in the AI's reply, click its \"Copy\" button, and paste it below." },
-  "pn.pastePlaceholder": { "zh-Hant-TW": "在這裡貼上（Cmd/Ctrl+V）", "en": "Paste here (Cmd/Ctrl+V)" },
-  "pn.loadGalaxy": { "zh-Hant-TW": "載入星系", "en": "Load galaxy" },
-  "pn.pasteFailedTitle": { "zh-Hant-TW": "讀不到星系", "en": "Couldn't read the galaxy" },
-  "pn.pasteFailedBody": { "zh-Hant-TW": "貼上的內容不是完整的星系 JSON。請確認從 { 開頭複製到最後的 }。", "en": "The pasted content isn't a complete galaxy JSON. Make sure you copy from the opening { to the final }." },
-  "pn.pasteAgain": { "zh-Hant-TW": "再貼一次", "en": "Paste again" },
-  "pn.cancel": { "zh-Hant-TW": "取消", "en": "Cancel" },
-  "pn.cliFailedStrip": { "zh-Hant-TW": "⚠ 本機 AI 沒有產出可用的星系", "en": "⚠ The local AI didn't produce a usable galaxy" },
-  "pn.retryLocal": { "zh-Hant-TW": "重試（本機）", "en": "Retry (local)" },
-  "pn.useWebAi": { "zh-Hant-TW": "改用網頁上的 AI", "en": "Use the AI on this page instead" },
-  "pn.cliRejected": { "zh-Hant-TW": "本機 CLI 拒絕：{detail}", "en": "Local CLI refused: {detail}" },
-  "pn.cliStatus": { "zh-Hant-TW": "本機 CLI 回應 {status}", "en": "Local CLI responded {status}" },
-  "pn.giveUpWaiting": { "zh-Hant-TW": "放棄等待", "en": "Stop waiting" },
-  "pn.gaveUpMsg": { "zh-Hant-TW": "已放棄等待。可以在輸入框打新的問題，再按 iG。", "en": "Stopped waiting. You can type a new question in the input box, then press iG." },
-  "pn.promptPlacedStrip": { "zh-Hant-TW": "📨 提示詞已放進輸入框：請按對話框的送出鍵，送出後這裡會自動接著等", "en": "📨 The prompt is in the input box: press the chat's send button, and this panel will keep waiting automatically" },
-  "pn.waitingStrip": { "zh-Hant-TW": "⋯ 等待 {site} 回覆 · {time}", "en": "⋯ Waiting for {site} to reply · {time}" },
-  "pn.repliedPasteJson": { "zh-Hant-TW": "已回覆但沒出現？貼上 JSON", "en": "Replied but nothing showed up? Paste JSON" },
-  "pn.viewDemoFirst": { "zh-Hant-TW": "先看示範", "en": "View a demo meanwhile" },
-  "pn.slowNote": { "zh-Hant-TW": "超過 20 秒還沒有回覆：可能選了深度推理模型（如 Pro、Thinking），常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓；想快一點，下次先在網頁上切換到一般模型。", "en": "No reply after 20 seconds: you may have picked a deep-reasoning model (such as Pro or Thinking), which often takes 5–15 minutes. You can press \"—\" in the top-right corner to minimize the panel; the iG button shows ✓ when it's done. For faster results, switch to a standard model on the page next time." },
-  "pn.stillGenerating": { "zh-Hant-TW": "⋯ 「{goal}」仍在生成，完成時會自動換成它的星系", "en": "⋯ \"{goal}\" is still generating; its galaxy will replace this one automatically when done" },
-  "pn.backToWaiting": { "zh-Hant-TW": "回到等待", "en": "Back to waiting" },
-  "pn.waitingForSend": { "zh-Hant-TW": "等你按下送出…", "en": "Waiting for you to press send…" },
-  "pn.waitingForAi": { "zh-Hant-TW": "等待 AI 在對話中回覆星系 JSON…", "en": "Waiting for the AI to reply with the galaxy JSON in the chat…" },
-  "pn.regenerate": { "zh-Hant-TW": "重新生成", "en": "Regenerate" },
-  "pn.back": { "zh-Hant-TW": "返回", "en": "Back" },
-  "pn.pasteJson": { "zh-Hant-TW": "貼上 JSON", "en": "Paste JSON" },
-  "pn.giveUp": { "zh-Hant-TW": "放棄", "en": "Give up" },
-  "pn.failedStrip": { "zh-Hant-TW": "⚠ {detail}", "en": "⚠ {detail}" },
-  "pn.confirmChatTitle": { "zh-Hant-TW": "用 {site} 生成星系", "en": "Generate the galaxy with {site}" },
-  "pn.confirmChatGoal": { "zh-Hant-TW": "目標：<b>{goal}</b><br><br>", "en": "Goal: <b>{goal}</b><br><br>" },
-  "pn.confirmChatHow": { "zh-Hant-TW": "我會把一段分析提示詞放進這個對話的輸入框，<b>由你按送出</b>；AI 回覆後自動畫出星系。對話裡的提示詞和 JSON 會自動折疊成一行，點一下可以展開。<br>", "en": "I'll put an analysis prompt into this chat's input box, and <b>you press send</b>; the galaxy is drawn automatically once the AI replies. The prompt and JSON in the chat are collapsed into a single line; click to expand.<br>" },
-  "pn.confirmChatNote": { "zh-Hant-TW": "<small>⏱ 一般模型約 1–3 分鐘；推理型高階模型（如 ChatGPT Pro、Thinking、Gemini Pro）可能要 5–15 分鐘，想快一點可以先在網頁上切換到一般模型。<br>不想讓提示詞出現在對話裡？在終端機執行 <code>{cmd}</code>，改用本機的 AI 生成。</small>", "en": "<small>⏱ Standard models take about 1–3 minutes; advanced reasoning models (such as ChatGPT Pro, Thinking, Gemini Pro) may take 5–15 minutes. For faster results, switch to a standard model on the page first.<br>Don't want the prompt to appear in the chat? Run <code>{cmd}</code> in a terminal to generate with your local AI instead.</small>" },
-  "pn.startGenerating": { "zh-Hant-TW": "開始生成", "en": "Start generating" },
-  "pn.doneStrip": { "zh-Hant-TW": "這是這個對話已生成的星系", "en": "This is the galaxy already generated for this chat" },
-  "pn.backToGalaxy": { "zh-Hant-TW": "回到星系", "en": "Back to galaxy" },
-  "pn.localDoneStrip": { "zh-Hant-TW": "這是本機已生成的星系", "en": "This is the galaxy already generated locally" },
-  "pn.useLocalAi": { "zh-Hant-TW": "改用本機 AI（不進對話，但看不到前文）", "en": "Use local AI instead (stays out of the chat, but can't see earlier messages)" },
-  "pn.thisAi": { "zh-Hant-TW": "這個 AI", "en": "this AI" },
-  "pn.cliBusyMsg": { "zh-Hant-TW": "本機正在生成上一個問題；完成後會問你要不要換成輸入框的新問題。", "en": "The local AI is still generating the previous question; when it's done, you'll be asked whether to switch to the new question in the input box." },
-  "pn.backToPrevGalaxy": { "zh-Hant-TW": "回到上一個星系", "en": "Back to the previous galaxy" },
-  "pn.loadLocalLatest": { "zh-Hant-TW": "載入本機最近的星系：{goal}", "en": "Load the latest local galaxy: {goal}" },
-  "pn.introTitle": { "zh-Hant-TW": "先寫下你要決定的事", "en": "First, write down what you need to decide" },
-  "pn.introBody": { "zh-Hant-TW": "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。", "en": "Type one sentence about something you're undecided on into this page's input box (for example, \"How do I choose a dishwasher?\"), then click iG or press <kbd>Cmd/Ctrl+Shift+G</kbd>.<br>The galaxy breaks it into 12 viewpoints from 4 angles and 3 plans; once you pick one, the plan is filled back into the input box for the AI to follow." },
-  "pn.newQuestionTitle": { "zh-Hant-TW": "輸入框有新的問題", "en": "There's a new question in the input box" },
-  "pn.newQuestionBody": { "zh-Hant-TW": "「{text}」<br><br>要用它重新生成星系，還是留在目前這個星系？", "en": "\"{text}\"<br><br>Generate a new galaxy from it, or stay on the current galaxy?" },
-  "pn.generateWithNew": { "zh-Hant-TW": "用新問題生成", "en": "Generate with the new question" },
-  "pn.backToPrevious": { "zh-Hant-TW": "回到剛才的星系", "en": "Back to the previous galaxy" },
-  "pn.stayOnCurrent": { "zh-Hant-TW": "留在目前的星系", "en": "Stay on the current galaxy" },
-  "pn.stillWaitingTitle": { "zh-Hant-TW": "上一個問題還在等 AI 回覆", "en": "The previous question is still waiting for the AI's reply" },
-  "pn.stillWaitingBody": { "zh-Hant-TW": "正在等：<b>{goal}</b><br>AI 回完之前，網站通常不接受新訊息。要繼續等，還是放棄它、改問新的問題？", "en": "Waiting on: <b>{goal}</b><br>Sites usually don't accept new messages until the AI finishes replying. Keep waiting, or give it up and ask the new question?" },
-  "pn.keepWaiting": { "zh-Hant-TW": "繼續等待", "en": "Keep waiting" },
-  "pn.giveUpAskNew": { "zh-Hant-TW": "放棄並改問新問題", "en": "Give up and ask the new question" },
-  "pn.cancelledElsewhere": { "zh-Hant-TW": "這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。", "en": "This generation was cancelled in another tab. You can type a question in the input box, then press iG." },
-  "pn.lockNotWritten": { "zh-Hant-TW": "決定紀錄沒有存成功：{detail}", "en": "Couldn't save the decision record: {detail}" }
+ "pn.demoDishwasherLabel": {
+  "zh-Hant-TW": "示範：怎麼挑洗碗機",
+  "en": "Demo: choosing a dishwasher"
+ },
+ "pn.demoDishwasherGoal": {
+  "zh-Hant-TW": "如何挑選洗碗機？",
+  "en": "How do I choose a dishwasher?"
+ },
+ "pn.demoSweetSourLabel": {
+  "zh-Hant-TW": "示範：酸甜又不負擔的食物",
+  "en": "Demo: sweet-and-sour food that's easy on the body"
+ },
+ "pn.demoSweetSourGoal": {
+  "zh-Hant-TW": "我喜歡又甜又酸的食物，但又不想吃了會讓身體太有負擔，有哪些選擇適合我？",
+  "en": "I love food that's both sweet and sour, but I don't want it to be too heavy on my body. What options suit me?"
+ },
+ "pn.demoFrontendLabel": {
+  "zh-Hant-TW": "示範：多主題前端架構",
+  "en": "Demo: multi-theme front-end architecture"
+ },
+ "pn.demoFrontendGoal": {
+  "zh-Hant-TW": "多版型、多主題的前端系統該怎麼設計？",
+  "en": "How should a front-end system with multiple layouts and themes be designed?"
+ },
+ "pn.minSec": {
+  "zh-Hant-TW": "{m} 分 {s} 秒",
+  "en": "{m} min {s} s"
+ },
+ "pn.sec": {
+  "zh-Hant-TW": "{s} 秒",
+  "en": "{s} s"
+ },
+ "pn.galaxyIncomplete": {
+  "zh-Hant-TW": "星系格式不完整，請再生成一次，或貼上修正後的 JSON",
+  "en": "The galaxy is incomplete. Generate it again, or paste corrected JSON"
+ },
+ "pn.galaxyShown": {
+  "zh-Hant-TW": "這是「{goal}」的星系。按 1／2／3 選方案，再按 Enter 填回對話框。",
+  "en": "This is the galaxy for \"{goal}\". Press 1/2/3 to pick a plan, then Enter to fill it into the chat box."
+ },
+ "pn.pasteTitle": {
+  "zh-Hant-TW": "貼上 AI 回覆的 JSON",
+  "en": "Paste the JSON from the AI's reply"
+ },
+ "pn.pasteBody": {
+  "zh-Hant-TW": "在對話裡找到 AI 回覆的 JSON 程式碼區塊，按它的「複製」按鈕，再貼到下面。",
+  "en": "Find the JSON code block in the AI's reply, click its \"Copy\" button, and paste it below."
+ },
+ "pn.pastePlaceholder": {
+  "zh-Hant-TW": "在這裡貼上（Cmd/Ctrl+V）",
+  "en": "Paste here (Cmd/Ctrl+V)"
+ },
+ "pn.loadGalaxy": {
+  "zh-Hant-TW": "載入星系",
+  "en": "Load galaxy"
+ },
+ "pn.pasteFailedTitle": {
+  "zh-Hant-TW": "讀不到星系",
+  "en": "Couldn't read the galaxy"
+ },
+ "pn.pasteFailedBody": {
+  "zh-Hant-TW": "貼上的內容不是完整的星系 JSON。請確認從 { 開頭複製到最後的 }。",
+  "en": "The pasted content isn't a complete galaxy JSON. Make sure you copy from the opening { to the final }."
+ },
+ "pn.pasteAgain": {
+  "zh-Hant-TW": "再貼一次",
+  "en": "Paste again"
+ },
+ "pn.cancel": {
+  "zh-Hant-TW": "取消",
+  "en": "Cancel"
+ },
+ "pn.cliFailedStrip": {
+  "zh-Hant-TW": "⚠ 本機 AI 沒有產出可用的星系",
+  "en": "⚠ The local AI didn't produce a usable galaxy"
+ },
+ "pn.retryLocal": {
+  "zh-Hant-TW": "重試（本機）",
+  "en": "Retry (local)"
+ },
+ "pn.useWebAi": {
+  "zh-Hant-TW": "改用網頁上的 AI",
+  "en": "Use the AI on this page instead"
+ },
+ "pn.cliRejected": {
+  "zh-Hant-TW": "本機 CLI 拒絕：{detail}",
+  "en": "Local CLI refused: {detail}"
+ },
+ "pn.cliStatus": {
+  "zh-Hant-TW": "本機 CLI 回應 {status}",
+  "en": "Local CLI responded {status}"
+ },
+ "pn.giveUpWaiting": {
+  "zh-Hant-TW": "放棄等待",
+  "en": "Stop waiting"
+ },
+ "pn.gaveUpMsg": {
+  "zh-Hant-TW": "已放棄等待。可以在輸入框打新的問題，再按 iG。",
+  "en": "Stopped waiting. You can type a new question in the input box, then press iG."
+ },
+ "pn.promptPlacedStrip": {
+  "zh-Hant-TW": "📨 提示詞已放進輸入框：請按對話框的送出鍵，送出後這裡會自動接著等",
+  "en": "📨 The prompt is in the input box: press the chat's send button, and this panel will keep waiting automatically"
+ },
+ "pn.waitingStrip": {
+  "zh-Hant-TW": "⋯ 等待 {site} 回覆 · {time}",
+  "en": "⋯ Waiting for {site} to reply · {time}"
+ },
+ "pn.repliedPasteJson": {
+  "zh-Hant-TW": "已回覆但沒出現？貼上 JSON",
+  "en": "Replied but nothing showed up? Paste JSON"
+ },
+ "pn.viewDemoFirst": {
+  "zh-Hant-TW": "先看示範",
+  "en": "View a demo meanwhile"
+ },
+ "pn.slowNote": {
+  "zh-Hant-TW": "超過 20 秒還沒有回覆：可能選了深度推理模型（如 Pro、Thinking），常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓；想快一點，下次先在網頁上切換到一般模型。",
+  "en": "No reply after 20 seconds: you may have picked a deep-reasoning model (such as Pro or Thinking), which often takes 5–15 minutes. You can press \"—\" in the top-right corner to minimize the panel; the iG button shows ✓ when it's done. For faster results, switch to a standard model on the page next time."
+ },
+ "pn.stillGenerating": {
+  "zh-Hant-TW": "⋯ 「{goal}」仍在生成，完成時會自動換成它的星系",
+  "en": "⋯ \"{goal}\" is still generating; its galaxy will replace this one automatically when done"
+ },
+ "pn.backToWaiting": {
+  "zh-Hant-TW": "回到等待",
+  "en": "Back to waiting"
+ },
+ "pn.waitingForSend": {
+  "zh-Hant-TW": "等你按下送出…",
+  "en": "Waiting for you to press send…"
+ },
+ "pn.waitingForAi": {
+  "zh-Hant-TW": "等待 AI 在對話中回覆星系 JSON…",
+  "en": "Waiting for the AI to reply with the galaxy JSON in the chat…"
+ },
+ "pn.regenerate": {
+  "zh-Hant-TW": "重新生成",
+  "en": "Regenerate"
+ },
+ "pn.back": {
+  "zh-Hant-TW": "返回",
+  "en": "Back"
+ },
+ "pn.pasteJson": {
+  "zh-Hant-TW": "貼上 JSON",
+  "en": "Paste JSON"
+ },
+ "pn.giveUp": {
+  "zh-Hant-TW": "放棄",
+  "en": "Give up"
+ },
+ "pn.failedStrip": {
+  "zh-Hant-TW": "⚠ {detail}",
+  "en": "⚠ {detail}"
+ },
+ "pn.confirmChatTitle": {
+  "zh-Hant-TW": "用 {site} 生成星系",
+  "en": "Generate the galaxy with {site}"
+ },
+ "pn.confirmChatGoal": {
+  "zh-Hant-TW": "目標：<b>{goal}</b><br><br>",
+  "en": "Goal: <b>{goal}</b><br><br>"
+ },
+ "pn.confirmChatHow": {
+  "zh-Hant-TW": "我會把一段分析提示詞放進這個對話的輸入框，<b>由你按送出</b>；AI 回覆後自動畫出星系。對話裡的提示詞和 JSON 會自動折疊成一行，點一下可以展開。<br>",
+  "en": "I'll put an analysis prompt into this chat's input box, and <b>you press send</b>; the galaxy is drawn automatically once the AI replies. The prompt and JSON in the chat are collapsed into a single line; click to expand.<br>"
+ },
+ "pn.confirmChatNote": {
+  "zh-Hant-TW": "<small>⏱ 一般模型約 1–3 分鐘；推理型高階模型（如 ChatGPT Pro、Thinking、Gemini Pro）可能要 5–15 分鐘，想快一點可以先在網頁上切換到一般模型。<br>不想讓提示詞出現在對話裡？在終端機執行 <code>{cmd}</code>，改用本機的 AI 生成。</small>",
+  "en": "<small>⏱ Standard models take about 1–3 minutes; advanced reasoning models (such as ChatGPT Pro, Thinking, Gemini Pro) may take 5–15 minutes. For faster results, switch to a standard model on the page first.<br>Don't want the prompt to appear in the chat? Run <code>{cmd}</code> in a terminal to generate with your local AI instead.</small>"
+ },
+ "pn.startGenerating": {
+  "zh-Hant-TW": "開始生成",
+  "en": "Start generating"
+ },
+ "pn.doneStrip": {
+  "zh-Hant-TW": "這是這個對話已生成的星系",
+  "en": "This is the galaxy already generated for this chat"
+ },
+ "pn.backToGalaxy": {
+  "zh-Hant-TW": "回到星系",
+  "en": "Back to galaxy"
+ },
+ "pn.localDoneStrip": {
+  "zh-Hant-TW": "這是本機已生成的星系",
+  "en": "This is the galaxy already generated locally"
+ },
+ "pn.useLocalAi": {
+  "zh-Hant-TW": "改用本機 AI（不進對話，但看不到前文）",
+  "en": "Use local AI instead (stays out of the chat, but can't see earlier messages)"
+ },
+ "pn.thisAi": {
+  "zh-Hant-TW": "這個 AI",
+  "en": "this AI"
+ },
+ "pn.cliBusyMsg": {
+  "zh-Hant-TW": "本機正在生成上一個問題；完成後會問你要不要換成輸入框的新問題。",
+  "en": "The local AI is still generating the previous question; when it's done, you'll be asked whether to switch to the new question in the input box."
+ },
+ "pn.backToPrevGalaxy": {
+  "zh-Hant-TW": "回到上一個星系",
+  "en": "Back to the previous galaxy"
+ },
+ "pn.loadLocalLatest": {
+  "zh-Hant-TW": "載入本機最近的星系：{goal}",
+  "en": "Load the latest local galaxy: {goal}"
+ },
+ "pn.introTitle": {
+  "zh-Hant-TW": "先寫下你要決定的事",
+  "en": "First, write down what you need to decide"
+ },
+ "pn.introBody": {
+  "zh-Hant-TW": "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。",
+  "en": "Type one sentence about something you're undecided on into this page's input box (for example, \"How do I choose a dishwasher?\"), then click iG or press <kbd>Cmd/Ctrl+Shift+G</kbd>.<br>The galaxy breaks it into 12 viewpoints from 4 angles and 3 plans; once you pick one, the plan is filled back into the input box for the AI to follow."
+ },
+ "pn.newQuestionTitle": {
+  "zh-Hant-TW": "輸入框有新的問題",
+  "en": "There's a new question in the input box"
+ },
+ "pn.newQuestionBody": {
+  "zh-Hant-TW": "「{text}」<br><br>要用它重新生成星系，還是留在目前這個星系？",
+  "en": "\"{text}\"<br><br>Generate a new galaxy from it, or stay on the current galaxy?"
+ },
+ "pn.generateWithNew": {
+  "zh-Hant-TW": "用新問題生成",
+  "en": "Generate with the new question"
+ },
+ "pn.backToPrevious": {
+  "zh-Hant-TW": "回到剛才的星系",
+  "en": "Back to the previous galaxy"
+ },
+ "pn.stayOnCurrent": {
+  "zh-Hant-TW": "留在目前的星系",
+  "en": "Stay on the current galaxy"
+ },
+ "pn.stillWaitingTitle": {
+  "zh-Hant-TW": "上一個問題還在等 AI 回覆",
+  "en": "The previous question is still waiting for the AI's reply"
+ },
+ "pn.stillWaitingBody": {
+  "zh-Hant-TW": "正在等：<b>{goal}</b><br>AI 回完之前，網站通常不接受新訊息。要繼續等，還是放棄它、改問新的問題？",
+  "en": "Waiting on: <b>{goal}</b><br>Sites usually don't accept new messages until the AI finishes replying. Keep waiting, or give it up and ask the new question?"
+ },
+ "pn.keepWaiting": {
+  "zh-Hant-TW": "繼續等待",
+  "en": "Keep waiting"
+ },
+ "pn.giveUpAskNew": {
+  "zh-Hant-TW": "放棄並改問新問題",
+  "en": "Give up and ask the new question"
+ },
+ "pn.cancelledElsewhere": {
+  "zh-Hant-TW": "這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。",
+  "en": "This generation was cancelled in another tab. You can type a question in the input box, then press iG."
+ },
+ "pn.lockNotWritten": {
+  "zh-Hant-TW": "決定紀錄沒有存成功：{detail}",
+  "en": "Couldn't save the decision record: {detail}"
+ },
+ "pn.promptPreamble": {
+  "zh-Hant-TW": "（這段是 Intent Galaxy 的分析指令，直接按送出就好。AI 會先整理出不同角度的觀點和 3 個方案，不會直接回答問題。）",
+  "en": "(This is an Intent Galaxy analysis prompt. Just press send. The AI will first lay out viewpoints from different angles and 3 plans instead of answering the question directly.)"
+ }
 }
