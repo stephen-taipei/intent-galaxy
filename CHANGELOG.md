@@ -2,8 +2,9 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
-## Unreleased
+## 0.1.6 — 2026-10-19
 
+- **Extension button shows the Intent Galaxy logo** instead of the 🌌 emoji, on a solid brand blue-purple background that stays readable on light sites; chat banners say "iG panel".
 - **Extension panel opens large enough to see the whole galaxy** (at least 1000px wide, up to the input box); nothing overflows the panel at 1280×720 any more.
 - **Plain-language fill-back**: the text put into the chat box no longer contains `LOCKED INTENT AST`, `MUST`, `[N#]` or `kill:`; empty sections are skipped and a one-line instruction for the AI closes it. The engineering AST stays in the CLI and `.intent.lock.json`.
 - **Prompt preamble** in the user's language explains what the long English prompt is before they press send; collapsed prompt turns hide their text fully.
@@ -11,6 +12,8 @@ Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.np
 - **Plain quadrant names** (no personas), N numbers / D badges / key hints hidden in the extension (a `?` button lists shortcuts), connection lines stop at node borders, adopted/excluded nodes use opaque backgrounds, dimmed nodes are more readable.
 - **Width-aware truncation** so Latin-script titles are no longer cut as if they were CJK.
 - **Brand colours** (blue/purple) on buttons, active cards and the panel frame; panel title shows the logo.
+- **Extension version follows the npm package**: both manifests now carry the package version (they were stuck at 0.1.0).
+- **README in five languages**: English by default, plus 繁體中文, 简体中文, 日本語 and 한국어.
 
 ## 0.1.5 — 2026-10-18
 
