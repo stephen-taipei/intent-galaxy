@@ -144,3 +144,7 @@ INTENT-RFC*.md
 
 # Latency benchmark output (tools/bench-latency.mjs)
 bench/
+
+# Store listing drafts, translations and submission assets (kept locally, not published)
+store-listing/
+intent-galaxy-src-*.zip

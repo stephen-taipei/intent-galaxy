@@ -5,6 +5,7 @@
 | `intent-galaxy-logo.svg` | 圖形＋文字，淺色背景 |
 | `intent-galaxy-logo-dark.svg` | 圖形＋白色文字，深色背景 |
 | `intent-galaxy-mark.svg` | 只有圖形（擴充功能圖示、favicon、頭像） |
+| `intent-galaxy-logo.png` | 原始設計稿點陣版（1254×1254，圖形在上、文字在下，白底），商店宣傳圖等需要 PNG 時使用 |
 
 三條光帶收束到菱形：四面發散的想法，收斂成一個鎖定的意圖。
 

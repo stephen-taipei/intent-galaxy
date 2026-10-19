@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Tunjuk atau sembunyikan kad pelan di bahagian bawah",
  "ct.toggleSummaryTitle": "Tunjuk atau sembunyikan panel pelan di sebelah kanan",
  "ext.actionTitle": "Intent Galaxy: buka galaksi dalam sembang AI ini (Cmd/Ctrl+Shift+G)",
- "ext.description": "Menambah butang iG pada sembang AI seperti Claude, ChatGPT dan Gemini untuk membantu anda menjelaskan apa yang benar-benar anda mahu dalam 60 saat.",
+ "ext.description": "Menambah butang iG pada sembang AI seperti Claude, ChatGPT dan Gemini supaya anda jelas apa yang anda mahu dalam 60 saat.",
  "ext.unsupportedSite": "Intent Galaxy hanya berfungsi di laman AI berikut: {sites}",
  "ov.blind": "✦ titik buta",
  "ov.blindTip": "✦ Titik buta: {blind}",

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 多語系字串：apps/web/locales/_parts/*.json 是原文（繁中 zh-Hant-TW 與英文 en），apps/web/locales/src/<語系>.json 是其他語系的譯文。
 // node tools/i18n.mjs          產生 apps/web/locales/<語系>.js（瀏覽器用的 ES module）
-// node tools/i18n.mjs --check  只檢查：每個語系都有全部的 key，{佔位符} 與 HTML 標籤和英文一致
+// node tools/i18n.mjs --check  只檢查：每個語系都有全部的 key，{佔位符} 與 HTML 標籤和英文一致，ext.description ≤ 132 字元
 // node tools/i18n.mjs --todo   列出每個語系缺少或過時的 key（翻譯用）
 import fs from "node:fs";
 import path from "node:path";
@@ -42,6 +42,8 @@ export function check() {
       if (typeof s !== "string" || !s.trim()) { list.push(`${key}: missing`); continue; }
       if (placeholders(s) !== placeholders(v.en)) list.push(`${key}: placeholders ${placeholders(s)} ≠ ${placeholders(v.en)}`);
       if (tags(s) !== tags(v.en)) list.push(`${key}: html tags differ`);
+      // manifest description 上限 132 字元（Chrome Web Store 摘要即此欄位）
+      if (key === "ext.description" && s.length > 132) list.push(`${key}: ${s.length} chars > 132`);
     }
     for (const key of Object.keys(tr)) if (!(key in src)) list.push(`${key}: unknown key`);
     if (list.length) problems[code] = list;
