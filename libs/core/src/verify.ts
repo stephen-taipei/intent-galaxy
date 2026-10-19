@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { hasSlop } from "./slop.ts";
 import { compileIntent } from "./compiler.ts";
 import { buildModel, repairAnalysis } from "./repair.ts";
-import { renderLockedAst, solveGalaxy } from "./galaxy.ts";
+import { AST_LABELS_ZH, renderLockedAst, renderPlainIntent, solveGalaxy } from "./galaxy.ts";
 import { buildIntentLock, LockError, requiresNumericKill } from "./lock.ts";
 import { specHash } from "../../protocol/src/jcs.ts";
 import { SAMPLE_GALAXY } from "../../../apps/web/sample-galaxy.js";
@@ -82,6 +82,18 @@ assert.ok(section("ACCEPTED RISK").includes("[N10]"));
 assert.ok(!section("MUST NOT").includes("[N10]"));
 assert.ok(section("MUST NOT").includes("[N9]"));
 assert.ok(section("MUST NOT").includes("[N5]"));
+// 白話版（填回聊天網站用）：同樣的極性映射，但沒有 AST／MUST／[N#]／kill: 記號，空段落不輸出，結尾附給 AI 的指示
+const plain = renderPlainIntent(a, risk, "alpha");
+assert.ok(plain.startsWith("我的決定："), plain.split("\n")[0]);
+assert.ok(!/LOCKED INTENT AST|MUST|\[N\d+\]|kill:/.test(plain), plain);
+const plainSection = (label: string) => plain.split(/\n(?=[✅🛡⛔⚠💸])/).find(s => s.includes(label)) ?? "";
+assert.ok(plainSection(AST_LABELS_ZH.risk).includes(a.nodes.N10.claim), plainSection(AST_LABELS_ZH.risk));
+assert.ok(!plainSection(AST_LABELS_ZH.mustNot).includes(a.nodes.N10.claim));
+assert.ok(plainSection(AST_LABELS_ZH.mustNot).includes(a.nodes.N9.claim));
+assert.ok(plain.trimEnd().endsWith(AST_LABELS_ZH.closing!));
+assert.ok(!/\n\n\n/.test(plain), "no double blank lines");
+const noRisk = renderPlainIntent(a, solveGalaxy(a, "alpha", new Map()), "alpha");
+assert.ok(!noRisk.includes(`⚠️ ${AST_LABELS_ZH.risk}`), "empty section omitted");
 // .intent.lock.json：specHash = SHA-256(JCS(payload))；根欄位與 payload 一致；極性映射
 const decidedAt = new Date("2026-10-16T00:00:00.400Z");
 const lock = await buildIntentLock({ analysis: a, solution: solveGalaxy(a, "alpha", new Map()), baseKey: "alpha", goal: "週報", decidedAt, scopePaths: ["src"] });

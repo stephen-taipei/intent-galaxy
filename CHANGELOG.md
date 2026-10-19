@@ -2,6 +2,16 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
+## Unreleased
+
+- **Extension panel opens large enough to see the whole galaxy** (at least 1000px wide, up to the input box); nothing overflows the panel at 1280×720 any more.
+- **Plain-language fill-back**: the text put into the chat box no longer contains `LOCKED INTENT AST`, `MUST`, `[N#]` or `kill:`; empty sections are skipped and a one-line instruction for the AI closes it. The engineering AST stays in the CLI and `.intent.lock.json`.
+- **Prompt preamble** in the user's language explains what the long English prompt is before they press send; collapsed prompt turns hide their text fully.
+- **Reopening the panel restores the chosen plan** and manual picks for that conversation.
+- **Plain quadrant names** (no personas), N numbers / D badges / key hints hidden in the extension (a `?` button lists shortcuts), connection lines stop at node borders, adopted/excluded nodes use opaque backgrounds, dimmed nodes are more readable.
+- **Width-aware truncation** so Latin-script titles are no longer cut as if they were CJK.
+- **Brand colours** (blue/purple) on buttons, active cards and the panel frame; panel title shows the logo.
+
 ## 0.1.5 — 2026-10-18
 
 - **41-locale UI**: picked from the browser language, with a language menu in the galaxy bottom bar; the choice is remembered and switches without reloading. Extension manifest, toolbar tooltip and demo galaxies are translated into all 41 locales.
