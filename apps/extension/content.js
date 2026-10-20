@@ -304,7 +304,7 @@
     opacity.addEventListener("input", () => { frame.style.opacity = String(opacity.value / 100); persistUi({ opacity: Number(opacity.value) }); });
     frame.hidden = quiet;
     document.documentElement.appendChild(frame);
-    placeFrame(ui.rect);
+    placeFrame(ui.box); // ui.rect：舊版（預設較小時）記下的大小，不再沿用
     wireDrag(root.querySelector("header"));
     root.querySelector(".max").addEventListener("click", toggleMaximize);
     root.querySelector(".min").addEventListener("click", minimizePanel);
@@ -348,24 +348,24 @@
   function placeFrame(saved) {
     const vw = window.innerWidth, vh = window.innerHeight;
     let { left, top, width, height } = saved ?? {};
-    if (!width || !height) {
-      // 預設盡量大：星系要一眼看得全（12 個觀點＋3 張方案卡＋中心問題）。寬至少 1000（或視窗的 85%），高到輸入框上緣。
-      const rect = (targetEditor?.isConnected ? targetEditor : findEditor())?.getBoundingClientRect();
-      width = Math.min(Math.max(rect?.width ?? 0, 1000, vw * 0.85), vw - 24);
-      const bottom = rect ? Math.max(12, vh - rect.top + 10) : 80;
-      height = Math.max(420, vh - bottom - 12);
-      left = (rect ? rect.left + rect.width / 2 : vw / 2) - width / 2;
-      top = vh - bottom - height;
+    // 預設接近滿版（四周各留視窗短邊的 1%，至少 8px）：面板在送出後才出現，不必讓出輸入框；視窗大小改變時跟著調整。
+    // 使用者拖過或調過大小（saved）才沿用記錄。
+    frame.dataset.auto = !width || !height ? "1" : "";
+    if (frame.dataset.auto) {
+      const m = frameMargin();
+      ({ left, top, width, height } = { left: m, top: m, width: vw - 2 * m, height: vh - 2 * m });
     }
     width = Math.min(width, vw - 16); height = Math.min(height, vh - 16);
     left = Math.min(Math.max(8, left), vw - width - 8); top = Math.min(Math.max(8, top), vh - height - 8);
     setRect({ left, top, width, height });
   }
-  const fillViewport = () => setRect({ left: 16, top: 16, width: window.innerWidth - 32, height: window.innerHeight - 32 });
-  const clampFrame = () => { if (frame && !frame.hidden) frame.dataset.max ? fillViewport() : placeFrame(frame.getBoundingClientRect()); };
+  const frameMargin = () => Math.max(8, Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.01));
+  const fillViewport = () => { const m = frameMargin(); setRect({ left: m, top: m, width: window.innerWidth - 2 * m, height: window.innerHeight - 2 * m }); };
+  const clampFrame = () => { if (frame && !frame.hidden) frame.dataset.max ? fillViewport() : placeFrame(frame.dataset.auto ? null : frame.getBoundingClientRect()); };
 
   let persistTimer = 0, pendingUi = {};
   function persistUi(change) {
+    if (change.rect && frame) frame.dataset.auto = "";
     Object.assign(pendingUi, change);
     clearTimeout(persistTimer);
     persistTimer = setTimeout(async () => {
@@ -375,7 +375,7 @@
       if (pendingUi.rect) {
         const r = frame.getBoundingClientRect();
         const rect = frame.dataset.max ? JSON.parse(frame.dataset.max) : { left: r.left, top: r.top, width: r.width, height: r.height };
-        if (rect.width && rect.height) ui.rect = rect;
+        if (rect.width && rect.height) ui.box = rect;
       }
       pendingUi = {};
       save(UI_KEY, ui);
