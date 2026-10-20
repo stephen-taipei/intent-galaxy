@@ -258,6 +258,8 @@ async function generate(back = [], _ask = false, reuse = true) {
   if (cur && cur.goal === goal && showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })) {
     return setStrip(t("pn.localDoneStrip"), [[t("pn.regenerate"), () => { const g = goal; generate([[t("pn.backToGalaxy"), () => { goal = g; }]], true, false); }]]);
   }
+  // 一般使用者（沒開本機 CLI）：按 iG 就直接把提示詞放進輸入框，不多一張確認卡片。
+  if (!local) return spawnViaChat();
   const g = goal;
   const viaCli = local && goal.length <= CLI_GOAL_MAX
     ? [[t("pn.useLocalAi"), () => { goal = g; spawnViaCli().catch(cliError); }]] : [];
