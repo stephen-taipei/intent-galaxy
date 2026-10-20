@@ -240,5 +240,7 @@
  "web.spawnButton": "Genera la galàxia",
  "web.spawnTitle": "Demana a la IA triada que prepari una nova galàxia de 12 idees per al teu objectiu (normalment entre 1 i 4 minuts)",
  "web.toastCopied": "📋 Instruccions copiades",
- "web.toastCopyFailed": "No s'han pogut copiar les instruccions automàticament"
+ "web.toastCopyFailed": "No s'han pogut copiar les instruccions automàticament",
+ "ct.sendCue": "El prompt ja és al quadre. Prem el botó d'enviar que brilla. El tauler iG es torna a obrir quan s'envia.",
+ "ct.sendCueCancel": "Cancel·la i torna a posar la meva pregunta"
 }

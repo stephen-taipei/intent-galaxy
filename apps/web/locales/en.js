@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ Generating",
  "ct.pillTitle": "Intent Galaxy: expand the goal in the input box into a galaxy, then fill the chosen plan back into the chat box (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Not sent",
+ "ct.sendCue": "Your prompt is in the box. Press the glowing send button. The iG panel opens again once it's sent.",
+ "ct.sendCueCancel": "Cancel and put my question back",
  "ct.toggleCardsTitle": "Show or hide the plan cards at the bottom",
  "ct.toggleSummaryTitle": "Show or hide the plan panel on the right",
  "ext.actionTitle": "Intent Galaxy: open the intent galaxy in this AI chat (Cmd/Ctrl+Shift+G)",

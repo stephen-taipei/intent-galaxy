@@ -240,5 +240,7 @@
  "web.spawnButton": "Sterrenstelsel genereren",
  "web.spawnTitle": "Laat de gekozen AI een nieuw sterrenstelsel met 12 ideeën voor je doel maken (meestal 1–4 minuten)",
  "web.toastCopied": "📋 Instructies gekopieerd",
- "web.toastCopyFailed": "Kon de instructies niet automatisch kopiëren"
+ "web.toastCopyFailed": "Kon de instructies niet automatisch kopiëren",
+ "ct.sendCue": "Je prompt staat in het vak. Druk op de oplichtende verzendknop. Het iG-paneel gaat weer open zodra hij is verzonden.",
+ "ct.sendCueCancel": "Annuleren en mijn vraag terugzetten"
 }

@@ -240,5 +240,7 @@
  "web.spawnButton": "Generiraj galaksiju",
  "web.spawnTitle": "Neka odabrani AI za vaš cilj složi novu galaksiju od 12 ideja (obično 1–4 minute)",
  "web.toastCopied": "📋 Upute su kopirane",
- "web.toastCopyFailed": "Upute se nisu mogle automatski kopirati"
+ "web.toastCopyFailed": "Upute se nisu mogle automatski kopirati",
+ "ct.sendCue": "Upit je u polju za unos. Pritisnite svijetleći gumb za slanje. Nakon slanja iG ploča ponovno se otvara.",
+ "ct.sendCueCancel": "Odustani i vrati moje pitanje"
 }

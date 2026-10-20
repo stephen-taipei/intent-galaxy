@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Galaksi oluştur",
  "web.spawnTitle": "Seçilen AI'dan hedefiniz için 12 fikirlik yeni bir galaksi hazırlamasını isteyin (genellikle 1–4 dakika)",
  "web.toastCopied": "📋 Talimatlar kopyalandı",
- "web.toastCopyFailed": "Talimatlar otomatik olarak kopyalanamadı"
+ "web.toastCopyFailed": "Talimatlar otomatik olarak kopyalanamadı",
+ "ct.sendCue": "İstem giriş kutusunda. Parlayan gönder düğmesine basın. Gönderildikten sonra iG paneli yeniden açılır.",
+ "ct.sendCueCancel": "İptal et, sorumu geri koy"
 };

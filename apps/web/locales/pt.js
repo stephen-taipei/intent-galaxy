@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Gerar galáxia",
  "web.spawnTitle": "Pedir à IA escolhida uma nova galáxia de 12 ideias para o seu objetivo (normalmente 1–4 minutos)",
  "web.toastCopied": "📋 Instruções copiadas",
- "web.toastCopyFailed": "Não foi possível copiar as instruções automaticamente"
+ "web.toastCopyFailed": "Não foi possível copiar as instruções automaticamente",
+ "ct.sendCue": "O pedido já está na caixa. Prima o botão de enviar que está a brilhar. O painel iG volta a abrir depois do envio.",
+ "ct.sendCueCancel": "Cancelar e repor a minha pergunta"
 };

@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Vygenerovať galaxiu",
  "web.spawnTitle": "Nechajte vybranú AI pripraviť pre váš cieľ novú galaxiu s 12 nápadmi (zvyčajne 1–4 minúty)",
  "web.toastCopied": "📋 Inštrukcie boli skopírované",
- "web.toastCopyFailed": "Inštrukcie sa nepodarilo skopírovať automaticky"
+ "web.toastCopyFailed": "Inštrukcie sa nepodarilo skopírovať automaticky",
+ "ct.sendCue": "Výzva je v poli. Stlačte svietiace tlačidlo odoslať. Po odoslaní sa panel iG znova otvorí.",
+ "ct.sendCueCancel": "Zrušiť a vrátiť moju otázku"
 };
