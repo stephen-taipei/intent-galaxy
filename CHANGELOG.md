@@ -10,6 +10,7 @@ Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.np
 - **Prompt preamble** in the user's language explains what the long English prompt is before they press send; collapsed prompt turns hide their text fully.
 - **One click to start**: pressing iG with a question in the chat box puts the analysis prompt straight in (no extra "start" card unless the local CLI is running). The panel stays hidden, the chat box turns read-only so the prompt can't be edited by accident, and the site's send button glows; once the prompt is sent the chat box is restored and the panel opens by itself.
 - **Gemini: iG button no longer sits inside the send button's container** (clicking it used to hit send and post the plain question); the button is placed next to the container and the send-button glow is no longer clipped.
+- **Claude: the prompt stays text in the chat box** instead of being turned into a "Pasted text" attachment, so the send button glows and the panel opens after sending.
 - **Reopening the panel restores the chosen plan** and manual picks for that conversation.
 - **Plain quadrant names** (no personas), N numbers / D badges / key hints hidden in the extension (a `?` button lists shortcuts), connection lines stop at node borders, adopted/excluded nodes use opaque backgrounds, dimmed nodes are more readable.
 - **Width-aware truncation** so Latin-script titles are no longer cut as if they were CJK.
