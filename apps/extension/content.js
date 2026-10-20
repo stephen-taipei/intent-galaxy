@@ -265,6 +265,11 @@
     }
     targetEditor = findEditor();
     openGoal = userText(targetEditor);
+    // 輸入框有新問題、這個對話也沒有在等的 run：面板會直接把提示詞放進輸入框（見 panel.js generate），
+    // 所以先不顯示，等使用者按下送出才打開；面板若改顯示別的（例如本機 CLI 在線時的確認卡片）就稍後再顯示。
+    const job = panelState(false).job;
+    const quiet = !!openGoal && job?.status !== "waiting" && job?.goal !== openGoal;
+    const spawnsBefore = spawns;
     panelId = crypto.randomUUID();
     panelPath = location.pathname;
     panelNonce = "";
@@ -297,6 +302,7 @@
     opacity.value = String(ui.opacity ?? 100);
     frame.style.opacity = String(opacity.value / 100);
     opacity.addEventListener("input", () => { frame.style.opacity = String(opacity.value / 100); persistUi({ opacity: Number(opacity.value) }); });
+    frame.hidden = quiet;
     document.documentElement.appendChild(frame);
     placeFrame(ui.rect);
     wireDrag(root.querySelector("header"));
@@ -321,7 +327,15 @@
     await loaded;
     if (panel !== myPanel) return; // 期間被關掉或重建
     sendPanel(panelState(false));
-    myPanel.focus();
+    if (quiet) setTimeout(() => { if (frame === myFrame && frame.hidden && spawns === spawnsBefore) showFrame(); }, 2000);
+    else myPanel.focus();
+  }
+  function showFrame() {
+    if (!frame) return;
+    frame.hidden = false;
+    clampFrame();
+    mountPill();
+    panel?.focus();
   }
 
   // 位置與大小：有記錄就沿用（夾在視窗內），否則貼在輸入框上方。lastSet 記錄實際尺寸（含 min-width/min-height 撐大後的）。
@@ -659,7 +673,7 @@
         await saveRun(run);
         if (cue?.nonce === run.nonce) hideCue();
         // 送出前收起來的面板：送出了就自動打開，接著等 AI 回覆。
-        if (frame?.hidden && panelNonce === run.nonce) { frame.hidden = false; clampFrame(); mountPill(); }
+        if (frame?.hidden && panelNonce === run.nonce) showFrame();
         toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) });
       }
       else if (editorHas) run.lostSince = 0;
@@ -743,12 +757,14 @@
 
   // ── 把提示詞放進輸入框（由使用者按送出；面板先隱藏、輸入框唯讀、送出鍵放大）──
 
+  let spawns = 0; // 面板要求放進輸入框的次數（安靜打開的面板用來判斷要不要顯示自己）
   async function startRun(goal, prompt) {
     await refresh(true);
-    if (current?.status === "waiting") { sendPanel({ type: "ig-chat-error", detail: t("ct.errBusy"), failed: true, nonce: "" }); return; }
+    if (current?.status === "waiting") { showFrame(); sendPanel({ type: "ig-chat-error", detail: t("ct.errBusy"), failed: true, nonce: "" }); return; }
     const editor = targetEditor?.isConnected ? targetEditor : findEditor();
     const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
-    if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { sendPanel({ type: "ig-chat-error", detail: t("ct.errNoEditor"), failed: true, nonce: "" }); return; }
+    spawns++;
+    if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { showFrame(); sendPanel({ type: "ig-chat-error", detail: t("ct.errNoEditor"), failed: true, nonce: "" }); return; }
     const now = Date.now();
     const run = { nonce, goal, status: "waiting", startedAt: now, owner: INSTANCE, beat: now, unsent: true, pathFrom: location.pathname };
     if (ephemeral()) run.ephemeral = true; // 無痕視窗、暫時對話：不寫進 storage
