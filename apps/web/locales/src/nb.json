@@ -240,7 +240,5 @@
  "web.spawnButton": "Generer galakse",
  "web.spawnTitle": "La den valgte AI-en sette opp en ny galakse med 12 ideer for målet ditt (tar vanligvis 1–4 minutter)",
  "web.toastCopied": "📋 Instruksjoner kopiert",
- "web.toastCopyFailed": "Kunne ikke kopiere instruksjonene automatisk",
- "ct.sendCue": "Ledeteksten ligger i feltet. Trykk på den lysende send-knappen. iG-panelet åpnes igjen når den er sendt.",
- "ct.sendCueCancel": "Avbryt og legg tilbake spørsmålet mitt"
+ "web.toastCopyFailed": "Kunne ikke kopiere instruksjonene automatisk"
 }

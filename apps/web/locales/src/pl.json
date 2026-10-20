@@ -240,7 +240,5 @@
  "web.spawnButton": "Wygeneruj galaktykę",
  "web.spawnTitle": "Niech wybrane AI rozpisze dla Twojego celu nową galaktykę 12 pomysłów (zwykle 1–4 minuty)",
  "web.toastCopied": "📋 Instrukcje skopiowane",
- "web.toastCopyFailed": "Nie udało się automatycznie skopiować instrukcji",
- "ct.sendCue": "Polecenie jest już w polu. Naciśnij świecący przycisk wysyłania. Po wysłaniu panel iG otworzy się ponownie.",
- "ct.sendCueCancel": "Anuluj i przywróć moje pytanie"
+ "web.toastCopyFailed": "Nie udało się automatycznie skopiować instrukcji"
 }

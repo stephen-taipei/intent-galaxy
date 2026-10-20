@@ -241,7 +241,5 @@ export default {
  "web.spawnButton": "Generar galaxia",
  "web.spawnTitle": "Pídele a la IA elegida una nueva galaxia de 12 ideas para tu objetivo (suele tardar de 1 a 4 minutos)",
  "web.toastCopied": "📋 Instrucciones copiadas",
- "web.toastCopyFailed": "No se pudieron copiar las instrucciones automáticamente",
- "ct.sendCue": "Tu prompt ya está en el cuadro. Presiona el botón de enviar que brilla. El panel iG se vuelve a abrir cuando se envía.",
- "ct.sendCueCancel": "Cancelar y regresar mi pregunta"
+ "web.toastCopyFailed": "No se pudieron copiar las instrucciones automáticamente"
 };

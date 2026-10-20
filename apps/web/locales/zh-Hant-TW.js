@@ -33,8 +33,6 @@ export default {
  "ct.pillGenerating": " ⋯ 生成中",
  "ct.pillTitle": "Intent Galaxy：把輸入框裡的目標展開成星系，選好方案後填回對話框（Cmd/Ctrl+Shift+G）",
  "ct.pillUnsent": " ⋯ 待送出",
- "ct.sendCue": "提示詞已放進輸入框。按發亮的送出鍵，送出後 iG 面板會自動打開。",
- "ct.sendCueCancel": "取消，放回我的問題",
  "ct.toggleCardsTitle": "顯示／收合底部的方案卡",
  "ct.toggleSummaryTitle": "顯示／收合右側的方案",
  "ext.actionTitle": "Intent Galaxy：在這個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）",

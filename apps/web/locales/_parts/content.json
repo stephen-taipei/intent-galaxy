@@ -94,13 +94,5 @@
  "ct.extraNote": {
   "zh-Hant-TW": "補充：{text}",
   "en": "Notes: {text}"
- },
- "ct.sendCue": {
-  "zh-Hant-TW": "提示詞已放進輸入框。按發亮的送出鍵，送出後 iG 面板會自動打開。",
-  "en": "Your prompt is in the box. Press the glowing send button. The iG panel opens again once it's sent."
- },
- "ct.sendCueCancel": {
-  "zh-Hant-TW": "取消，放回我的問題",
-  "en": "Cancel and put my question back"
  }
 }

@@ -241,7 +241,5 @@ export default {
  "web.spawnButton": "Buat galaksi",
  "web.spawnTitle": "Minta AI yang dipilih menyusun galaksi baru berisi 12 sudut pandang untuk tujuanmu (biasanya 1–4 menit)",
  "web.toastCopied": "📋 Instruksi disalin",
- "web.toastCopyFailed": "Tidak dapat menyalin instruksi secara otomatis",
- "ct.sendCue": "Prompt sudah ada di kotak. Tekan tombol kirim yang menyala. Panel iG akan terbuka lagi setelah terkirim.",
- "ct.sendCueCancel": "Batal dan kembalikan pertanyaan saya"
+ "web.toastCopyFailed": "Tidak dapat menyalin instruksi secara otomatis"
 };

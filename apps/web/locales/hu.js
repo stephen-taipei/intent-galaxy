@@ -241,7 +241,5 @@ export default {
  "web.spawnButton": "Galaxis generálása",
  "web.spawnTitle": "A kiválasztott AI új, 12 ötletből álló galaxist készít a célodhoz (általában 1–4 perc)",
  "web.toastCopied": "📋 Utasítások másolva",
- "web.toastCopyFailed": "Nem sikerült automatikusan kimásolni az utasításokat",
- "ct.sendCue": "A kérés a beviteli mezőben van. Nyomd meg a világító küldés gombot. Küldés után az iG panel újra megnyílik.",
- "ct.sendCueCancel": "Mégse, tedd vissza a kérdésemet"
+ "web.toastCopyFailed": "Nem sikerült automatikusan kimásolni az utasításokat"
 };

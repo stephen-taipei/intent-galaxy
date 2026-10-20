@@ -240,7 +240,5 @@
  "web.spawnButton": "Skapa galax",
  "web.spawnTitle": "Låt den valda AI:n ta fram en ny galax med 12 idéer för ditt mål (tar oftast 1–4 minuter)",
  "web.toastCopied": "📋 Instruktionerna har kopierats",
- "web.toastCopyFailed": "Kunde inte kopiera instruktionerna automatiskt",
- "ct.sendCue": "Prompten ligger i rutan. Tryck på den lysande skicka-knappen. iG-panelen öppnas igen när den har skickats.",
- "ct.sendCueCancel": "Avbryt och lägg tillbaka min fråga"
+ "web.toastCopyFailed": "Kunde inte kopiera instruktionerna automatiskt"
 }

@@ -241,7 +241,5 @@ export default {
  "web.spawnButton": "Gumawa ng galaxy",
  "web.spawnTitle": "Ipalatag sa napiling AI ang bagong galaxy na may 12 ideya para sa layunin mo (karaniwang 1–4 minuto)",
  "web.toastCopied": "📋 Nakopya na ang mga tagubilin",
- "web.toastCopyFailed": "Hindi awtomatikong nakopya ang mga tagubilin",
- "ct.sendCue": "Nasa kahon na ang prompt. Pindutin ang kumikinang na send button. Bubukas ulit ang iG panel kapag naipadala na.",
- "ct.sendCueCancel": "Kanselahin at ibalik ang tanong ko"
+ "web.toastCopyFailed": "Hindi awtomatikong nakopya ang mga tagubilin"
 };
