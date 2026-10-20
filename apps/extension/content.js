@@ -459,6 +459,7 @@
   listen(window, "resize", clampFrame);
 
   // 寫入原生輸入框：<textarea> 用原生 setter + input 事件；ProseMirror / Quill / contenteditable 先模擬貼上，失敗再用 insertText。
+  const PASTE_TO_FILE = ["claude.ai"];
   function writeToEditor(el, text, probe) {
     if (!el) return false;
     el.focus();
@@ -473,6 +474,12 @@
     sel.removeAllRanges();
     sel.addRange(range);
     const landed = () => el.innerText.includes(probe);
+    // Claude 會把貼上的長文字轉成「貼上的文字.txt」附件：識別碼跟著進附件，頁面上看不到，就無法判斷送出、讀回覆。
+    // 這類網站改用打字的方式放入，不經過貼上。
+    if (PASTE_TO_FILE.some((h) => location.hostname === h || location.hostname.endsWith("." + h))) {
+      document.execCommand("insertText", false, text);
+      if (landed()) return true;
+    }
     const dt = new DataTransfer();
     dt.setData("text/plain", text);
     el.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
