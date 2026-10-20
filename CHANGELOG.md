@@ -5,7 +5,7 @@ Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.np
 ## 0.1.6 — 2026-10-19
 
 - **Extension button shows the Intent Galaxy logo** instead of the 🌌 emoji, on a solid brand blue-purple background that stays readable on light sites; chat banners say "iG panel".
-- **Extension panel opens large enough to see the whole galaxy** (at least 1000px wide, up to the input box); nothing overflows the panel at 1280×720 any more.
+- **Extension panel opens almost full-screen** (1% margin on each side, at least 8px) and follows window resizes until you move or resize it; nothing overflows the panel at 1280×720 any more.
 - **Plain-language fill-back**: the text put into the chat box no longer contains `LOCKED INTENT AST`, `MUST`, `[N#]` or `kill:`; empty sections are skipped and a one-line instruction for the AI closes it. The engineering AST stays in the CLI and `.intent.lock.json`.
 - **Prompt preamble** in the user's language explains what the long English prompt is before they press send; collapsed prompt turns hide their text fully.
 - **One click to start**: pressing iG with a question in the chat box puts the analysis prompt straight in (no extra "start" card unless the local CLI is running). The panel stays hidden, the chat box turns read-only so the prompt can't be edited by accident, and the site's send button glows; once the prompt is sent the chat box is restored and the panel opens by itself.
