@@ -2,7 +2,7 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
-## Unreleased
+## 0.1.8 — 2026-10-20
 
 - **Anti-slop rule works across languages**: the prompt's R4 is now a language-neutral rule (no vague improve/ensure verbs, hedges, or comparatives without a baseline number) with Traditional Chinese and English examples, instead of a Traditional-Chinese-only word list. The `claim` check (V16, warning only) also catches Simplified Chinese forms (优化, 确保, 加强…) and English filler (improve, enhance, leverage, might…); proper terms such as 负载平衡器, 强化学习, potential customers and optimizer are not flagged.
 
