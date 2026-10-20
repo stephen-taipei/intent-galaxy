@@ -2,16 +2,20 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
-## 0.1.6 — 2026-10-19
+## 0.1.7 — 2026-10-20
 
-- **Extension button shows the Intent Galaxy logo** instead of the 🌌 emoji, on a solid brand blue-purple background that stays readable on light sites; chat banners say "iG panel".
-- **Extension panel opens almost full-screen** (1% margin on each side, at least 8px) and follows window resizes until you move or resize it; nothing overflows the panel at 1280×720 any more.
-- **Plain-language fill-back**: the text put into the chat box no longer contains `LOCKED INTENT AST`, `MUST`, `[N#]` or `kill:`; empty sections are skipped and a one-line instruction for the AI closes it. The engineering AST stays in the CLI and `.intent.lock.json`.
-- **Prompt preamble** in the user's language explains what the long English prompt is before they press send; collapsed prompt turns hide their text fully.
+- **Extension panel opens almost full-screen** (1% margin on each side, at least 8px) and follows window resizes until you move or resize it.
 - **One click to start**: pressing iG with a question in the chat box puts the analysis prompt straight in (no extra "start" card unless the local CLI is running). The panel stays hidden, the chat box turns read-only so the prompt can't be edited by accident, and the site's send button glows; once the prompt is sent the chat box is restored and the panel opens by itself.
 - **Gemini: iG button no longer sits inside the send button's container** (clicking it used to hit send and post the plain question); the button is placed next to the container and the send-button glow is no longer clipped.
 - **Claude and Gemini get the same send flow as ChatGPT**: on Claude the prompt is pasted in short pieces so it stays text instead of becoming a "Pasted text" attachment; on Gemini the extension waits for its delayed paste instead of reporting "can't find the input box". The chat box locks, the send button glows, and the panel opens after sending.
 - **After the plan is put in the chat box** the iG button moves to the bottom-right corner as "Intent Galaxy ✓ Galaxy ready"; it returns to the chat toolbar as a plain "iG" once you type or send something new. Until you send it, the chat box stays read-only and the site's send button glows, the same as when the prompt is first put in.
+
+## 0.1.6 — 2026-10-19
+
+- **Extension button shows the Intent Galaxy logo** instead of the 🌌 emoji, on a solid brand blue-purple background that stays readable on light sites; chat banners say "iG panel".
+- **Extension panel opens large enough to see the whole galaxy** (at least 1000px wide, up to the input box); nothing overflows the panel at 1280×720 any more.
+- **Plain-language fill-back**: the text put into the chat box no longer contains `LOCKED INTENT AST`, `MUST`, `[N#]` or `kill:`; empty sections are skipped and a one-line instruction for the AI closes it. The engineering AST stays in the CLI and `.intent.lock.json`.
+- **Prompt preamble** in the user's language explains what the long English prompt is before they press send; collapsed prompt turns hide their text fully.
 - **Reopening the panel restores the chosen plan** and manual picks for that conversation.
 - **Plain quadrant names** (no personas), N numbers / D badges / key hints hidden in the extension (a `?` button lists shortcuts), connection lines stop at node borders, adopted/excluded nodes use opaque backgrounds, dimmed nodes are more readable.
 - **Width-aware truncation** so Latin-script titles are no longer cut as if they were CJK.
