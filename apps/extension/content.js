@@ -42,7 +42,7 @@
   // 方案剛填回輸入框：iG 先移到右下角顯示「✓ 星系完成」，輸入框內容被使用者改動（打字、送出）後才回到工具列。
   // text：填回後輸入框的內容（等網站處理完才記下，null 表示還在等）。
   let fillWatch = null; // { text, since }
-  let cue = null; // 等使用者送出時的狀態：{ editor, nonce, send, anim, timer, restore }（見 showCue）
+  let cue = null; // 等使用者送出時的狀態：{ editor, nonce, probe, send, anim, timer, restore }（見 showCue）
 
   // 各站輸入框選擇器，依序嘗試；全部失敗時退回頁面上最後一個可見的 contenteditable / textarea。
   const EDITOR_SELECTORS = {
@@ -829,6 +829,7 @@
     const editor = targetEditor?.isConnected ? targetEditor : findEditor();
     const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
     spawns++;
+    hideCue(); // 填回的方案還鎖著輸入框時先解開
     if (!(await writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce)))) { showFrame(); sendPanel({ type: "ig-chat-error", detail: t("ct.errNoEditor"), failed: true, nonce: "" }); return; }
     const now = Date.now();
     const run = { nonce, goal, status: "waiting", startedAt: now, owner: INSTANCE, beat: now, unsent: true, pathFrom: location.pathname };
@@ -867,17 +868,22 @@
       Object.assign(el.style, style);
     };
   }
-  function showCue(editor, nonce) {
+  /** probe：輸入框裡還有這段字就繼續等（預設是 run 的識別碼；填回方案時是方案的開頭）。 */
+  function showCue(editor, nonce, probe = tagOf(nonce)) {
     hideCue();
-    if (!editor?.isConnected) return;
-    cue = { editor, nonce, send: null, anim: null, timer: 0, restore: lockEditor(editor) };
+    if (!editor?.isConnected || !probe) return;
+    cue = { editor, nonce, probe, send: null, anim: null, timer: 0, restore: lockEditor(editor) };
     syncCue();
     cue.timer = setInterval(() => { if (!alive()) return teardown(); syncCue(); }, 150);
   }
   function syncCue() {
     if (!cue) return;
     const { editor } = cue;
-    if (!editor.isConnected || !editorText(editor).includes(tagOf(cue.nonce))) return hideCue();
+    if (!editor.isConnected || !editorText(editor).includes(cue.probe)) {
+      // 填回的方案送出（或被清掉）了：右下角的「星系完成」也一起收回輸入框旁的 iG。
+      if (!cue.nonce) { fillWatch = null; hideCue(); return mountPill(true); }
+      return hideCue();
+    }
     // 網站（例如 ProseMirror 重畫）把可編輯狀態改回來時再鎖一次。
     if (editor.getAttribute("aria-readonly") !== "true") { cue.restore(); cue.restore = lockEditor(editor); }
     const send = findSend(editor);
@@ -1026,7 +1032,13 @@
       const text = [goal, body, extra ? t("ct.extraNote", { text: extra }) : ""].filter(Boolean).join("\n\n");
       closePanel();
       lastAst = body;
-      if (!(await writeToEditor(editor, text, body.split("\n")[0]))) navigator.clipboard?.writeText(text).catch(() => {});
+      hideCue(); // 上一次填回還鎖著時，先解開才寫得進去
+      const head = body.split("\n")[0];
+      if (await writeToEditor(editor, text, head)) {
+        // 填回後一樣：輸入框暫時唯讀、送出鍵發光，送出（方案離開輸入框）後復原。
+        const probe = head.trim().slice(0, 40);
+        if (probe) showCue(editor, "", probe);
+      } else navigator.clipboard?.writeText(text).catch(() => {});
       fillWatch = { text: null, since: Date.now() };
       // 記住這次的選擇：下次在同一個對話重開面板，方案卡與手動調整會還原。
       if (msg.nonce) {
