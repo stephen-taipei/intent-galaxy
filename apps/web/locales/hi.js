@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "नीचे दिए गए प्लान कार्ड्स दिखाएं या छिपाएं",
  "ct.toggleSummaryTitle": "दाईं ओर का प्लान पैनल दिखाएं या छिपाएं",
  "ext.actionTitle": "Intent Galaxy: इस AI चैट में गैलेक्सी खोलें (Cmd/Ctrl+Shift+G)",
- "ext.description": "Claude, ChatGPT और Gemini जैसी AI चैट में iG बटन जोड़ता है, ताकि 60 सेकंड में साफ़ हो जाए कि आप असल में क्या चाहते हैं।",
+ "ext.description": "Claude, ChatGPT और Gemini जैसी AI चैट में iG बटन जोड़ता है, ताकि साफ़ हो जाए कि आप असल में क्या चाहते हैं।",
  "ext.unsupportedSite": "Intent Galaxy केवल इन AI साइटों पर काम करता है: {sites}",
  "ov.blind": "✦ अनदेखा पहलू",
  "ov.blindTip": "✦ अनदेखा पहलू: {blind}",

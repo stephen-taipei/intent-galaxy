@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Mostra o amaga les targetes de pla de la part inferior",
  "ct.toggleSummaryTitle": "Mostra o amaga el panell del pla de la dreta",
  "ext.actionTitle": "Intent Galaxy: obre la galàxia d’intencions en aquest xat d’IA (Cmd/Ctrl+Maj+G)",
- "ext.description": "Afegeix un botó iG als xats d’IA com Claude, ChatGPT i Gemini per aclarir en 60 segons què vols de debò.",
+ "ext.description": "Afegeix un botó iG als xats d’IA com Claude, ChatGPT i Gemini per aclarir què vols de debò.",
  "ext.unsupportedSite": "Intent Galaxy només funciona en aquests llocs d’IA: {sites}",
  "ov.blind": "✦ punt cec",
  "ov.blindTip": "✦ Punt cec: {blind}",

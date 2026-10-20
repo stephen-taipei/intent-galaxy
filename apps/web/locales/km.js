@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "បង្ហាញ ឬលាក់កាតផែនការនៅផ្នែកខាងក្រោម",
  "ct.toggleSummaryTitle": "បង្ហាញ ឬលាក់ផ្ទាំងផែនការនៅផ្នែកខាងស្តាំ",
  "ext.actionTitle": "Intent Galaxy៖ បើកកាឡាក់ស៊ីក្នុងការជជែក AI នេះ (Cmd/Ctrl+Shift+G)",
- "ext.description": "បន្ថែមប៊ូតុង iG ក្នុងការជជែក AI ដូចជា Claude, ChatGPT និង Gemini ដើម្បីរៀបចំអ្វីដែលអ្នកចង់បានពិតៗ ក្នុង 60 វិនាទី។",
+ "ext.description": "បន្ថែមប៊ូតុង iG ក្នុងការជជែក AI ដូចជា Claude, ChatGPT និង Gemini ដើម្បីរៀបចំអ្វីដែលអ្នកចង់បានពិតៗ។",
  "ext.unsupportedSite": "Intent Galaxy ដំណើរការតែលើគេហទំព័រ AI ទាំងនេះ៖ {sites}",
  "ov.blind": "✦ ចំណុចមើលរំលង",
  "ov.blindTip": "✦ ចំណុចមើលរំលង៖ {blind}",

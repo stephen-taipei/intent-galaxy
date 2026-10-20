@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "แสดงหรือซ่อนการ์ดแผนด้านล่าง",
  "ct.toggleSummaryTitle": "แสดงหรือซ่อนแผงแผนทางด้านขวา",
  "ext.actionTitle": "Intent Galaxy: เปิดกาแล็กซีในแชต AI นี้ (Cmd/Ctrl+Shift+G)",
- "ext.description": "เพิ่มปุ่ม iG ในแชต AI อย่าง Claude, ChatGPT และ Gemini ช่วยให้รู้ว่าคุณต้องการอะไรจริง ๆ ภายใน 60 วินาที",
+ "ext.description": "เพิ่มปุ่ม iG ในแชต AI อย่าง Claude, ChatGPT และ Gemini ช่วยให้รู้ว่าคุณต้องการอะไรจริง ๆ",
  "ext.unsupportedSite": "Intent Galaxy ใช้งานได้เฉพาะเว็บไซต์ AI เหล่านี้: {sites}",
  "ov.blind": "✦ จุดบอด",
  "ov.blindTip": "✦ จุดบอด: {blind}",

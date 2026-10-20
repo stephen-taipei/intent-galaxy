@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Hiện hoặc ẩn các thẻ kế hoạch ở dưới cùng",
  "ct.toggleSummaryTitle": "Hiện hoặc ẩn bảng kế hoạch ở bên phải",
  "ext.actionTitle": "Intent Galaxy: mở thiên hà trong cuộc trò chuyện AI này (Cmd/Ctrl+Shift+G)",
- "ext.description": "Thêm nút iG vào các cuộc trò chuyện AI như Claude, ChatGPT, Gemini để làm rõ điều bạn thật sự muốn trong 60 giây.",
+ "ext.description": "Thêm nút iG vào các cuộc trò chuyện AI như Claude, ChatGPT, Gemini để làm rõ điều bạn thật sự muốn.",
  "ext.unsupportedSite": "Intent Galaxy chỉ hoạt động trên các trang AI sau: {sites}",
  "ov.blind": "✦ điểm mù",
  "ov.blindTip": "✦ Điểm mù: {blind}",

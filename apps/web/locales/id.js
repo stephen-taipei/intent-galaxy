@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Tampilkan atau sembunyikan kartu rencana di bagian bawah",
  "ct.toggleSummaryTitle": "Tampilkan atau sembunyikan panel rencana di sebelah kanan",
  "ext.actionTitle": "Intent Galaxy: buka galaksi di obrolan AI ini (Cmd/Ctrl+Shift+G)",
- "ext.description": "Menambahkan tombol iG di obrolan AI seperti Claude, ChatGPT, dan Gemini agar kamu tahu apa yang benar-benar kamu mau dalam 60 detik.",
+ "ext.description": "Menambahkan tombol iG di obrolan AI seperti Claude, ChatGPT, dan Gemini agar kamu tahu apa yang benar-benar kamu mau.",
  "ext.unsupportedSite": "Intent Galaxy hanya berfungsi di situs AI berikut: {sites}",
  "ov.blind": "✦ titik buta",
  "ov.blindTip": "✦ Titik buta: {blind}",

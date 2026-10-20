@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Ipakita o itago ang mga plan card sa ibaba",
  "ct.toggleSummaryTitle": "Ipakita o itago ang plan panel sa kanan",
  "ext.actionTitle": "Intent Galaxy: buksan ang galaxy sa AI chat na ito (Cmd/Ctrl+Shift+G)",
- "ext.description": "Naglalagay ng iG button sa mga AI chat gaya ng Claude, ChatGPT at Gemini para malaman mo sa 60 segundo kung ano talaga ang gusto mo.",
+ "ext.description": "Naglalagay ng iG button sa mga AI chat gaya ng Claude, ChatGPT at Gemini para malaman mo kung ano talaga ang gusto mo.",
  "ext.unsupportedSite": "Gumagana lang ang Intent Galaxy sa mga AI site na ito: {sites}",
  "ov.blind": "✦ hindi napapansin",
  "ov.blindTip": "✦ Hindi napapansin: {blind}",

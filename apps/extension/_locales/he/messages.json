@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: פתיחת גלקסיית הכוונות בצ׳אט ה־AI הזה (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "מוסיף כפתור iG לצ׳אטים של AI כמו Claude, ChatGPT ו־Gemini, ועוזר לכם להבין תוך 60 שניות מה אתם באמת רוצים."
+  "message": "מוסיף כפתור iG לצ׳אטים של AI כמו Claude, ChatGPT ו־Gemini, ועוזר לכם להבין מה אתם באמת רוצים."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy פועל רק באתרי ה־AI האלה: $1"

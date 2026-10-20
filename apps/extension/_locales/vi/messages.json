@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: mở thiên hà trong cuộc trò chuyện AI này (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Thêm nút iG vào các cuộc trò chuyện AI như Claude, ChatGPT, Gemini để làm rõ điều bạn thật sự muốn trong 60 giây."
+  "message": "Thêm nút iG vào các cuộc trò chuyện AI như Claude, ChatGPT, Gemini để làm rõ điều bạn thật sự muốn."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy chỉ hoạt động trên các trang AI sau: $1"

@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "顯示／收起底部的方案卡",
  "ct.toggleSummaryTitle": "顯示／收起右側的方案",
  "ext.actionTitle": "Intent Galaxy：在這個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）",
- "ext.description": "在 Claude、ChatGPT、Gemini 等 AI 對話加上 iG 按鈕，60 秒幫你把真正想要的整理清楚。",
+ "ext.description": "在 Claude、ChatGPT、Gemini 等 AI 對話加上 iG 按鈕，幫你把真正想要的整理清楚。",
  "ext.unsupportedSite": "Intent Galaxy 只在這些 AI 網站運作：{sites}",
  "ov.blind": "✦ 盲區",
  "ov.blindTip": "✦ 盲區：{blind}",

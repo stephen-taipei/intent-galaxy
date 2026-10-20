@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Mostra o nascondi le schede del piano in basso",
  "ct.toggleSummaryTitle": "Mostra o nascondi il pannello del piano a destra",
  "ext.actionTitle": "Intent Galaxy: apri la galassia delle intenzioni in questa chat AI (Cmd/Ctrl+Shift+G)",
- "ext.description": "Aggiunge un pulsante iG alle chat AI come Claude, ChatGPT e Gemini per chiarire in 60 secondi cosa vuoi davvero.",
+ "ext.description": "Aggiunge un pulsante iG alle chat AI come Claude, ChatGPT e Gemini per chiarire cosa vuoi davvero.",
  "ext.unsupportedSite": "Intent Galaxy funziona solo su questi siti AI: {sites}",
  "ov.blind": "✦ punto cieco",
  "ov.blindTip": "✦ Punto cieco: {blind}",

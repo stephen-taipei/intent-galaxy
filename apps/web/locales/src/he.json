@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "הצגה או הסתרה של כרטיסי התוכנית בתחתית",
  "ct.toggleSummaryTitle": "הצגה או הסתרה של לוח התוכנית מימין",
  "ext.actionTitle": "Intent Galaxy: פתיחת גלקסיית הכוונות בצ׳אט ה־AI הזה (Cmd/Ctrl+Shift+G)",
- "ext.description": "מוסיף כפתור iG לצ׳אטים של AI כמו Claude, ChatGPT ו־Gemini, ועוזר לכם להבין תוך 60 שניות מה אתם באמת רוצים.",
+ "ext.description": "מוסיף כפתור iG לצ׳אטים של AI כמו Claude, ChatGPT ו־Gemini, ועוזר לכם להבין מה אתם באמת רוצים.",
  "ext.unsupportedSite": "Intent Galaxy פועל רק באתרי ה־AI האלה: {sites}",
  "ov.blind": "✦ נקודה עיוורת",
  "ov.blindTip": "✦ נקודה עיוורת: {blind}",

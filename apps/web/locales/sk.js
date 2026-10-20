@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Zobraziť alebo skryť karty plánov v dolnej časti",
  "ct.toggleSummaryTitle": "Zobraziť alebo skryť panel plánu vpravo",
  "ext.actionTitle": "Intent Galaxy: otvoriť galaxiu zámerov v tomto AI chate (Cmd/Ctrl+Shift+G)",
- "ext.description": "Pridá tlačidlo iG do AI chatov ako Claude, ChatGPT a Gemini, aby ste si za 60 sekúnd ujasnili, čo naozaj chcete.",
+ "ext.description": "Pridá tlačidlo iG do AI chatov ako Claude, ChatGPT a Gemini, aby ste si ujasnili, čo naozaj chcete.",
  "ext.unsupportedSite": "Intent Galaxy funguje iba na týchto AI stránkach: {sites}",
  "ov.blind": "✦ slepé miesto",
  "ov.blindTip": "✦ Slepé miesto: {blind}",

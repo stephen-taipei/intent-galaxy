@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Afficher ou masquer les cartes de plan en bas",
  "ct.toggleSummaryTitle": "Afficher ou masquer le panneau du plan à droite",
  "ext.actionTitle": "Intent Galaxy : ouvrir la galaxie d’intentions dans ce chat IA (Cmd/Ctrl+Maj+G)",
- "ext.description": "Ajoute un bouton iG aux chats IA comme Claude, ChatGPT et Gemini pour clarifier en 60 secondes ce que vous voulez vraiment.",
+ "ext.description": "Ajoute un bouton iG aux chats IA comme Claude, ChatGPT et Gemini pour clarifier ce que vous voulez vraiment.",
  "ext.unsupportedSite": "Intent Galaxy ne fonctionne que sur ces sites d’IA : {sites}",
  "ov.blind": "✦ angle mort",
  "ov.blindTip": "✦ Angle mort : {blind}",

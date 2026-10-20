@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: a szándékgalaxis megnyitása ebben az AI-csevegésben (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "iG gombot ad az olyan AI-csevegőkhöz, mint a Claude, a ChatGPT és a Gemini, hogy 60 másodperc alatt tisztázd, mit akarsz valójában."
+  "message": "iG gombot ad az olyan AI-csevegőkhöz, mint a Claude, a ChatGPT és a Gemini, hogy tisztázd, mit akarsz valójában."
  },
  "unsupportedSite": {
   "message": "Az Intent Galaxy csak ezeken az AI-oldalakon működik: $1"

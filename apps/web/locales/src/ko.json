@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "하단 계획 카드 표시 / 숨기기",
  "ct.toggleSummaryTitle": "우측 계획 패널 표시 / 숨기기",
  "ext.actionTitle": "Intent Galaxy: 이 AI 채팅에서 은하 열기 (Cmd/Ctrl+Shift+G)",
- "ext.description": "Claude, ChatGPT, Gemini 같은 AI 채팅에 iG 버튼을 추가해 60초 만에 정말 원하는 것을 정리해 줍니다.",
+ "ext.description": "Claude, ChatGPT, Gemini 같은 AI 채팅에 iG 버튼을 추가해 정말 원하는 것을 정리해 줍니다.",
  "ext.unsupportedSite": "Intent Galaxy는 다음 AI 사이트에서만 작동합니다: {sites}",
  "ov.blind": "✦ 맹점",
  "ov.blindTip": "✦ 맹점: {blind}",

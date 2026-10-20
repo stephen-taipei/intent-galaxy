@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Näytä tai piilota alareunan suunnitelmakortit",
  "ct.toggleSummaryTitle": "Näytä tai piilota oikean reunan suunnitelmapaneeli",
  "ext.actionTitle": "Intent Galaxy: avaa galaksi tässä tekoälychatissa (Cmd/Ctrl+Shift+G)",
- "ext.description": "Lisää iG-painikkeen tekoälychatteihin, kuten Claude, ChatGPT ja Gemini, ja auttaa selvittämään 60 sekunnissa, mitä oikeasti haluat.",
+ "ext.description": "Lisää iG-painikkeen tekoälychatteihin, kuten Claude, ChatGPT ja Gemini, ja auttaa selvittämään, mitä oikeasti haluat.",
  "ext.unsupportedSite": "Intent Galaxy toimii vain näillä tekoälysivustoilla: {sites}",
  "ov.blind": "✦ sokea piste",
  "ov.blindTip": "✦ Sokea piste: {blind}",

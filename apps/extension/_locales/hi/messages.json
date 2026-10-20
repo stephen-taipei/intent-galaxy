@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: इस AI चैट में गैलेक्सी खोलें (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Claude, ChatGPT और Gemini जैसी AI चैट में iG बटन जोड़ता है, ताकि 60 सेकंड में साफ़ हो जाए कि आप असल में क्या चाहते हैं।"
+  "message": "Claude, ChatGPT और Gemini जैसी AI चैट में iG बटन जोड़ता है, ताकि साफ़ हो जाए कि आप असल में क्या चाहते हैं।"
  },
  "unsupportedSite": {
   "message": "Intent Galaxy केवल इन AI साइटों पर काम करता है: $1"

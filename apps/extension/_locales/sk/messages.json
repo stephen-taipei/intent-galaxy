@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: otvoriť galaxiu zámerov v tomto AI chate (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Pridá tlačidlo iG do AI chatov ako Claude, ChatGPT a Gemini, aby ste si za 60 sekúnd ujasnili, čo naozaj chcete."
+  "message": "Pridá tlačidlo iG do AI chatov ako Claude, ChatGPT a Gemini, aby ste si ujasnili, čo naozaj chcete."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy funguje iba na týchto AI stránkach: $1"

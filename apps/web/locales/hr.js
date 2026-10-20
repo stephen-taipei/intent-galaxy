@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Prikaži ili sakrij kartice planova na dnu",
  "ct.toggleSummaryTitle": "Prikaži ili sakrij ploču s planom s desne strane",
  "ext.actionTitle": "Intent Galaxy: otvori galaksiju namjera u ovom AI razgovoru (Cmd/Ctrl+Shift+G)",
- "ext.description": "Dodaje gumb iG u AI razgovore poput Claudea, ChatGPT-a i Geminija da u 60 sekundi razjasnite što zapravo želite.",
+ "ext.description": "Dodaje gumb iG u AI razgovore poput Claudea, ChatGPT-a i Geminija da razjasnite što zapravo želite.",
  "ext.unsupportedSite": "Intent Galaxy radi samo na ovim AI stranicama: {sites}",
  "ov.blind": "✦ slijepa točka",
  "ov.blindTip": "✦ Slijepa točka: {blind}",

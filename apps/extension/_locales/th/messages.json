@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: เปิดกาแล็กซีในแชต AI นี้ (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "เพิ่มปุ่ม iG ในแชต AI อย่าง Claude, ChatGPT และ Gemini ช่วยให้รู้ว่าคุณต้องการอะไรจริง ๆ ภายใน 60 วินาที"
+  "message": "เพิ่มปุ่ม iG ในแชต AI อย่าง Claude, ChatGPT และ Gemini ช่วยให้รู้ว่าคุณต้องการอะไรจริง ๆ"
  },
  "unsupportedSite": {
   "message": "Intent Galaxy ใช้งานได้เฉพาะเว็บไซต์ AI เหล่านี้: $1"
