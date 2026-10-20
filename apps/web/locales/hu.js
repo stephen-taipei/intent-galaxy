@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Tervkártyák megjelenítése vagy elrejtése alul",
  "ct.toggleSummaryTitle": "Tervpanel megjelenítése vagy elrejtése a jobb oldalon",
  "ext.actionTitle": "Intent Galaxy: a szándékgalaxis megnyitása ebben az AI-csevegésben (Cmd/Ctrl+Shift+G)",
- "ext.description": "iG gombot ad az olyan AI-csevegőkhöz, mint a Claude, a ChatGPT és a Gemini, hogy 60 másodperc alatt tisztázd, mit akarsz valójában.",
+ "ext.description": "iG gombot ad az olyan AI-csevegőkhöz, mint a Claude, a ChatGPT és a Gemini, hogy tisztázd, mit akarsz valójában.",
  "ext.unsupportedSite": "Az Intent Galaxy csak ezeken az AI-oldalakon működik: {sites}",
  "ov.blind": "✦ vakfolt",
  "ov.blindTip": "✦ Vakfolt: {blind}",

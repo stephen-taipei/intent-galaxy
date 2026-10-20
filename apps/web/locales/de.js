@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Plankarten unten ein- oder ausblenden",
  "ct.toggleSummaryTitle": "Plan-Panel rechts ein- oder ausblenden",
  "ext.actionTitle": "Intent Galaxy: Galaxie in diesem KI-Chat öffnen (Cmd/Strg+Umschalt+G)",
- "ext.description": "Fügt KI-Chats wie Claude, ChatGPT und Gemini einen iG-Button hinzu, damit du in 60 Sekunden klärst, was du wirklich willst.",
+ "ext.description": "Fügt KI-Chats wie Claude, ChatGPT und Gemini einen iG-Button hinzu, damit du klärst, was du wirklich willst.",
  "ext.unsupportedSite": "Intent Galaxy funktioniert nur auf diesen KI-Websites: {sites}",
  "ov.blind": "✦ Blinder Fleck",
  "ov.blindTip": "✦ Blinder Fleck: {blind}",

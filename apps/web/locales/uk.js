@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Показати або сховати картки планів знизу",
  "ct.toggleSummaryTitle": "Показати або сховати панель плану праворуч",
  "ext.actionTitle": "Intent Galaxy: відкрити галактику намірів у цьому чаті з ШІ (Cmd/Ctrl+Shift+G)",
- "ext.description": "Додає кнопку iG у чати з ШІ, як-от Claude, ChatGPT і Gemini, щоб за 60 секунд розібратися, чого ви насправді хочете.",
+ "ext.description": "Додає кнопку iG у чати з ШІ, як-от Claude, ChatGPT і Gemini, щоб розібратися, чого ви насправді хочете.",
  "ext.unsupportedSite": "Intent Galaxy працює лише на цих сайтах ШІ: {sites}",
  "ov.blind": "✦ сліпа зона",
  "ov.blindTip": "✦ Сліпа зона: {blind}",

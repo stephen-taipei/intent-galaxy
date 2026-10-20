@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Показать или скрыть карточки планов внизу",
  "ct.toggleSummaryTitle": "Показать или скрыть панель плана справа",
  "ext.actionTitle": "Intent Galaxy: открыть галактику намерений в этом чате с ИИ (Cmd/Ctrl+Shift+G)",
- "ext.description": "Добавляет кнопку iG в чаты с ИИ, такие как Claude, ChatGPT и Gemini, чтобы за 60 секунд разобраться, чего вы на самом деле хотите.",
+ "ext.description": "Добавляет кнопку iG в чаты с ИИ, такие как Claude, ChatGPT и Gemini, чтобы разобраться, чего вы на самом деле хотите.",
  "ext.unsupportedSite": "Intent Galaxy работает только на этих сайтах ИИ: {sites}",
  "ov.blind": "✦ слепая зона",
  "ov.blindTip": "✦ Слепая зона: {blind}",

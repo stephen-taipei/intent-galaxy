@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Vis eller skjul plankortene i bunden",
  "ct.toggleSummaryTitle": "Vis eller skjul planpanelet til højre",
  "ext.actionTitle": "Intent Galaxy: åbn galaksen i denne AI-chat (Cmd/Ctrl+Shift+G)",
- "ext.description": "Tilføjer en iG-knap til AI-chats som Claude, ChatGPT og Gemini, så du på 60 sekunder får styr på, hvad du egentlig vil.",
+ "ext.description": "Tilføjer en iG-knap til AI-chats som Claude, ChatGPT og Gemini, så du får styr på, hvad du egentlig vil.",
  "ext.unsupportedSite": "Intent Galaxy virker kun på disse AI-websteder: {sites}",
  "ov.blind": "✦ blind vinkel",
  "ov.blindTip": "✦ Blind vinkel: {blind}",

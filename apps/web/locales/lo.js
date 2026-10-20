@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "ສະແດງ ຫຼື ເຊື່ອງບັດແຜນການຢູ່ດ້ານລຸ່ມ",
  "ct.toggleSummaryTitle": "ສະແດງ ຫຼື ເຊື່ອງແຜງສະຫຼຸບແຜນການຢູ່ເບື້ອງຂວາ",
  "ext.actionTitle": "Intent Galaxy: ເປີດກາແລັກຊີໃນແຊັດ AI ນີ້ (Cmd/Ctrl+Shift+G)",
- "ext.description": "ເພີ່ມປຸ່ມ iG ໃນແຊັດ AI ເຊັ່ນ Claude, ChatGPT ແລະ Gemini ເພື່ອຊ່ວຍທ່ານຈັດລຽງໃຫ້ຊັດເຈນວ່າຕ້ອງການຫຍັງແທ້ໆ ພາຍໃນ 60 ວິນາທີ.",
+ "ext.description": "ເພີ່ມປຸ່ມ iG ໃນແຊັດ AI ເຊັ່ນ Claude, ChatGPT ແລະ Gemini ເພື່ອຊ່ວຍທ່ານຈັດລຽງໃຫ້ຊັດເຈນວ່າຕ້ອງການຫຍັງແທ້ໆ.",
  "ext.unsupportedSite": "Intent Galaxy ໃຊ້ໄດ້ສະເພາະເວັບໄຊ AI ເຫຼົ່ານີ້: {sites}",
  "ov.blind": "✦ ຈຸດບອດ",
  "ov.blindTip": "✦ ຈຸດບອດ: {blind}",

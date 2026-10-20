@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "إظهار أو إخفاء بطاقات الخطط في الأسفل",
  "ct.toggleSummaryTitle": "إظهار أو إخفاء لوحة الخطة على اليمين",
  "ext.actionTitle": "Intent Galaxy: افتح مجرة النوايا في محادثة الذكاء الاصطناعي هذه (Cmd/Ctrl+Shift+G)",
- "ext.description": "يضيف زر iG إلى محادثات الذكاء الاصطناعي مثل Claude وChatGPT وGemini ليساعدك خلال 60 ثانية على معرفة ما تريده فعلًا.",
+ "ext.description": "يضيف زر iG إلى محادثات الذكاء الاصطناعي مثل Claude وChatGPT وGemini ليساعدك على معرفة ما تريده فعلًا.",
  "ext.unsupportedSite": "يعمل Intent Galaxy فقط على مواقع الذكاء الاصطناعي هذه: {sites}",
  "ov.blind": "✦ نقطة عمياء",
  "ov.blindTip": "✦ نقطة عمياء: {blind}",

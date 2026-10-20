@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Alttaki plan kartlarını göster veya gizle",
  "ct.toggleSummaryTitle": "Sağdaki plan panelini göster veya gizle",
  "ext.actionTitle": "Intent Galaxy: bu yapay zekâ sohbetinde galaksiyi aç (Cmd/Ctrl+Shift+G)",
- "ext.description": "Claude, ChatGPT ve Gemini gibi yapay zekâ sohbetlerine iG düğmesi ekler; gerçekte ne istediğinizi 60 saniyede netleştirir.",
+ "ext.description": "Claude, ChatGPT ve Gemini gibi yapay zekâ sohbetlerine iG düğmesi ekler; gerçekte ne istediğinizi netleştirir.",
  "ext.unsupportedSite": "Intent Galaxy yalnızca şu yapay zekâ sitelerinde çalışır: {sites}",
  "ov.blind": "✦ kör nokta",
  "ov.blindTip": "✦ Kör nokta: {blind}",

@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "顯示／收埋底部嘅方案卡",
  "ct.toggleSummaryTitle": "顯示／收埋右邊嘅方案",
  "ext.actionTitle": "Intent Galaxy：喺呢個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）",
- "ext.description": "喺 Claude、ChatGPT、Gemini 等 AI 對話加個 iG 按鈕，60 秒幫你理清自己真正想要乜。",
+ "ext.description": "喺 Claude、ChatGPT、Gemini 等 AI 對話加個 iG 按鈕，幫你理清自己真正想要乜。",
  "ext.unsupportedSite": "Intent Galaxy 只可以喺以下 AI 網站用：{sites}",
  "ov.blind": "✦ 盲區",
  "ov.blindTip": "✦ 盲區：{blind}",

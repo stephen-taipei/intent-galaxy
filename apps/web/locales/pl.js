@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Pokaż lub ukryj karty planów na dole",
  "ct.toggleSummaryTitle": "Pokaż lub ukryj panel planu po prawej",
  "ext.actionTitle": "Intent Galaxy: otwórz galaktykę intencji w tym czacie AI (Cmd/Ctrl+Shift+G)",
- "ext.description": "Dodaje przycisk iG do czatów AI, takich jak Claude, ChatGPT i Gemini, by w 60 sekund ustalić, czego naprawdę chcesz.",
+ "ext.description": "Dodaje przycisk iG do czatów AI, takich jak Claude, ChatGPT i Gemini, by ustalić, czego naprawdę chcesz.",
  "ext.unsupportedSite": "Intent Galaxy działa tylko na tych stronach AI: {sites}",
  "ov.blind": "✦ martwe pole",
  "ov.blindTip": "✦ Martwe pole: {blind}",

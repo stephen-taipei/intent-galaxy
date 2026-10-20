@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Plankaarten onderaan tonen of verbergen",
  "ct.toggleSummaryTitle": "Planpaneel aan de rechterkant tonen of verbergen",
  "ext.actionTitle": "Intent Galaxy: open het sterrenstelsel in deze AI-chat (Cmd/Ctrl+Shift+G)",
- "ext.description": "Voegt een iG-knop toe aan AI-chats zoals Claude, ChatGPT en Gemini, zodat je in 60 seconden helder hebt wat je echt wilt.",
+ "ext.description": "Voegt een iG-knop toe aan AI-chats zoals Claude, ChatGPT en Gemini, zodat je helder hebt wat je echt wilt.",
  "ext.unsupportedSite": "Intent Galaxy werkt alleen op deze AI-sites: {sites}",
  "ov.blind": "✦ blinde vlek",
  "ov.blindTip": "✦ Blinde vlek: {blind}",

@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "下部のプランカードの表示 / 非表示",
  "ct.toggleSummaryTitle": "右側のプランパネルの表示 / 非表示",
  "ext.actionTitle": "Intent Galaxy：この AI チャットで銀河を開く（Cmd/Ctrl+Shift+G）",
- "ext.description": "Claude・ChatGPT・Gemini などの AI チャットに iG ボタンを追加し、本当に望んでいることを 60 秒で整理します。",
+ "ext.description": "Claude・ChatGPT・Gemini などの AI チャットに iG ボタンを追加し、本当に望んでいることを整理します。",
  "ext.unsupportedSite": "Intent Galaxy は次の AI サイトでのみ動作します：{sites}",
  "ov.blind": "✦ 盲点",
  "ov.blindTip": "✦ 盲点：{blind}",

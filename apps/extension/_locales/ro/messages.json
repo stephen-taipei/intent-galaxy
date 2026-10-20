@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: deschide galaxia intențiilor în acest chat AI (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Adaugă un buton iG în chaturile AI precum Claude, ChatGPT și Gemini, ca să clarifici în 60 de secunde ce vrei cu adevărat."
+  "message": "Adaugă un buton iG în chaturile AI precum Claude, ChatGPT și Gemini, ca să clarifici ce vrei cu adevărat."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy funcționează doar pe aceste site-uri AI: $1"

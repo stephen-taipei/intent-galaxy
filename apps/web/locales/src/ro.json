@@ -35,7 +35,7 @@
  "ct.toggleCardsTitle": "Afișează sau ascunde cardurile cu planuri din partea de jos",
  "ct.toggleSummaryTitle": "Afișează sau ascunde panoul planului din dreapta",
  "ext.actionTitle": "Intent Galaxy: deschide galaxia intențiilor în acest chat AI (Cmd/Ctrl+Shift+G)",
- "ext.description": "Adaugă un buton iG în chaturile AI precum Claude, ChatGPT și Gemini, ca să clarifici în 60 de secunde ce vrei cu adevărat.",
+ "ext.description": "Adaugă un buton iG în chaturile AI precum Claude, ChatGPT și Gemini, ca să clarifici ce vrei cu adevărat.",
  "ext.unsupportedSite": "Intent Galaxy funcționează doar pe aceste site-uri AI: {sites}",
  "ov.blind": "✦ unghi mort",
  "ov.blindTip": "✦ Unghi mort: {blind}",

@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: avaa galaksi tässä tekoälychatissa (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Lisää iG-painikkeen tekoälychatteihin, kuten Claude, ChatGPT ja Gemini, ja auttaa selvittämään 60 sekunnissa, mitä oikeasti haluat."
+  "message": "Lisää iG-painikkeen tekoälychatteihin, kuten Claude, ChatGPT ja Gemini, ja auttaa selvittämään, mitä oikeasti haluat."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy toimii vain näillä tekoälysivustoilla: $1"

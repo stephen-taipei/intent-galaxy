@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: άνοιγμα του γαλαξία προθέσεων σε αυτή τη συνομιλία AI (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Προσθέτει κουμπί iG σε συνομιλίες AI όπως Claude, ChatGPT και Gemini, για να ξεκαθαρίσετε σε 60 δευτερόλεπτα τι θέλετε πραγματικά."
+  "message": "Προσθέτει κουμπί iG σε συνομιλίες AI όπως Claude, ChatGPT και Gemini, για να ξεκαθαρίσετε τι θέλετε πραγματικά."
  },
  "unsupportedSite": {
   "message": "Το Intent Galaxy λειτουργεί μόνο σε αυτούς τους ιστότοπους AI: $1"

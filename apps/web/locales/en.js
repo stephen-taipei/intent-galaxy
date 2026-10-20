@@ -36,7 +36,7 @@ export default {
  "ct.toggleCardsTitle": "Show or hide the plan cards at the bottom",
  "ct.toggleSummaryTitle": "Show or hide the plan panel on the right",
  "ext.actionTitle": "Intent Galaxy: open the intent galaxy in this AI chat (Cmd/Ctrl+Shift+G)",
- "ext.description": "Adds an iG button to AI chats like Claude, ChatGPT and Gemini to sort out what you really want in 60 seconds.",
+ "ext.description": "Adds an iG button to AI chats like Claude, ChatGPT and Gemini to help you sort out what you really want.",
  "ext.unsupportedSite": "Intent Galaxy only works on these AI sites: {sites}",
  "ov.blind": "✦ blind spot",
  "ov.blindTip": "✦ Blind spot: {blind}",

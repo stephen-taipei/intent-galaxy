@@ -3,7 +3,7 @@
   "message": "Intent Galaxy: open het sterrenstelsel in deze AI-chat (Cmd/Ctrl+Shift+G)"
  },
  "description": {
-  "message": "Voegt een iG-knop toe aan AI-chats zoals Claude, ChatGPT en Gemini, zodat je in 60 seconden helder hebt wat je echt wilt."
+  "message": "Voegt een iG-knop toe aan AI-chats zoals Claude, ChatGPT en Gemini, zodat je helder hebt wat je echt wilt."
  },
  "unsupportedSite": {
   "message": "Intent Galaxy werkt alleen op deze AI-sites: $1"

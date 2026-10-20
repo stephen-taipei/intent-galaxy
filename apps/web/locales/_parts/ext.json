@@ -4,8 +4,8 @@
   "en": "Intent Galaxy: open the intent galaxy in this AI chat (Cmd/Ctrl+Shift+G)"
  },
  "ext.description": {
-  "zh-Hant-TW": "在 Claude、ChatGPT、Gemini 等 AI 對話加上 iG 按鈕，60 秒幫你把真正想要的整理清楚。",
-  "en": "Adds an iG button to AI chats like Claude, ChatGPT and Gemini to sort out what you really want in 60 seconds."
+  "zh-Hant-TW": "在 Claude、ChatGPT、Gemini 等 AI 對話加上 iG 按鈕，幫你把真正想要的整理清楚。",
+  "en": "Adds an iG button to AI chats like Claude, ChatGPT and Gemini to help you sort out what you really want."
  },
  "ext.unsupportedSite": {
   "zh-Hant-TW": "Intent Galaxy 只在這些 AI 網站運作：{sites}",
