@@ -68,6 +68,20 @@
     return [...document.querySelectorAll('[contenteditable="true"], textarea')].filter(visible).at(-1) ?? null;
   }
 
+  /** 送出鍵外面常包著只夠它自己大小的容器（例如 Gemini 的 send-button-container，固定寬度、裁掉多的部分）：
+   *  往上找到最外層這種容器。膠囊插在它前面才不會被擠進去（點到的其實是送出鍵），發光也加在它上面才不會被裁掉。 */
+  function sendBox(send, editor, stop) {
+    let box = send;
+    for (let i = 0; i < 4; i++) {
+      const up = box.parentElement;
+      if (!up || up === stop || up.contains(editor)) break;
+      const own = [...up.children].filter((c) => c.id !== PILL_ID && visible(c));
+      if (own.length > 1 || up.getBoundingClientRect().width > box.getBoundingClientRect().width + 40) break;
+      box = up;
+    }
+    return box;
+  }
+
   // 掛載點優先序：Claude Code Mod 狀態列 → 輸入框工具列（送出按鈕旁）→ 浮動按鈕。
   function findMount(editor) {
     for (const label of MOD_PILLS) {
@@ -76,7 +90,10 @@
     }
     const form = editor?.closest("form, fieldset") ?? editor?.parentElement?.parentElement;
     const send = form && [...form.querySelectorAll(SEND_BUTTON)].find(visible);
-    if (send) return { parent: send.parentElement, before: send, kind: "toolbar" };
+    if (send) {
+      const anchor = sendBox(send, editor, form);
+      return { parent: anchor.parentElement, before: anchor, kind: "toolbar" };
+    }
     return { parent: document.body, before: null, kind: "floating" };
   }
 
@@ -783,7 +800,8 @@
   // ── 等使用者送出：輸入框暫時唯讀＋停用（避免改到提示詞），送出鍵放大發光；提示詞離開輸入框（送出或被清掉）就復原 ──
   function findSend(editor) {
     const scope = editor.closest("form, fieldset") ?? editor.parentElement?.parentElement?.parentElement ?? document;
-    return [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b)) ?? null;
+    const send = [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b));
+    return send ? sendBox(send, editor, editor.closest("form, fieldset")) : null;
   }
   /** 把輸入框鎖成唯讀，回傳復原函式（只還原我們改過的屬性）。 */
   function lockEditor(el) {
@@ -819,9 +837,11 @@
     cue.anim?.cancel();
     cue.send = send;
     // 送出鍵放大發光（網站重畫按鈕時換到新的那顆）。只用動畫，不改網站的樣式。
+    // 包著送出鍵的容器是方的：發光時一併改成圓角（送出鍵都是圓或圓角的）。
+    const round = send && !send.matches("button") ? { borderRadius: "50%" } : {};
     cue.anim = send?.animate([
-      { transform: "scale(1.2)", boxShadow: "0 0 0 3px rgba(0,113,254,.9), 0 0 10px 2px rgba(122,59,241,.6)" },
-      { transform: "scale(1.35)", boxShadow: "0 0 0 6px rgba(0,113,254,.55), 0 0 24px 8px rgba(122,59,241,.75)" },
+      { transform: "scale(1.2)", boxShadow: "0 0 0 3px rgba(0,113,254,.9), 0 0 10px 2px rgba(122,59,241,.6)", ...round },
+      { transform: "scale(1.35)", boxShadow: "0 0 0 6px rgba(0,113,254,.55), 0 0 24px 8px rgba(122,59,241,.75)", ...round },
     ], { duration: 700, direction: "alternate", iterations: Infinity, easing: "ease-in-out" }) ?? null;
   }
   function hideCue() {
