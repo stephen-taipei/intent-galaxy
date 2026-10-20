@@ -458,9 +458,35 @@
   }
   listen(window, "resize", clampFrame);
 
+  // Claude 會把一次貼上的長文字轉成「貼上的文字.txt」附件（識別碼跟著進附件，頁面上看不到，就無法判斷送出、讀回覆），
+  // 打字方式放入又會被它的輸入框改寫。這類網站改成分段貼上，每段都短於轉附件的長度。
+  const PASTE_IN_CHUNKS = ["claude.ai"];
+  const CHUNK = 1200;
+  /** 依行切成不超過 CHUNK 字的片段（單行過長才硬切）。 */
+  function chunks(text) {
+    const out = [];
+    let cur = "";
+    for (const line of text.split(/(?<=\n)/)) {
+      if (cur && cur.length + line.length > CHUNK) { out.push(cur); cur = ""; }
+      for (let i = 0; i < line.length; i += CHUNK) {
+        const part = line.slice(i, i + CHUNK);
+        if (part.length === CHUNK) out.push(part); else cur += part;
+      }
+    }
+    if (cur) out.push(cur);
+    return out;
+  }
+  const pasteText = (el, text) => {
+    const dt = new DataTransfer();
+    dt.setData("text/plain", text);
+    const ev = new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true });
+    el.dispatchEvent(ev);
+    return ev.defaultPrevented; // 網站自己處理了貼上（可能非同步才寫進去）
+  };
+
   // 寫入原生輸入框：<textarea> 用原生 setter + input 事件；ProseMirror / Quill / contenteditable 先模擬貼上，失敗再用 insertText。
-  const PASTE_TO_FILE = ["claude.ai"];
-  function writeToEditor(el, text, probe) {
+  // 有些網站（Gemini 的 Quill）處理貼上是非同步的：要等一下再判斷有沒有寫進去，不能馬上改用別的方式（會重複或誤判失敗）。
+  async function writeToEditor(el, text, probe) {
     if (!el) return false;
     el.focus();
     if (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement) {
@@ -474,20 +500,20 @@
     sel.removeAllRanges();
     sel.addRange(range);
     const landed = () => el.innerText.includes(probe);
-    // Claude 會把貼上的長文字轉成「貼上的文字.txt」附件：識別碼跟著進附件，頁面上看不到，就無法判斷送出、讀回覆。
-    // 這類網站改用打字的方式放入，不經過貼上。
-    if (PASTE_TO_FILE.some((h) => location.hostname === h || location.hostname.endsWith("." + h))) {
-      document.execCommand("insertText", false, text);
-      if (landed()) return true;
+    const settle = async (ms) => { for (let t = 0; t < ms && !landed(); t += 100) await sleep(100); return landed(); };
+    if (PASTE_IN_CHUNKS.some((h) => location.hostname === h || location.hostname.endsWith("." + h))) {
+      for (const part of chunks(text)) { pasteText(el, part); await sleep(30); }
+      if (await settle(1000)) return true;
+      // 分段沒成功：清掉已經貼進去的部分，再走一般流程。
+      range.selectNodeContents(el); sel.removeAllRanges(); sel.addRange(range);
+      document.execCommand("delete");
     }
-    const dt = new DataTransfer();
-    dt.setData("text/plain", text);
-    el.dispatchEvent(new ClipboardEvent("paste", { clipboardData: dt, bubbles: true, cancelable: true }));
-    if (landed()) return true;
+    const handled = pasteText(el, text);
+    if (handled ? await settle(1500) : landed()) return true;
     el.dispatchEvent(new InputEvent("beforeinput", { inputType: "insertText", data: text, bubbles: true, cancelable: true }));
     if (landed()) return true;
     document.execCommand("insertText", false, text);
-    return landed();
+    return settle(500);
   }
 
   // ── 從頁面讀星系 JSON ──
@@ -788,7 +814,7 @@
     const editor = targetEditor?.isConnected ? targetEditor : findEditor();
     const nonce = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
     spawns++;
-    if (!writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce))) { showFrame(); sendPanel({ type: "ig-chat-error", detail: t("ct.errNoEditor"), failed: true, nonce: "" }); return; }
+    if (!(await writeToEditor(editor, `${prompt}\n${tagOf(nonce)}`, tagOf(nonce)))) { showFrame(); sendPanel({ type: "ig-chat-error", detail: t("ct.errNoEditor"), failed: true, nonce: "" }); return; }
     const now = Date.now();
     const run = { nonce, goal, status: "waiting", startedAt: now, owner: INSTANCE, beat: now, unsent: true, pathFrom: location.pathname };
     if (ephemeral()) run.ephemeral = true; // 無痕視窗、暫時對話：不寫進 storage
@@ -985,7 +1011,7 @@
       const text = [goal, body, extra ? t("ct.extraNote", { text: extra }) : ""].filter(Boolean).join("\n\n");
       closePanel();
       lastAst = body;
-      if (!writeToEditor(editor, text, body.split("\n")[0])) navigator.clipboard?.writeText(text).catch(() => {});
+      if (!(await writeToEditor(editor, text, body.split("\n")[0]))) navigator.clipboard?.writeText(text).catch(() => {});
       // 記住這次的選擇：下次在同一個對話重開面板，方案卡與手動調整會還原。
       if (msg.nonce) {
         const run = cache.get(msg.nonce) ?? ((await loadMany(runKey(msg.nonce)))[runKey(msg.nonce)] ?? null);
