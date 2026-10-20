@@ -240,7 +240,5 @@
  "web.spawnButton": "Generează galaxia",
  "web.spawnTitle": "Cere AI-ului ales să propună o nouă galaxie de 12 idei pentru obiectivul tău (de obicei 1–4 minute)",
  "web.toastCopied": "📋 Instrucțiuni copiate",
- "web.toastCopyFailed": "Instrucțiunile nu au putut fi copiate automat",
- "ct.sendCue": "Promptul este în casetă. Apăsați butonul de trimitere care strălucește. Panoul iG se redeschide după trimitere.",
- "ct.sendCueCancel": "Anulează și pune înapoi întrebarea mea"
+ "web.toastCopyFailed": "Instrucțiunile nu au putut fi copiate automat"
 }

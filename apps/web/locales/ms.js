@@ -241,7 +241,5 @@ export default {
  "web.spawnButton": "Jana galaksi",
  "web.spawnTitle": "Minta AI yang dipilih menyusun galaksi baharu 12 idea untuk matlamat anda (biasanya 1–4 minit)",
  "web.toastCopied": "📋 Arahan disalin",
- "web.toastCopyFailed": "Tidak dapat menyalin arahan secara automatik",
- "ct.sendCue": "Gesaan sudah ada dalam kotak. Tekan butang hantar yang bercahaya. Panel iG akan dibuka semula selepas dihantar.",
- "ct.sendCueCancel": "Batal dan letak semula soalan saya"
+ "web.toastCopyFailed": "Tidak dapat menyalin arahan secara automatik"
 };

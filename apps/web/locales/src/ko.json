@@ -240,7 +240,5 @@
  "web.spawnButton": "은하 생성",
  "web.spawnTitle": "고른 AI가 목표에 맞춰 12개 관점의 새 은하를 만듭니다 (보통 1~4분)",
  "web.toastCopied": "📋 지시문 복사됨",
- "web.toastCopyFailed": "지시문을 자동으로 복사하지 못했습니다",
- "ct.sendCue": "프롬프트를 입력창에 넣었어요. 빛나는 보내기 버튼을 누르세요. 보내고 나면 iG 패널이 다시 열립니다.",
- "ct.sendCueCancel": "취소하고 내 질문 되돌리기"
+ "web.toastCopyFailed": "지시문을 자동으로 복사하지 못했습니다"
 }

@@ -240,7 +240,5 @@
  "web.spawnButton": "銀河を生成",
  "web.spawnTitle": "選んだ AI が、目標に合わせて 12 個の観点の銀河を新しく作ります（通常 1〜4 分）",
  "web.toastCopied": "📋 指示文をコピーしました",
- "web.toastCopyFailed": "指示文を自動コピーできませんでした",
- "ct.sendCue": "プロンプトを入力欄に入れました。光っている送信ボタンを押してください。送信すると iG パネルがまた開きます。",
- "ct.sendCueCancel": "キャンセルして質問を元に戻す"
+ "web.toastCopyFailed": "指示文を自動コピーできませんでした"
 }
