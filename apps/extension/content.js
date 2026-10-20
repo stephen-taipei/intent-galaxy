@@ -39,6 +39,9 @@
   /** 掛在頁面（document、window）上的監聽：teardown 時一併移除，新版才不會被舊的攔截。 */
   const listen = (target, type, fn, opts) => { target.addEventListener(type, fn, opts); unlisten.push(() => target.removeEventListener(type, fn, opts)); };
   const PILL_ID = "intent-galaxy-mod-pill";
+  // 方案剛填回輸入框：iG 先移到右下角顯示「✓ 星系完成」，輸入框內容被使用者改動（打字、送出）後才回到工具列。
+  // text：填回後輸入框的內容（等網站處理完才記下，null 表示還在等）。
+  let fillWatch = null; // { text, since }
   let cue = null; // 等使用者送出時的狀態：{ editor, nonce, send, anim, timer, restore }（見 showCue）
 
   // 各站輸入框選擇器，依序嘗試；全部失敗時退回頁面上最後一個可見的 contenteditable / textarea。
@@ -90,7 +93,7 @@
     }
     const form = editor?.closest("form, fieldset") ?? editor?.parentElement?.parentElement;
     const send = form && [...form.querySelectorAll(SEND_BUTTON)].find(visible);
-    if (send) {
+    if (send && !fillWatch) {
       const anchor = sendBox(send, editor, form);
       return { parent: anchor.parentElement, before: anchor, kind: "toolbar" };
     }
@@ -125,7 +128,8 @@
     btn.type = "button";
     // 掛不進輸入框工具列時改成右下角浮動按鈕：寫出全名，避免被當成頁面本身的小圖示。
     const status = current?.status;
-    const badge = status === "done" && !frameVisible() ? t("ct.pillDone") : status === "waiting" ? (current.unsent ? t("ct.pillUnsent") : t("ct.pillGenerating")) : status === "failed" ? t("ct.pillFailed") : "";
+    // 已填回過方案的 run，回到工具列後只顯示「iG」。
+    const badge = status === "done" && !frameVisible() && (fillWatch || !current.filled) ? t("ct.pillDone") : status === "waiting" ? (current.unsent ? t("ct.pillUnsent") : t("ct.pillGenerating")) : status === "failed" ? t("ct.pillFailed") : "";
     btn.append(logoMark(), (kind === "floating" ? "Intent Galaxy" : "iG") + badge);
     btn.title = t("ct.pillTitle");
     btn.dataset.kind = kind;
@@ -146,6 +150,11 @@
     if (!force && current?.isConnected && current.dataset.state === pillState() && current.dataset.owner === INSTANCE && Date.now() - lastMountCheck < 1000) return;
     lastMountCheck = Date.now();
     const editor = findEditor();
+    if (fillWatch) {
+      const now = editorText(editor);
+      if (fillWatch.text == null) { if (Date.now() - fillWatch.since > 500) fillWatch.text = now; }
+      else if (now !== fillWatch.text) fillWatch = null;
+    }
     const mount = findMount(editor);
     const existing = document.getElementById(PILL_ID);
     if (existing && existing.dataset.owner === INSTANCE && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
@@ -169,7 +178,7 @@
   const cache = new Map();     // nonce → 記錄
   let frame = null, panel = null, panelId = "", panelPath = "", panelNonce = "", panelBusy = false, targetEditor = null, openGoal = "";
   const frameVisible = () => !!frame && !frame.hidden;
-  const pillState = () => `${current?.status ?? "idle"}${current?.unsent ? "-unsent" : ""}-${frameVisible() ? "open" : "closed"}`;
+  const pillState = () => `${current?.status ?? "idle"}${current?.unsent ? "-unsent" : ""}${fillWatch ? "-filled" : ""}-${frameVisible() ? "open" : "closed"}`;
   const UI_KEY = "ig:ui";
   const RUN_PREFIX = "ig:run:";
   const MAX_RUNS = 100;
@@ -457,6 +466,12 @@
     openPanel();
   }
   listen(window, "resize", clampFrame);
+  // 填回方案後使用者在輸入框打字：iG 立刻回到工具列（textarea 打字不會改動 DOM，不能只靠 MutationObserver）。
+  listen(document, "input", (e) => {
+    if (!fillWatch || Date.now() - fillWatch.since < 500 || !(e.target instanceof Element) || !e.target.closest('[contenteditable="true"], textarea')) return;
+    fillWatch = null;
+    mountPill(true);
+  }, true);
 
   // Claude 會把一次貼上的長文字轉成「貼上的文字.txt」附件（識別碼跟著進附件，頁面上看不到，就無法判斷送出、讀回覆），
   // 打字方式放入又會被它的輸入框改寫。這類網站改成分段貼上，每段都短於轉附件的長度。
@@ -1012,11 +1027,13 @@
       closePanel();
       lastAst = body;
       if (!(await writeToEditor(editor, text, body.split("\n")[0]))) navigator.clipboard?.writeText(text).catch(() => {});
+      fillWatch = { text: null, since: Date.now() };
       // 記住這次的選擇：下次在同一個對話重開面板，方案卡與手動調整會還原。
       if (msg.nonce) {
         const run = cache.get(msg.nonce) ?? ((await loadMany(runKey(msg.nonce)))[runKey(msg.nonce)] ?? null);
-        if (run) { run.picks = { baseKey: msg.baseKey ?? null, overrides: msg.overrides ?? {} }; await saveRun(run); }
+        if (run) { run.picks = { baseKey: msg.baseKey ?? null, overrides: msg.overrides ?? {} }; run.filled = true; await saveRun(run); }
       }
+      mountPill(true);
     }
   }
 
