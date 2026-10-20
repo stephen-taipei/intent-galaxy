@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "生成星系",
  "web.spawnTitle": "用選定的 AI 依你的目標整理出 12 個觀點的星系（通常 1–4 分鐘）",
  "web.toastCopied": "📋 指令已複製",
- "web.toastCopyFailed": "指令沒能自動複製"
+ "web.toastCopyFailed": "指令沒能自動複製",
+ "ct.sendCue": "提示詞已放進輸入框。按發亮的送出鍵，送出後 iG 面板會自動打開。",
+ "ct.sendCueCancel": "取消，放回我的問題"
 };

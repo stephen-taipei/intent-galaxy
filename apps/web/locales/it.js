@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Genera galassia",
  "web.spawnTitle": "Fai proporre all'IA selezionata una nuova galassia di 12 idee per il tuo obiettivo (di solito 1–4 minuti)",
  "web.toastCopied": "📋 Istruzioni copiate",
- "web.toastCopyFailed": "Impossibile copiare le istruzioni automaticamente"
+ "web.toastCopyFailed": "Impossibile copiare le istruzioni automaticamente",
+ "ct.sendCue": "Il prompt è nella casella. Premi il pulsante di invio che si illumina. Il pannello iG si riapre dopo l'invio.",
+ "ct.sendCueCancel": "Annulla e rimetti la mia domanda"
 };

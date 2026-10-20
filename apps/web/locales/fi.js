@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Luo galaksi",
  "web.spawnTitle": "Anna valitun tekoälyn koota tavoitteellesi uusi 12 idean galaksi (yleensä 1–4 minuuttia)",
  "web.toastCopied": "📋 Ohjeet kopioitu",
- "web.toastCopyFailed": "Ohjeita ei voitu kopioida automaattisesti"
+ "web.toastCopyFailed": "Ohjeita ei voitu kopioida automaattisesti",
+ "ct.sendCue": "Kehote on syöttökentässä. Paina hehkuvaa lähetyspainiketta. iG-paneeli avautuu uudelleen, kun viesti on lähetetty.",
+ "ct.sendCueCancel": "Peru ja palauta kysymykseni"
 };

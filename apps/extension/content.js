@@ -8,7 +8,7 @@
   if (window.__intentGalaxyMounted && window.__intentGalaxyAlive?.()) return;
   try { window.__intentGalaxyTeardown?.(); } catch { /* 舊版沒有提供，或已無法執行 */ }
   // 舊版留下的按鈕與面板（Firefox 會直接銷毀舊的 content script，來不及自己清）
-  document.querySelectorAll("#intent-galaxy-mod-pill, intent-galaxy-frame").forEach((el) => el.remove());
+  document.querySelectorAll("#intent-galaxy-mod-pill, intent-galaxy-frame, intent-galaxy-cue").forEach((el) => el.remove());
   window.__intentGalaxyMounted = true;
 
   const api = globalThis.browser ?? globalThis.chrome;
@@ -30,6 +30,7 @@
     observer?.disconnect();
     document.getElementById(PILL_ID)?.remove();
     document.querySelector("intent-galaxy-frame")?.remove();
+    hideCue();
     if (window.__intentGalaxyToggle === togglePanel) delete window.__intentGalaxyToggle;
     window.__intentGalaxyMounted = false;
   }
@@ -628,8 +629,11 @@
 
   async function failRun(run, detail, failedKey = "") {
     if (run.status === "failed" && run.detail === detail && run.failedKey === failedKey) return; // 同樣的失敗不重複通知
+    const wasUnsent = run.unsent;
     Object.assign(run, { status: "failed", detail, unsent: false, failedKey });
     await saveRun(run);
+    // 提示詞沒送出就被清掉：把收起來的面板打開，讓使用者看到原因。
+    if (wasUnsent && frame?.hidden && panelNonce === run.nonce) { frame.hidden = false; clampFrame(); mountPill(); }
     toPanel(run.nonce, { type: "ig-chat-error", detail, failed: true });
   }
 
@@ -651,6 +655,9 @@
         Object.assign(run, { unsent: false, sentAt: now });
         delete run.pathFrom;
         await saveRun(run);
+        if (cue?.nonce === run.nonce) hideCue();
+        // 送出前收起來的面板：送出了就自動打開，接著等 AI 回覆。
+        if (frame?.hidden && panelNonce === run.nonce) { frame.hidden = false; clampFrame(); mountPill(); }
         toPanel(run.nonce, { type: "ig-reopen", job: runInfo(run) });
       }
       else if (editorHas) run.lostSince = 0;
@@ -732,7 +739,7 @@
   });
   listen(document, "visibilitychange", () => { if (!document.hidden && alive()) refresh(); });
 
-  // ── 把提示詞放進輸入框（由使用者按送出）──
+  // ── 把提示詞放進輸入框（由使用者按送出；面板先收起、送出鍵放大）──
 
   async function startRun(goal, prompt) {
     await refresh(true);
@@ -747,10 +754,84 @@
     panelNonce = nonce;
     await saveRun(run);
     sendPanel({ type: "ig-started", nonce });
-    mountPill();
-    // 由使用者自己按送出（自動送出可能違反各家網站的使用條款）：這裡只提醒，送出後識別碼出現在對話裡就自動接著等。
+    // 由使用者自己按送出（自動送出可能違反各家網站的使用條款）。面板先收起來，不擋住送出鍵；
+    // 輸入框蓋上提示（避免改到提示詞），送出鍵放大發光。送出後識別碼出現在對話裡，面板自動打開接著等。
+    minimizePanel();
+    showCue(editor, nonce);
     toPanel(nonce, { type: "ig-progress", elapsedSec: 0, unsent: true });
     refresh();
+  }
+
+  // ── 送出提示：蓋住輸入框裡的提示詞、放大送出鍵，直到提示詞離開輸入框（送出或被清掉）──
+  let cue = null; // { el, editor, nonce, send, anim, timer }
+  const CUE_CSS = `
+    :host { all: initial; position: fixed; z-index: 2147483646; box-sizing: border-box; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;
+      padding: 10px 14px; border-radius: 12px; background: #080b11; border: 1px solid #0071FE; box-shadow: 0 0 0 1px rgba(122,59,241,.35), 0 8px 30px rgba(0,0,0,.35);
+      font: 600 14px/1.45 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; color: #f1f5f9; text-align: center; color-scheme: dark; }
+    .msg { display: flex; align-items: center; gap: 8px; }
+    .msg svg { height: 16px; width: auto; flex: none; }
+    button { all: unset; cursor: pointer; font-size: 12px; font-weight: 400; color: #94a3b8; text-decoration: underline; }
+    button:hover { color: #fff; }`;
+  /** 元素實際看得到的範圍：與會捲動或裁切的祖先框取交集（長提示詞時編輯器本身比可見區高）。 */
+  function visibleRect(el) {
+    let { left, top, right, bottom } = el.getBoundingClientRect();
+    for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+      if (getComputedStyle(p).overflow === "visible") continue;
+      const r = p.getBoundingClientRect();
+      left = Math.max(left, r.left); top = Math.max(top, r.top); right = Math.min(right, r.right); bottom = Math.min(bottom, r.bottom);
+    }
+    return { left, top, width: Math.max(0, right - left), height: Math.max(0, bottom - top) };
+  }
+  function findSend(editor) {
+    const scope = editor.closest("form, fieldset") ?? editor.parentElement?.parentElement?.parentElement ?? document;
+    return [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b)) ?? null;
+  }
+  function showCue(editor, nonce) {
+    hideCue();
+    if (!editor?.isConnected) return;
+    const el = document.createElement("intent-galaxy-cue");
+    const root = el.attachShadow({ mode: "closed" });
+    root.innerHTML = `<style>${CUE_CSS}</style><div class="msg"></div><button type="button"></button>`;
+    const mark = logoMark();
+    mark.querySelectorAll("path").forEach((pth, i) => pth.setAttribute("fill", i === 0 ? "#0071FE" : "#7A3BF1"));
+    root.querySelector(".msg").append(mark, t("ct.sendCue"));
+    const cancel = root.querySelector("button");
+    cancel.textContent = t("ct.sendCueCancel");
+    // 取消：放回原本的問題、丟掉這個 run、關掉面板，回到按 iG 之前的樣子。
+    cancel.addEventListener("click", async () => { hideCue(); await onPanelMessage({ type: "intent-reset", nonce }); closePanel(); });
+    document.documentElement.appendChild(el);
+    cue = { el, editor, nonce, send: null, anim: null, timer: 0 };
+    syncCue();
+    cue.timer = setInterval(() => { if (!alive()) return teardown(); syncCue(); }, 150);
+  }
+  function syncCue() {
+    if (!cue) return;
+    const { el, editor } = cue;
+    if (!editor.isConnected || !editorText(editor).includes(tagOf(cue.nonce))) return hideCue();
+    const send = findSend(editor);
+    if (send !== cue.send) {
+      cue.anim?.cancel();
+      cue.send = send;
+      // 送出鍵放大發光（網站重畫按鈕時換到新的那顆）。只用動畫，不改網站的樣式。
+      cue.anim = send?.animate([
+        { transform: "scale(1.35)", boxShadow: "0 0 0 3px rgba(0,113,254,.9), 0 0 10px 2px rgba(122,59,241,.6)" },
+        { transform: "scale(1.5)", boxShadow: "0 0 0 5px rgba(0,113,254,.6), 0 0 22px 6px rgba(122,59,241,.75)" },
+      ], { duration: 700, direction: "alternate", iterations: Infinity, easing: "ease-in-out" }) ?? null;
+    }
+    const r = visibleRect(editor);
+    let right = r.left + r.width;
+    // 送出鍵在輸入框同一列時不能蓋住它。
+    const s = send?.getBoundingClientRect();
+    if (s && (s.top + s.bottom) / 2 < r.top + r.height && (s.top + s.bottom) / 2 > r.top && s.left > r.left) right = Math.min(right, s.left - 10);
+    el.hidden = r.height < 8 || right - r.left < 60;
+    Object.assign(el.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${right - r.left}px`, height: `${Math.max(r.height, 44)}px` });
+  }
+  function hideCue() {
+    if (!cue) return;
+    clearInterval(cue.timer);
+    cue.anim?.cancel();
+    cue.el.remove();
+    cue = null;
   }
 
   // ── 換對話 ──

@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Tạo thiên hà",
  "web.spawnTitle": "Để AI đã chọn bày ra một thiên hà mới gồm 12 góc nhìn cho mục tiêu của bạn (thường mất 1–4 phút)",
  "web.toastCopied": "📋 Đã sao chép hướng dẫn",
- "web.toastCopyFailed": "Không thể tự động sao chép hướng dẫn"
+ "web.toastCopyFailed": "Không thể tự động sao chép hướng dẫn",
+ "ct.sendCue": "Lời nhắc đã nằm trong ô nhập. Hãy bấm nút gửi đang sáng. Bảng iG sẽ tự mở lại sau khi gửi.",
+ "ct.sendCueCancel": "Hủy và đặt lại câu hỏi của tôi"
 };

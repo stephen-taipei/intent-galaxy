@@ -241,5 +241,7 @@ export default {
  "web.spawnButton": "Galaxie erstellen",
  "web.spawnTitle": "Die gewählte KI eine neue Galaxie mit 12 Ideen zu deinem Ziel entwerfen lassen (meist 1–4 Minuten)",
  "web.toastCopied": "📋 Anweisungen kopiert",
- "web.toastCopyFailed": "Anweisungen konnten nicht automatisch kopiert werden"
+ "web.toastCopyFailed": "Anweisungen konnten nicht automatisch kopiert werden",
+ "ct.sendCue": "Dein Prompt steht im Eingabefeld. Drück den leuchtenden Senden-Knopf. Nach dem Senden öffnet sich das iG-Fenster wieder.",
+ "ct.sendCueCancel": "Abbrechen und meine Frage zurücksetzen"
 };
