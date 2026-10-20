@@ -11,6 +11,9 @@ import type { IntentAnalysisResponse, NodeId, Stance } from "../../protocol/src/
 
 assert.equal(hasSlop("提升用戶體驗"), true);
 assert.equal(hasSlop("負載平衡器只留 2 台"), false);
+// 簡中字形與英文也要抓到；專有名詞（負載平衡器、強化學習、潛在客戶、optimizer）不算。
+for (const t of ["优化用户体验", "确保数据一致", "加强监控", "取决于预算", "Improve onboarding", "This might work", "leverage AI to enhance retention"]) assert.equal(hasSlop(t), true, t);
+for (const t of ["负载平衡器只留 2 台", "用强化学习排程", "潜在客户名单 200 筆", "Adam optimizer 學習率 3e-4", "Cut churn from 8% to 5% in 30 days", "list 50 potential customers"]) assert.equal(hasSlop(t), false, t);
 const model = { version: "v1", feasibleVersion: "v1", validated: true as const, ids: ["N1", "N2", "N3"], feasibleMasks: [0, 2, 3, 4] };
 const resA = compileIntent({ model, base: ["include", "include", "neutral"], overrides: new Map([[2, "include"]]) });
 assert.equal(resA.status, "SAT");

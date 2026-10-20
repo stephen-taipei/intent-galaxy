@@ -131,7 +131,7 @@ R0 LANGUAGE  Every string in the user's language. Caps are in CJK chars (字); f
 R1 ORDER     Fill fields strictly in schema order. A field may use only fields already written. Never revise.
 R2 CONCRETE  Every claim = transitive verb + named mechanism or number + what it rules out. No middle-ground compromise.
 R3 INVERSION First pick inverse_cell (!== cell in the same dim), write inverse_pos defending that alternative, then write claim containing dims[dim].values[cell] and a number or input term.
-R4 BANNED    提升 加強 優化 完善 打造 賦能 整合 全面 有效 相關 確保 推動 強化 深化 落實 兼顧 平衡 增強 改善 提高 促進 可能面臨 需要注意 有一定風險 需要權衡 建議評估 視情況而定 或許 潛在 挑戰 取決於 適當 合理 長期 未來 逐步 and any comparative 更 without a baseline number.
+R4 BANNED    In every language: no vague improve/ensure verbs, hedges or time fillers; name the mechanism and the number instead. Examples: 提升 加強 優化 完善 打造 賦能 整合 全面 有效 相關 確保 推動 強化 深化 落實 兼顧 平衡 增強 改善 提高 促進 可能面臨 需要注意 有一定風險 需要權衡 建議評估 視情況而定 或許 潛在 挑戰 取決於 適當 合理 長期 未來 逐步; improve enhance optimize ensure leverage empower streamline robust holistic seamless might potential depends. No comparative (更, better, faster) without a baseline number.
 R5 FIT      Match depth to the question: everyday choices get everyday trade-offs in plain words; do not force jargon, deadlines or conflicts the situation does not have.
 
 S0 _scratchpad: terms (3-8 from input), scarce (2 resources, >=1 not in terms), assumptions (A1-A4 with Aristotle cause and 若 X，則 T 內 Y), dims (D1-D4, 3 distinct concrete values each), fn_sig (verb｜flow｜constraints｜failure mode).
