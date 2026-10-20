@@ -262,5 +262,17 @@
  "pn.promptPreamble": {
   "zh-Hant-TW": "（這段是 Intent Galaxy 的分析指令，直接按送出就好。AI 會先整理出不同角度的觀點和 3 個方案，不會直接回答問題。）",
   "en": "(This is an Intent Galaxy analysis prompt. Just press send. The AI will first lay out viewpoints from different angles and 3 plans instead of answering the question directly.)"
+ },
+ "pn.jsonFailTitle": {
+  "zh-Hant-TW": "AI 的回覆不完整",
+  "en": "The AI's reply was incomplete"
+ },
+ "pn.jsonFailBody": {
+  "zh-Hant-TW": "這次的回覆沒有完整的星系資料，通常是這個模型的推理強度不夠。<br><br>請在這個網站換成更高等級的模型（例如 Pro），或開啟更高的推理強度（例如「思考」模式），調整後再試一次。",
+  "en": "This reply didn't include the complete galaxy data. That usually means the model needs more reasoning power.<br><br>On this site, switch to a higher-tier model (such as a Pro model) or turn on a stronger reasoning setting (such as a Thinking mode), then try again."
+ },
+ "pn.tryAgain": {
+  "zh-Hant-TW": "調整好了，再試一次",
+  "en": "Done, try again"
  }
 }

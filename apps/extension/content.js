@@ -253,7 +253,7 @@
     iframe { flex: 1; width: 100%; border: 0; background: #080b11; }
     :host(.dragging) iframe { pointer-events: none; }`;
 
-  const runInfo = (r) => r && { goal: r.goal, nonce: r.nonce, status: r.status, elapsedSec: Math.round((Date.now() - (r.sentAt ?? r.startedAt)) / 1000), analysis: r.analysis ?? null, detail: r.detail ?? "", unsent: !!r.unsent, picks: r.picks ?? null };
+  const runInfo = (r) => r && { goal: r.goal, nonce: r.nonce, status: r.status, elapsedSec: Math.round((Date.now() - (r.sentAt ?? r.startedAt)) / 1000), analysis: r.analysis ?? null, detail: r.detail ?? "", jsonFail: !!r.failedKey, unsent: !!r.unsent, picks: r.picks ?? null };
   const sendPanel = (msg) => { if (panel) api.runtime.sendMessage({ ...msg, id: panelId }).catch?.(() => {}); };
   /** 關於某個 run 的通知：只送給正在顯示這個 run（或還沒綁定 run）的面板。 */
   const toPanel = (nonce, msg) => { if (panel && (!panelNonce || panelNonce === nonce)) sendPanel({ ...msg, nonce }); };
@@ -715,7 +715,7 @@
     await saveRun(run);
     // 提示詞沒送出就被清掉：把收起來的面板打開，讓使用者看到原因。
     if (wasUnsent && frame?.hidden && panelNonce === run.nonce) { frame.hidden = false; clampFrame(); mountPill(); }
-    toPanel(run.nonce, { type: "ig-chat-error", detail, failed: true });
+    toPanel(run.nonce, { type: "ig-chat-error", detail, failed: true, jsonFail: !!failedKey });
   }
 
   async function finishRun(run, analysis) {
@@ -954,7 +954,7 @@
       const run = prev ? Object.assign(prev, newValue) : newValue;
       cache.set(nonce, run);
       if (run.status === "done") toPanel(nonce, { type: "ig-galaxy", analysis: run.analysis, goal: run.goal });
-      else if (run.status === "failed") toPanel(nonce, { type: "ig-chat-error", detail: run.detail, failed: true });
+      else if (run.status === "failed") toPanel(nonce, { type: "ig-chat-error", detail: run.detail, failed: true, jsonFail: !!run.failedKey });
       else toPanel(nonce, { type: "ig-reopen", job: runInfo(run) });
     }
     if (relevant) refresh();

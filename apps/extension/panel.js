@@ -206,7 +206,7 @@ function updateWaiting(elapsedSec, unsent) {
   const line = strip.querySelector(".t");
   if (line && !unsent) line.textContent = t("pn.waitingStrip", { site, time: fmt(elapsedSec) });
 }
-function showFailed(detail) {
+function showFailed(detail, jsonFail = false) {
   // 同樣的失敗再通知一次（例如另一個分頁也讀到）：不重畫，使用者開著的「貼上 JSON」卡片不會被關掉。
   if (shown === "failed" && detail === lastFailed && !card.hidden) return;
   hideCard();
@@ -216,9 +216,13 @@ function showFailed(detail) {
   galaxy.showMessage(detail);
   // 沒有對應的工作（例如提示詞根本沒放進輸入框）時，不提供「放棄」，避免刪到這個對話其他的記錄。
   // 「重新生成」先只開確認卡片；按「開始生成」才取消舊的 run，按「返回」一切照舊（還能貼上 JSON）。
-  const actions = [[t("pn.regenerate"), () => confirmChat([[t("pn.back"), () => {}]], () => { if (nonce) resetJob(); })], [t("pn.pasteJson"), showPaste]];
+  const regenerate = () => confirmChat([[t("pn.back"), () => {}]], () => { if (nonce) resetJob(); });
+  const actions = [[t("pn.regenerate"), regenerate], [t("pn.pasteJson"), showPaste]];
   if (nonce) actions.push([t("pn.giveUp"), resetJob]);
   setStrip(t("pn.failedStrip", { detail }), actions);
+  // AI 回了 JSON 但不完整：多半是模型推理強度不夠，直接彈出提示，請使用者換更高等級的模型或推理強度再試。
+  if (jsonFail) showCard(t("pn.jsonFailTitle"), t("pn.jsonFailBody"), [[t("pn.tryAgain"), regenerate, true], [t("pn.pasteJson"), showPaste], [t("pn.cancel"), () => {}]]);
+  shown = "failed"; // showCard 會改成 "card"：維持失敗狀態，重複的通知才不會一直重彈
 }
 
 function spawnViaChat() {
@@ -296,7 +300,7 @@ async function open({ goal: text = "", site: host = t("pn.thisAi"), job = null, 
   if (job && !newGoal) {
     if (job.status === "done" && job.analysis) return showDone(job);
     if (job.status === "waiting") return startWaiting(job.goal, job.elapsedSec, job.unsent);
-    if (job.status === "failed") { goal = job.goal; galaxy.beginStream(goal); return showFailed(job.detail); }
+    if (job.status === "failed") { goal = job.goal; galaxy.beginStream(goal); return showFailed(job.detail, job.jsonFail); }
   }
   // 上一個問題還在等，輸入框又打了新問題：先決定要繼續等還是放棄。
   if (job?.status === "waiting" && newGoal) return askWhileWaiting(job, goal);
@@ -339,7 +343,7 @@ function onRuntimeMessage(msg) {
   if (msg.type === "ig-reset" && (!msg.nonce || msg.nonce === nonce)) { waiting = false; nonce = ""; shown = "idle"; lastFailed = ""; setStrip(""); galaxy.showMessage(t("pn.cancelledElsewhere")); }
   if (msg.type === "ig-chat-error") {
     if (msg.nonce !== undefined && msg.failed) nonce = msg.nonce;
-    if (msg.failed || !waiting) showFailed(msg.detail);
+    if (msg.failed || !waiting) showFailed(msg.detail, !!msg.jsonFail);
     else galaxy.showMessage(msg.detail);
   }
 }

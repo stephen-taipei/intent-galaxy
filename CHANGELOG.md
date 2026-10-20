@@ -2,8 +2,9 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
-## Unreleased
+## 0.1.9 — 2026-10-21
 
+- **Incomplete AI reply prompts for a stronger model**: when the galaxy JSON in the AI's reply is incomplete, the extension panel pops up a dialog suggesting a higher-tier model (such as Pro) or a stronger reasoning setting (such as a Thinking mode) on that site, with "Done, try again", "Paste JSON" and "Cancel" (all 41 locales).
 - **Extension description no longer promises "60 seconds"** (all 41 locales): the AI's reply usually takes a few minutes, so the store summary just says what the button helps with.
 
 ## 0.1.8 — 2026-10-20
