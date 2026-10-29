@@ -43,7 +43,7 @@
 | ---- | ---- | ---- | :--: |
 | **CLI** | 엔지니어 | `npx @stephen.taipei/intent-galaxy`: 127.0.0.1 성계 서버. 생성에 Claude, Codex, Gemini, agy CLI 또는 12개 API 중 선택 가능 | ✅ |
 | **MCP** | 엔지니어 | Stdio MCP Server: `intent_spawner_prompt` → `intent_open_galaxy`. Claude Code, Codex, Gemini CLI, agy에 모두 연결 가능 | ✅ |
-| **Extension** | 일반 사용자 | Chrome / Firefox: Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral, Kimi 입력창 옆에 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** 캡슐을 추가해 해당 사이트의 AI가 바로 성계를 생성 | ✅ |
+| **Extension** | 일반 사용자 | Chrome / Firefox: Claude, ChatGPT, Gemini, Grok, DeepSeek, Qwen, Perplexity, Copilot, Mistral, Kimi 입력창 옆에 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **Intent Galaxy logo** 버튼을 추가. 옵션을 비교하고 필요하면 성계를 보거나 고급 조정한 뒤 미리보기하고 입력창에 넣으면, 전송은 사용자가 직접 합니다 | ✅ |
 | **Kill-gate** | 엔지니어 | `.intent.lock.json`(RFC 8785 JCS + SHA-256)과 14일 후 commit을 검증하는 게이트키퍼 | ✅ |
 
 <br>
@@ -230,26 +230,30 @@ npm run build:ext    # apps/extension과 apps/extension-firefox에 동기화. �
 npm run pack:ext     # 스토어 등록용 dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip도 생성
 ```
 
-입력창에 고민 중인 일을 한 문장 적고 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG**(또는 툴바 아이콘, `Cmd/Ctrl+Shift+G`)를 클릭하세요:
+입력창에 고민 중인 일을 한 문장 적고 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **Intent Galaxy logo**(또는 툴바 아이콘, `Cmd/Ctrl+Shift+G`)를 클릭하세요:
+
+현재 대화에 분석 결과가 있으면 아래 비교 단계로 바로 이어집니다. 처음 사용할 때는 확장 프로그램이 생성 프롬프트를 입력창에 먼저 넣습니다. 사용자가 직접 전송하고 사이트 AI의 답변을 기다린 뒤 아래 비교 및 미리보기 절차를 시작합니다.
 
 ```mermaid
 flowchart LR
-    A["iG 클릭"] --> B{"이 대화에서<br/>생성한 적 있음?"}
-    B -- 예 --> C["성계를 바로 표시"]
-    B -- 아니요 --> D["프롬프트를 입력창에 삽입<br/>전송은 사용자가 직접"]
-    D --> E["웹 AI가 JSON으로 응답"]
-    E --> F["성계 자동 렌더링<br/>프롬프트와 응답은 한 줄로 접힘"]
-    B -. 로컬 CLI 온라인 .-> G["'로컬 AI 사용'도 선택 가능<br/>대화에 프롬프트가 남지 않음"]
-    G --> F
+    A["Intent Galaxy logo 클릭"] --> B["옵션 비교"]
+    B --> C{"성계를 보거나<br/>고급 조정할까요?"}
+    C -- 예 --> D["선택 사항: 성계 보기<br/>또는 고급 조정"]
+    C -- 아니요 --> E["선택한 옵션 미리보기"]
+    D --> E
+    E --> F["대화 입력창에 넣기"]
+    F --> G["웹사이트에서 사용자가 직접 전송"]
 ```
+
+보기를 전환해도 AI를 다시 호출하지 않습니다.
 
 | 기능 | 설명 |
 | --- | --- |
-| 생성 주체 | 기본값은 현재 사이트의 AI(대화 맥락을 볼 수 있음). 로컬 CLI가 온라인이면 '로컬 AI 사용' 버튼이 추가됨. 확장 프로그램이 자동으로 전송하지 않음 |
+| 생성 주체 | 기본적으로 현재 대화의 AI가 옵션을 생성하며, 사용 가능하면 로컬 AI를 선택할 수 있습니다. 미리보기 후 확장 프로그램이 선택한 옵션을 입력창에 넣고, 전송은 사용자가 직접 합니다 |
 | 접기 | 확장 프로그램이 직접 보냈고 확실히 식별할 수 있는 메시지만 접음. 사이트 구조를 인식하지 못하면 접지 않으며, 클릭하면 펼쳐짐 |
 | 대기 | 추론형 상위 모델은 5–15분 걸릴 수 있음. 20초가 넘으면 안내가 뜨고 패널을 최소화해 둘 수 있으며, 완료되면 버튼에 '✓ 성계 완성' 표시 |
 | 응답을 못 읽을 때 | 사이트가 긴 코드 블록을 접어 둔 경우 'JSON 붙여넣기'로 직접 불러오기 |
-| 기억 | 같은 대화를 다시 열거나 새로고침하면 생성된 성계를 바로 표시. 확장 프로그램 안에만 30일간 저장. 시크릿 창과 ChatGPT 임시 채팅에서는 저장하지 않음 |
+| 기억 | 웹사이트 AI가 생성했고 run 기록이 있는 대화에 한해 선택한 옵션과 선택적 메모를 대화별 초안으로 저장합니다. 로컬 CLI, `pageGalaxy`, 데모 흐름에는 동일한 초안 저장 기능이 없습니다. 생성된 성계 데이터는 확장 프로그램 안에만 30일간 보관되며 시크릿 창과 ChatGPT 임시 채팅에는 저장되지 않습니다 |
 | 개인정보 | 패널과 페이지 사이는 확장 프로그램 내부 메시지로만 통신하므로 사이트 자체 스크립트는 질문과 성계를 읽을 수 없음 |
 | 잠금 파일 | `.intent.lock.json`은 로컬 CLI로 생성한 성계만 기록. 웹 AI, 붙여넣기, 데모 성계는 방안을 입력창에 다시 채우기만 함 |
 | 패널 | 제목 표시줄을 드래그해 이동, 오른쪽 아래 모서리를 드래그해 크기 조절, 제목 표시줄을 더블클릭해 최대화. 투명도 조절 가능 |
@@ -266,6 +270,8 @@ flowchart LR
 | `npm test` | libs 단위 테스트, CLI 통합 테스트, 확장 프로그램 동기화, npm pack E2E 테스트 |
 | `npm start` | 소스에서 바로 실행(Node 런타임이 TypeScript 타입을 제거) |
 | `npm run build` | `dist/` 생성(npm 패키지 내용. npm pack / publish 전에 자동 실행) |
+| `npm run build:ext` | 확장 프로그램을 빌드해 `apps/extension` 및 `apps/extension-firefox`에 동기화(로컬에서 로드 가능) |
+| `npm run preview:ext` | `http://127.0.0.1:4789/`에서 로컬 shim 미리보기를 실행합니다. 실제 사이트 호환성 검증은 아닙니다 |
 | `npm run bench:latency -- --providers claude,codex` | 고정된 10개 문제로 생성 지연 시간 측정(실제로 모델을 호출). 결과는 `bench/latency.jsonl`에 기록 |
 
 아키텍처와 데이터 구조는 [`INTENT-SPEC-FINAL.md`](INTENT-SPEC-FINAL.md)를 기준으로 합니다.

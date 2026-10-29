@@ -1,0 +1,792 @@
+{
+  "baseCommit": "37c3be3ef94dd6a6faeb474225ca313f9ac28d7e",
+  "capturedAt": "2026-10-29",
+  "purpose": "Read-only snapshot of in-progress v2; original working tree preserved. Hosted changes start after this snapshot commit.",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "c1afb79ee3753e2bb3eef81617e9b75b9f424f14e9cf78757cdfb83dd1bcf27f",
+      "untracked": false
+    },
+    {
+      "path": "README.ja.md",
+      "sha256": "b67ed69d81aaf7c2130a40a9066e665e75f5433b09644fdb40c76d660dbd3811",
+      "untracked": false
+    },
+    {
+      "path": "README.ko.md",
+      "sha256": "6bc59a4984c05657715a3017ed774497975f9349c58ff5e7888a9e2db48b4a31",
+      "untracked": false
+    },
+    {
+      "path": "README.md",
+      "sha256": "52b77baf52c378da9ae248df10803b5db43b5ca2cf910ebe89587ae81ca817e2",
+      "untracked": false
+    },
+    {
+      "path": "README.zh-CN.md",
+      "sha256": "36b7053ef1076c931d1efd2e98f9d40810a1c84da81394f2416455afc3bf704f",
+      "untracked": false
+    },
+    {
+      "path": "README.zh-TW.md",
+      "sha256": "9f35d6182975bd1f92f49b84da075cdd20db3d6cd3181dfcadc6b4c8c598bfbc",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ar/messages.json",
+      "sha256": "6c187f3767324226bc9f556fff31a2e89375e8534207d88e874870e9739d63ac",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ca/messages.json",
+      "sha256": "3d9b3853ac4aa450b62cb417ba715c785a5f8d5d6ed432efbf845bf3c5bf42ad",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/cs/messages.json",
+      "sha256": "54cf69d06dcef5288600448f7c2a588146edb3ef4638d681e1b5011039cd9136",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/da/messages.json",
+      "sha256": "f6bbfc28745f3d8255224ce3d31905b260f745af376eb7e2bfdbe660680bd7e9",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/de/messages.json",
+      "sha256": "a4ed9a2c87a5b32f53f401a27f649df96d62e9d477bfcb8ce69c1e0e33ffb493",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/el/messages.json",
+      "sha256": "81801547d21a49d51f7d779c2c114a8cabf31b182a9d4fff0bc7ca8e8ca4bf99",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/en/messages.json",
+      "sha256": "667029df94e1f4c260b9ea33127db6c54f5e785dbc7c045f991f6ea0b018d9cb",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/es/messages.json",
+      "sha256": "e53c31f34e6c8572c5524c6564c392ba67d1f6b9c1d9d1f0ed4b303f329378e1",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/es_419/messages.json",
+      "sha256": "301bc13ecc1ac00f6dea21079ab5f5c2a313e06f8733d4efac9e96d845bc69ac",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/fi/messages.json",
+      "sha256": "a088dc2ec4bd03c9a4cf9ac49fc8193f4124e20e84017e63b9350496667b6925",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/fil/messages.json",
+      "sha256": "03516b08bd9167a148bd825905ec478268006ad6fd4e698e80484ed9f8062cbd",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/fr/messages.json",
+      "sha256": "a116b803997e5ed3d6e01914a7430c7e8e7139358d10b89bf9dd09098b10ff6b",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/he/messages.json",
+      "sha256": "fe468d49b3b361e9ba5f1826dfa1a63e9963bdc405deaf9c65e798af126266ad",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/hi/messages.json",
+      "sha256": "d977b402ccfa0a16ccf6d93c40d04d26c142dd17b04b52cd4ed5500aa65e6123",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/hr/messages.json",
+      "sha256": "74d5eb740633a4133c2b2c16c65f7b0b905d8265a1a02c8c8125ffd55c6f32b2",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/hu/messages.json",
+      "sha256": "752ccd873946697f123243dde8060296803d61fe006b0e347885a376be6296c8",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/id/messages.json",
+      "sha256": "0658f54addb622d32e13384e57e76225b01e99e58ca9adab8e204c573565f9b3",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/it/messages.json",
+      "sha256": "240eb404e2bf7b0312480783a7fe9fbe60d6e2b261f33d5a4eaac729ca92ddb5",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ja/messages.json",
+      "sha256": "b06763b265c119b024fc7398fc636327dfd6e38f937680fc8b389ae51c737ce5",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/km/messages.json",
+      "sha256": "29ba8b848a008a5cd6545a0fea1957816ccb6fc97ca2a8979a1a84be8819c633",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ko/messages.json",
+      "sha256": "bd0cb472028353e5bf96d5b013470cafb87a980c297ccfc0a98f5274a52c51f6",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/lo/messages.json",
+      "sha256": "e202424bd3b4f1c308ef97f6ca146bd5396cbf66803a5feb3edd1fd7121bebfa",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ms/messages.json",
+      "sha256": "1cc8bb9fd2e8b0364f4bade206903400cebb162858e8169fcc6f825917dbea5b",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/my/messages.json",
+      "sha256": "6eb3f692e6e598a106352b15e971220a859df1f6b2e14cfb3c897d12588ee2a0",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/nb/messages.json",
+      "sha256": "7ebe0d46de7e6f6899eab9c15a79e2a118f3940df625f1c107b025a030f2c50d",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/nl/messages.json",
+      "sha256": "5408f3b3b87f14f20f38bbc836bae640d382fd92179bee06f8e6003f37824a13",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/pl/messages.json",
+      "sha256": "a1cdfcb480aa88b7c49752e009a967d16c29a1a829503016d2a9e094daa70213",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/pt_BR/messages.json",
+      "sha256": "2e99776635a7fd5fe4c1a1ee650958bcde35292b1c9fec3c14e29f86ee9d97b8",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/pt_PT/messages.json",
+      "sha256": "bcd34de922579af5d494c76b9ddef3f20a1093f8310310e63d6325fdbfec733e",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ro/messages.json",
+      "sha256": "4ef02109f50fad007e1546392614a5146c0ee35bcdbbad055e168e3ff6a4fa75",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/ru/messages.json",
+      "sha256": "785124080452975ae8a3a3c041de9d472a225ea08b804c2482a8cade025fe3cf",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/sk/messages.json",
+      "sha256": "e86985112e3ec1a38e7a8878f331d22d58f526dd473c0de8f3f25e2ec103d182",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/sv/messages.json",
+      "sha256": "0c89f3644de6b58ead4e0a0e1b009b9745b44fb85a6c797231edd333e3d02c77",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/th/messages.json",
+      "sha256": "b89a8df09bf3ad45f3a79b558e5636bfc251894a90b452ef0a5aeb877a293201",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/tr/messages.json",
+      "sha256": "1fc24887fbeba01980b64ca94a48db52a38975f5a7cb1fcb300f9ff298f86768",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/uk/messages.json",
+      "sha256": "2ed7fdd4f50735ba584ab82df5236ee77277b9254a20b5a96349f126e99feff5",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/vi/messages.json",
+      "sha256": "88f2f4cb4718c7a3c7ecb3bf208cc36b1d990e012322f937f02ea000ea9bc94d",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/zh_CN/messages.json",
+      "sha256": "abc75b20c98f25825afb74b17ff88ef03a5f84baacb09bc4d0ab0791cf93e461",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/zh_HK/messages.json",
+      "sha256": "3e458726eced6a51979db66899782d45c9cf897a22ff6a59fafdd500f891aa24",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/_locales/zh_TW/messages.json",
+      "sha256": "3eb86863dc8a5b7cb21c12430282db94ccb68b113dd4d843a606e43e17b1972f",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/content.js",
+      "sha256": "45d80930d54e1d3a0e5f5f08a92c85f46807d9be00f4aa4ffac8e468fdbc4c46",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/decision-view.css",
+      "sha256": "7c13aca1ccb0cdf9b17526d98d813a74918c1a01295217372daa61c52dcc4f9a",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/decision-view.js",
+      "sha256": "391a62c1bc639dcb2fef42dc9abfc846acc0a0175370ea43f47ca3c0e4215e67",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/LICENSE",
+      "sha256": "308028e93fcf84972523cdf6e616f73168546b4953895f516d01287f16fe7bee",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/arrow-left.svg",
+      "sha256": "a71d26dae8d7bd2c172a502258e13793ecf3fa80935d42f7fa692b8d182d0794",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/arrow-right.svg",
+      "sha256": "f341a7b2b0f0ce280c2ff80ba7b4519323e2503d66575443ffe07c8f0a87123d",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/check-circle.svg",
+      "sha256": "0954a83db1736bb3e7108a00111ba5fccae9e16c6c711993cbe3c9984dc8aaec",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/chevron-right.svg",
+      "sha256": "e37a663fc7cc5d1a0540e27ecb567d70e4706eb32f07e47f212369881bd999bc",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/copy.svg",
+      "sha256": "a32de6b675efb2d05a19455cde9d7350706257069e0a52d0a99fdf51a565fe91",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/corner-down-left.svg",
+      "sha256": "9ea7b4b36120e70a4dfd8b63fb016e07f9a3c1750d2d10d034084944636558c3",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/edit-3.svg",
+      "sha256": "9f2ac8efda551f724247e2d3a2431ec1194dc1087e8d571ea764edd5f8a8a6ca",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/git-branch.svg",
+      "sha256": "a4c57087b5e1f511e84982b5c7295035a602023768e45c8c5f93d1632a0d9a6d",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/info.svg",
+      "sha256": "75e0cc23431cd121e2e9183937c34ebd3278a4185d643187b4da532aa9714853",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/rotate-ccw.svg",
+      "sha256": "bbd1916b01dca1c1b6cc411369c4f578c6e1126da171f17bd5ab4e5be421bcc1",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/icons/ui/rotate-cw.svg",
+      "sha256": "9f231590e39c2d9b2a20a40bc9e3d5cc4a3fc06c424569bb43afd3316efe28c3",
+      "untracked": true
+    },
+    {
+      "path": "apps/extension/panel.html",
+      "sha256": "9bd3ea95295075220891cbcbd9f6e0d3a41733320bdf0e9d4d0944f9d839367f",
+      "untracked": false
+    },
+    {
+      "path": "apps/extension/panel.js",
+      "sha256": "beae28b42a159bad5b77104cd73c10823961a5565b1caca0fb9659a9d80c8f48",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/galaxy-overlay.js",
+      "sha256": "5cd1c61fa30f570ee0e0b942a93bd4fd0d2483203119c1410927b56ff76fb338",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/_parts/content.json",
+      "sha256": "e3293820b20954212be93c46b53f57397eef3fbbe61d7b40cd9b195a493c27e5",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/_parts/ext.json",
+      "sha256": "4eb42bdc2c5243b913be8534709084b33de12d12e528c764afdeb27e1acdb27e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/_parts/panel.json",
+      "sha256": "c2634399a20324bbe7e260ad5aa2beb0a4998c554bafddd9ac52e26f1e433c29",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/_parts/v2.json",
+      "sha256": "87e7450f9d32fe2c5a457c68742a28fbeb0a33afe23f47555f6af63852ed5b05",
+      "untracked": true
+    },
+    {
+      "path": "apps/web/locales/ar.js",
+      "sha256": "c264216cf138930658066b85f74a387fd9249a70aedcd52dcf86023923779465",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/ca.js",
+      "sha256": "6649287bbd1dfe41a4f92403c6f89145d6792ca710c5dfc94774265333523e0e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/cs.js",
+      "sha256": "a7c244055fa834bf3229a337d65f7412a7ed8d62acf122a1864c58d33ffe03a8",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/da.js",
+      "sha256": "80844bd150b829dd1cfce507df60d05ab10a22031d3366ec106327fcd2fd2ddc",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/de.js",
+      "sha256": "c85f812806f10cbe69af825904137e7d97887596e4f7ac25f7541c888e1e8829",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/el.js",
+      "sha256": "c7bcc3bd4e98cb226cfac4714503ecffafbf595929c9b39edfecdf010ea17ebc",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/en.js",
+      "sha256": "259459fbd09678dcfca82f05d3c3e27de86f52f049068543b26e927f1027258b",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/es-MX.js",
+      "sha256": "31bdb7003f0e57035654742708ec89a3293578ed434893790b914cf1fa3d2038",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/es.js",
+      "sha256": "1b31152f420be444f90d9cee94263afb5990d056228869311d01df970ef4d6b2",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/fi.js",
+      "sha256": "de09fe9c835a169a83f1485470e9e0d0f26301c5bd51a9852c74811cfb82aef4",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/fil.js",
+      "sha256": "ea6bee337baa5fc65fc3f8726f0a3e2d7dce21dcde05433c528eb71f28f5ea82",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/fr.js",
+      "sha256": "de6f2ff6ad28153321be7705d01088d8fe0ce54f91a2c75f34dab35359a3009f",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/he.js",
+      "sha256": "3a34e231c7d92fdf3afc3988753af53c7f4f020e9ff218eb1abfe8cee1fca350",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/hi.js",
+      "sha256": "fd80bd8f3f68623b68aaa677391189acd94c8ca29194b93cc1a605ac8d55f72d",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/hr.js",
+      "sha256": "b95720f51bcdf897bbba50c2ee9e9ae7549df4d92168d559b938dc02ce9d7fb1",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/hu.js",
+      "sha256": "bed654d66dfc3cb179c301a9cf8bc8dffa76a6f96fd24388514344889c9daf30",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/id.js",
+      "sha256": "223e43fdd38b03323fe7b370ebb12931974963ef163dc4e30d74109592c6c092",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/it.js",
+      "sha256": "dec8276e9ed57a350fac4d114110fd61de7fdb3d783eae41b5b8ad8b8a7d1d0e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/ja.js",
+      "sha256": "f54346c65af5644185dfd0e6c7b46b793891aacb4098a247ef72a81c3ed803bd",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/km.js",
+      "sha256": "0676696f7970cefae356dd8a6e941656542b571c07551bde08ed238dbc9bfab1",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/ko.js",
+      "sha256": "17dee9621b9ccab2136500466d75d924031e4c8de48a9d3f67519631fc6bc9ad",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/lo.js",
+      "sha256": "77b221f49dd0abee12d6acfd29928cf9646c5d0f0f2c29cac3bcc31795049113",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/ms.js",
+      "sha256": "4a6b739ff02dc549504f8bedc9899374e1c36ffd5681aacde91a075998ce39ec",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/my.js",
+      "sha256": "1eafc14127d389e9d3ce5355f29100ea1c79d9415e1a2749431e155372dc7fa9",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/nb.js",
+      "sha256": "dd65b7da2be26d59c7b41f5ef5bd1cc337ac04759f9bb6d3a35b1a44131b3690",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/nl.js",
+      "sha256": "a5c529dab4366514a1803fe50befe5890e8d482ab2cf8942d88712c757cb812f",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/pl.js",
+      "sha256": "b90e4d83150fd4f76c5dfcbfb06d04ff2f83cb2227b20a0fc7f872197d2d6f1e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/pt-BR.js",
+      "sha256": "d7a6e5986de8edc6f0e15080bdb730a24b2916ebb7c26b115abdd8af29081489",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/pt.js",
+      "sha256": "7e6c42c4bac54eb404f53e5278d1d235419d7c66048171a32b707020583ef11b",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/ro.js",
+      "sha256": "88762198d7b82e774f04919df86bd06febc94e494c3e51cc24342dff5ace97a6",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/ru.js",
+      "sha256": "8e1a1b2283111827a517983413b71c7c4fc5292b3ebf66f96ad9feb2c03a264e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/sk.js",
+      "sha256": "48d6df976c95ca29264c855220afc49240e8e00244a0ff05831068f6d20ef828",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ar.json",
+      "sha256": "c9debccc60434ab1744a4e4f03fa19db7cd11b408db5594998038ebc6d407aa1",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ca.json",
+      "sha256": "2bd49a72a7d3007b5e4ef6448b94351afa0b7670d4fbf0f85d03a662da70b052",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/cs.json",
+      "sha256": "9240f66eeffb62a1dace53b67bdc01b84a6a8654bb7cac529b2cdf0a44e7b715",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/da.json",
+      "sha256": "d837508929b6fdb8aba08483119f603811061ff110045c79af153e82da080f72",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/de.json",
+      "sha256": "5f07bff81583aed88b77b10b544bbb6df8d46c2294ea1021e9f8b0cc3afd098d",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/el.json",
+      "sha256": "71d3538e6c02bcb08a90e9a8ff6e153c29d3330f83f6c4125fd9bc076c9856b3",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/es-MX.json",
+      "sha256": "c8466a05c1fd2c1e7ba592fbb99a532872e27b27f054b0e9241574cfd7d2a804",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/es.json",
+      "sha256": "dcdcd774d5e13208e6af1226cbe766e242dded225c59c14a5ce568e95c7df60e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/fi.json",
+      "sha256": "9eb034e45ae57b6000bd2ee0db173ca5969ff59bacc17830a918014d053a9bfc",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/fil.json",
+      "sha256": "ab6d253f0a19565a826d84b827cf3830ff2d4e25e1a6574f90afae07d84ccf50",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/fr.json",
+      "sha256": "d305c577ae09b612bf86166b30c02ecb982622c140ba8033b987495b2d45fbe6",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/he.json",
+      "sha256": "0d3a2f62b66e3ae545973ec93406c4954da5db8ff0164bbd54beb38777d09044",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/hi.json",
+      "sha256": "14d084cf4c0c1058808bf5365574f341e1633b7468ee7043b1cb1b0bf19ee4f9",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/hr.json",
+      "sha256": "2538cc4bf4e9245fa73c27823c27188dac0e657b86a4f164b7c54390ab772578",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/hu.json",
+      "sha256": "dcd1c3f05f0fecea80fc548f7499a512fb20a341438202d3099df13f1b97e15f",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/id.json",
+      "sha256": "3d2c37b5b17dee578296c1f984327b6c98f13db25942b79a5be8d13e79d47b59",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/it.json",
+      "sha256": "b3e74e3fc2bc34dee9e72ef87dfbbd55d1706ad3088a400c1d743b68f5bf83fa",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ja.json",
+      "sha256": "af32cf9dbf68de23ff9961e1c45326102d46dc87eb0957abbd91000f1ecb3980",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/km.json",
+      "sha256": "8ed68f703b5e75c7dcaf06aaaabdba7e1fa861d6f44edd7d876715cb181db9f1",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ko.json",
+      "sha256": "aa8952e38c2032ef3532c5c5e98a8915475e529a4f229405d7bb72c22e6fcd0b",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/lo.json",
+      "sha256": "0d71e26e8c3d0cbc30be2883e4e34689eb85f546bed649a1973ed3384351d209",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ms.json",
+      "sha256": "9e6e830683907905506368583790139783c715adaf25eaf2f9acb07eaa981400",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/my.json",
+      "sha256": "b997922d15e294bdc52a79b198219af6ecde352b1b8375c8c1301667e11c81be",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/nb.json",
+      "sha256": "90b306313e17e546bae1093b31f768e19bc85b922c5af9362d8903690a12a8bf",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/nl.json",
+      "sha256": "f34c1d637d7232610f869e54ea3595179b9683d3de36a0b0ecfca068527a1152",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/pl.json",
+      "sha256": "221690ea25ca6e69ab9ec6db576d609d0bd659744c21d60e60acd6987792e911",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/pt-BR.json",
+      "sha256": "4c393f29bcac4b1b823294cbf2db387e909a107821ed799def850860182ba387",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/pt.json",
+      "sha256": "01c23e6fa988af5f590d7cbbbc6183452d99c8ae4796c1ee5760412f464dca7d",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ro.json",
+      "sha256": "cd2d3ce7d1bf96beef0a78dee1c668ee53b4a669d9933a1f2c2116c289853090",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/ru.json",
+      "sha256": "71ed301b3a2fbe3a530703eb9067aa6bcaa926aea39e7dfcc22237717d23b651",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/sk.json",
+      "sha256": "7c975a64a6d96dc07dd85b4de85270f8d158233dbe1442119c4d0270c1eb573e",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/sv.json",
+      "sha256": "d827fcc6851286da9ac1bbdc46b37592bc04285752a94e446e8a16f9ce58afc2",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/th.json",
+      "sha256": "2260a96cd5d20975c3e973edd7e407a6e31bda7c871291e2e996498b45946015",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/tr.json",
+      "sha256": "6ccb5d49ce80c5fc36790f771f0fd4444313a224f12c113c615c370fc68906bf",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/uk.json",
+      "sha256": "50f4b957af4924f1b32f345d7311178cc8256cadbece04bad76b93f9248ad16a",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/vi.json",
+      "sha256": "1443f0b3bde3ab4bffc6e9dc98299feb19e496572ac3db6523ec90217a23598a",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/zh-Hans.json",
+      "sha256": "53659175fdaf1abac6a46cbaa15ef3b2e20f3ea7541893bdc787f7fbf83e6df9",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/zh-Hant-HK.json",
+      "sha256": "8b08ea4fb1128907fb820be5a3c63f2c80102ff24bb0cdc11c684c25cf6d8a67",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/src/zh-Hant.json",
+      "sha256": "bf58439e984394f0d2f2c298a347d5f3e68db69b7dec6028adc9c71ac9ac416f",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/sv.js",
+      "sha256": "f93cc047e3957e8d7a42e0b129d8d0c0abb5c7b11db4fa13745b0682cb834584",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/th.js",
+      "sha256": "42cbe3acffcde16a3164720a5ba47f6aa848f5c6c9af57411519a7e79422830d",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/tr.js",
+      "sha256": "4183b575ba62f1d77a1488cb3f51cccc2515bdb10db6bc082f7b43b1b8bce5d2",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/uk.js",
+      "sha256": "0df4619c0a759e717d317ee418d447f990f5460d23576592124f0307c5b61a31",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/vi.js",
+      "sha256": "276ec5b72e4d4f6d67241586cc97e652179d127b53e57cb64ba35734a000d419",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/zh-Hans.js",
+      "sha256": "a326be550b0a7d513401be9dcdbfcdec16b222df32cddacdaf8e9e76e224108a",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/zh-Hant-HK.js",
+      "sha256": "50dbda12f98e4989b80d31f000ad21b1f7af64760b18815fb48939403fc6d2d6",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/zh-Hant-TW.js",
+      "sha256": "d5d64efdf74c30899f6090e2a2f722fed987c4e128a6ecd24c290dca9ae1e2dd",
+      "untracked": false
+    },
+    {
+      "path": "apps/web/locales/zh-Hant.js",
+      "sha256": "8fe8f62dbcff91558a5714d29ad004f8983348ac372d3ca04978231aff8df719",
+      "untracked": false
+    },
+    {
+      "path": "design-qa.md",
+      "sha256": "72c303740bb309252a69c2fa722e279c6b9b00e0822705e7ba7946cf3ac7b3ce",
+      "untracked": true
+    },
+    {
+      "path": "libs/core/src/index.ts",
+      "sha256": "b50bd537380deb2f22334caae49b8640f9612acf9ac7420d4d1d438a8725581d",
+      "untracked": false
+    },
+    {
+      "path": "libs/core/src/session.ts",
+      "sha256": "7a780c86066913c9cda4eed355564f05d82b50fb0dad5994de6c781b40615730",
+      "untracked": true
+    },
+    {
+      "path": "libs/core/src/verify-session.ts",
+      "sha256": "d35172dfba44bedec72f3b7e92b801ae4c0fa87e698115981226ccedad5aa92d",
+      "untracked": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "efe7b0a1c2efc1c3b3eaf51f6d7715c481f001e0aa8e01405c6366cca0a8c04f",
+      "untracked": false
+    },
+    {
+      "path": "tools/extension-preview.mjs",
+      "sha256": "f42f1f4ab6473ac931afc2e3b003b25d0313eb48232ff9e12ef6fcde1d13ad67",
+      "untracked": true
+    },
+    {
+      "path": "tools/fixtures/extension-preview.html",
+      "sha256": "3f4a631f9821d10452a4126c3306813b2e74ec5c3f3c6bb220ce0a4617a07e07",
+      "untracked": true
+    },
+    {
+      "path": "tools/fixtures/extension-preview.js",
+      "sha256": "fbc44164f39654a5aff311b28a818ba271fc5ae670a6ff26cd67412bd7ebcf53",
+      "untracked": true
+    },
+    {
+      "path": "tools/sync-extension.mjs",
+      "sha256": "339236eaf0bf7c82fb3e3e766032d2bfaa71a33f655988266159e8264484fc3f",
+      "untracked": false
+    }
+  ]
+}

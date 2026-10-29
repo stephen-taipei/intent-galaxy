@@ -9,7 +9,7 @@ import { execFileSync } from "node:child_process";
 import { ROOT, isMain, libSources, transpileTo, webLocaleSources, webSampleSources } from "./transpile.mjs";
 
 const SOURCES = ["apps/web/galaxy-overlay.js", ...webSampleSources(), ...webLocaleSources(), ...libSources("protocol", "core"), "libs/epistemic/src/prompt.ts"];
-const SHARED = ["content.js", "background.js", "panel.html", "panel.js"];
+const SHARED = ["content.js", "background.js", "panel.html", "panel.js", "decision-view.js", "decision-view.css"];
 
 export const packageVersion = () => JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
 

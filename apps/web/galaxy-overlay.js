@@ -1,7 +1,7 @@
 // <intent-galaxy-overlay>：純正星系版 UI 的 Shadow DOM Web Component。
 // 同一份元件用於 CLI 網頁（apps/web/index.html）與瀏覽器擴充功能（內嵌於 AI 網頁輸入框上方）。
 // 事件：intent-lock {ast, baseKey, overrides, galaxyId}、intent-close、intent-synth-request {conflicts}。
-import { renderLockedAst, renderPlainIntent, renderSacrifice, repairAnalysis, solveGalaxy, stripDecisionPrefix } from "../../libs/core/src/index.ts";
+import { DecisionSession, renderLockedAst, renderPlainIntent, renderSacrifice, stripDecisionPrefix } from "../../libs/core/src/index.ts";
 import { NODE_IDS, quadrantOf } from "../../libs/protocol/src/index.ts";
 import { t, ready, locale, preference, LOCALES, chooseLocale, languageName, onLocaleChange } from "./i18n.js";
 
@@ -13,6 +13,10 @@ const COORDS = [
   { x: 84, y: 32 }, { x: 87, y: 50 }, { x: 84, y: 68 },
   { x: 65, y: 83 }, { x: 50, y: 88 }, { x: 35, y: 83 },
   { x: 16, y: 68 }, { x: 13, y: 50 }, { x: 16, y: 32 },
+];
+const COMPACT_COORDS = [
+  { x: 50, y: 12 }, { x: 80, y: 28 }, { x: 80, y: 72 },
+  { x: 50, y: 88 }, { x: 20, y: 72 }, { x: 20, y: 28 },
 ];
 const QUADRANT_TAGS = () => ({
   Q1: t("ov.q1"), Q2: t("ov.q2"), Q3: t("ov.q3"), Q4: t("ov.q4"),
@@ -93,6 +97,23 @@ svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; 
 .node[data-src="user"] { outline:2px solid #fff; outline-offset:2px; }
 .node[data-src="derived"] { border-style:dashed; }
 .node.conflict { border-color:var(--q4) !important; background:rgba(244,63,94,.32) !important; }
+:host([readonly]) #bar .keys { display:none; }
+:host([v2]) #bar, :host([v2]) #cards { display:none; }
+:host([compact]) { width:min(100%,650px); min-width:0; height:340px; min-height:340px; max-height:340px; margin-inline:auto; }
+:host([compact]) .wrap { display:block; height:100%; min-height:0; }
+:host([compact]) #stage { width:100%; height:100%; min-height:0; overflow:hidden; border:1px solid var(--border); border-radius:14px; }
+:host([compact]) #canvas { min-width:0; min-height:0; }
+:host([compact]) #tags, :host([compact]) #cards, :host([compact]) #bar, :host([compact]) aside { display:none; }
+:host([compact]) #core { width:min(240px,60%); padding:8px 11px; }
+:host([compact]) #core .sub { display:none; }
+:host([compact]) #core .goal { display:-webkit-box; overflow:hidden; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+:host([compact]) #core .metric { display:-webkit-box; overflow:hidden; -webkit-line-clamp:1; -webkit-box-orient:vertical; }
+:host([compact]) .node { width:clamp(128px,32%,178px); min-width:0; max-width:178px; padding:7px 9px; font-size:12px; }
+:host([compact]) .node .lbl { display:-webkit-box; overflow:hidden; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+@media (max-width:399px) {
+  :host([compact]) { height:380px; min-height:380px; max-height:380px; }
+  :host([compact]) .node { width:36%; max-width:146px; }
+}
 #cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:8px 10px; min-width:0; background:var(--panel); border-top:1px solid var(--border); }
 .card { background:#0b101b; border:1.5px solid var(--border); border-radius:9px; padding:7px 10px; cursor:pointer; font:inherit; color:inherit; text-align:left; min-width:0; overflow:hidden; }
 .card.active { border-color:var(--brand); background:rgba(0,113,254,.1); box-shadow:0 0 0 1px rgba(0,113,254,.35); }
@@ -154,14 +175,33 @@ aside .findings { font-size:10.5px; color:var(--gold); max-height:80px; overflow
 `;
 
 export class IntentGalaxyOverlay extends HTMLElement {
-  #analysis = null; #draft = null; #galaxyId = 0; #findings = [];
-  #baseKey = null; #overrides = new Map(); #seq = 0; #focus = 0;
-  #undo = []; #redo = []; #hint = ""; #message = ""; #solution = null; #showRaw = false;
+  #session = new DecisionSession(); #draft = null; #findings = [];
+  #focus = 0; #hint = ""; #message = ""; #solution = null; #showRaw = false; #settingGalaxy = false; #pointerNodeDown = false;
+  #visibleNodeIds = NODE_IDS;
   // 嵌入模式（擴充功能）的版面：方案側欄、方案卡列。summaryPref 為 null 時「第一次選策略卡自動打開一次」；使用者切換過就照他的。
   #summaryOpen = false; #summaryShown = false; #summaryPref = null; #cardsOpen = true;
+  goal = "";
+
+  static get observedAttributes() { return ["readonly", "compact"]; }
+
+  get session() { return this.#session; }
+  get #analysis() { return this.#draft ? null : this.#session.analysis; }
+  get #baseKey() { return this.#session.baseKey; }
+  get #galaxyId() { return this.#session.galaxyId; }
+  get readOnly() { return this.hasAttribute("readonly"); }
+  set readOnly(value) { this.toggleAttribute("readonly", !!value); }
+  get compact() { return this.hasAttribute("compact"); }
+  set compact(value) { this.toggleAttribute("compact", !!value); }
+  get #nonEditable() { return this.readOnly || this.compact; }
 
   constructor() {
     super();
+    this.#session.subscribe((event) => {
+      const { picks, goal, galaxyId } = this.#session;
+      if (event.type === "load") { this.#draft = null; this.goal = goal; }
+      this.dispatchEvent(new CustomEvent("intent-change", { bubbles: true, composed: true, detail: { type: event.type, picks, goal, galaxyId } }));
+      if (!this.#settingGalaxy) this.#render();
+    });
     this.attachShadow({ mode: "open" }).innerHTML = `<style>${STYLE}</style><div class="wrap">
       <main id="stage"><div id="canvas"><svg viewBox="0 0 1000 600" preserveAspectRatio="none"></svg><div id="tags"></div>
         <div id="core"><div class="sub"></div><div class="goal"></div><div class="metric"></div></div><div id="nodes"></div></div></main>
@@ -172,10 +212,11 @@ export class IntentGalaxyOverlay extends HTMLElement {
       <aside><div class="head"><h2></h2><button type="button" id="raw-toggle"></button></div><div class="findings"></div><div id="summary"></div><pre hidden></pre></aside></div><div id="tip" role="tooltip"></div>`;
     const root = this.shadowRoot;
     // 每次 render 都重建節點按鈕；點擊後把焦點拉回 host，鍵盤流才不會掉到 document.body。
-    root.addEventListener("click", () => this.focus({ preventScroll: true }));
+    root.addEventListener("click", () => { this.#pointerNodeDown = false; this.focus({ preventScroll: true }); });
+    root.addEventListener("pointercancel", () => { this.#pointerNodeDown = false; });
     root.getElementById("nodes").addEventListener("click", (e) => this.#onNodeClick(e, "include"));
-    root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#onNodeClick(e, "exclude"); });
-    root.getElementById("cards").addEventListener("click", (e) => { const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); }); // 點卡片＝還原成卡片原始選擇；Shift 保留手動調整
+    root.getElementById("nodes").addEventListener("contextmenu", (e) => { e.preventDefault(); this.#pointerNodeDown = false; this.#onNodeClick(e, "exclude"); });
+    root.getElementById("cards").addEventListener("click", (e) => { if (this.#nonEditable) return; const k = e.target.closest("[data-arch]")?.dataset.arch; if (k) this.selectArchetype(k, e.shiftKey); }); // 點卡片＝還原成卡片原始選擇；Shift 保留手動調整
     root.getElementById("lock").addEventListener("click", () => this.lock());
     root.getElementById("reset").addEventListener("click", () => this.reset());
     root.getElementById("raw-toggle").addEventListener("click", () => { this.#showRaw = !this.#showRaw; this.#render(); });
@@ -183,8 +224,14 @@ export class IntentGalaxyOverlay extends HTMLElement {
     const showTip = (e) => { const el = e.target.closest?.("[data-tip]"); if (el) this.#showTip(el); else this.#hideTip(); };
     root.addEventListener("pointerover", showTip);
     root.addEventListener("focusin", showTip);
+    root.addEventListener("focusin", (e) => {
+      const id = e.target.closest?.("[data-node]")?.dataset.node;
+      if (!id || NODE_IDS.indexOf(id) === this.#focus) return;
+      // Native Tab traversal must not reorder/recreate its next focus target.
+      this.#updateFocus(id, { focusHost: false, render: false });
+    });
     root.addEventListener("pointerleave", () => this.#hideTip(), true);
-    root.addEventListener("pointerdown", () => this.#hideTip());
+    root.addEventListener("pointerdown", (e) => { if (e.target.closest?.("[data-node]")) this.#pointerNodeDown = true; this.#hideTip(); });
     this.addEventListener("keydown", (e) => this.#onKey(e));
     root.getElementById("lang").addEventListener("change", (e) => chooseLocale(e.target.value));
     ready.then(() => this.#render()); // 語系載入後重畫一次（載入前先用英文）
@@ -215,23 +262,27 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
   connectedCallback() { if (!this.hasAttribute("tabindex")) this.tabIndex = 0; this.#render(); }
 
+  attributeChangedCallback(name, oldValue, newValue) { if (oldValue !== newValue) this.#render(); }
+
   /** 完整星系（IntentAnalysisResponse）。會先經 V1–V18 修復管線。 */
   get analysis() { return this.#analysis; }
   set analysis(value) { this.setGalaxy(value); }
 
   setGalaxy(value, { galaxyId = 0, goal = "" } = {}) {
-    const repaired = repairAnalysis(value);
+    this.#settingGalaxy = true;
+    let repaired;
+    try { repaired = this.#session.load(value, { galaxyId, goal }); }
+    finally { this.#settingGalaxy = false; }
     this.#findings = repaired.findings;
     if (!repaired.ok) { this.#message = t("ov.cannotCompile", { detail: repaired.findings.at(-1)?.msg ?? "" }); this.#render(); return false; }
-    this.#analysis = repaired.analysis; this.#draft = null; this.#galaxyId = galaxyId; this.goal = goal;
-    this.#baseKey = null; this.#overrides.clear(); this.#undo = []; this.#redo = []; this.#message = ""; this.#summaryOpen = this.#summaryPref === true; this.#summaryShown = false;
+    this.#draft = null; this.goal = goal; this.#message = ""; this.#summaryOpen = this.#summaryPref === true; this.#summaryShown = false;
     this.#render();
     return true;
   }
 
   /** 進入串流等待狀態：中心顯示命題，四周 12 個 Ghost Slots。 */
   beginStream(goal) {
-    this.#analysis = null; this.#findings = []; this.goal = goal;
+    this.#findings = []; this.goal = goal;
     this.#draft = { core: { decision: goal, metric: "" }, nodes: {}, archetypes: {} };
     this.#message = t("ov.expanding"); this.#render();
   }
@@ -255,9 +306,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
   /** 選策略卡＝還原成這張卡的原始選擇（清掉手動調整）；keepOverrides（Shift）才保留手動調整。 */
   selectArchetype(key, keepOverrides = false) {
     if (!this.#analysis?.archetypes[key]) return;
-    this.#snapshot();
-    this.#baseKey = key;
-    if (!keepOverrides) this.#overrides.clear();
+    this.#session.selectArchetype(key, keepOverrides);
     if (!this.#summaryShown && this.#summaryPref === null) { this.#summaryShown = true; this.#summaryOpen = true; this.#emitLayout(); }
     this.#render();
   }
@@ -265,18 +314,15 @@ export class IntentGalaxyOverlay extends HTMLElement {
   /** 重開面板時還原上次填回的選擇（方案卡＋手動調整）。 */
   restorePicks({ baseKey = null, overrides = {} } = {}) {
     if (!this.#analysis) return;
-    this.#baseKey = baseKey && this.#analysis.archetypes[baseKey] ? baseKey : null;
-    this.#overrides = new Map(Object.entries(overrides ?? {}).filter(([id, s]) => NODE_IDS.includes(id) && ["include", "exclude", "neutral"].includes(s)).map(([id, s]) => [id, { stance: s, seq: ++this.#seq }]));
-    this.#undo = []; this.#redo = [];
+    this.#session.restorePicks({ baseKey, overrides });
     if (this.#baseKey && this.#summaryPref === null) { this.#summaryShown = true; this.#summaryOpen = true; this.#emitLayout(); }
     this.#render();
   }
 
   /** 重設：清掉策略卡與所有手動調整，回到剛發散的星系（u 可復原）。 */
   reset() {
-    if (!this.#analysis || (!this.#baseKey && !this.#overrides.size)) return;
-    this.#snapshot();
-    this.#baseKey = null; this.#overrides.clear();
+    if (!this.#analysis || !this.#session.hasPicks) return;
+    this.#session.reset();
     this.#message = t("ov.resetDone");
     this.#render();
   }
@@ -299,78 +345,75 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
   setStance(id, target) {
     if (!this.#analysis) return;
-    this.#snapshot();
-    // 再按一次同一立場即切回忽略；結果等於策略卡預設時移除覆寫，
-    // 但預設已被互斥推導讓位（derived）時必須保留覆寫，用戶的明確決定才會生效。
-    const view = this.#solution?.nodes[id], shown = view?.stance;
-    const next = shown === target ? "neutral" : target;
-    const arch = this.#baseKey ? this.#analysis.archetypes[this.#baseKey] : null;
-    const baseStance = arch?.include.includes(id) ? "include" : arch?.exclude.includes(id) ? "exclude" : "neutral";
-    if (next === baseStance && view?.src !== "derived") this.#overrides.delete(id);
-    else this.#overrides.set(id, { stance: next, seq: ++this.#seq });
+    this.#session.setStance(id, target);
     this.#render();
   }
 
   /** r：衝突核心中依序撤銷較舊的手動決定，直到 SAT（保留較新決定）。 */
   resolveConflicts() {
     if (!this.#solution?.conflicts.length) return;
-    this.#snapshot();
-    let guard = 12;
-    while (this.#solve().status === "L3_UNSAT" && guard--) {
-      const core = this.#solve().conflicts;
-      const oldest = core.filter((id) => this.#overrides.has(id)).sort((a, b) => this.#overrides.get(a).seq - this.#overrides.get(b).seq)[0];
-      if (!oldest) break;
-      this.#overrides.delete(oldest);
-    }
+    this.#session.resolveConflicts();
     this.#message = t("ov.resolved"); this.#render();
   }
 
   lock() {
+    if (this.#nonEditable) return;
     const sol = this.#solution;
     if (!sol || !this.#analysis) return;
     if (sol.status !== "SAT") { this.#message = t("ov.resolveFirst"); this.#render(); return; }
     const ast = renderLockedAst(this.#analysis, sol, this.#baseKey, astLabels());
     const plain = renderPlainIntent(this.#analysis, sol, this.#baseKey, astLabels()); // 白話版：擴充功能填回聊天網站用
-    const overrides = Object.fromEntries([...this.#overrides].map(([id, o]) => [id, o.stance]));
+    const overrides = this.#session.picks.overrides;
     this.dispatchEvent(new CustomEvent("intent-lock", { bubbles: true, composed: true, detail: { ast, plain, baseKey: this.#baseKey, overrides, galaxyId: this.#galaxyId } }));
   }
 
   #solve() {
-    const overrides = new Map([...this.#overrides].map(([id, o]) => [id, o.stance]));
-    return solveGalaxy(this.#analysis, this.#baseKey, overrides);
+    return this.#analysis ? this.#session.solution : null;
   }
 
-  #snapshot() {
-    this.#undo.push({ baseKey: this.#baseKey, overrides: new Map(this.#overrides) });
-    if (this.#undo.length > 100) this.#undo.shift();
-    this.#redo = [];
-  }
+  undo() { const restored = this.#session.undo(); if (restored) this.#render(); return restored; }
+  redo() { const restored = this.#session.redo(); if (restored) this.#render(); return restored; }
 
-  #restore(from, to) {
-    const snap = from.pop();
-    if (!snap) return;
-    to.push({ baseKey: this.#baseKey, overrides: new Map(this.#overrides) });
-    this.#baseKey = snap.baseKey; this.#overrides = snap.overrides; this.#render();
+  focusNode(id) { return this.#updateFocus(id, { focusHost: true, render: true, emit: true }); }
+
+  #updateFocus(id, { focusHost = true, render = true, emit = true } = {}) {
+    const index = NODE_IDS.indexOf(id);
+    if (index < 0) return false;
+    const changed = this.#focus !== index;
+    this.#focus = index;
+    if (render && changed) this.#render();
+    else if (!render && changed) {
+      this.shadowRoot?.querySelectorAll(".node.focused").forEach((el) => el.classList.remove("focused"));
+      this.shadowRoot?.querySelector(`[data-node="${id}"]`)?.classList.add("focused");
+    }
+    if (focusHost) this.focus({ preventScroll: true });
+    if (emit) this.dispatchEvent(new CustomEvent("intent-node-focus", { bubbles: true, composed: true, detail: { id } }));
+    return true;
   }
 
   #onNodeClick(e, stance) {
     const id = e.target.closest("[data-node]")?.dataset.node;
     if (!id || !this.#analysis) return;
-    this.#focus = NODE_IDS.indexOf(id);
+    this.focusNode(id);
+    if (this.#nonEditable) return;
     this.setStance(id, stance);
   }
 
   #move(dir) {
-    const from = COORDS[this.#focus];
+    const ids = this.compact ? this.#visibleNodeIds : NODE_IDS;
+    const focusIndex = ids.indexOf(NODE_IDS[this.#focus]);
+    if (focusIndex < 0) return;
+    const coords = ids.map((id, i) => this.compact ? COMPACT_COORDS[i] : COORDS[NODE_IDS.indexOf(id)]);
+    const from = coords[focusIndex];
     let best = -1, bestCost = Infinity;
-    COORDS.forEach((p, i) => {
+    coords.forEach((p, i) => {
       const dx = p.x - from.x, dy = p.y - from.y;
       const [along, across] = dir === "h" ? [-dx, dy] : dir === "l" ? [dx, dy] : dir === "k" ? [-dy, dx] : [dy, dx];
-      if (i === this.#focus || along <= 0) return; // 半平面過濾
+      if (i === focusIndex || along <= 0) return; // 半平面過濾
       const cost = along + 2 * Math.abs(across);
       if (cost < bestCost) { bestCost = cost; best = i; }
     });
-    if (best >= 0) { this.#focus = best; this.#render(); }
+    if (best >= 0) this.focusNode(ids[best]);
   }
 
   #onKey(e) {
@@ -378,23 +421,39 @@ export class IntentGalaxyOverlay extends HTMLElement {
     if (t?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t?.tagName)) return;
     if (e.metaKey || e.altKey) return;
     const k = normalizeKey(e);
+    // V2 is one control inside a larger panel. Tab must be able to leave it.
+    if (k === "Tab" && this.hasAttribute("v2")) { this.#hint = ""; return; }
     const handled = () => { e.preventDefault(); e.stopPropagation(); };
     if (k === "Escape") { handled(); this.dispatchEvent(new CustomEvent("intent-close", { bubbles: true, composed: true })); return; }
-    if (e.ctrlKey) { if (k === "r") { handled(); this.#restore(this.#redo, this.#undo); } return; }
+    if (this.#nonEditable) {
+      if (e.ctrlKey) return;
+      if (this.#hint) {
+        if (this.#hint === "g" && HINT_QUADRANT[k]) { handled(); this.#hint = HINT_QUADRANT[k]; return; }
+        if (/^Q[1-4]$/.test(this.#hint) && /^[1-3]$/.test(k)) {
+          handled(); this.focusNode(NODE_IDS[(Number(this.#hint[1]) - 1) * 3 + Number(k) - 1]);
+        } else handled();
+        this.#hint = ""; this.#render(); return;
+      }
+      if ("hjkl".includes(k) && k.length === 1) { handled(); this.#move(k); }
+      else if (k === "c") { handled(); const c = this.#solution?.conflicts[0]; if (c) this.focusNode(c); }
+      else if (k === "g") { handled(); this.#hint = "g"; }
+      return; // Tab stays native; all other editing, synth, undo, and lock keys are inert.
+    }
+    if (e.ctrlKey) { if (k === "r") { handled(); this.redo(); } return; }
     if (this.#hint) {
       handled();
       if (this.#hint === "g" && HINT_QUADRANT[k]) { this.#hint = HINT_QUADRANT[k]; return; }
-      if (/^Q[1-4]$/.test(this.#hint) && /^[1-3]$/.test(k)) { this.#focus = (Number(this.#hint[1]) - 1) * 3 + Number(k) - 1; }
+      if (/^Q[1-4]$/.test(this.#hint) && /^[1-3]$/.test(k)) this.focusNode(NODE_IDS[(Number(this.#hint[1]) - 1) * 3 + Number(k) - 1]);
       this.#hint = ""; this.#render(); return;
     }
     const focused = NODE_IDS[this.#focus];
     if (/^[1-3]$/.test(k)) { handled(); this.selectArchetype(ARCH[Number(k) - 1][0], e.shiftKey); }
     else if ("hjkl".includes(k) && k.length === 1) { handled(); this.#move(k); }
-    else if (k === "Tab") { handled(); this.#focus = (this.#focus + (e.shiftKey ? 11 : 1)) % 12; this.#render(); }
+    else if (k === "Tab") { handled(); this.focusNode(NODE_IDS[(this.#focus + (e.shiftKey ? 11 : 1)) % 12]); }
     else if (k === " " || k === "i") { handled(); this.setStance(focused, "include"); }
     else if (k === "x") { handled(); this.setStance(focused, "exclude"); }
     else if (k === "0" || k === "n") { handled(); this.setStance(focused, "neutral"); }
-    else if (k === "c") { handled(); const c = this.#solution?.conflicts[0]; if (c) { this.#focus = NODE_IDS.indexOf(c); this.#render(); } }
+    else if (k === "c") { handled(); const c = this.#solution?.conflicts[0]; if (c) this.focusNode(c); }
     else if (k === "r") { handled(); this.resolveConflicts(); }
     else if (k === "s") {
       handled();
@@ -403,9 +462,26 @@ export class IntentGalaxyOverlay extends HTMLElement {
       this.#message = conflicts.length ? t("ov.trizPending") : t("ov.noConflict");
       this.#render();
     }
-    else if (k === "u") { handled(); this.#restore(this.#undo, this.#redo); }
+    else if (k === "u") { handled(); this.undo(); }
     else if (k === "g") { handled(); this.#hint = "g"; }
     else if (k === "Enter") { handled(); this.lock(); }
+  }
+
+  #chooseCompactNodes(nodes, analysis, solution) {
+    const available = NODE_IDS.filter((id) => nodes[id]);
+    const picked = [];
+    const add = (id) => { if (available.includes(id) && !picked.includes(id) && picked.length < 6) picked.push(id); };
+    const focused = NODE_IDS[this.#focus];
+    add(focused);
+    const connected = new Set();
+    for (const edge of analysis?.edges ?? []) {
+      if (edge.from === focused) connected.add(edge.to);
+      else if (edge.to === focused) connected.add(edge.from);
+    }
+    for (const id of NODE_IDS) if (connected.has(id)) add(id);
+    for (const id of available) if (solution && solution.nodes[id]?.stance !== "neutral") add(id);
+    for (const id of available) add(id);
+    return picked;
   }
 
   #render() {
@@ -420,6 +496,8 @@ export class IntentGalaxyOverlay extends HTMLElement {
     root.getElementById("lang").value = preference;
     const sol = this.#solution = a ? this.#solve() : null;
     const conflicts = new Set(sol?.conflicts ?? []);
+    const nodeIds = this.compact ? this.#chooseCompactNodes(nodes, a, sol) : NODE_IDS;
+    this.#visibleNodeIds = nodeIds;
 
     root.getElementById("tags").innerHTML = Object.entries(QUADRANT_TAGS()).map(([q, label]) =>
       `<div class="q-tag ${q}" title="${esc(quadrants[q]?.scar)}">${label}${quadrants[q]?.sacred ? ` <small>· ${esc(quadrants[q].sacred)}</small>` : ""}</div>`).join("");
@@ -430,8 +508,8 @@ export class IntentGalaxyOverlay extends HTMLElement {
 
     // ✦ 盲區最多標 3 顆，才看得出重點：優先 Q3 越界者（跨界的點子最常是原話沒想到的），再來 Q4、Q1、Q2。
     const blindShown = new Set(["Q3", "Q4", "Q1", "Q2"].flatMap((q) => NODE_IDS.filter((id) => quadrantOf(id) === q && nodes[id]?.blind)).slice(0, 3));
-    root.getElementById("nodes").innerHTML = NODE_IDS.map((id, i) => {
-      const n = nodes[id], pos = COORDS[i], q = quadrantOf(id);
+    root.getElementById("nodes").innerHTML = nodeIds.map((id, position) => {
+      const i = NODE_IDS.indexOf(id), n = nodes[id], pos = this.compact ? COMPACT_COORDS[position] : COORDS[i], q = quadrantOf(id);
       const style = `left:${pos.x}%;top:${pos.y}%`;
       if (!n) return `<button type="button" class="node ghost" style="${style}" tabindex="-1"><span class="nid">${id}</span>…</button>`;
       const view = sol?.nodes[id] ?? { stance: "neutral", src: "none" };
@@ -460,15 +538,34 @@ export class IntentGalaxyOverlay extends HTMLElement {
       return Number.isFinite(k) ? { x: from.x + dx * k, y: from.y + dy * k } : from;
     };
     const center = coreBox ? { x: coreBox.x + coreBox.w / 2, y: coreBox.y + coreBox.h / 2 } : { x: 500, y: 300 };
-    root.querySelector("svg").innerHTML = !sol || !this.#baseKey ? "" : NODE_IDS.map((id) => {
+    const reasons = sol ? this.#reasons(sol).filter(({ from, to }) => nodeIds.includes(from) && nodeIds.includes(to)) : [];
+    const edgeKey = (type, from, to) => type === "excludes" ? `${type}:${[from, to].sort().join(":")}` : `${type}:${from}:${to}`;
+    const activeEdges = new Set(reasons.map((reason) => edgeKey(reason.kind, reason.from, reason.to)));
+    const compactEdges = this.compact ? (a?.edges ?? []).filter((edge) => nodeIds.includes(edge.from) && nodeIds.includes(edge.to)
+      && !activeEdges.has(edgeKey(edge.type, edge.from, edge.to))) : [];
+    const arrowDefs = this.compact ? `<defs>
+      <marker id="compact-requires-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3.5 L0,7 Z" fill="#f59e0b"/></marker>
+      <marker id="compact-before-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L7,3.5 L0,7 Z" fill="#38bdf8"/></marker>
+    </defs>` : "";
+    const includeLines = !sol || !this.#baseKey ? "" : nodeIds.map((id) => {
       if (sol.nodes[id].stance !== "include") return "";
       const c = centerOf(id), p = edgeOf(boxes[id], c, center), q = edgeOf(coreBox, center, c);
       return `<path d="M ${p.x.toFixed(1)} ${p.y.toFixed(1)} Q ${((p.x + q.x) / 2).toFixed(1)} ${p.y.toFixed(1)} ${q.x.toFixed(1)} ${q.y.toFixed(1)}" stroke="#10b981" stroke-width="2.2" fill="none" stroke-dasharray="${sol.nodes[id].src === "derived" ? "5,5" : "none"}" opacity=".78"/>`;
-    }).join("") + this.#reasons(sol).map(({ from, to, kind }) => {
+    }).join("");
+    const reasonLines = reasons.map(({ from, to, kind }) => {
       const a1 = centerOf(from), b1 = centerOf(to), p = edgeOf(boxes[from], a1, b1), q = edgeOf(boxes[to], b1, a1);
       const color = kind === "excludes" ? "#f43f5e" : "#f59e0b", dash = kind === "excludes" ? "7,5" : "2,4";
-      return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="${color}" stroke-width="1.8" stroke-dasharray="${dash}" opacity=".85"/>`;
+      const marker = this.compact && kind === "requires" ? ` marker-end="url(#compact-requires-arrow)"` : "";
+      return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="${color}" stroke-width="1.8" stroke-dasharray="${dash}" opacity=".85"${marker}/>`;
     }).join("");
+    const structureLines = compactEdges.map((edge) => {
+      const from = centerOf(edge.from), to = centerOf(edge.to), p = edgeOf(boxes[edge.from], from, to), q = edgeOf(boxes[edge.to], to, from);
+      const color = edge.type === "excludes" ? "#f43f5e" : edge.type === "before" ? "#38bdf8" : "#f59e0b";
+      const dash = edge.type === "excludes" ? "7,5" : edge.type === "requires" ? "2,4" : "none";
+      const marker = edge.type === "requires" ? ` marker-end="url(#compact-requires-arrow)"` : edge.type === "before" ? ` marker-end="url(#compact-before-arrow)"` : "";
+      return `<line x1="${p.x.toFixed(1)}" y1="${p.y.toFixed(1)}" x2="${q.x.toFixed(1)}" y2="${q.y.toFixed(1)}" stroke="${color}" stroke-width="1.4" stroke-dasharray="${dash}" opacity=".5"${marker}/>`;
+    }).join("");
+    root.querySelector("svg").innerHTML = arrowDefs + includeLines + reasonLines + structureLines;
 
     const rec = a?.recommend?.key;
     root.getElementById("cards").innerHTML = ARCH.map(([key, num]) => {
@@ -484,7 +581,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
         + `<br>${t("ov.cost", { cost: esc(renderSacrifice(c.sacrifice)) })}`
         + (fatalKill ? `<br><span class=k>${t("ov.fatalTip", { kill: esc(fatalKill) })}</span>` : "")
         + `<br><span class=dim>${t("ov.cardHow", { num })}</span>`;
-      return `<button type="button" class="${cls}" data-arch="${key}" data-tip="${esc(tip)}">
+      return `<button type="button" class="${cls}" data-arch="${key}" data-tip="${esc(tip)}" ${this.#nonEditable ? "disabled" : ""}>
         <div class="head"><span class="title">[${num}] ${esc(clip(c.title, 16))}</span><span class="badges">${isRec ? `<span class="rec-badge" title="${esc(t("ov.recBadgeTip"))}">${t("ov.recBadge")}</span>` : ""}${DIST_BADGE[dist] ? `<span class="badge">${DIST_BADGE[dist]}</span>` : ""}</span></div>
         ${isRec && a.recommend.why ? `<div class="why">★ ${esc(clip(a.recommend.why, 30))}</div>` : ""}
         <div class="row">${t("ov.cost", { cost: esc(clip(renderSacrifice(c.sacrifice), 40)) })}</div>
@@ -500,9 +597,10 @@ export class IntentGalaxyOverlay extends HTMLElement {
       : t("ov.tipConflict", { status: esc(sol.status) });
     const resetBtn = root.getElementById("reset");
     resetBtn.textContent = t("ov.reset");
-    resetBtn.disabled = !a || (!this.#baseKey && !this.#overrides.size);
+    resetBtn.disabled = !a || !this.#session.hasPicks || this.#nonEditable;
     resetBtn.dataset.tip = t("ov.resetTip");
     const lockBtn = root.getElementById("lock"), embedded = this.hasAttribute("embedded");
+    lockBtn.disabled = this.#nonEditable;
     // 嵌入模式沒有固定的右側欄：方案側欄由外層（面板標題列的按鈕）開關，回填前可以核對「最後選了什麼」。
     const wrap = root.querySelector(".wrap");
     wrap.classList.toggle("summary-open", embedded && this.#summaryOpen);
@@ -534,6 +632,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
   #nodeTip(id, n, q, view) {
     const state = view.stance === "include" ? (q === "Q4" ? t("ov.stGuard") : t("ov.stIncluded")) : view.stance === "exclude" ? (q === "Q4" ? t("ov.stRisk") : t("ov.stExcluded")) : t("ov.stNone");
     const why = view.src === "derived" ? (view.stance === "include" ? t("ov.whyPulled") : t("ov.whyGaveWay")) : view.src === "user" ? t("ov.whyUser") : view.src === "default" ? t("ov.whyCard") : "";
+    const how = this.#nonEditable ? t("v2.viewHint") : t("ov.nodeHow");
     return `<b>${esc(id)} ${esc(n.label)}</b><br>${esc(n.claim)}`
       + (n.kill ? `<br><span class=k>${t("ov.killCond", { kill: esc(n.kill) })}</span>` : "")
       + (n.blind ? `<br><span class=g>${t("ov.blindTip", { blind: esc(n.blind) })}</span>` : "")
@@ -542,7 +641,7 @@ export class IntentGalaxyOverlay extends HTMLElement {
         const text = t(r.kind === "excludes" ? "ov.relConflict" : r.from === id ? "ov.relNeeds" : "ov.relNeededBy", { id: esc(other), label });
         return `<br><span class=k>${text}${r.why ? `：${esc(r.why)}` : ""}</span>`;
       }).join("") : "")
-      + `<br><span class=dim>${t("ov.nodeState", { state: state + why })}<br>${t("ov.nodeHow")}</span>`;
+      + `<br><span class=dim>${t("ov.nodeState", { state: state + why })}<br>${esc(how)}</span>`;
   }
 
   #tipTimer = 0;

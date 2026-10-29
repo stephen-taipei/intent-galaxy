@@ -2,6 +2,7 @@
 // 生成來源：本機 CLI 在線就交給它（不出現在對話裡）；否則請當前網頁的 AI 在對話中產生星系 JSON。
 // 重新打開時：這個對話已生成（或正在生成）的星系優先顯示，不必重問。
 import "./galaxy/apps/web/galaxy-overlay.js";
+import { DecisionView } from "./decision-view.js";
 import { SPAWNER_SYSTEM_PROMPT, buildSpawnerUserMessage } from "./galaxy/libs/epistemic/src/prompt.js";
 import { stripDecisionPrefix } from "./galaxy/libs/core/src/index.js";
 import { t, ready, isRtl, onLocaleChange, loadSample } from "./galaxy/apps/web/i18n.js";
@@ -38,6 +39,14 @@ const CLI_GOAL_MAX = 4000; // 本機 CLI 接受的問題長度上限（apps/cli/
 const dropped = new Set(); // 改用本機生成後不再理會的網頁 run（之後又明確回到它時移除）
 /** 面板改為顯示某個網頁 run：記下識別碼，它的通知也重新接收。 */
 const bindNonce = (n) => { nonce = n ?? ""; dropped.delete(nonce); };
+const loading = document.getElementById("waiting-view");
+const decision = new DecisionView(galaxy, {
+  onDraft: (draft) => { if (shown === "galaxy" && nonce && decision.source === "chat" && !demoShown && !cliBusy) toParent({ type: "intent-draft", nonce, ...draft }); },
+  onFill: commitDecision,
+});
+function showLoading(message = t("pn.waitingForAi")) {
+  decision.hide(); loading.hidden = false; loading.querySelector("p").textContent = message;
+}
 
 async function cliAlive() {
   try { return (await fetch(`${CLI}/api/galaxy`, { signal: AbortSignal.timeout(800) })).ok; } catch { return false; }
@@ -61,10 +70,10 @@ function showCard(title, body, actions = []) {
   if (shown !== "waiting" && shown !== "galaxy") shown = "card";
   row.querySelector("button")?.focus();
 }
-function hideCard() { card.hidden = true; galaxy.focus(); }
+function hideCard() { card.hidden = true; }
 
 let demoShown = null; // 目前顯示的示範題目：切換語系時換成該語系的版本
-const showDemo = async (d) => { const g = await loadSample(d.base); setStrip(""); if (showGalaxy(g, t(d.goal))) demoShown = d; };
+const showDemo = async (d) => { const g = await loadSample(d.base); setStrip(""); if (showGalaxy(g, t(d.goal), { source: "demo" })) demoShown = d; };
 const demoActions = () => DEMOS.map((d) => [t(d.label), () => showDemo(d)]);
 onLocaleChange(() => { if (demoShown && shown === "galaxy" && card.hidden) showDemo(demoShown); });
 const fmt = (sec) => sec >= 60 ? t("pn.minSec", { m: Math.floor(sec / 60), s: sec % 60 }) : t("pn.sec", { s: sec });
@@ -82,9 +91,9 @@ function setStrip(text, buttons = [], note = "") {
   }));
   if (note) strip.append(Object.assign(document.createElement("small"), { textContent: note }));
 }
-const resetJob = () => { toParent({ type: "intent-reset", nonce }); nonce = ""; waiting = false; shown = "idle"; setStrip(""); };
+const resetJob = () => { toParent({ type: "intent-reset", nonce }); nonce = ""; waiting = false; shown = "idle"; setStrip(""); showLoading(t("pn.gaveUpMsg")); };
 
-function showGalaxy(analysis, g, { adopt = false, galaxyId = 0 } = {}) {
+function showGalaxy(analysis, g, { adopt = false, galaxyId = 0, source = "chat" } = {}) {
   // 先驗證：格式不對時保留原本的等待／失敗提示條與按鈕。
   if (!galaxy.setGalaxy(analysis, { goal: g || goal, galaxyId })) { galaxy.showMessage(t("pn.galaxyIncomplete")); return false; }
   demoShown = null;
@@ -92,6 +101,8 @@ function showGalaxy(analysis, g, { adopt = false, galaxyId = 0 } = {}) {
   goal = g || goal;
   waiting = false;
   shown = "galaxy";
+  loading.hidden = true;
+  decision.show(galaxyId ? "local" : source);
   lastFailed = "";
   setStrip("");
   galaxy.showMessage(goal ? t("pn.galaxyShown", { goal: goal.slice(0, 40) }) : "");
@@ -109,7 +120,7 @@ function showPaste() {
       const at = text.indexOf("{");
       let obj = null;
       try { obj = at >= 0 ? JSON.parse(text.slice(at, text.lastIndexOf("}") + 1)) : null; } catch { obj = null; }
-      if (obj && showGalaxy(obj, goal, { adopt: true })) { lastPaste = ""; nonce = ""; return; }
+      if (obj && showGalaxy(obj, goal, { adopt: true, source: nonce ? "chat" : "page" })) { lastPaste = ""; return; }
       if (obj && shown === "galaxy") return; // 格式不完整：showGalaxy 已在畫面上說明，原本的星系保留
       showCard(t("pn.pasteFailedTitle"), t("pn.pasteFailedBody"), [[t("pn.pasteAgain"), showPaste, true]]);
     }, true], [t("pn.cancel"), () => {}]]);
@@ -120,6 +131,7 @@ function showPaste() {
 
 function showCliFailed() {
   shown = "failed";
+  showLoading(t("pn.cliFailedStrip"));
   setStrip(t("pn.cliFailedStrip"), [[t("pn.retryLocal"), () => { setStrip(""); spawnViaCli().catch(cliError); }], [t("pn.useWebAi"), () => confirmChat()]]);
 }
 const cliError = (err) => { galaxy.applyStreamEvent({ t: "error", code: "network", detail: err.message }); galaxy.showMessage(err.message); };
@@ -134,6 +146,7 @@ async function spawnViaCli() {
   nonce = ""; waiting = false; lastFailed = ""; pendingGoal = "";
   setStrip("");
   try {
+    showLoading();
     galaxy.beginStream(goal);
     shown = "waiting";
     const res = await fetch(`${CLI}/api/spawn`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ goal }) });
@@ -154,7 +167,7 @@ async function spawnViaCli() {
         const ev = JSON.parse(line);
         galaxy.applyStreamEvent(ev);
         // 本機生成的結果由本機 CLI 保存（不寫進網站或擴充功能的記錄）；同一個問題再按 iG 時從 /api/galaxy 帶回來。
-        if (ev.t === "repaired" && galaxy.analysis) shown = "galaxy";
+        if (ev.t === "repaired" && galaxy.analysis) { shown = "galaxy"; loading.hidden = true; decision.show("local"); }
       }
     }
   } finally {
@@ -190,6 +203,7 @@ function startWaiting(g, elapsedSec = 0, unsent = false) {
   goal = g || goal;
   waiting = true;
   shown = "waiting";
+  showLoading(unsent ? t("pn.waitingForSend") : t("pn.waitingForAi"));
   galaxy.beginStream(goal);
   galaxy.showMessage(unsent ? t("pn.waitingForSend") : t("pn.waitingForAi"));
   waitingUnsent = unsent;
@@ -200,7 +214,7 @@ function updateWaiting(elapsedSec, unsent) {
   // 狀態改變（送出了、超過 20 秒）時重建一次提示條；其他時候只更新秒數，按鈕才點得到。
   if (unsent !== waitingUnsent || (!unsent && !slowShown && elapsedSec >= SLOW_HINT_SEC)) {
     waitingUnsent = unsent;
-    if (!unsent) galaxy.showMessage(t("pn.waitingForAi"));
+    if (!unsent) { galaxy.showMessage(t("pn.waitingForAi")); loading.querySelector("p").textContent = t("pn.waitingForAi"); }
     return waitingStrip(elapsedSec, unsent);
   }
   const line = strip.querySelector(".t");
@@ -213,6 +227,7 @@ function showFailed(detail, jsonFail = false) {
   waiting = false;
   shown = "failed";
   lastFailed = detail;
+  showLoading(detail);
   galaxy.showMessage(detail);
   // 沒有對應的工作（例如提示詞根本沒放進輸入框）時，不提供「放棄」，避免刪到這個對話其他的記錄。
   // 「重新生成」先只開確認卡片；按「開始生成」才取消舊的 run，按「返回」一切照舊（還能貼上 JSON）。
@@ -248,7 +263,7 @@ function confirmChat(extra = [], beforeStart = null) {
 function showDone(job) {
   if (!showGalaxy(job.analysis, job.goal)) return;
   bindNonce(job.nonce);
-  if (job.picks) galaxy.restorePicks(job.picks); // 上次填回的方案與調整
+  decision.restoreDraft(job.draft, job.picks);
   // 「回到星系」只關掉卡片：星系一直在下面，已選的方案和節點立場都保留。
   setStrip(t("pn.doneStrip"), [[t("pn.regenerate"), () => { const g = goal; confirmChat([[t("pn.backToGalaxy"), () => { goal = g; }]]); }]]);
 }
@@ -306,7 +321,7 @@ async function open({ goal: text = "", site: host = t("pn.thisAi"), job = null, 
   if (job?.status === "waiting" && newGoal) return askWhileWaiting(job, goal);
   if (goal) return generate(job?.status === "done" && job.analysis ? [[t("pn.backToPrevGalaxy"), () => showDone(job)]] : [], reopen);
   // 2. 頁面上已經有 AI 回覆過的星系（例如換了裝置或清掉記錄）：直接載入。
-  if (pageGalaxy) return showGalaxy(pageGalaxy, stripDecisionPrefix(pageGalaxy.core?.decision));
+  if (pageGalaxy) return showGalaxy(pageGalaxy, stripDecisionPrefix(pageGalaxy.core?.decision), { source: "page" });
   // 3. 本機 CLI 有最近生成的星系：不分對話，所以不自動顯示，只提供按鈕（可能是別的網站或 Claude Code 的決策）。
   const cur = await cliLatest();
   const local = cur ? [[t("pn.loadLocalLatest", { goal: `${cur.goal.slice(0, 20)}${cur.goal.length > 20 ? "…" : ""}` }), () => showGalaxy(cur.analysis, cur.goal, { galaxyId: cur.id })]] : [];
@@ -339,8 +354,8 @@ function onRuntimeMessage(msg) {
   if (msg.type === "ig-started") bindNonce(msg.nonce);
   if (msg.type === "ig-progress" && waiting) { if (msg.nonce) nonce = msg.nonce; updateWaiting(msg.elapsedSec, !!msg.unsent); }
   if (msg.type === "ig-reopen" && msg.job) { nonce = msg.job.nonce; startWaiting(msg.job.goal, msg.job.elapsedSec, msg.job.unsent); }
-  if (msg.type === "ig-galaxy") showGalaxy(msg.analysis, msg.goal);
-  if (msg.type === "ig-reset" && (!msg.nonce || msg.nonce === nonce)) { waiting = false; nonce = ""; shown = "idle"; lastFailed = ""; setStrip(""); galaxy.showMessage(t("pn.cancelledElsewhere")); }
+  if (msg.type === "ig-galaxy") { if (msg.nonce) bindNonce(msg.nonce); showGalaxy(msg.analysis, msg.goal); }
+  if (msg.type === "ig-reset" && (!msg.nonce || msg.nonce === nonce)) { waiting = false; nonce = ""; shown = "idle"; lastFailed = ""; setStrip(""); showLoading(t("pn.cancelledElsewhere")); }
   if (msg.type === "ig-chat-error") {
     if (msg.nonce !== undefined && msg.failed) nonce = msg.nonce;
     if (msg.failed || !waiting) showFailed(msg.detail, !!msg.jsonFail);
@@ -348,26 +363,24 @@ function onRuntimeMessage(msg) {
   }
 }
 
-galaxy.addEventListener("intent-lock", async (e) => {
+async function commitDecision(detail) {
+  const analysis = galaxy.analysis, selectedNonce = nonce, selectedGoal = galaxy.goal || goal;
+  const draft = decision.draft;
+  const source = detail.galaxyId ? "local" : decision.source;
   // 本機 CLI 生成的星系（有 galaxyId）由 CLI 簽署 .intent.lock.json；被拒（例如沒有採納 Q4 節點）就留在面板顯示原因。
   // 網頁 AI、貼上、示範的星系與 CLI 所在的專案無關，不寫鎖檔。一律附上 analysis：CLI 重啟後舊 id 找不到時照樣能簽。
-  if (e.detail.galaxyId && await cliAlive()) {
-    const body = { ...e.detail, analysis: galaxy.analysis, goal: galaxy.goal };
+  if (detail.galaxyId && await cliAlive()) {
+    const body = { ...detail, analysis, goal: selectedGoal };
     const res = await fetch(`${CLI}/api/lock`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((r) => r.json()).catch(() => null);
-    if (res && !res.ok) { galaxy.showMessage(t("pn.lockNotWritten", { detail: res.error })); return; }
+    if (res && !res.ok) throw new Error(t("pn.lockNotWritten", { detail: res.error }));
   }
-  toParent({ type: "intent-lock", ast: e.detail.ast, plain: e.detail.plain, baseKey: e.detail.baseKey, overrides: e.detail.overrides, goal: galaxy.goal || goal, nonce });
-});
-galaxy.addEventListener("intent-close", () => toParent({ type: "intent-close" }));
-// 版面（方案側欄、方案卡列）：記在擴充功能自己的 localStorage，下次打開照舊；狀態回報給標題列按鈕。
-const LAYOUT_KEY = "ig-layout";
-const savedLayout = (() => { try { return JSON.parse(localStorage.getItem(LAYOUT_KEY) ?? "null"); } catch { return null; } })();
-if (savedLayout) galaxy.restoreLayout({ summary: savedLayout.summary ?? null, cards: savedLayout.cards !== false });
-toParent({ type: "intent-layout", ...galaxy.layout }); // 標題列按鈕的初始狀態
-galaxy.addEventListener("intent-layout", (e) => {
-  const { summary, cards, summaryPref } = e.detail;
-  try { localStorage.setItem(LAYOUT_KEY, JSON.stringify({ summary: summaryPref, cards })); } catch { /* 不能存就不存 */ }
-  toParent({ type: "intent-layout", summary, cards });
+  if (analysis !== galaxy.analysis || selectedNonce !== nonce) throw new Error(t("ct.errOtherChat"));
+  await toParent({ type: "intent-lock", ...detail, draft, goal: selectedGoal, source, nonce: source === "chat" ? selectedNonce : "" });
+}
+galaxy.addEventListener("intent-lock", () => decision.setView("preview"));
+galaxy.addEventListener("intent-close", () => {
+  if (decision.view !== "compare") decision.setView("compare");
+  else toParent({ type: "intent-close" });
 });
 window.addEventListener("keydown", (e) => {
   if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyG") { e.preventDefault(); toParent({ type: "intent-close" }); }
