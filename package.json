@@ -34,7 +34,11 @@
     "build": "node tools/i18n.mjs && node tools/build.mjs",
     "prepare": "node tools/build.mjs",
     "pack:ext": "node tools/i18n.mjs && node tools/sync-extension.mjs --zip",
-    "bench:latency": "node tools/bench-latency.mjs"
+    "bench:latency": "node tools/bench-latency.mjs",
+    "build:hosted": "node tools/build-hosted.mjs",
+    "dev:hosted": "node tools/dev-hosted.mjs",
+    "test:hosted": "node --test apps/hosted/test/*.test.mjs",
+    "eval:hosted": "node apps/hosted/evals/run.mjs"
   },
   "engines": {
     "node": ">=22.18.0"

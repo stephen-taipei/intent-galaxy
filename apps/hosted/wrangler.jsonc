@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "intent-galaxy-hosted",
+  "main": "server/cloudflare.mjs",
+  "compatibility_date": "2026-10-01",
+  "build": { "command": "node ../../tools/build-hosted.mjs" },
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": true, "not_found_handling": "single-page-application" },
+  "workflows": [{ "binding": "JOB_WORKFLOW", "name": "intent-galaxy-jobs", "class_name": "HostedJobWorkflow" }],
+  "triggers": { "crons": ["*/15 * * * *"] },
+  "observability": { "enabled": false },
+  "vars": {
+    "APP_MODE": "disabled",
+    "LIVE_AI_ENABLED": "false",
+    "MODEL_QUALITY_APPROVED": "false",
+    "AI_DAILY_BUDGET_USD": "0",
+    "AI_MONTHLY_BUDGET_USD": "0",
+    "BILLING_ENABLED": "false",
+    "PADDLE_ENV": "sandbox",
+    "TRIAL_DAILY_LIMIT": "25",
+    "TRIAL_IP_DAILY_LIMIT": "3",
+    "TRIAL_DAILY_BUDGET_USD": "0.50"
+  }
+}

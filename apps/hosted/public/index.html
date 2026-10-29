@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-Hant-TW" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Intent Galaxy Studio and Mandala goal planner">
+  <title>Intent Galaxy</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/galaxy/apps/web/decision-view.css">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip"></a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Intent Galaxy home"><span class="brand-mark" aria-hidden="true">✦</span><span>Intent Galaxy</span></a>
+    <nav class="topnav" aria-label="Primary navigation">
+      <a href="/studio" data-i18n="studio"></a>
+      <a href="/mandala" data-i18n="mandala"></a>
+      <a href="/pricing" data-i18n="pricing"></a>
+    </nav>
+    <div class="top-controls">
+      <label class="sr-only" for="language" data-i18n="language"></label>
+      <select id="language" aria-label="Language">
+        <option value="zh">繁體中文</option>
+        <option value="en">English</option>
+      </select>
+      <button id="themeToggle" class="icon-button" type="button" aria-label="Toggle color theme" title="Toggle color theme">◐</button>
+      <div id="account"></div>
+    </div>
+  </header>
+
+  <div id="demoBanner" class="demo-banner" hidden role="status"></div>
+  <main id="main" tabindex="-1"><div class="loading-state" role="status">Loading Intent Galaxy…</div></main>
+  <footer class="site-footer">
+    <span>Intent Galaxy</span>
+    <nav aria-label="Legal">
+      <a href="/privacy" data-i18n="privacy"></a>
+      <a href="/terms" data-i18n="terms"></a>
+    </nav>
+  </footer>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <dialog id="decisionDialog" aria-labelledby="decisionDialogTitle">
+    <div class="dialog-top"><h2 id="decisionDialogTitle" data-i18n="chooseDecision"></h2><button id="closeDecision" class="icon-button" type="button" aria-label="Close">×</button></div>
+    <div id="decisionMount"><intent-galaxy-overlay id="selectionGalaxy"></intent-galaxy-overlay></div>
+  </dialog>
+  <div id="turnstile" aria-live="polite"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

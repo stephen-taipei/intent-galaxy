@@ -150,3 +150,11 @@ bench/
 # Store listing drafts, translations and submission assets (kept locally, not published)
 store-listing/
 intent-galaxy-src-*.zip
+
+# Hosted build, local runtime and credentials
+apps/hosted/dist/
+apps/hosted/node_modules/
+apps/hosted/.wrangler/
+apps/hosted/.dev.vars*
+apps/hosted/.env*
+!apps/hosted/.env.example

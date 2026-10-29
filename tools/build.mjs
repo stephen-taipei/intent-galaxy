@@ -11,7 +11,7 @@ export function buildDist(outDir = path.join(ROOT, "dist")) {
     const dir = path.join(ROOT, "apps/cli", d);
     return fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith(".mjs")).map((f) => `apps/cli/${d}/${f}`) : [];
   });
-  const web = ["apps/web/index.html", "apps/web/galaxy-overlay.js", ...webSampleSources(), ...webLocaleSources()];
+  const web = ["apps/web/index.html", "apps/web/galaxy-overlay.js", "apps/web/decision-view.js", "apps/web/decision-view.css", "apps/web/decision-copy.js", ...webSampleSources(), ...webLocaleSources()];
   const files = [...cli, ...web, ...libSources("protocol", "core", "epistemic")];
   for (const rel of files) transpileTo(outDir, rel);
   fs.chmodSync(path.join(outDir, "apps/cli/bin/intent-galaxy.mjs"), 0o755);

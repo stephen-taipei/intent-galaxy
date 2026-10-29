@@ -1,0 +1,19 @@
+{
+  "name": "@stephen.taipei/intent-galaxy-hosted",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ../../tools/build-hosted.mjs",
+    "dev": "node ../../tools/dev-hosted.mjs",
+    "check:worker": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "test:server": "node --test test/server*.test.mjs",
+    "test:domain": "node --test test/domain*.test.mjs"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "wrangler": "4.155.0"
+  }
+}
