@@ -33,11 +33,9 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
     const ppid = Number(execFileSync('ps', ['-p', String(postgresPid), '-o', 'ppid='], { encoding: 'utf8' }).trim());
     try { descendantPids = execFileSync('pgrep', ['-P', String(postgresPid)], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().split(/\s+/).map(Number).filter(Boolean); } catch { /* no children yet */ }
     writeFileSync(join(root, 'owned-resource.json'), JSON.stringify({ owner: 'hosted-backend-sql-test', startedAt: new Date().toISOString(), pid: postgresPid, ppid, descendants: descendantPids, command: 'postgres (private unix socket only)', cwd: data, socketDirectory: root, tcpListeners: false }));
-    sql(`create role anon noinherit; create role authenticated noinherit; create role service_role noinherit bypassrls;
-      create schema auth; create table auth.users(id uuid primary key);
-      create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
-      grant usage on schema auth to authenticated; grant execute on function auth.uid() to authenticated;
-      insert into auth.users values('${U}'),('${V}');`);
+    // The self-hosted bootstrap stands in for the Supabase roles and auth schema.
+    execFileSync('psql', [...args], { input: readFileSync(new URL('../selfhosted/bootstrap.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    sql(`insert into auth.users values('${U}'),('${V}');`);
     const migration = readFileSync(new URL('../migrations/0001_hosted.sql', import.meta.url), 'utf8');
     execFileSync('psql', [...args], { input: migration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     const trialMigration = readFileSync(new URL('../migrations/0002_mandala_trial.sql', import.meta.url), 'utf8');
@@ -48,6 +46,8 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       const doc = JSON.parse(sql(`select hosted_document_create('${U}',${literal({ product: 'studio', kind: 'work', title: 'private', data: { body: 'private body' } })});`));
       assert.equal(sql(`set role authenticated; set request.jwt.claim.sub='${V}'; select count(*) from hosted_documents;`), '0');
       assert.equal(sql(`set role authenticated; set request.jwt.claim.sub='${U}'; select count(*) from hosted_documents;`), '1');
+      // PostgREST 12 passes claims as one JSON setting.
+      assert.equal(sql(`set role authenticated; set request.jwt.claims='{"sub":"${U}"}'; select count(*) from hosted_documents;`), '1');
       assert.throws(() => sql(`set role authenticated; select hosted_document_get('${U}','${doc.id}');`), /permission denied/);
       assert.throws(() => sql(`set role authenticated; insert into hosted_documents(user_id,product,kind,title,data) values('${V}','studio','work','bad','{}');`), /permission denied/);
       assert.throws(() => sql(`select hosted_document_get('${V}','${doc.id}');`), /not_found/);

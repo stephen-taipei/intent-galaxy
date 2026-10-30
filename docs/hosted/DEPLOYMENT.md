@@ -18,7 +18,7 @@ Keep secrets in the Worker secret store, outside Git and client assets. Do not p
 | --- | --- |
 | `APP_MODE` | `disabled` by default; `demo` only on loopback; `live` for a configured hosted environment |
 | `APP_ORIGIN` | Exact HTTPS origin with no trailing slash; every live request must match it |
-| `SUPABASE_URL` | Supabase HTTPS origin, without a path |
+| `SUPABASE_URL` | Supabase or self-hosted PostgREST HTTPS origin, without a path (see self-hosted section) |
 | `SUPABASE_ANON_KEY` | Auth API key, used by the BFF; not required in browser code |
 | `SUPABASE_SERVICE_ROLE_KEY` | Secret for service-only PostgREST RPCs; never expose it to clients |
 | `SESSION_SECRET` | Independent random secret, minimum 32 characters, for AES-GCM session-token encryption, signed browser/guest cookies and checkout binding |
@@ -56,6 +56,19 @@ The BFF does not accept client price IDs, owner IDs, credit balances, billing pe
 5. Verify all unsafe browser methods require both exact `Origin` and the current `/api/session` CSRF token in `X-CSRF-Token`. The Paddle webhook is exempt from browser CSRF because it verifies its own signature before parsing or applying an event.
 
 Session-cookie expiration is fixed at seven days. Browser trial/CSRF binding cookies last thirty days. Rotating `SESSION_SECRET` invalidates cookies and encrypted sessions; it also invalidates signatures on previously issued, unpaid checkout bindings. Reconcile pending checkouts and plan forced sign-in before rotating. This implementation does not include multi-key rotation.
+
+## Self-hosted PostgreSQL instead of Supabase
+
+The Worker only needs a PostgREST endpoint at `/rest/v1`, so a self-hosted PostgreSQL with PostgREST can replace Supabase for the guest trial. Sign-in still requires Supabase Auth: leave `SUPABASE_ANON_KEY` unset and `authEnabled` stays false, which hides sign-in and keeps the free Mandala trial guest-only. Files are in `apps/hosted/selfhosted/`.
+
+1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql` and `0002_mandala_trial.sql`. Never run `bootstrap.sql` on Supabase.
+2. Run PostgREST 12 with `postgrest.conf`. Pass `PGRST_DB_URI` and `PGRST_JWT_SECRET` through a mode-0600 environment file; the JWT secret is independent of every other secret. PostgREST listens on `127.0.0.1:3000` only, and PostgreSQL stays on loopback.
+3. Install `nginx-postgrest.conf`. It listens on `127.0.0.1:8088` and forwards only `POST /rest/v1/rpc/hosted_*`; everything else returns 403 or 404.
+4. Expose port 8088 through Cloudflare Tunnel (`cloudflared.yml`), so the server opens no inbound port.
+5. Run `PGRST_JWT_SECRET=... node apps/hosted/selfhosted/mint-service-token.mjs 365` and store the output with `wrangler secret put SUPABASE_SERVICE_ROLE_KEY`. Set `SUPABASE_URL` to the tunnel origin (for example `https://ig-db.example.com`). The token grants full data access: keep it only in the Worker secret store and rotate it before it expires by minting a new one.
+6. Back up the database (for example nightly `pg_dump` kept off the host) before opening the trial. Trial counters and job records live only there.
+
+The SQL suite applies the same `bootstrap.sql`, so a migration that needs another Supabase object fails in CI. PostgREST itself and the tunnel are not exercised by the tests; verify one real `hosted_reserve_job` call through the tunnel on staging.
 
 ## Entitlements and documents
 
