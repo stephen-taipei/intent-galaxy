@@ -65,6 +65,7 @@ export class DecisionView {
     galaxy.addEventListener("intent-change", (e) => {
       if (e.detail.type === "load") {
         this.view = this.defaultGalaxy ? "galaxy" : "compare";
+        this.notify("");
         this.notes = ""; this.focusedNode = null; this.editing = false; this.full = false;
         this.root.querySelector("#v2-notes").value = "";
       }
@@ -74,7 +75,7 @@ export class DecisionView {
     galaxy.addEventListener("intent-node-focus", (e) => {
       this.focusedNode = e.detail.id;
       this.renderDetail();
-      this.emitDraft();
+      // Focus moves alone are not persisted; the next pick or view change carries focusedNode.
     });
     // Native controls retain their Enter/Space behavior. Only Escape navigates back.
     this.root.addEventListener("keydown", (e) => {
@@ -140,6 +141,7 @@ export class DecisionView {
       this.notify(t(this.session.solution?.status !== "SAT" ? "v2.unsat" : "v2.empty"));
       return;
     }
+    this.notify("");
     this.view = view;
     if (view !== "galaxy") this.editing = false;
     if (view === "galaxy" && !this.focusedNode) {
@@ -197,7 +199,7 @@ export class DecisionView {
     if (!a) return;
     const active = document.activeElement;
     const focusAction = this.root.contains(active) && active?.dataset.action;
-    const focusKey = focusAction ? active.dataset.key : null;
+    const focusKey = focusAction ? ["key", "stance", "node"].map((k) => active.dataset[k] ? `[data-${k}="${CSS.escape(active.dataset[k])}"]` : "").join("") : "";
     const q = (id) => this.root.querySelector(`#${id}`);
     q("v2-source").textContent = t(this.source === "demo" ? "v2.sample" : this.session.galaxyId ? "v2.localAi" : "v2.currentAi");
     q("v2-language").setAttribute("aria-label", t("ov.langTitle"));
@@ -256,8 +258,10 @@ export class DecisionView {
       q("v2-footer-hint").textContent = t(sol.status !== "SAT" ? "v2.unsat" : output ? "v2.previewHint" : "v2.empty");
     }
     if (focusAction) {
-      const selector = `[data-action="${CSS.escape(focusAction)}"]${focusKey ? `[data-key="${CSS.escape(focusKey)}"]` : ""}`;
-      this.root.querySelector(selector)?.focus({ preventScroll: true });
+      const selector = `[data-action="${CSS.escape(focusAction)}"]${focusKey}`;
+      const next = this.root.querySelector(selector);
+      // The control may be gone or disabled now (undo stack empty, relation list rebuilt): keep focus inside the panel.
+      (next && !next.disabled ? next : this.root.querySelector(`#v2-${this.view === "compare" ? "title" : this.view === "galaxy" ? "galaxy-title" : "preview-title"}`))?.focus({ preventScroll: true });
     }
   }
 

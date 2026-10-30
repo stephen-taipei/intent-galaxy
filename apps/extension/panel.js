@@ -384,5 +384,10 @@ galaxy.addEventListener("intent-close", () => {
   else toParent({ type: "intent-close" });
 });
 window.addEventListener("keydown", (e) => {
-  if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyG") { e.preventDefault(); toParent({ type: "intent-close" }); }
+  if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.code === "KeyG") { e.preventDefault(); toParent({ type: "intent-close" }); return; }
+  // Esc 不論焦點在哪（方案卡、輸入框外、星系元件已處理過的除外）：星系／預覽畫面退回方案，方案畫面縮小面板。
+  if (e.key !== "Escape" || e.defaultPrevented || e.isComposing || !card.hidden) return;
+  e.preventDefault();
+  if (decision.active && decision.view !== "compare") decision.setView("compare");
+  else toParent({ type: "intent-close" });
 });
