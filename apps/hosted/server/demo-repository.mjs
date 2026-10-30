@@ -1,4 +1,5 @@
 import { HttpError } from './security.mjs';
+import { MANDALA_TRIAL_OPERATIONS } from '../domain/validation.mjs';
 
 const fail = (code, status = 409) => { throw new HttpError(status, code, code.replaceAll('_', ' ')); };
 const clone = value => value == null ? value : structuredClone(value);
@@ -50,8 +51,19 @@ export class DemoRepository {
     const key = `${ownerKey(value.owner)}:${value.key}`;
     const existing = this.jobs.get(this.jobKeys.get(key));
     if (existing) { if (existing.requestHash !== value.requestHash) fail('idempotency_conflict'); return { ...clone(existing), created: false }; }
-    let creditKey; let allowance;
-    if (value.owner.userId) {
+    let creditKey; let allowance; let platformKey;
+    if (value.request.product === 'mandala' && MANDALA_TRIAL_OPERATIONS.includes(value.request.operation)) {
+      // Mirrors 0002_mandala_trial.sql: per-owner and platform caps per Asia/Taipei day.
+      if (value.request.mode !== 'standard' || value.creditCost !== 1) fail('trial_limit', 429);
+      if (value.owner.guestId) { const guest = this.guests.get(value.owner.guestId); if (!guest || Date.parse(guest.expiresAt) <= this.clock()) fail('guest_limit', 429); }
+      const kind = value.request.operation === 'themes' ? 'charts' : 'calls';
+      const day = new Date(this.clock() + 8 * 3600e3).toISOString().slice(0, 10);
+      const period = `mandala:trial-${kind}:${day}`;
+      const owned = kind === 'charts' ? value.mandalaOwnerDailyCharts : value.mandalaOwnerDailyCalls;
+      const platform = kind === 'charts' ? value.mandalaPlatformDailyCharts : value.mandalaPlatformDailyCalls;
+      platformKey = `platform:${period}`; creditKey = `${ownerKey(value.owner)}:${period}`;
+      if (!(owned > 0) || !(platform > 0) || (this.credits.get(platformKey) || 0) + 1 > platform || (this.credits.get(creditKey) || 0) + 1 > owned) fail('trial_limit', 429);
+    } else if (value.owner.userId) {
       const plan = this.plan(value.owner.userId, value.request.product);
       creditKey = `${value.owner.userId}:${value.request.product}:${plan.period}`; allowance = plan.allowance;
       if ((this.credits.get(creditKey) || 0) + value.creditCost > allowance) fail('quota_exceeded', 402);
@@ -66,6 +78,7 @@ export class DemoRepository {
     if (value.owner.guestId) budgets.push([`trial:${now.slice(0, 10)}`, value.trialDailyLimitMicros]);
     for (const [period, limit] of budgets) if (!(limit > 0) || (this.budgets.get(period) || 0) + value.reservedMicros > limit) fail('budget_exceeded', 503);
     this.credits.set(creditKey, (this.credits.get(creditKey) || 0) + value.creditCost);
+    if (platformKey) this.credits.set(platformKey, (this.credits.get(platformKey) || 0) + 1);
     for (const [period] of budgets) this.budgets.set(period, (this.budgets.get(period) || 0) + value.reservedMicros);
     const job = { ...clone(value), id: crypto.randomUUID(), status: 'queued', createdAt: now, updatedAt: now, creditKey, budgets: budgets.map(([period]) => period), dispatched: false };
     this.jobs.set(job.id, job); this.jobKeys.set(key, job.id); return { ...clone(job), created: true };

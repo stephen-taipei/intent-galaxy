@@ -2,7 +2,7 @@ import { HttpError } from './security.mjs';
 
 const ERRORS = {
   quota_exceeded: [402, 'There are not enough credits.'], budget_exceeded: [503, 'The platform budget is unavailable.'],
-  guest_limit: [429, 'The browser trial or server trial cap has been reached.'], not_found: [404, 'The record was not found.'],
+  guest_limit: [429, 'The browser trial or server trial cap has been reached.'], trial_limit: [429, 'Today’s free Mandala AI limit has been reached.'], not_found: [404, 'The record was not found.'],
   stale_revision: [409, 'The document changed. Reload it before saving.'], document_limit: [403, 'The saved document limit has been reached.'],
   pro_required: [403, 'This feature requires this product’s Pro plan.'], idempotency_conflict: [409, 'This key was already used for a different request.'],
   checkout_pending: [409, 'Checkout is pending reconciliation.'], session_busy: [409, 'The session is refreshing. Please retry shortly.'],

@@ -24,7 +24,14 @@ function budget(env, mode) {
   const daily = positiveNumber(env.AI_DAILY_BUDGET_USD, mode === 'demo' ? 5 : 0);
   const monthly = positiveNumber(env.AI_MONTHLY_BUDGET_USD, daily * 31);
   const trial = Math.min(daily, positiveNumber(env.TRIAL_DAILY_BUDGET_USD, 0.5));
-  return { dailyLimitMicros: Math.floor(daily * 1e6), monthlyLimitMicros: Math.floor(monthly * 1e6), trialDailyLimitMicros: Math.floor(trial * 1e6) };
+  return { dailyLimitMicros: Math.floor(daily * 1e6), monthlyLimitMicros: Math.floor(monthly * 1e6), trialDailyLimitMicros: Math.floor(trial * 1e6), ...mandalaTrialLimits(env) };
+}
+// Free Mandala AI counts: charts start with one themes call; every later
+// expansion or perspectives call is counted separately. Zero disables a cap.
+function mandalaTrialLimits(env) {
+  const count = (value, fallback) => { const n = Number(value ?? fallback); return Number.isInteger(n) && n >= 0 ? n : 0; };
+  return { mandalaOwnerDailyCharts: count(env.MANDALA_OWNER_DAILY_CHARTS, 3), mandalaOwnerDailyCalls: count(env.MANDALA_OWNER_DAILY_CALLS, 30),
+    mandalaPlatformDailyCharts: count(env.MANDALA_PLATFORM_DAILY_CHARTS, 200), mandalaPlatformDailyCalls: count(env.MANDALA_PLATFORM_DAILY_CALLS, 2000) };
 }
 function aiEnabled(env, mode) { return mode === 'demo' || (mode === 'live' && liveModelGate(env) && budget(env, mode).dailyLimitMicros > 0 && budget(env, mode).monthlyLimitMicros > 0); }
 function publicJob(job) {
@@ -54,7 +61,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         if (env.ASSETS?.fetch) return secureResponse(await env.ASSETS.fetch(request), mode);
         return secureResponse(json({ error: { code: 'not_found', message: 'Not found.' } }, 404), mode);
       }
-      if (path === '/api/config' && request.method === 'GET') return secureResponse(json({ mode, authEnabled: authEnabled(env, mode), billingEnabled: billingEnabled(env, mode), turnstileSiteKey: mode === 'live' ? env.TURNSTILE_SITE_KEY || null : null, models: aiEnabled(env, mode) ? engine.MODEL_REGISTRY : {} }), mode);
+      if (path === '/api/config' && request.method === 'GET') return secureResponse(json({ mode, authEnabled: authEnabled(env, mode), billingEnabled: billingEnabled(env, mode), turnstileSiteKey: mode === 'live' ? env.TURNSTILE_SITE_KEY || null : null, mandalaTrial: aiEnabled(env, mode) && Object.values(mandalaTrialLimits(env)).every(n => n > 0), models: aiEnabled(env, mode) ? engine.MODEL_REGISTRY : {} }), mode);
       assert(mode !== 'disabled', 503, 'service_disabled', 'The hosted service is not enabled.');
       const repo = injectedRepo || repository(env, mode, fetchImpl, clock);
       if (path === '/api/webhooks/paddle' && request.method === 'POST') {

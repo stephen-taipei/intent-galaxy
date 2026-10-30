@@ -5,6 +5,13 @@ export const MODEL_REGISTRY = Object.freeze({
   openai: { standard: { id: 'gpt-6-luna', input: 0.10, output: 0.50 }, deep: { id: 'gpt-6.1-sol', input: 2, output: 10 } },
   anthropic: { standard: { id: 'claude-haiku-5-5', input: 0.10, output: 0.50 }, deep: { id: 'claude-sonnet-5-5', input: 2, output: 10 } },
 });
+// Mandala trial operations use fixed Anthropic models whatever the request mode:
+// themes decide the quality of the whole chart, so they use Sonnet; filling a
+// theme with actions is a bounded task for Haiku.
+export const MANDALA_MODELS = Object.freeze({
+  themes: { id: 'claude-sonnet-5-5', input: 2, output: 10, effort: 'low', maxTokens: 6000 },
+  cells: { id: 'claude-haiku-5-5', input: 0.10, output: 0.50, effort: 'low', maxTokens: 3000 },
+});
 export const DECISIONS_MODEL = 'gpt-6-luna';
 export const MAX_OUTPUT_TOKENS = 8000;
 const MAX_RESPONSE_BYTES = 350000;
@@ -54,8 +61,9 @@ async function post(url, headers, body, fetchImpl) {
   catch { throw new DomainError('provider_invalid_response', 'Provider returned invalid JSON.', 502, false); }
 }
 
-export async function generateJSON({ provider, mode, system, input }, { env, fetchImpl = fetch }) {
-  const key = enabled(env, provider), model = MODEL_REGISTRY[provider][mode];
+export async function generateJSON({ provider, mode, system, input, model: fixedModel, schema }, { env, fetchImpl = fetch }) {
+  const key = enabled(env, provider), model = fixedModel ?? MODEL_REGISTRY[provider][mode];
+  if (fixedModel && provider !== 'anthropic') throw new DomainError('provider_unavailable', 'This operation requires Anthropic.', 400);
   const user = JSON.stringify(input);
   let raw, output, inputTokens, outputTokens;
   if (provider === 'openai') {
@@ -69,8 +77,9 @@ export async function generateJSON({ provider, mode, system, input }, { env, fet
     inputTokens = raw.usage?.input_tokens; outputTokens = raw.usage?.output_tokens;
   } else {
     raw = await post('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2026-10-21' }, {
-      model: model.id, max_tokens: MAX_OUTPUT_TOKENS, system,
+      model: model.id, max_tokens: model.maxTokens ?? MAX_OUTPUT_TOKENS, system,
       messages: [{ role: 'user', content: user }],
+      ...(model.effort || schema ? { output_config: { ...(model.effort ? { effort: model.effort } : {}), ...(schema ? { format: { type: 'json_schema', schema } } : {}) } } : {}),
     }, fetchImpl);
     if (raw.stop_reason !== 'end_turn') throw new DomainError('provider_incomplete', 'The model did not finish a usable result.', 502, false);
     output = (raw.content ?? []).filter(x => x.type === 'text').map(x => x.text).join('');

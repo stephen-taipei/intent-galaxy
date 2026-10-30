@@ -17,6 +17,7 @@ const COPY = {
     artifactTitle:"可編輯成果", artifactHelp:"手動修改成果後，先前評估會失效。需要時可明確要求重新評估。", artifactContent:"成果內容", forceNoHTML:"使用純文字編輯，輸入不會當成 HTML 執行。", workContextMissing:"這份舊工作沒有保存分析與選擇資料，因此不能重新評估或要求 AI 修改。你仍可編輯、複製與匯出成果。", saveWork:"儲存工作", copyArtifact:"複製成果", exportMarkdown:"匯出 Markdown", evaluateAgain:"重新評估（付費操作）", revise:"請 AI 修改", reviseInstruction:"修改要求", reviseNow:"送出修改要求", workTitle:"工作名稱", evaluation:"評估", evaluationPass:"通過", evaluationFail:"未通過", evaluationUnknown:"未知／無法判定", evaluationInvalidated:"成果已修改，先前評估已失效。", evaluationDemo:"示範模式不會執行真實語意評估。", evaluationConsent:"缺少所需的跨服務商同意，無法執行語意評估。", evaluationCheckUnavailable:"語意評估目前無法使用。", evaluationUnavailable:"語意評估目前無法使用。", evaluationModified:"成果已修改，請重新評估。", evaluationSourceRules:"規則檢查", evaluationSourceAI:"AI 評估", unknownReview:"未知不代表通過。", copied:"已複製。", copyFailed:"無法自動複製；請手動選取內容。",
     pricing:"方案與價格", pricingLead:"兩項產品獨立訂閱，不共用點數。", studioPro:"AI 工作室 Pro", mandalaPro:"九宮格目標規劃 Pro", freePlan:"免費", perMonth:"／月", works:"已儲存工作", templates:"範本", cloudGoals:"雲端目標", freeStudio:"每月 20 點、5 份工作、3 個範本。", proStudio:"每月 200 點、100 份工作、50 個範本。", freeMandala:"完整手動編輯與匯出；登入後可存 1 個雲端目標；不含 AI 點數。", proMandala:"每月 100 點，可存 20 個雲端目標。", checkoutUnavailable:"伺服器尚未啟用結帳。", checkoutOff:"結帳尚未由伺服器啟用。", checkout:"升級方案", monthly:"每月", invalidCheckout:"伺服器沒有回傳有效的 HTTPS 結帳網址。",
     privacyLead:"本頁說明託管版前端如何呼叫服務。資料處理與保留細節以部署者公布的政策為準。", termsLead:"此託管版目前是可供檢視的服務草稿。付款與正式營運依伺服器設定開啟後才會生效。", privacyPage:"隱私說明", termsPage:"使用條款草稿", privacyOne:"登入與工作狀態由同源服務 API 管理。此介面只會在你明確開始操作時送出內容。", privacyTwo:"你輸入的目標、背景、分析結果與成果可能送往你選擇的 AI 服務商。請勿輸入不適合傳送的機密資料。", privacyThree:"文件儲存、刪除、帳務與資料保留期限由伺服器執行；此頁不假設尚未公開的保留細節。", termsOne:"AI 分析與建議可能出錯。使用者需自行檢查輸入、候選與成果。", termsTwo:"九宮格目標規劃的本機檔案由使用者裝置管理；雲端功能受帳戶、方案與伺服器額度限制。", termsThree:"此介面不會自動下單、付款、部署或對外傳送生成內容。付款跳轉只會在服務設定啟用結帳後，由使用者明確操作。", unsupportedRoute:"找不到這個頁面。",
+    trialTitle:"免費 AI 體驗", trialLead:"先由 AI 提出 8 個主題，再逐格展開成行動。所有結果都要按「套用」才會寫入。", trialProvider:"使用 Anthropic Claude：主題由 Sonnet 產生，展開與多視角由 Haiku 產生。", trialUnavailable:"目前沒有開放免費 AI 體驗。", trialLimit:"今天的免費 AI 次數已用完，明天再試，或先手動編輯。", trialNeedsSession:"登入或開始免費體驗後即可使用。", generateThemes:"AI 產生主題", expandTheme:"展開這個主題", expandEmpty:"展開所有空白主題", perspectives:"換個視角看看", perspectivesTitle:"其他視角的主題（點選後替換到指定格）", chooseTheme:"選擇主題", replaceSlot:"替換到", replace:"替換", lensQ1:"歸零者：從零重想", lensQ2:"老兵：前人做法", lensQ3:"越界者：跨領域借用", lensQ4:"驗屍官：先防失敗", skippedActions:"有 {n} 格與其他主題重複，已留白，可以再展開一次。", themeReplaced:"已替換主題，記得儲存。", noEmptyThemes:"8 個主題都已填寫。", 
     mandalaTitle:"九宮格目標規劃", mandalaLead:"以一個中心目標展開 8 個主題與 64 個可追蹤行動。手動編輯、儲存與匯出不需要 AI。", standalone:"獨立的目標規劃工具", chartTitle:"目標名稱", chartLabel:"九宮格目標規劃", themeTitle:"主題", action:"行動", done:"已完成", dueDate:"到期日", notes:"備註", progress:"完成進度", weeklyReview:"每週回顧", reviewDate:"回顧日期", reviewNote:"本週觀察與下一步", reviewProgress:"本週進度", saveReview:"儲存每週回顧", gridView:"81 格檢視", groupView:"主題分組檢視", mirrored:"主題鏡像", themesHint:"中央的 8 個主題會鏡像到周圍 8 個 3×3 區塊。", actionHint:"可填行動、完成狀態、日期與備註。", newChart:"新目標", saveLocal:"儲存到此裝置", saveCloud:"儲存到雲端", exportJson:"匯出 JSON", exportMarkdown:"匯出 Markdown", printPdf:"列印／存成 PDF", importJson:"匯入有效 JSON", importFailed:"匯入失敗。請選擇 schemaVersion 1 且含 8 個主題、每個主題 8 個行動的 JSON。", localSaved:"此裝置的目標", cloudSaved:"雲端目標", noGoals:"尚無目標。", goalCount:"目標數", localOnly:"手動目標表可在此裝置使用，不需要登入。", cloudLimit:"雲端目標數量由伺服器依方案限制。", localHistory:"本機回顧不會建立雲端版本。", useAI:"AI 建議", expand:"展開行動", review:"檢視目標", aiInstruction:"給 AI 的補充要求（選填）", applyProposal:"套用完整候選圖", proposalTitle:"AI 候選圖（尚未套用）", proposalReview:"AI 回饋", staleProposal:"圖表在產生建議後有變更。這份候選已過期，請重新執行 AI 操作。", noFullChart:"服務回傳建議文字，沒有可套用的完整候選圖。請依建議自行修改。", candidateInvalid:"服務回傳的候選圖不符合 8×8 格式，沒有套用。", proposalApplied:"已套用候選圖，請檢查內容並手動保存。", applyProposalHint:"候選圖只會在你按下套用後取代目前圖表。", saveGoalFirst:"先儲存雲端目標，才能查看雲端版本。", cloudHistory:"雲端版本", selectCloudGoal:"選擇雲端目標", noCloudDocs:"尚無雲端目標。", noHistory:"沒有可讀取的版本紀錄。", noHistoryPro:"版本紀錄需要 Pro 方案。", chooseDecision:"選擇並調整方案", useSelection:"使用此方案", previewSelection:"檢視選擇", copyDecision:"複製決策", titleRequired:"請填寫文件名稱。", goalRequired:"請先填寫中心目標。", status:"狀態", source:"來源", none:"無", version:"版本", current:"目前版本", comparison:"方案比較", compareVersions:"比較版本", chooseVersion:"選擇版本", chartValid:"有效的 8×8 圖表", invalidChart:"圖表格式不正確。", chartTooLarge:"圖表資料太大，請縮短行動或備註內容後再試。", noResult:"沒有結果。", signInFirst:"請登入或開始訪客體驗後再繼續。", signIn:"Google 登入", signOut:"登出", signedIn:"已登入", authDisabled:"此環境未啟用登入。", language:"介面語言", privacy:"隱私", terms:"使用條款", home:"首頁",
     needsLogin:"登入後才可使用雲端保存。", aiMandalaNoCredits:"九宮格目標規劃免費方案不含 AI 點數；手動編輯與匯出仍可使用。", signInToCloud:"登入後可使用雲端保存。", saveError:"儲存失敗。", confirmRemove:"要刪除這份已儲存資料嗎？", confirmDelete:"要刪除這份文件嗎？", saved:"已儲存。", savedLocal:"已儲存到此裝置。", cloudGoalSaved:"雲端目標已保存。", exportHint:"匯出內容只包含此份圖表資料。", importHelp:"匯入會先完整驗證，不會合併不完整資料。", noTemplates:"尚無範本。", noSaved:"目前沒有已儲存資料。", selectProvider:"選擇服務商", ready:"準備就緒", active:"使用中", updated:"已更新。", signInGoogle:"使用 Google 登入", billing:"帳務", checkoutMessage:"結帳由服務端啟用後才可使用。", supportUnavailable:"支援資訊尚未設定。", noAIForFree:"免費方案不含 Mandala AI 點數。", providerOpenAI:"OpenAI", providerAnthropic:"Anthropic", error:"錯誤", close:"關閉", remove:"刪除", open:"開啟", retry:"重新載入", loading:"載入中…",
     requestId:"工作識別碼", eventError:"伺服器回報錯誤", inputRequired:"請先填寫目標與背景輸入。", privacyNote:"只有在你按下 AI 操作按鈕後才會送出資料。頁面不會自動送出，也不會從生成內容執行外部動作。", modeDisabled:"服務未開放 AI 操作。", consentNeeded:"執行 AI 操作前，請先勾選資料傳送同意。", noRetries:"未知結果不會自動重送。", checkStatus:"查詢工作狀態", stillChecking:"仍在查詢同一工作。", jobUnknown:"工作狀態未知；伺服器沒有回報可確認的結果。", jobRecoverable:"可查詢這筆工作的伺服器狀態；頁面不會自動重送。", clearJob:"清除狀態提示", callUnknown:"送出結果未知", working:"工作進行中…", jobAccepted:"伺服器已接受工作。", statusQueued:"排入佇列", statusRunning:"正在執行", statusCompleted:"完成", statusFailed:"失敗", statusUnknown:"未知", jobFailed:"工作失敗", recovered:"已從伺服器查回工作結果。", malformedResponse:"伺服器回應格式不完整。", actionNo:"行動", completed:"工作完成。", details:"詳細資料", docsError:"無法讀取雲端文件。", groupViewHint:"手機版以主題分組，資料與 81 格檢視相同。", missingArtifact:"工作完成，但回應沒有成果內容。", noTurnstile:"請完成頁面上的人機驗證後重試。", previous:"比較版本 A", roleGoal:"中心目標", runningJob:"正在查詢工作狀態。", sessionError:"無法讀取登入狀態。", siteDraft:"服務草稿", templateSaved:"範本已保存。", themeNo:"主題", titleHint:"最多 160 字。", versionCompare:"版本比較", workContract:"需求摘要", workSaved:"工作已保存。", noOverage:"不會自動加購，也不會超額扣款。", freePeriod:"免費點數每月依 Asia/Taipei 時區重設。"
@@ -33,6 +34,7 @@ const COPY = {
     artifactTitle:"Editable artifact", artifactHelp:"Editing the artifact invalidates its earlier evaluation. You can explicitly run an evaluation again.", artifactContent:"Artifact content", forceNoHTML:"Plain-text editing. Input is never executed as HTML.", workContextMissing:"This saved work has no analysis and selection data, so it cannot be re-evaluated or revised with AI. You can still edit, copy, and export the artifact.", saveWork:"Save work", copyArtifact:"Copy artifact", exportMarkdown:"Export Markdown", evaluateAgain:"Evaluate again (paid operation)", revise:"Ask AI to revise", reviseInstruction:"Revision instruction", reviseNow:"Send revision request", workTitle:"Work title", evaluation:"Evaluation", evaluationPass:"Pass", evaluationFail:"Fail", evaluationUnknown:"Unknown / cannot determine", evaluationInvalidated:"The artifact changed; the earlier evaluation is invalidated.", evaluationDemo:"Demo mode does not run a real semantic evaluation.", evaluationConsent:"The required cross-provider consent is missing, so semantic evaluation could not run.", evaluationCheckUnavailable:"Semantic evaluation is currently unavailable.", evaluationUnavailable:"Semantic evaluation is currently unavailable.", evaluationModified:"The artifact changed. Run an evaluation again.", evaluationSourceRules:"Rule check", evaluationSourceAI:"AI evaluation", unknownReview:"Unknown does not mean pass.", copied:"Copied.", copyFailed:"Automatic copy failed. Select the text manually.",
     pricing:"Plans & pricing", pricingLead:"The two products have separate subscriptions and do not share credits.", studioPro:"Studio Pro", mandalaPro:"Mandala Pro", freePlan:"Free", perMonth:"/month", works:"saved works", templates:"templates", cloudGoals:"cloud goals", freeStudio:"20 credits/month, 5 works, and 3 templates.", proStudio:"200 credits/month, 100 works, and 50 templates.", freeMandala:"Full manual editing and export; one cloud goal after sign-in; no AI credits.", proMandala:"100 credits/month and up to 20 cloud goals.", checkoutUnavailable:"Checkout is not enabled by the server.", checkoutOff:"Checkout has not been enabled by the server.", checkout:"Upgrade", monthly:"Monthly", invalidCheckout:"The server did not return a valid HTTPS checkout URL.",
     privacyLead:"This page explains how the hosted frontend calls the service. Follow the operator's published policy for data handling and retention details.", termsLead:"This hosted frontend is a reviewable service draft. Payments and production operation depend on server settings.", privacyPage:"Privacy draft", termsPage:"Terms draft", privacyOne:"Sign-in and job state are managed by the same-origin service API. This interface submits content only after you explicitly start an operation.", privacyTwo:"Goals, background, analyses, and artifacts may be sent to the AI provider you choose. Do not enter confidential data that you should not share.", privacyThree:"The server controls document storage, deletion, billing, and retention. This page does not assume details that have not been published.", termsOne:"AI analysis and suggestions can be wrong. Review the input, proposals, and artifact yourself.", termsTwo:"Local Mandala files are managed on your device. Cloud features depend on your account, plan, and server limits.", termsThree:"This interface does not automatically buy, pay, deploy, or send generated content externally. Checkout redirects are available only when enabled by the service and initiated by you.", unsupportedRoute:"Page not found.",
+    trialTitle:"Free AI trial", trialLead:"AI proposes 8 themes, then expands each theme into actions. Nothing is written until you click Apply.", trialProvider:"Uses Anthropic Claude: Sonnet proposes the themes; Haiku expands them and offers other perspectives.", trialUnavailable:"The free AI trial is not available right now.", trialLimit:"Today’s free AI limit has been reached. Try again tomorrow or keep editing by hand.", trialNeedsSession:"Sign in or start the free trial to use it.", generateThemes:"Propose themes", expandTheme:"Expand this theme", expandEmpty:"Expand all empty themes", perspectives:"Try other perspectives", perspectivesTitle:"Themes from other perspectives (pick one, then replace a slot)", chooseTheme:"Choose a theme", replaceSlot:"Replace", replace:"Replace", lensQ1:"Zero-Resetter: start from zero", lensQ2:"Veteran: what worked before", lensQ3:"Border-Crosser: borrow from elsewhere", lensQ4:"Coroner: prevent failure first", skippedActions:"{n} cells duplicated another theme and were left empty. Expand again to fill them.", themeReplaced:"Theme replaced. Remember to save.", noEmptyThemes:"All 8 themes already have titles.", 
     mandalaTitle:"Mandala goal planner", mandalaLead:"Expand one central goal into 8 themes and 64 trackable actions. Manual editing, saving, and export do not need AI.", standalone:"A standalone goal-planning tool", chartTitle:"Goal title", chartLabel:"Mandala chart", themeTitle:"Theme", action:"Action", done:"Done", dueDate:"Due date", notes:"Notes", progress:"Progress", weeklyReview:"Weekly review", reviewDate:"Review date", reviewNote:"Observations and next steps", reviewProgress:"Weekly progress", saveReview:"Save weekly review", gridView:"81-cell view", groupView:"Grouped by theme", mirrored:"Mirrored theme", themesHint:"The 8 inner themes mirror into the centers of the 8 surrounding 3×3 blocks.", actionHint:"Edit action text, completion, due date, and notes.", newChart:"New goal", saveLocal:"Save on this device", saveCloud:"Save to cloud", exportJson:"Export JSON", exportMarkdown:"Export Markdown", printPdf:"Print / save PDF", importJson:"Import valid JSON", importFailed:"Import failed. Choose schemaVersion 1 JSON with 8 themes and 8 actions per theme.", localSaved:"Goals on this device", cloudSaved:"Cloud goals", noGoals:"No goals yet.", goalCount:"goals", localOnly:"Manual planning works on this device without sign-in.", cloudLimit:"The server enforces your cloud goal limit.", localHistory:"Local reviews do not create cloud versions.", useAI:"AI proposals", expand:"Expand actions", review:"Review goal", aiInstruction:"Optional instruction for AI", applyProposal:"Apply complete proposal", proposalTitle:"AI proposal (not applied)", proposalReview:"AI feedback", staleProposal:"The chart changed after this proposal was created. Run the AI operation again.", noFullChart:"The service returned written suggestions without a complete chart. Apply changes by hand.", candidateInvalid:"The service returned an invalid 8×8 proposal. Nothing was applied.", proposalApplied:"Proposal applied. Review it and save manually.", applyProposalHint:"The current chart changes only after you click Apply.", saveGoalFirst:"Save the cloud goal before opening its versions.", cloudHistory:"Cloud versions", selectCloudGoal:"Choose a cloud goal", noCloudDocs:"No cloud goals saved yet.", noHistory:"No readable version history.", noHistoryPro:"Version history requires Pro.", chooseDecision:"Choose and adjust a plan", useSelection:"Use this plan", previewSelection:"Review selection", copyDecision:"Copy decision", titleRequired:"Enter a document title.", goalRequired:"Enter a central goal first.", status:"Status", source:"Source", none:"None", version:"Version", current:"Current version", compareVersions:"Compare versions", chooseVersion:"Choose a version", chartValid:"Valid 8×8 chart", invalidChart:"Invalid chart data.", chartTooLarge:"The chart is too large. Shorten action or note text and try again.", noResult:"No result.", needsLogin:"Sign in for cloud storage.", aiMandalaNoCredits:"The free Mandala plan has no AI credits. Manual editing and export remain available.", signInToCloud:"Sign in to use cloud storage.", saveError:"Save failed.", confirmRemove:"Delete this saved item?", confirmDelete:"Delete this document?", saved:"Saved.", savedLocal:"Saved on this device.", cloudGoalSaved:"Cloud goal saved.", exportHint:"Export contains only this chart's data.", importHelp:"The entire import is validated before it replaces the current chart.", ready:"Ready", active:"Active", updated:"Updated.", signInGoogle:"Sign in with Google", supportUnavailable:"Support information has not been configured.",
     notFound:"Page not found.", loading:"Loading…", retry:"Reload", close:"Close", error:"Error", privacyNote:"Data is sent only after you start an AI operation. The page will not submit automatically or run external actions from generated content.", demoBanner:"Demo mode: analysis and generation results are synthetic fixtures returned by the server, not real model output.", requestId:"Job ID", statusQueued:"Queued", statusRunning:"Running", statusCompleted:"Completed", statusFailed:"Failed", statusUnknown:"Unknown", actionNo:"Action", completed:"Job complete.", details:"Details", docsError:"Could not load cloud documents.", groupViewHint:"On phones, actions are grouped by theme. The same data powers the 81-cell view.", missingArtifact:"The job completed without artifact content.", noTurnstile:"Complete the human check on this page and try again.", previous:"Compare version A", roleGoal:"Central goal", runningJob:"Checking job status.", sessionError:"Could not read the sign-in state.", siteDraft:"Service draft", templateSaved:"Template saved.", themeNo:"Theme", titleHint:"Up to 160 characters.", versionCompare:"Version comparison", workContract:"Request summary", workSaved:"Work saved.", noOverage:"No automatic overage or additional purchases.", freePeriod:"Free credits reset monthly in the Asia/Taipei time zone."
   }
@@ -57,10 +59,12 @@ let state = {
   ready: false, config: null, session: null, accountEpoch: 0, accountTransition: false, route: location.pathname,
   notice: null, pending: null, jobBusy: false, jobStatus: "", studioContinuation: null, studioContinuationRestored: false,
   studio: { step: 1, preflight: null, form: { taskType: "message", goal: "", input: "", requirements: "", provider: "openai", mode: "standard", providerConsent: false, consentDecisions: false }, formDirty: false, analysis: null, selection: null, contract: null, artifact: null, evaluation: null, artifactDirty: false, currentDoc: null, history: null, templates: [], works: [] },
-  mandala: { chart: createEmptyChart(), chartEpoch: 0, localId: null, cloudDoc: null, cloudHistory: null, cloudGoals: [], proposal: null, proposalSnapshot: null, proposalText: "", proposalStale: false, instruction: "", provider: "openai", mode: "standard", consent: false, reviewDate: new Date().toISOString().slice(0,10), reviewNote: "", reviewFor: null, view: "grid" },
+  mandala: { perspectives: null, pickedTheme: null, replaceSlot: 0, trialThemeId: "", chart: createEmptyChart(), chartEpoch: 0, localId: null, cloudDoc: null, cloudHistory: null, cloudGoals: [], proposal: null, proposalSnapshot: null, proposalText: "", proposalStale: false, instruction: "", provider: "openai", mode: "standard", consent: false, reviewDate: new Date().toISOString().slice(0,10), reviewNote: "", reviewFor: null, view: "grid" },
 };
 
 const langCopy = () => COPY[locale] ?? COPY.en;
+// Free Mandala trial operations; the server caps them per day, not by plan credits.
+const MANDALA_TRIAL_OPERATIONS = ["themes", "expand_theme", "expand_empty", "perspectives"];
 function tr(key, vars = {}) {
   let value = langCopy()[key] ?? COPY.zh[key] ?? key;
   for (const [name, replacement] of Object.entries(vars)) value = value.replaceAll(`{${name}}`, String(replacement));
@@ -340,6 +344,7 @@ function toMessage(error) {
   if (error.code === "network_error") return tr("apiError");
   if (error.code === "csrf_invalid" || error.code === "session_expired" || error.code === "session_required") return tr("csrfError");
   if (error.code === "insufficient_credits") return tr("noCredits");
+  if (error.code === "trial_limit") return tr("trialLimit");
   if (error.code === "guest_limit") return tr("guestTrialUsed");
   if (["trial_disabled", "turnstile_unavailable"].includes(error.code)) return tr("guestTrialUnavailable");
   if (["turnstile_required", "turnstile_rejected"].includes(error.code)) return tr("noTurnstile");
@@ -409,7 +414,8 @@ async function runJob(request, onResult, { providerConsent = false, mandalaSnaps
   if (state.jobBusy) return;
   if (state.accountTransition) return;
   if (!providerConsent) { notify(tr("consentNeeded"), "error"); return; }
-  if (!allowAi(request.product, request.mode)) {
+  const trial = request.product === "mandala" && MANDALA_TRIAL_OPERATIONS.includes(request.operation);
+  if (trial ? !(state.config?.mandalaTrial && (isSignedIn() || guestSessionActive())) : !allowAi(request.product, request.mode)) {
     if (!isSignedIn() && getEntitlement(request.product).plan !== "guest") notify(tr("signInFirst"), "error");
     else if (state.config?.mode === "disabled") notify(tr("modeDisabled"), "error");
     else notify(tr("noCredits"), "error");
@@ -851,9 +857,17 @@ async function processJobResult(result, pending) {
       return;
     }
   }
+  if (pending.product === "mandala" && result.perspectives) {
+    state.mandala.perspectives = result.perspectives; state.mandala.pickedTheme = null;
+    state.mandala.proposal = null; state.mandala.proposalText = ""; state.mandala.proposalSnapshot = null;
+    setNotice(tr("perspectivesTitle"), "success");
+    navigate("/mandala");
+    return;
+  }
   if (pending.product === "mandala") {
     const mandala = state.mandala;
     mandala.proposal = null;
+    mandala.proposalSource = MANDALA_TRIAL_OPERATIONS.includes(pending.operation) ? "trial" : "paid";
     mandala.proposalSnapshot = pending.mandalaSnapshot ?? null;
     mandala.proposalStale = !mandalaOperationSnapshotMatches(mandala.proposalSnapshot, mandala);
     if (result.chart) {
@@ -866,6 +880,7 @@ async function processJobResult(result, pending) {
     if (!mandala.proposal && result.chart) setNotice(tr("candidateInvalid"), "warning");
     else if (mandala.proposalStale) setNotice(tr("staleProposal"), "warning");
     else if (!mandala.proposal && pending.operation === "review") setNotice(tr("noFullChart"), "warning");
+    else if (result.skipped > 0) setNotice(tr("skippedActions", { n: result.skipped }), "warning");
     else setNotice(tr("proposalTitle"), "success");
     navigate("/mandala");
   }
@@ -1092,8 +1107,9 @@ function renderMandala() {
   const track = el("span", "progress-track"); const fill = el("span"); fill.style.width = `${Math.round(progress.done / 64 * 100)}%`; track.append(fill); meter.append(track); chartCard.append(meter);
   const review = renderWeeklyReview();
   const saved = renderMandalaSaved(); saved.classList.add("mandala-saved");
+  const trial = renderMandalaTrial(); trial.classList.add("mandala-ai");
   const ai = renderMandalaAI(); ai.classList.add("mandala-ai");
-  section.append(chartCard, review, saved, ai);
+  section.append(chartCard, trial, review, saved, ai);
   page.append(section);
   if (!mandala.cloudLoaded && isSignedIn()) loadMandalaCloudGoals();
 }
@@ -1322,6 +1338,120 @@ function renderMandalaVersionCompare(doc, versions) {
   }
   update(); box.append(field(tr("previous"), beforePick), field(tr("current"), afterPick), diff); return box;
 }
+// The free trial runs on fixed Anthropic models; the paid AI panel below
+// keeps its own provider and mode choices.
+function guestSessionActive() {
+  const expiresAt = Date.parse(getEntitlement("studio").limits?.expiresAt ?? "");
+  return !isSignedIn() && Number.isFinite(expiresAt) && expiresAt > Date.now();
+}
+function renderMandalaTrial() {
+  const mandala = state.mandala;
+  const box = el("section", "panel"); box.append(sectionTitle(tr("trialTitle"), tr("trialLead")), el("p", "help", tr("trialProvider")));
+  if (!state.config?.mandalaTrial) { box.append(alertBox(tr("trialUnavailable"), "warning")); return box; }
+  const ready = isSignedIn() || guestSessionActive();
+  if (!ready) {
+    box.append(alertBox(tr("trialNeedsSession"), "warning"));
+    const row = el("div", "action-row");
+    if (state.config?.authEnabled) row.append(link(tr("signIn"), "/api/auth/login", "button small"));
+    if (guestTrialState() === "available" && (state.config?.mode !== "live" || state.config?.turnstileSiteKey)) row.append(btn(tr("guestStart"), { cls: "button small secondary", action: () => startGuest() }));
+    box.append(row);
+    return box;
+  }
+  const consent = input("", { type: "checkbox", checked: mandala.consent, onInput: (event) => { mandala.consent = event.target.checked; update(); } });
+  const consentLine = el("label", "check-line"); consentLine.append(consent, el("span", "", tr("providerConsent"))); box.append(consentLine);
+  const run = (operation, extra = {}) => {
+    try { validateChart(mandala.chart); } catch (error) { notify(chartError(error), "error"); return; }
+    if (!mandala.chart.goal.trim()) { notify(tr("goalRequired"), "error"); return; }
+    const payload = { chart: chartDto(mandala.chart), ...extra }; if (mandala.instruction.trim()) payload.instruction = mandala.instruction.trim();
+    const snapshot = createMandalaOperationSnapshot({ chart: payload.chart, localId: mandala.localId, cloudDoc: mandala.cloudDoc, epoch: mandala.chartEpoch });
+    if (!snapshot) { notify(tr("candidateInvalid"), "error"); return; }
+    runJob({ product: "mandala", operation, provider: "anthropic", mode: "standard", consentDecisions: false, payload }, processJobResult, { providerConsent: mandala.consent, mandalaSnapshot: snapshot });
+  };
+  const buttons = [];
+  const add = (row, button) => { buttons.push(button); row.append(button); };
+  const themeRow = el("div", "action-row");
+  const emptyThemes = mandala.chart.themes.filter((t) => !t.title.trim()).length;
+  const themesButton = btn(tr("generateThemes"), { cls: "button primary", title: emptyThemes ? "" : tr("noEmptyThemes"), action: () => run("themes") });
+  add(themeRow, themesButton);
+  add(themeRow, btn(tr("perspectives"), { cls: "button", action: () => run("perspectives") }));
+  box.append(themeRow);
+  const titled = mandala.chart.themes.filter((t) => t.title.trim());
+  if (!titled.some((t) => t.id === mandala.trialThemeId)) mandala.trialThemeId = titled[0]?.id ?? "";
+  const expandRow = el("div", "action-row");
+  if (titled.length) {
+    expandRow.append(field(tr("chooseTheme"), select(mandala.trialThemeId, titled.map((t) => [t.id, t.title]), (event) => { mandala.trialThemeId = event.target.value; })));
+    add(expandRow, btn(tr("expandTheme"), { cls: "button", action: () => run("expand_theme", { themeId: mandala.trialThemeId }) }));
+    add(expandRow, btn(tr("expandEmpty"), { cls: "button", action: () => run("expand_empty") }));
+  }
+  box.append(expandRow);
+  function update() { for (const button of buttons) button.disabled = state.jobBusy || !mandala.consent || (button === themesButton && !emptyThemes); }
+  update();
+  if (mandala.proposalSource === "trial") renderMandalaProposal(box);
+  if (mandala.perspectives?.length) box.append(renderPerspectives());
+  return box;
+}
+function renderPerspectives() {
+  const mandala = state.mandala;
+  const wrap = el("section", "proposal"); wrap.append(el("h3", "", tr("perspectivesTitle")));
+  const grid = el("div", "form-grid");
+  for (const lens of mandala.perspectives) {
+    const column = el("div", "stack"); column.append(el("p", "eyebrow", tr(`lens${lens.lens}`)));
+    const list = el("div", "action-row");
+    for (const theme of lens.themes) {
+      const picked = mandala.pickedTheme === theme;
+      list.append(btn(theme, { cls: picked ? "button small primary" : "button small", action: () => { mandala.pickedTheme = theme; render(); } }));
+    }
+    column.append(list); grid.append(column);
+  }
+  wrap.append(grid);
+  if (mandala.pickedTheme) {
+    const row = el("div", "action-row");
+    const slots = mandala.chart.themes.map((t, i) => [String(i), `${i + 1}. ${t.title || "—"}`]);
+    row.append(el("span", "badge", mandala.pickedTheme), field(tr("replaceSlot"), select(String(mandala.replaceSlot), slots, (event) => { mandala.replaceSlot = Number(event.target.value); })));
+    row.append(btn(tr("replace"), { cls: "button secondary", action: () => {
+      mandala.chart.themes[mandala.replaceSlot].title = mandala.pickedTheme; mandala.pickedTheme = null;
+      touchChart(); notify(tr("themeReplaced"), "success"); render();
+    } }));
+    wrap.append(row);
+  }
+  return wrap;
+}
+// Shared by the paid AI panel and the free trial panel; the proposal shows
+// next to the controls that produced it.
+function renderMandalaProposal(box) {
+  const mandala = state.mandala;
+  if (mandala.proposal) {
+    const proposal = el("section", "proposal"); proposal.append(el("h3", "", tr("proposalTitle")), el("p", "muted", tr("applyProposalHint")));
+    if (mandala.proposalStale) proposal.append(alertBox(tr("staleProposal"), "warning"));
+    if (mandala.proposalSource === "trial") proposal.append(proposalChanges(mandala.chart, mandala.proposal));
+    else { const preview = el("pre"); preview.textContent = mandala.proposalText || JSON.stringify(mandala.proposal, null, 2); proposal.append(preview); }
+    proposal.append(btn(tr("applyProposal"), { cls: "button secondary", disabled: mandala.proposalStale, action: () => {
+      const current = { chart: mandala.chart, localId: mandala.localId, cloudDoc: mandala.cloudDoc, epoch: mandala.chartEpoch };
+      const outcome = applyMandalaProposalIfCurrent(current, mandala.proposalSnapshot, mandala.proposal);
+      if (!outcome.applied) { mandala.proposalStale = true; setNotice(tr("staleProposal"), "warning"); render(); return; }
+      try { state.mandala.chart = structuredClone(validateChart(outcome.chart)); state.mandala.chartEpoch++; state.mandala.proposal = null; state.mandala.proposalText = ""; state.mandala.proposalSnapshot = null; state.mandala.proposalStale = false; setNotice(tr("proposalApplied"), "success"); render(); }
+      catch { notify(tr("candidateInvalid"), "error"); }
+    } }));
+    box.append(proposal);
+  } else if (mandala.proposalText) {
+    const proposal = el("section", "proposal"); proposal.append(el("h3", "", tr("proposalReview")));
+    if (mandala.proposalStale) proposal.append(alertBox(tr("staleProposal"), "warning"));
+    else proposal.append(el("p", "muted", tr("noFullChart")));
+    const preview = el("pre"); preview.textContent = mandala.proposalText; proposal.append(preview); box.append(proposal);
+  }
+}
+// Trial proposals only fill blanks, so list what would be added.
+function proposalChanges(chart, proposal) {
+  const list = el("ul", "help");
+  proposal.themes.forEach((theme, t) => {
+    const before = chart.themes[t];
+    if (!before) return;
+    if (theme.title && theme.title !== before.title) list.append(el("li", "", `${tr("themeTitle")} ${t + 1}：${theme.title}`));
+    const added = theme.actions.filter((a, i) => a.text && a.text !== before.actions[i]?.text).map((a) => a.text);
+    if (added.length) list.append(el("li", "", `${theme.title || before.title}：${added.join("、")}`));
+  });
+  return list;
+}
 function renderMandalaAI() {
   const mandala = state.mandala;
   const box = el("section", "panel"); box.append(sectionTitle(tr("useAI"), tr("applyProposalHint")), creditsPanel("mandala"));
@@ -1355,24 +1485,7 @@ function renderMandalaAI() {
   }
   function updateAiButtons() { for (const button of aiButtons) button.disabled = state.jobBusy || !mandala.consent || !allowAi("mandala", mandala.mode); }
   box.append(actions);
-  if (mandala.proposal) {
-    const proposal = el("section", "proposal"); proposal.append(el("h3", "", tr("proposalTitle")), el("p", "muted", tr("applyProposalHint")));
-    if (mandala.proposalStale) proposal.append(alertBox(tr("staleProposal"), "warning"));
-    const preview = el("pre"); preview.textContent = mandala.proposalText || JSON.stringify(mandala.proposal, null, 2); proposal.append(preview);
-    proposal.append(btn(tr("applyProposal"), { cls: "button secondary", disabled: mandala.proposalStale, action: () => {
-      const current = { chart: mandala.chart, localId: mandala.localId, cloudDoc: mandala.cloudDoc, epoch: mandala.chartEpoch };
-      const outcome = applyMandalaProposalIfCurrent(current, mandala.proposalSnapshot, mandala.proposal);
-      if (!outcome.applied) { mandala.proposalStale = true; setNotice(tr("staleProposal"), "warning"); render(); return; }
-      try { state.mandala.chart = structuredClone(validateChart(outcome.chart)); state.mandala.chartEpoch++; state.mandala.proposal = null; state.mandala.proposalSnapshot = null; state.mandala.proposalStale = false; setNotice(tr("proposalApplied"), "success"); render(); }
-      catch { notify(tr("candidateInvalid"), "error"); }
-    } }));
-    box.append(proposal);
-  } else if (mandala.proposalText) {
-    const proposal = el("section", "proposal"); proposal.append(el("h3", "", tr("proposalReview")));
-    if (mandala.proposalStale) proposal.append(alertBox(tr("staleProposal"), "warning"));
-    else proposal.append(el("p", "muted", tr("noFullChart")));
-    const preview = el("pre"); preview.textContent = mandala.proposalText; proposal.append(preview); box.append(proposal);
-  }
+  if (mandala.proposalSource !== "trial") renderMandalaProposal(box);
   return box;
 }
 

@@ -30,6 +30,10 @@ Keep secrets in the Worker secret store, outside Git and client assets. Do not p
 | `TRIAL_DAILY_BUDGET_USD` | Separate trial cost cap, default USD 0.50 and never greater than the global daily cap |
 | `TRIAL_DAILY_LIMIT` | New trial sessions per UTC day, default 25, maximum 100 |
 | `TRIAL_IP_DAILY_LIMIT` | New trials per hashed edge IP per UTC day, default/maximum 3 |
+| `MANDALA_OWNER_DAILY_CHARTS` | Free Mandala AI: theme proposals per guest or user per Asia/Taipei day, default 3; 0 turns the trial off |
+| `MANDALA_OWNER_DAILY_CALLS` | Free Mandala AI: expansions and perspectives per guest or user per day, default 30 |
+| `MANDALA_PLATFORM_DAILY_CHARTS` | Free Mandala AI: theme proposals across the whole platform per day, default 200 |
+| `MANDALA_PLATFORM_DAILY_CALLS` | Free Mandala AI: expansions and perspectives across the platform per day, default 2000 |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Challenge keys for the configured hostname; render with action `guest_trial` |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Independent direct-provider credentials; only configured providers can be requested |
 | `DECISIONS_ENABLED` | Must equal `true` to enable the optional OpenAI Decisions checks; unavailable checks remain `unknown` |
@@ -45,7 +49,7 @@ The BFF does not accept client price IDs, owner IDs, credit balances, billing pe
 
 ## Supabase preparation (requires separate authorization)
 
-1. Select a new staging project and take a recoverable schema backup. Apply `apps/hosted/migrations/0001_hosted.sql` as the Supabase migration owner. The script expects Supabase `auth.users`, `auth.uid()`, `anon`, `authenticated`, and `service_role`.
+1. Select a new staging project and take a recoverable schema backup. Apply `apps/hosted/migrations/0001_hosted.sql`, then `0002_mandala_trial.sql`, as the Supabase migration owner. The script expects Supabase `auth.users`, `auth.uid()`, `anon`, `authenticated`, and `service_role`.
 2. Verify the resulting functions are service-role only. Check every hosted table has enabled/forced RLS and that two real staging users cannot read or write each other’s records. Authenticated clients may select their own documents/jobs/subscription summaries; they cannot call mutation or ownership-parameter RPCs. Version selection additionally requires the document product’s current Pro plan.
 3. Configure Google OAuth through Supabase Auth. Allow the exact application origin and `/api/auth/callback` redirect, including its `flow` query parameter. The BFF uses Supabase PKCE (`s256`), a ten-minute encrypted verifier cookie and a same-browser random flow binding. It exchanges the one-use code server-side.
 4. Verify login/callback/logout and concurrent refresh against the real staging project. The browser gets a random opaque seven-day session cookie, `Secure`, `HttpOnly`, `SameSite=Lax`, host-only and `Path=/`. Access/refresh tokens stay encrypted in a service-only table. Refresh has a database lease. An uncertain/failed refresh revokes the local session and requires sign-in again.
@@ -134,3 +138,9 @@ Launch remains blocked until all of the following are independently evidenced an
 Rollback is to disable AI/billing flags, route traffic back to the prior Worker version and retain the database for reconciliation/export. Do not drop hosted tables or restore an old database over new user/payment data as an automatic rollback. Destructive database operations require a reviewed backup/restore plan and explicit owner authorization.
 
 References used for protocol details: [Cloudflare Workflow retries](https://developers.cloudflare.com/workflows/build/sleeping-and-retrying/), [Supabase PKCE](https://supabase.com/docs/guides/auth/sessions/pkce-flow), [Paddle signature verification](https://developer.paddle.com/webhooks/about/signature-verification/), [Paddle transaction creation](https://developer.paddle.com/api-reference/transactions/create-transaction/).
+
+## Free Mandala AI trial
+
+Mandala's AI is free to use during the trial; the Pro price on the pricing page is the planned price. Four operations bypass plan credits: `themes`, `expand_theme`, `expand_empty` and `perspectives`. They accept only `provider: "anthropic"` and `mode: "standard"`, and run on fixed models: `themes` on `claude-sonnet-5-5` at effort `low`, everything else on `claude-haiku-5-5` at effort `low`, each with a JSON-schema response format. `perspectives` makes four parallel calls, one per Intent Galaxy quadrant; `expand_empty` makes one call per titled theme with empty actions. The program, not a model, checks every result: the exact count, no blank entries, and no duplicates of each other or of what the user already wrote. Every result is a proposal the user applies.
+
+`hosted_reserve_job` (from `0002_mandala_trial.sql`) admits these operations for guests and every signed-in plan. It counts a theme proposal against the `charts` caps and any other trial call against the `calls` caps, both per owner and platform-wide (`owner_key = 'platform'` in `hosted_credit_usage`), per Asia/Taipei day. A cap that is reached raises `trial_limit` (HTTP 429). When a job fails, the owner's count is returned but the platform count is not, so a failing provider cannot push usage past the daily total. The existing daily, monthly and guest-trial USD budgets still apply on top of these counts. With the default `TRIAL_DAILY_BUDGET_USD` of 0.50, guests can hold at most seven theme reservations at USD 0.07 each at once. Raise it to match `MANDALA_PLATFORM_DAILY_CHARTS` before opening the trial to guests.

@@ -24,6 +24,8 @@ export function strings(value, name, limit = 12, max = 500) {
   return value.map(v => text(v, name, max));
 }
 export const TASK_TYPES = ['message', 'weekly', 'compare'];
+// Kept here, not in mandala-ai.mjs, so validation has no provider dependency.
+export const MANDALA_TRIAL_OPERATIONS = ['themes', 'expand_theme', 'expand_empty', 'perspectives'];
 
 export function validateChart(raw) {
   const c = boundedJson(raw, 80000);
@@ -110,9 +112,17 @@ export function validateJobRequest(raw) {
     operation: r.operation, provider: oneOf(r.provider ?? 'openai', ['openai', 'anthropic'], 'provider'),
     mode: oneOf(r.mode ?? 'standard', ['standard', 'deep'], 'mode'), consentDecisions: r.consentDecisions === true, payload: {} };
   if (result.product === 'mandala') {
-    oneOf(r.operation, ['expand', 'review'], 'operation');
+    oneOf(r.operation, ['expand', 'review', ...MANDALA_TRIAL_OPERATIONS], 'operation');
     result.payload = { chart: validateChart(r.payload.chart), instruction: text(r.payload.instruction ?? '', 'instruction', 2000, true) };
     text(result.payload.chart.goal, 'goal', 500);
+    if (MANDALA_TRIAL_OPERATIONS.includes(r.operation)) {
+      // Free trial operations run on fixed Anthropic models in one cost class.
+      if (result.provider !== 'anthropic' || result.mode !== 'standard') fail('This operation runs on the standard Anthropic models only.');
+      if (r.operation === 'expand_theme') {
+        if (typeof r.payload.themeId !== 'string' || !result.payload.chart.themes.some(t => t.id === r.payload.themeId)) fail('Choose a theme on this chart.');
+        result.payload.themeId = r.payload.themeId;
+      }
+    }
   } else {
     oneOf(r.operation, ['analyze', 'generate', 'revise', 'evaluate'], 'operation');
     const c = validateContract(r.payload.contract ?? r.payload);

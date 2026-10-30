@@ -40,6 +40,8 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       insert into auth.users values('${U}'),('${V}');`);
     const migration = readFileSync(new URL('../migrations/0001_hosted.sql', import.meta.url), 'utf8');
     execFileSync('psql', [...args], { input: migration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    const trialMigration = readFileSync(new URL('../migrations/0002_mandala_trial.sql', import.meta.url), 'utf8');
+    execFileSync('psql', [...args], { input: trialMigration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
 
     await t.test('RLS hides other tenants and authenticated callers cannot run service RPCs', () => {
       reset();
@@ -176,6 +178,30 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       rpc('webhook_apply', { ...otherBase, id: 'evt_other_cancel', type: 'subscription.canceled', action: 'revoke', status: 'canceled', occurredAt: new Date(occurred + 4000).toISOString() });
       rpc('webhook_apply', { ...paid, ...otherBase, id: 'evt_other_payment', transactionId: 'txn_other' });
       assert.equal(JSON.parse(sql(`select hosted_entitlements('${V}');`)).studio.plan, 'free');
+    });
+
+    await t.test('free Mandala trial: per-owner and platform daily caps, guests allowed, owner refund only on failure', () => {
+      reset(); const gid = '44444444-4444-4444-8444-444444444444';
+      rpc('guest_create', { id: gid, browserHash: 'mandala-browser', ipHash: 'ip', expiresAt: new Date(Date.now() + 3600000).toISOString(), ipDailyLimit: 3, globalDailyLimit: 25 });
+      const limits = { mandalaOwnerDailyCharts: 1, mandalaOwnerDailyCalls: 2, mandalaPlatformDailyCharts: 2, mandalaPlatformDailyCalls: 10 };
+      const trial = (owner, operation, key) => job({ owner, key, requestHash: key, request: { product: 'mandala', operation, mode: 'standard' }, reservedMicros: 70000, ...limits });
+      const first = rpc('reserve_job', trial({ guestId: gid }, 'themes', 'g-themes-1'));
+      assert.equal(first.created, true);
+      // Free users have no Mandala credits, but the trial does not use the plan.
+      assert.equal(rpc('reserve_job', trial({ userId: U }, 'themes', 'u-themes-1')).created, true);
+      assert.throws(() => rpc('reserve_job', trial({ userId: V }, 'themes', 'v-themes-1')), /trial_limit/);
+      assert.throws(() => rpc('reserve_job', trial({ guestId: gid }, 'themes', 'g-themes-2')), /trial_limit/);
+      rpc('reserve_job', trial({ guestId: gid }, 'expand_theme', 'g-cell-1')); rpc('reserve_job', trial({ guestId: gid }, 'perspectives', 'g-cell-2'));
+      assert.throws(() => rpc('reserve_job', trial({ guestId: gid }, 'expand_empty', 'g-cell-3')), /trial_limit/);
+      // A failed job returns the owner's count; the platform total stays spent.
+      sql(`select hosted_job_claim('${first.id}'); select hosted_job_finish('${first.id}','failed',null,'operation_rejected',0);`);
+      assert.equal(sql(`select used from hosted_credit_usage where owner_key='g:${gid}' and period like 'trial-charts:%';`), '0');
+      assert.equal(sql(`select used from hosted_credit_usage where owner_key='platform' and period like 'trial-charts:%';`), '2');
+      assert.throws(() => rpc('reserve_job', trial({ guestId: gid }, 'themes', 'g-themes-3')), /trial_limit/);
+      // The paid operations and the deep mode still follow the plan.
+      assert.throws(() => rpc('reserve_job', job({ owner: { userId: V }, key: 'v-expand', request: { product: 'mandala', operation: 'expand', mode: 'standard' } })), /quota_exceeded/);
+      assert.throws(() => rpc('reserve_job', { ...trial({ userId: V }, 'expand_theme', 'v-deep'), creditCost: 10, request: { product: 'mandala', operation: 'expand_theme', mode: 'deep' } }), /trial_limit/);
+      assert.throws(() => rpc('reserve_job', { ...trial({ userId: V }, 'expand_theme', 'v-off'), mandalaOwnerDailyCalls: 0 }), /trial_limit/);
     });
 
     await t.test('guest caps and 24-hour payload cleanup retain aggregate cost and trial tombstone', () => {
