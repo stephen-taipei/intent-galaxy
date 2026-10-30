@@ -5,8 +5,8 @@
 - **零外部 Runtime 依賴（0 Dependencies）**、Node.js >= 22、Apache-2.0 License。
 - **三位一體發行形態**：
   1. **Local CLI & MCP Server (`apps/cli`)**：支援 `npx @stephen.taipei/intent-galaxy` 於本機 `127.0.0.1` 啟動，並支援 Stdio MCP 協議直接與 Claude Code / CLI 工具雙向通訊。
-  2. **Chrome & Firefox Extensions (`apps/extension`, `apps/extension-firefox`)**：將 `🌌 iG` (Intent Galaxy) 膠囊按鈕注入各大 AI 網頁版（Claude, ChatGPT, Grok, Gemini），點擊後原地展開星系 Overlay，按下 Enter 直接將鎖定之 `LOCKED INTENT AST` 注入對話輸入框。
-  3. **Claude Code Mod 原生 UI 整合 (`apps/web` & Mod Injector)**：完美融入作者自訂之 Claude 狀態列（`Sub5 | cL | cS | cA | cR | gF | Recap` 旁新增 `🌌 iG` 膠囊），實現零剪貼、零視窗跳轉的原生開發流。
+  2. **Chrome & Firefox Extensions (`apps/extension`, `apps/extension-firefox`)**：將 Intent Galaxy logo 圖示按鈕（舊版為 `🌌 iG` 文字膠囊）注入各大 AI 網頁版（Claude, ChatGPT, Grok, Gemini），點擊後原地展開星系 Overlay，按下 Enter 直接將鎖定之 `LOCKED INTENT AST` 注入對話輸入框。
+  3. **Claude Code Mod 原生 UI 整合 (`apps/web` & Mod Injector)**：完美融入作者自訂之 Claude 狀態列（`Sub5 | cL | cS | cA | cR | gF | Recap` 旁新增 Intent Galaxy logo 圖示），實現零剪貼、零視窗跳轉的原生開發流。
 
 ## 2. 唯一真理來源 (Single Source of Truth)
 - 任何架構、資料結構、演算法與 UI 變更，**MUST** 嚴格遵循根目錄之 `INTENT-SPEC-FINAL.md` (v1.0.0 Galaxy-First Edition)。
@@ -23,7 +23,7 @@ intent-galaxy/
 ├── apps/
 │   ├── cli/                      # npx 入口 (bin/intent-galaxy.mjs)：127.0.0.1 HTTP + Stdio MCP Server
 │   ├── web/                      # 純正星系版 Web UI + Claude Code Mod 狀態列整合介面
-│   ├── extension/                # Chrome Extension (MV3) — 注入 `🌌 iG` 膠囊與星系 Overlay
+│   ├── extension/                # Chrome Extension (MV3) — 注入 Intent Galaxy logo 圖示與星系 Overlay
 │   └── extension-firefox/        # Firefox Extension — 跨瀏覽器支援
 └── libs/
     ├── protocol/                 # @intent-eng/protocol: Canonical Schema v1.0 型別定義

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Intent Galaxy V2 extension preview</title>
+  <style>
+    :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", sans-serif; color: #14213d; background: #fff; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; min-width: 320px; min-height: 520px; margin: 0; overflow: hidden; }
+    body { display: grid; grid-template-columns: 265px minmax(0, 1fr); }
+    button, textarea { font: inherit; }
+    button { color: inherit; }
+    .sidebar { position: relative; display: flex; flex-direction: column; gap: 18px; min-height: 0; padding: 24px 14px 16px; overflow: auto; border-right: 1px solid #e8edf5; background: #f6f8fc; }
+    .sidebar h1 { margin: 0 8px; font-size: 19px; letter-spacing: -.02em; }
+    .new-chat { display: flex; align-items: center; gap: 12px; min-height: 50px; padding: 0 16px; border: 1px solid #dbe3ef; border-radius: 12px; background: #fff; font-weight: 600; text-align: left; }
+    .new-chat .plus { color: #52627c; font-size: 22px; font-weight: 400; }
+    .side-label { margin: 8px 8px -7px; color: #7888a1; font-size: 13px; font-weight: 600; }
+    .history { display: grid; gap: 8px; }
+    .history-item { display: flex; gap: 10px; align-items: center; width: 100%; min-height: 48px; padding: 8px 12px; border: 0; border-radius: 12px; background: transparent; color: #52627c; text-align: left; }
+    .history-item.active { background: #e8f0ff; color: #173767; font-weight: 650; }
+    .history-icon { flex: none; font-size: 17px; }
+    .history-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-faint { height: 8px; border-radius: 8px; background: #dce4ef; }
+    .history-faint:nth-child(2) { width: 80%; }
+    .history-faint:nth-child(3) { width: 63%; }
+    .preview-tools { display: grid; gap: 7px; margin-top: auto; padding-top: 12px; border-top: 1px solid #e1e7f0; }
+    .preview-tools h2 { margin: 0 6px 2px; color: #7888a1; font-size: 12px; font-weight: 650; }
+    .preview-tools button { padding: 8px 9px; border: 1px solid #dce4ef; border-radius: 8px; background: #fff; color: #394b66; font-size: 11px; text-align: left; }
+    .preview-tools button:hover { background: #f1f5fb; }
+    .local-note { margin: 0 5px; color: #8a98ac; font-size: 10px; line-height: 1.5; }
+    .runtime-log { flex: none; margin-top: 2px; border-top: 1px solid #e1e7f0; color: #52627c; font-size: 10px; }
+    .runtime-log summary { padding: 8px 3px; cursor: pointer; font-weight: 650; }
+    .runtime-log .log-actions { display: flex; justify-content: flex-end; padding-bottom: 5px; }
+    .runtime-log .log-actions button { padding: 4px 7px; border: 1px solid #dce4ef; border-radius: 6px; background: #fff; font-size: 10px; }
+    .runtime-log .log-head, .runtime-log li { display: grid; grid-template-columns: 58px 58px 48px minmax(0, 1fr); gap: 4px; align-items: start; }
+    .runtime-log .log-head { padding: 3px 2px; color: #8391a5; font-size: 9px; }
+    .runtime-log ol { display: grid; gap: 3px; max-height: 220px; margin: 0; padding: 0 2px 8px; overflow: auto; list-style: none; }
+    .runtime-log li { padding: 4px 2px; border-top: 1px solid #edf1f6; font: 9px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .runtime-log li span { min-width: 0; overflow-wrap: anywhere; }
+    .runtime-log li .route { color: #31527f; }
+    .main { position: relative; display: flex; min-width: 0; min-height: 0; flex-direction: column; background: #fff; }
+    .chat-header { flex: none; display: flex; align-items: center; justify-content: space-between; min-height: 88px; padding: 18px 36px; }
+    .chat-header h2 { margin: 0; overflow: hidden; color: #14213d; font-size: clamp(22px, 2vw, 30px); letter-spacing: -.035em; text-overflow: ellipsis; white-space: nowrap; }
+    .chat-header button { width: 36px; height: 36px; border: 0; border-radius: 8px; background: transparent; color: #51627d; font-size: 22px; }
+    .thread-scroll { flex: 1; min-height: 0; overflow: auto; padding: 18px 28px 150px; }
+    .thread { display: grid; gap: 26px; width: min(720px, 100%); margin: 0 auto; }
+    .message { display: flex; align-items: flex-start; gap: 14px; }
+    .message.user { justify-content: flex-end; }
+    .avatar { display: grid; flex: none; width: 40px; height: 40px; place-items: center; border-radius: 50%; background: #edf2f8; color: #495c78; font-size: 17px; }
+    .bubble { max-width: min(570px, 86%); padding: 16px 20px; border: 1px solid #e0e7f0; border-radius: 17px; background: #fff; color: #263754; font-size: 16px; line-height: 1.7; }
+    .user .bubble { border-color: #e0ebff; background: #edf4ff; }
+    .analysis-card { display: grid; gap: 5px; padding: 15px 18px; border: 1px solid #dfe7f1; border-radius: 14px; background: #fff; color: #223552; }
+    .analysis-card strong { font-size: 15px; }
+    .analysis-card span { color: #6e7f99; font-size: 12px; }
+    .analysis-card .run-token { justify-self: start; margin-top: 3px; padding: 3px 7px; border-radius: 6px; background: #f3f6fb; color: #72829a; font: 10px ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .composer-wrap { position: absolute; right: 0; bottom: 20px; left: 0; padding: 0 28px; }
+    .composer { display: flex; align-items: flex-end; gap: 10px; width: min(684px, 100%); margin: 0 auto; padding: 10px 12px; border: 1px solid #dbe4f0; border-radius: 18px; background: #fff; box-shadow: 0 6px 24px rgba(34,54,86,.06); }
+    .attach { flex: none; align-self: center; padding: 0 5px; color: #566985; font-size: 20px; }
+    #prompt-textarea { flex: 1; min-width: 0; min-height: 42px; max-height: 110px; padding: 10px 5px; resize: none; border: 0; outline: 0; background: transparent; color: #263754; font-size: 14px; line-height: 1.5; }
+    #prompt-textarea::placeholder { color: #92a0b3; }
+    .composer-actions { display: flex; align-items: center; gap: 7px; }
+    #send { flex: none; width: 42px; height: 42px; border: 0; border-radius: 50%; background: #203452; color: #fff; font-size: 20px; cursor: pointer; }
+    #send:hover { background: #31527f; }
+    @media (max-width: 760px) {
+      body { grid-template-columns: 72px minmax(0, 1fr); }
+      .sidebar { gap: 14px; padding: 16px 8px; }
+      .sidebar h1 { margin: 0; overflow: hidden; font-size: 0; }
+      .sidebar h1::after { content: "AI"; font-size: 16px; }
+      .new-chat { justify-content: center; padding: 0; font-size: 0; }
+      .new-chat .plus { font-size: 21px; }
+      .side-label, .history-text, .history-faint, .preview-tools h2, .preview-tools button, .local-note { display: none; }
+      .history-item { justify-content: center; padding: 5px; }
+      .preview-tools { display: flex; justify-content: center; }
+      .preview-tools::before { content: "⚙"; color: #64748b; }
+      .chat-header { min-height: 68px; padding: 12px 18px; }
+      .thread-scroll { padding: 18px 14px 130px; }
+      .composer-wrap { bottom: 12px; padding: 0 12px; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" aria-label="示意對話側欄">
+    <h1>AI 對話・示意</h1>
+    <button class="new-chat" type="button"><span class="plus" aria-hidden="true">＋</span>新對話</button>
+    <p class="side-label">對話記錄</p>
+    <nav class="history" aria-label="對話記錄">
+      <button class="history-item active" type="button"><span class="history-icon" aria-hidden="true">▢</span><span id="history-title" class="history-text">家裡適合買洗碗機嗎？</span></button>
+      <p class="side-label">之前的對話</p>
+      <div class="history-item" aria-hidden="true"><span class="history-icon">◯</span><span class="history-faint"></span></div>
+      <div class="history-item" aria-hidden="true"><span class="history-icon">◯</span><span class="history-faint"></span></div>
+      <div class="history-item" aria-hidden="true"><span class="history-icon">◯</span><span class="history-faint"></span></div>
+    </nav>
+    <section class="preview-tools" aria-label="預覽工具">
+      <h2>本機預覽工具</h2>
+      <button id="reset-demo" type="button">重設示範對話與資料</button>
+      <button id="fill-prompt" type="button">填入示範問題</button>
+      <button id="clear-prompt" type="button">清空輸入框</button>
+      <button id="switch-conversation" type="button">模擬切換另一段對話</button>
+      <button id="toggle-temporary" type="button">切換暫時對話模式</button>
+      <p class="local-note">此頁只在本機運作。送出只會加入本頁文字，不會呼叫模型或傳送網路請求。</p>
+    </section>
+    <details id="runtime-log" class="runtime-log">
+      <summary>Runtime 訊息紀錄</summary>
+      <div class="log-actions"><button id="clear-runtime-log" type="button">清除紀錄</button></div>
+      <div class="log-head" aria-hidden="true"><span>type</span><span>nonce</span><span>id</span><span>route</span></div>
+      <ol id="runtime-log-list" aria-live="polite"></ol>
+    </details>
+  </aside>
+
+  <main class="main">
+    <header class="chat-header">
+      <h2 id="thread-title">家裡適合買洗碗機嗎？</h2>
+      <button type="button" aria-label="更多對話選項">···</button>
+    </header>
+    <div class="thread-scroll" id="thread-scroll">
+      <section class="thread" id="thread" aria-label="示意對話">
+        <article class="message user">
+          <div class="bubble">我想買洗碗機。家裡兩個人，預算一萬五，廚房檯面不大。</div>
+          <div class="avatar" aria-hidden="true">●</div>
+        </article>
+        <article class="message assistant">
+          <div class="avatar" aria-hidden="true">▣</div>
+          <div class="bubble">我們可以先確認空間與安裝條件，再比較適合的方向。</div>
+        </article>
+        <article class="analysis-card">
+          <strong>Intent Galaxy 分析已完成</strong>
+          <span>根據你的需求整理了 3 個方向，供你比較。</span>
+          <span id="run-token" class="run-token">[ig:a1b2c3d4]</span>
+        </article>
+      </section>
+    </div>
+    <div class="composer-wrap">
+      <div class="composer" aria-label="訊息輸入區">
+        <span class="attach" aria-hidden="true">⌁</span>
+        <textarea id="prompt-textarea" rows="1" autocomplete="off" placeholder="繼續對話 …" aria-label="訊息"></textarea>
+        <div class="composer-actions">
+          <button id="send" type="button" aria-label="送出訊息">➜</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="/fixture/extension-preview.js"></script>
+</body>
+</html>

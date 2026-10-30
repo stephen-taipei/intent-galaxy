@@ -96,8 +96,8 @@
   "en": "Stop waiting"
  },
  "pn.gaveUpMsg": {
-  "zh-Hant-TW": "已放棄等待。可以在輸入框打新的問題，再按 iG。",
-  "en": "Stopped waiting. You can type a new question in the input box, then press iG."
+  "zh-Hant-TW": "已放棄等待。可以在輸入框打新的問題，再按旁邊的 Intent Galaxy 圖示。",
+  "en": "Stopped waiting. You can type a new question in the input box, then press the Intent Galaxy icon next to it."
  },
  "pn.promptPlacedStrip": {
   "zh-Hant-TW": "📨 提示詞已放進輸入框：請按對話框的送出鍵，送出後這裡會自動接著等",
@@ -116,8 +116,8 @@
   "en": "View a demo meanwhile"
  },
  "pn.slowNote": {
-  "zh-Hant-TW": "超過 20 秒還沒有回覆：可能選了深度推理模型（如 Pro、Thinking），常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 iG 按鈕會顯示 ✓；想快一點，下次先在網頁上切換到一般模型。",
-  "en": "No reply after 20 seconds: you may have picked a deep-reasoning model (such as Pro or Thinking), which often takes 5–15 minutes. You can press \"—\" in the top-right corner to minimize the panel; the iG button shows ✓ when it's done. For faster results, switch to a standard model on the page next time."
+  "zh-Hant-TW": "超過 20 秒還沒有回覆：可能選了深度推理模型（如 Pro、Thinking），常要 5–15 分鐘。可以按右上角「—」縮小面板，完成時 Intent Galaxy 圖示會顯示 ✓；想快一點，下次先在網頁上切換到一般模型。",
+  "en": "No reply after 20 seconds: you may have picked a deep-reasoning model (such as Pro or Thinking), which often takes 5–15 minutes. You can press \"—\" in the top-right corner to minimize the panel; the Intent Galaxy icon shows ✓ when it's done. For faster results, switch to a standard model on the page next time."
  },
  "pn.stillGenerating": {
   "zh-Hant-TW": "⋯ 「{goal}」仍在生成，完成時會自動換成它的星系",
@@ -212,8 +212,8 @@
   "en": "First, write down what you need to decide"
  },
  "pn.introBody": {
-  "zh-Hant-TW": "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點 iG 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。",
-  "en": "Type one sentence about something you're undecided on into this page's input box (for example, \"How do I choose a dishwasher?\"), then click iG or press <kbd>Cmd/Ctrl+Shift+G</kbd>.<br>The galaxy breaks it into 12 viewpoints from 4 angles and 3 plans; once you pick one, the plan is filled back into the input box for the AI to follow."
+  "zh-Hant-TW": "在這個網頁的輸入框打一句你正在猶豫的事（例如「如何挑選洗碗機？」），再點輸入框旁的 Intent Galaxy 圖示 或按 <kbd>Cmd/Ctrl+Shift+G</kbd>。<br>星系會把它拆成 4 種角度的 12 個觀點和 3 條方案，你選好後，方案會填回輸入框讓 AI 照著回答。",
+  "en": "Type one sentence about something you're undecided on into this page's input box (for example, \"How do I choose a dishwasher?\"), then click the Intent Galaxy icon next to the input box or press <kbd>Cmd/Ctrl+Shift+G</kbd>.<br>The galaxy breaks it into 12 viewpoints from 4 angles and 3 plans; once you pick one, the plan is filled back into the input box for the AI to follow."
  },
  "pn.newQuestionTitle": {
   "zh-Hant-TW": "輸入框有新的問題",
@@ -252,8 +252,8 @@
   "en": "Give up and ask the new question"
  },
  "pn.cancelledElsewhere": {
-  "zh-Hant-TW": "這個生成已在其他分頁取消。可以在輸入框打問題，再按 iG。",
-  "en": "This generation was cancelled in another tab. You can type a question in the input box, then press iG."
+  "zh-Hant-TW": "這個生成已在其他分頁取消。可以在輸入框打問題，再按旁邊的 Intent Galaxy 圖示。",
+  "en": "This generation was cancelled in another tab. You can type a question in the input box, then press the Intent Galaxy icon next to it."
  },
  "pn.lockNotWritten": {
   "zh-Hant-TW": "決定紀錄沒有存成功：{detail}",

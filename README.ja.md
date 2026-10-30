@@ -43,7 +43,7 @@
 | ---- | ---- | ---- | :--: |
 | **CLI** | エンジニア | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 の星系サーバー。生成には Claude、Codex、Gemini、agy CLI または 12 社の API を選択可能 | ✅ |
 | **MCP** | エンジニア | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`。Claude Code、Codex、Gemini CLI、agy から利用可能 | ✅ |
-| **Extension** | 一般ユーザー | Chrome / Firefox：Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi の入力欄の横に <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** カプセルを追加し、そのサイトの AI に星系を生成させる | ✅ |
+| **Extension** | 一般ユーザー | Chrome / Firefox：Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi の入力欄の横に <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy アイコン"> **Intent Galaxy** アイコンボタンを追加。プランを比較し、必要に応じて星系を確認または詳細調整してからプレビューし、入力欄に戻してユーザー自身が送信します | ✅ |
 | **Kill-gate** | エンジニア | `.intent.lock.json`（RFC 8785 JCS + SHA-256）と、14 日後の commit を検証するゲートキーパー | ✅ |
 
 <br>
@@ -230,26 +230,30 @@ npm run build:ext    # apps/extension と apps/extension-firefox に同期。そ
 npm run pack:ext     # ストア公開用に dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip も生成
 ```
 
-入力欄に迷っていることを一文書いて、<img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG**（またはツールバーのアイコン、`Cmd/Ctrl+Shift+G`）をクリック：
+入力欄に迷っていることを一文書いて、<img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy アイコン"> **Intent Galaxy** アイコン（またはツールバーのアイコン、`Cmd/Ctrl+Shift+G`）をクリック：
+
+この会話に分析結果がある場合は、以下の比較にそのまま進みます。初回は拡張機能が生成プロンプトを入力欄に入れます。ユーザー自身が送信し、サイトの AI の返答を待ってから、以下の比較・プレビュー手順に進みます。
 
 ```mermaid
 flowchart LR
-    A["iG をクリック"] --> B{"この会話で<br/>生成済み？"}
-    B -- はい --> C["星系をそのまま表示"]
-    B -- いいえ --> D["プロンプトを入力欄に挿入<br/>送信はユーザーが行う"]
-    D --> E["Web の AI が JSON を返答"]
-    E --> F["星系を自動で描画<br/>プロンプトと返答は 1 行に折りたたみ"]
-    B -. ローカル CLI がオンライン .-> G["「ローカル AI を使う」も選択可<br/>会話にプロンプトが残らない"]
-    G --> F
+    A["Intent Galaxy アイコンをクリック"] --> B["プランを比較"]
+    B --> C{"星系を確認または<br/>詳細調整する？"}
+    C -- はい --> D["任意：星系を確認<br/>または詳細調整"]
+    C -- いいえ --> E["選択したプランをプレビュー"]
+    D --> E
+    E --> F["会話の入力欄に戻す"]
+    F --> G["サイト上でユーザーが送信"]
 ```
+
+表示を切り替えても AI は再度呼び出されません。
 
 | 機能 | 説明 |
 | --- | --- |
-| 生成元 | デフォルトでは現在のサイトの AI に依頼（会話の文脈が見える）。ローカル CLI がオンラインなら「ローカル AI を使う」ボタンが追加される。拡張機能が自動送信することはない |
+| 生成元 | デフォルトでは現在の会話の AI が選択肢を生成します。利用可能な場合はローカル AI も選べます。プレビュー後に拡張機能が選択したプランを入力欄へ戻し、送信はユーザー自身が行います |
 | 折りたたみ | 拡張機能自身が送信し、確実に識別できるメッセージだけを折りたたむ。サイト構造を認識できない場合は折りたたまない。クリックで展開可能 |
 | 待ち時間 | 推論系の上位モデルでは 5–15 分かかることがある。20 秒を超えると通知され、パネルを縮小しておける。完了するとボタンに「✓ 星系完成」と表示 |
 | 返答が読めない | サイトが長いコードブロックを折りたたんでいる場合は「JSON を貼り付け」で手動読み込み |
-| 記憶 | 同じ会話を開き直したりリロードしたりすると、生成済みの星系をそのまま表示。データは拡張機能内にのみ 30 日間保存。シークレットウィンドウと ChatGPT の一時チャットでは保存しない |
+| 記憶 | 同じ会話を開き直したり再読み込みしたりすると、生成済みの星系、選んだプラン、補足が戻ります。選択が記憶されるのはサイトの AI が生成した星系だけで、ローカル AI、ページから読み取った星系、デモは毎回最初からです。拡張機能内に 30 日間だけ保存され、シークレットウィンドウと ChatGPT の一時チャットでは保存しません |
 | プライバシー | パネルとページ間の通信は拡張機能の内部メッセージのみ。サイト側のスクリプトからは質問内容も星系も読めない |
 | ロックファイル | `.intent.lock.json` を書き込むのはローカル CLI で生成した星系のみ。Web の AI、貼り付け、デモの星系はプランを入力欄に戻すだけ |
 | パネル | タイトルバーをドラッグで移動、右下をドラッグでリサイズ、タイトルバーをダブルクリックで最大化。透明度も調整可能 |
@@ -266,6 +270,8 @@ flowchart LR
 | `npm test` | libs の単体テスト、CLI の結合テスト、拡張機能の同期、npm pack の E2E テスト |
 | `npm start` | ソースから直接起動（Node ランタイムが TypeScript の型を除去） |
 | `npm run build` | `dist/` を生成（npm パッケージの中身。npm pack / publish の前に自動実行） |
+| `npm run build:ext` | 拡張機能をビルドして `apps/extension` と `apps/extension-firefox` に同期（ローカルで読み込み可能） |
+| `npm run preview:ext` | `http://127.0.0.1:4789/` でサンプルデータを使ったローカルプレビューを開きます。実際の AI サイトはテストしません |
 | `npm run bench:latency -- --providers claude,codex` | 固定の 10 問で生成レイテンシを計測（実際にモデルを呼び出す）。結果は `bench/latency.jsonl` に出力 |
 
 アーキテクチャとデータ構造は [`INTENT-SPEC-FINAL.md`](INTENT-SPEC-FINAL.md) を正とします。
