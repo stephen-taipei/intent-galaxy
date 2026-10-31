@@ -7,6 +7,8 @@ const ERRORS = {
   pro_required: [403, 'This feature requires this product’s Pro plan.'], idempotency_conflict: [409, 'This key was already used for a different request.'],
   checkout_pending: [409, 'Checkout is pending reconciliation.'], session_busy: [409, 'The session is refreshing. Please retry shortly.'],
   session_expired: [401, 'Please sign in again.'], billing_conflict: [409, 'Billing information needs reconciliation.'],
+  trial_login_required: [403, 'Sign in to use the free Mandala AI, or open an invite link.'], invite_limit: [429, 'You have reached today’s invite limit or have too many unused invites.'],
+  invite_invalid: [404, 'This invite code is invalid, used or expired.'], invite_used: [409, 'This browser has already used an invite.'],
 };
 
 /** Production persistence: every mutation is a service-only, atomic Postgres RPC.
@@ -58,4 +60,12 @@ export class PostgrestRepository {
   webhookApply(event) { return this.rpc('webhook_apply', { p_event: event }); }
   recordEvent(userId, name, product, templateId) { return this.rpc('record_event', { p_user_id: userId, p_name: name, p_product: product, p_template_id: templateId }); }
   cleanup() { return this.rpc('cleanup'); }
+  userUpsert(identity) { return this.rpc('user_upsert', { p_identity: identity }); }
+  touchActivity(userId) { return this.rpc('touch_activity', { p_user_id: userId }); }
+  inviteCreate(value) { return this.rpc('invite_create', { p_invite: value }); }
+  inviteList(userId) { return this.rpc('invite_list', { p_user_id: userId }); }
+  inviteRedeem(value) { return this.rpc('invite_redeem', { p_redeem: value }); }
+  inviteConvert(browserHash, userId) { return this.rpc('invite_convert', { p_browser_hash: browserHash, p_user_id: userId }); }
+  accountDelete(userId) { return this.rpc('account_delete', { p_user_id: userId }); }
+  metrics(days) { return this.rpc('metrics', { p_days: days }); }
 }

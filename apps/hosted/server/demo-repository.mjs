@@ -15,6 +15,7 @@ export class DemoRepository {
     this.jobs = new Map(); this.jobKeys = new Map(); this.credits = new Map(); this.budgets = new Map();
     this.documents = new Map(); this.versions = new Map(); this.checkouts = new Map(); this.checkoutKeys = new Map();
     this.subscriptions = new Map(); this.billingLinks = new Map(); this.payments = new Map(); this.webhooks = new Map(); this.events = new Map();
+    this.identities = new Map(); this.activity = new Set(); this.invites = new Map(); this.redemptions = new Map();
   }
   async sessionGet(id) { const s = this.sessions.get(id); return s && Date.parse(s.expiresAt) > this.clock() ? clone(s) : null; }
   async sessionCreate(value) { this.sessions.set(value.id, clone(value)); return true; }
@@ -24,7 +25,7 @@ export class DemoRepository {
     if (s.refreshUntil > this.clock()) fail('session_busy'); s.refreshUntil = this.clock() + 30000; return true;
   }
   async sessionRefresh(id, tokens, expiresAt) { const s = this.sessions.get(id); if (!s) fail('session_expired', 401); Object.assign(s, { tokens, accessExpiresAt: expiresAt, refreshUntil: null }); return true; }
-  async guestGet(id) { const guest = this.guests.get(id); return guest && Date.parse(guest.expiresAt) > this.clock() ? { ...clone(guest), remainingAnalyses: Math.max(0, 1 - (this.credits.get(`g:${id}:analyze`) || 0)), remainingGenerations: Math.max(0, 1 - (this.credits.get(`g:${id}:generate`) || 0)) } : null; }
+  async guestGet(id) { const guest = this.guests.get(id); return guest && Date.parse(guest.expiresAt) > this.clock() ? { ...clone(guest), invite: Boolean(guest.inviteCode), remainingAnalyses: Math.max(0, 1 - (this.credits.get(`g:${id}:analyze`) || 0)), remainingGenerations: Math.max(0, 1 - (this.credits.get(`g:${id}:generate`) || 0)) } : null; }
   async guestCreate(value) {
     const now = this.clock(); const day = new Date(now).toISOString().slice(0, 10);
     if (this.trials.has(value.browserHash)) fail('guest_limit', 429);
@@ -43,7 +44,7 @@ export class DemoRepository {
     const answer = {};
     for (const product of ['studio', 'mandala']) {
       const plan = this.plan(userId, product); const used = this.credits.get(`${userId}:${product}:${plan.period}`) || 0;
-      answer[product] = { plan: plan.plan, credits: Math.max(0, plan.allowance - used), limits: product === 'studio' ? { works: plan.plan === 'pro' ? 100 : 5, templates: plan.plan === 'pro' ? 50 : 3, goals: 0 } : { works: 0, templates: 0, goals: plan.plan === 'pro' ? 20 : 1 } };
+      answer[product] = { plan: plan.plan, credits: Math.max(0, plan.allowance - used), limits: product === 'studio' ? { works: plan.plan === 'pro' ? 100 : 5, templates: plan.plan === 'pro' ? 50 : 3, goals: 0 } : { works: 0, templates: 0, goals: plan.plan === 'pro' ? 20 : 10 } };
     }
     return answer;
   }
@@ -53,15 +54,17 @@ export class DemoRepository {
     if (existing) { if (existing.requestHash !== value.requestHash) fail('idempotency_conflict'); return { ...clone(existing), created: false }; }
     let creditKey; let allowance; let platformKey;
     if (value.request.product === 'mandala' && MANDALA_TRIAL_OPERATIONS.includes(value.request.operation)) {
-      // Mirrors 0002_mandala_trial.sql: per-owner and platform caps per Asia/Taipei day.
       if (value.request.mode !== 'standard' || value.creditCost !== 1) fail('trial_limit', 429);
-      if (value.owner.guestId) { const guest = this.guests.get(value.owner.guestId); if (!guest || Date.parse(guest.expiresAt) <= this.clock()) fail('guest_limit', 429); }
+      // Mirrors 0003: guests need an invite and get a lifetime allowance.
+      const guest = value.owner.guestId && this.guests.get(value.owner.guestId);
+      if (value.owner.guestId && (!guest || Date.parse(guest.expiresAt) <= this.clock())) fail('guest_limit', 429);
+      if (guest && !guest.inviteCode) fail('trial_login_required', 403);
       const kind = value.request.operation === 'themes' ? 'charts' : 'calls';
       const day = new Date(this.clock() + 8 * 3600e3).toISOString().slice(0, 10);
       const period = `mandala:trial-${kind}:${day}`;
-      const owned = kind === 'charts' ? value.mandalaOwnerDailyCharts : value.mandalaOwnerDailyCalls;
+      const owned = guest ? (kind === 'charts' ? value.mandalaInviteCharts : value.mandalaInviteCalls) : kind === 'charts' ? value.mandalaOwnerDailyCharts : value.mandalaOwnerDailyCalls;
       const platform = kind === 'charts' ? value.mandalaPlatformDailyCharts : value.mandalaPlatformDailyCalls;
-      platformKey = `platform:${period}`; creditKey = `${ownerKey(value.owner)}:${period}`;
+      platformKey = `platform:${period}`; creditKey = `${ownerKey(value.owner)}:${guest ? `mandala:trial-${kind}:invite` : period}`;
       if (!(owned > 0) || !(platform > 0) || (this.credits.get(platformKey) || 0) + 1 > platform || (this.credits.get(creditKey) || 0) + 1 > owned) fail('trial_limit', 429);
     } else if (value.owner.userId) {
       const plan = this.plan(value.owner.userId, value.request.product);
@@ -118,7 +121,7 @@ export class DemoRepository {
     return this.documentGet(userId, id);
   }
   async documentDelete(userId, id) { this.ownedDocument(userId, id); this.documents.delete(id); this.versions.delete(id); return true; }
-  async documentVersions(userId, id) { const doc = this.ownedDocument(userId, id); if (this.plan(userId, doc.product).plan !== 'pro') fail('pro_required', 403); return clone(this.versions.get(id)); }
+  async documentVersions(userId, id) { const doc = this.ownedDocument(userId, id); if (doc.product !== 'mandala' && this.plan(userId, doc.product).plan !== 'pro') fail('pro_required', 403); return clone(this.versions.get(id)); }
   async checkoutBegin(userId, product, key) {
     const k = `${userId}:${key}`; const existing = this.checkouts.get(this.checkoutKeys.get(k));
     if (existing) { if (existing.product !== product) fail('idempotency_conflict'); return { ...clone(existing), created: false }; }
@@ -169,6 +172,49 @@ export class DemoRepository {
       if (!previous || Date.parse(event.occurredAt) > Date.parse(previous.lastEventAt)) this.subscriptions.set(key, { ...previous, ...clone(event), checkoutCreatedAt: checkout?.createdAt, lastEventAt: event.occurredAt, revoked: event.action === 'revoke' || previous?.revoked || false });
     }
     this.webhooks.set(event.id, clone(event)); return { received: true };
+  }
+  async userUpsert({ provider, subject, email }) {
+    const key = `${provider}:${subject}`; const known = this.identities.get(key);
+    if (known) { known.email = email; return { id: known.userId, email, created: false }; }
+    const userId = crypto.randomUUID(); this.identities.set(key, { userId, email, createdAt: this.clock() }); return { id: userId, email, created: true };
+  }
+  async touchActivity(userId) { this.activity.add(`${userId}:${new Date(this.clock() + 8 * 3600e3).toISOString().slice(0, 10)}`); return true; }
+  inviteJson(i) { return { code: i.code, createdAt: i.createdAt, expiresAt: i.expiresAt, status: i.convertedUserId ? 'joined' : i.redeemedAt ? 'redeemed' : Date.parse(i.expiresAt) <= this.clock() ? 'expired' : 'open' }; }
+  async inviteCreate({ userId, code, browserHash, dailyLimit, openLimit, ttlDays }) {
+    const day = new Date(this.clock() + 8 * 3600e3).toISOString().slice(0, 10); const mine = [...this.invites.values()].filter(i => i.inviterId === userId);
+    if (mine.filter(i => i.createdDay === day).length >= dailyLimit || mine.filter(i => !i.redeemedAt && Date.parse(i.expiresAt) > this.clock()).length >= openLimit) fail('invite_limit', 429);
+    const invite = { code, inviterId: userId, createdBrowserHash: browserHash, createdDay: day, createdAt: new Date(this.clock()).toISOString(), expiresAt: new Date(this.clock() + ttlDays * 86400000).toISOString() };
+    this.invites.set(code, invite); return this.inviteJson(invite);
+  }
+  async inviteList(userId) { return [...this.invites.values()].filter(i => i.inviterId === userId).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 30).map(i => this.inviteJson(i)); }
+  async inviteRedeem({ code, browserHash, ipHash, ipDailyLimit, guestId, expiresAt }) {
+    const invite = this.invites.get(code); const day = new Date(this.clock()).toISOString().slice(0, 10);
+    if (!invite || invite.redeemedAt || Date.parse(invite.expiresAt) <= this.clock() || invite.createdBrowserHash === browserHash) fail('invite_invalid', 404);
+    if (this.redemptions.has(browserHash)) fail('invite_used');
+    if ([...this.redemptions.values()].filter(r => r.ipHash === ipHash && r.day === day).length >= ipDailyLimit) fail('guest_limit', 429);
+    this.redemptions.set(browserHash, { ipHash, day, code });
+    this.guests.set(guestId, { id: guestId, expiresAt, inviteCode: code });
+    Object.assign(invite, { redeemedAt: new Date(this.clock()).toISOString(), redeemedBrowserHash: browserHash });
+    return this.guestGet(guestId);
+  }
+  async inviteConvert(browserHash, userId) {
+    let changed = false;
+    for (const invite of this.invites.values()) if (invite.redeemedBrowserHash === browserHash && !invite.convertedUserId && invite.inviterId !== userId) { invite.convertedUserId = userId; changed = true; }
+    return changed;
+  }
+  async accountDelete(userId) {
+    if ([...this.payments.values()].some(p => p.userId === userId)) fail('billing_conflict');
+    for (const [id, s] of this.sessions) if (s.user.id === userId) this.sessions.delete(id);
+    for (const [id, d] of this.documents) if (d.userId === userId) { this.documents.delete(id); this.versions.delete(id); }
+    for (const [key, i] of this.identities) if (i.userId === userId) this.identities.delete(key);
+    for (const [code, i] of this.invites) if (i.inviterId === userId) this.invites.delete(code);
+    for (const key of this.credits.keys()) if (key.startsWith(`${userId}:`) || key.startsWith(`u:${userId}:`)) this.credits.delete(key);
+    for (const key of this.activity) if (key.startsWith(`${userId}:`)) this.activity.delete(key);
+    return true;
+  }
+  async metrics(days) {
+    const invites = [...this.invites.values()];
+    return { synthetic: true, days, signups: this.identities.size, activeUserDays: this.activity.size, invites: { created: invites.length, redeemed: invites.filter(i => i.redeemedAt).length, joined: invites.filter(i => i.convertedUserId).length } };
   }
   async recordEvent(_userId, name, product, templateId) { const k = `${new Date(this.clock()).toISOString().slice(0, 10)}:${name}:${product}:${templateId || ''}`; this.events.set(k, Math.min(1000000, (this.events.get(k) || 0) + 1)); return true; }
   async cleanup() {

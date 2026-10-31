@@ -25,7 +25,7 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
   const args = ['-h', root, '-p', '5432', '-U', 'hosted_test', '-d', 'postgres', '-X', '-q', '-t', '-A', '-v', 'ON_ERROR_STOP=1'];
   const sql = text => execFileSync('psql', [...args, '-c', text], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   const rpc = (name, value) => JSON.parse(sql(`select hosted_${name}(${literal(value)});`));
-  const reset = () => sql(`truncate hosted_sessions,hosted_jobs,hosted_guests,hosted_trials,hosted_credit_usage,hosted_budgets,hosted_documents,hosted_checkouts,hosted_billing_links,hosted_subscriptions,hosted_payments,hosted_webhook_events,hosted_events restart identity cascade;`);
+  const reset = () => sql(`truncate hosted_sessions,hosted_jobs,hosted_guests,hosted_trials,hosted_credit_usage,hosted_budgets,hosted_documents,hosted_checkouts,hosted_billing_links,hosted_subscriptions,hosted_payments,hosted_webhook_events,hosted_events,hosted_invites,hosted_invite_redemptions,hosted_user_activity restart identity cascade; delete from hosted_identities; delete from auth.users where id not in ('${U}','${V}');`);
   try {
     execFileSync('initdb', ['-D', data, '--no-locale', '--encoding=UTF8', '--auth=trust', '--username=hosted_test'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     execFileSync('pg_ctl', ['-D', data, '-l', join(root, 'postgres.log'), '-o', `-c listen_addresses= -c unix_socket_directories=${root} -c port=5432`, '-w', 'start'], { stdio: 'ignore' });
@@ -40,6 +40,7 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
     execFileSync('psql', [...args], { input: migration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     const trialMigration = readFileSync(new URL('../migrations/0002_mandala_trial.sql', import.meta.url), 'utf8');
     execFileSync('psql', [...args], { input: trialMigration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    execFileSync('psql', [...args], { input: readFileSync(new URL('../migrations/0003_google_invites_metrics.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
 
     await t.test('RLS hides other tenants and authenticated callers cannot run service RPCs', () => {
       reset();
@@ -140,11 +141,16 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
     await t.test('document create limits and optimistic concurrency are enforced in SQL', async () => {
       reset(); const value = { product: 'mandala', kind: 'goal', title: 'one goal', data: { schemaVersion: 1 } };
       const doc = JSON.parse(sql(`select hosted_document_create('${U}',${literal(value)});`));
+      // Free accounts keep ten Mandala charts during the free test period (0003).
+      for (let n = 1; n < 10; n++) sql(`select hosted_document_create('${U}',${literal(value)});`);
       assert.throws(() => sql(`select hosted_document_create('${U}',${literal(value)});`), /document_limit/);
       const writes = await Promise.allSettled([1, 2].map(n => exec('psql', [...args, '-c', `select hosted_document_update('${U}','${doc.id}',${literal({ title: `edit ${n}`, data: { n }, revision: 1 })});`])));
       assert.equal(writes.filter(r => r.status === 'fulfilled').length, 1);
       assert.equal(sql(`select revision from hosted_documents where id='${doc.id}';`), '2');
-      assert.throws(() => sql(`select hosted_document_versions('${U}','${doc.id}');`), /pro_required/);
+      // Mandala history is free during the test period; Studio history still needs Pro.
+      assert.equal(JSON.parse(sql(`select hosted_document_versions('${U}','${doc.id}');`)).length, 2);
+      const work = JSON.parse(sql(`select hosted_document_create('${U}',${literal({ product: 'studio', kind: 'work', title: 'w', data: {} })});`));
+      assert.throws(() => sql(`select hosted_document_versions('${U}','${work.id}');`), /pro_required/);
       assert.equal(sql(`select count(*) from hosted_document_versions where document_id='${doc.id}';`), '2');
     });
 
@@ -180,11 +186,16 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       assert.equal(JSON.parse(sql(`select hosted_entitlements('${V}');`)).studio.plan, 'free');
     });
 
-    await t.test('free Mandala trial: per-owner and platform daily caps, guests allowed, owner refund only on failure', () => {
-      reset(); const gid = '44444444-4444-4444-8444-444444444444';
-      rpc('guest_create', { id: gid, browserHash: 'mandala-browser', ipHash: 'ip', expiresAt: new Date(Date.now() + 3600000).toISOString(), ipDailyLimit: 3, globalDailyLimit: 25 });
-      const limits = { mandalaOwnerDailyCharts: 1, mandalaOwnerDailyCalls: 2, mandalaPlatformDailyCharts: 2, mandalaPlatformDailyCalls: 10 };
+    await t.test('free Mandala trial: daily caps for accounts, invite-only for guests, owner refund only on failure', () => {
+      reset(); const gid = '44444444-4444-4444-8444-444444444444'; const plain = '55555555-5555-4555-8555-555555555555';
+      const limits = { mandalaOwnerDailyCharts: 1, mandalaOwnerDailyCalls: 2, mandalaInviteCharts: 1, mandalaInviteCalls: 2, mandalaPlatformDailyCharts: 2, mandalaPlatformDailyCalls: 10 };
       const trial = (owner, operation, key) => job({ owner, key, requestHash: key, request: { product: 'mandala', operation, mode: 'standard' }, reservedMicros: 70000, ...limits });
+      // A plain browser trial is for the Studio only; the Mandala needs an account or an invite.
+      rpc('guest_create', { id: plain, browserHash: 'plain-browser', ipHash: 'ip', expiresAt: new Date(Date.now() + 3600000).toISOString(), ipDailyLimit: 3, globalDailyLimit: 25 });
+      assert.throws(() => rpc('reserve_job', trial({ guestId: plain }, 'themes', 'plain-themes')), /trial_login_required/);
+      const code = 'ABCDEFGH23';
+      rpc('invite_create', { userId: U, code, browserHash: 'inviter-browser', dailyLimit: 3, openLimit: 3, ttlDays: 7 });
+      assert.equal(rpc('invite_redeem', { code: code.toLowerCase(), browserHash: 'friend-browser', ipHash: 'ip', ipDailyLimit: 3, guestId: gid, expiresAt: new Date(Date.now() + 3600000).toISOString() }).invite, true);
       const first = rpc('reserve_job', trial({ guestId: gid }, 'themes', 'g-themes-1'));
       assert.equal(first.created, true);
       // Free users have no Mandala credits, but the trial does not use the plan.
@@ -195,13 +206,64 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       assert.throws(() => rpc('reserve_job', trial({ guestId: gid }, 'expand_empty', 'g-cell-3')), /trial_limit/);
       // A failed job returns the owner's count; the platform total stays spent.
       sql(`select hosted_job_claim('${first.id}'); select hosted_job_finish('${first.id}','failed',null,'operation_rejected',0);`);
-      assert.equal(sql(`select used from hosted_credit_usage where owner_key='g:${gid}' and period like 'trial-charts:%';`), '0');
+      assert.equal(sql(`select used from hosted_credit_usage where owner_key='g:${gid}' and period='trial-charts:invite';`), '0');
       assert.equal(sql(`select used from hosted_credit_usage where owner_key='platform' and period like 'trial-charts:%';`), '2');
       assert.throws(() => rpc('reserve_job', trial({ guestId: gid }, 'themes', 'g-themes-3')), /trial_limit/);
       // The paid operations and the deep mode still follow the plan.
       assert.throws(() => rpc('reserve_job', job({ owner: { userId: V }, key: 'v-expand', request: { product: 'mandala', operation: 'expand', mode: 'standard' } })), /quota_exceeded/);
       assert.throws(() => rpc('reserve_job', { ...trial({ userId: V }, 'expand_theme', 'v-deep'), creditCost: 10, request: { product: 'mandala', operation: 'expand_theme', mode: 'deep' } }), /trial_limit/);
       assert.throws(() => rpc('reserve_job', { ...trial({ userId: V }, 'expand_theme', 'v-off'), mandalaOwnerDailyCalls: 0 }), /trial_limit/);
+    });
+
+    await t.test('invites: daily and open limits, single use, one per browser, not the inviter, conversion', () => {
+      reset(); const create = (code, browserHash = 'inviter') => rpc('invite_create', { userId: U, code, browserHash, dailyLimit: 3, openLimit: 2, ttlDays: 7 });
+      const redeem = (code, browserHash, guestId) => rpc('invite_redeem', { code, browserHash, ipHash: 'ip', ipDailyLimit: 2, guestId, expiresAt: new Date(Date.now() + 3600000).toISOString() });
+      create('AAAAAAAAA2'); create('AAAAAAAAA3');
+      assert.throws(() => create('AAAAAAAAA4'), /invite_limit/);
+      assert.throws(() => redeem('AAAAAAAAA2', 'inviter', '61111111-1111-4111-8111-111111111111'), /invite_invalid/);
+      redeem('AAAAAAAAA2', 'friend', '62222222-2222-4222-8222-222222222222');
+      assert.throws(() => redeem('AAAAAAAAA2', 'other', '63333333-3333-4333-8333-333333333333'), /invite_invalid/);
+      assert.throws(() => redeem('AAAAAAAAA3', 'friend', '64444444-4444-4444-8444-444444444444'), /invite_used/);
+      // Redeeming freed an open slot; the third code of the day is the last.
+      create('AAAAAAAAA4');
+      assert.throws(() => create('AAAAAAAAA5'), /invite_limit/);
+      assert.throws(() => rpc('invite_create', { userId: V, code: 'lowercase1', browserHash: 'v', dailyLimit: 3, openLimit: 2, ttlDays: 7 }), /check constraint/);
+      sql("update hosted_invites set expires_at=now()-interval '1 second' where code='AAAAAAAAA3';");
+      assert.throws(() => redeem('AAAAAAAAA3', 'late', '65555555-5555-4555-8555-555555555555'), /invite_invalid/);
+      assert.equal(sql(`select hosted_invite_convert('friend','${U}');`), 'f');
+      assert.equal(sql(`select hosted_invite_convert('friend','${V}');`), 't');
+      assert.deepEqual(JSON.parse(sql(`select hosted_invite_list('${U}');`)).map(i => i.status).sort(), ['expired', 'joined', 'open']);
+    });
+
+    await t.test('Google identities, activity, metrics and account deletion', () => {
+      reset();
+      const first = rpc('user_upsert', { provider: 'google', subject: 'google-sub-1', email: 'a@example.test' });
+      assert.equal(first.created, true);
+      const again = rpc('user_upsert', { provider: 'google', subject: 'google-sub-1', email: 'new@example.test' });
+      assert.equal(again.id, first.id); assert.equal(again.created, false); assert.equal(again.email, 'new@example.test');
+      assert.throws(() => rpc('user_upsert', { provider: 'github', subject: 'x', email: 'a@example.test' }), /not_found/);
+      sql(`select hosted_touch_activity('${first.id}'); select hosted_touch_activity('${first.id}');`);
+      sql(`update hosted_identities set created_at=now()-interval '1 day' where user_id='${first.id}'; insert into hosted_user_activity values('${first.id}',(now() at time zone 'Asia/Taipei')::date-1);`);
+      const chart = { title: 'x', goal: 'g', themes: [{ id: 't0', title: 'a', actions: Array.from({ length: 8 }, (_, i) => ({ id: `a${i}`, text: `step ${i}`, done: false })) }] };
+      sql(`insert into hosted_documents(user_id,product,kind,title,data) values('${first.id}','mandala','goal','x',${literal(chart)});`);
+      rpc('invite_create', { userId: first.id, code: 'BBBBBBBBB2', browserHash: 'b', dailyLimit: 3, openLimit: 3, ttlDays: 7 });
+      const metrics = JSON.parse(sql('select hosted_metrics(7);'));
+      assert.equal(metrics.signups, 1); assert.deepEqual(metrics.retention.d1, { eligible: 1, retained: 1 });
+      assert.equal(metrics.retention.d7.eligible, 0); assert.equal(metrics.activated, 1); assert.equal(metrics.invites.created, 1);
+      // Free test period: ten cloud charts and Mandala history without Pro.
+      assert.equal(JSON.parse(sql(`select hosted_entitlements('${first.id}');`)).mandala.limits.goals, 10);
+      const doc = sql(`select id from hosted_documents where user_id='${first.id}';`);
+      assert.equal(JSON.parse(sql(`select hosted_document_versions('${first.id}','${doc}');`)).length, 0);
+      sql(`insert into hosted_credit_usage(owner_key,product,period,used) values('u:${first.id}','mandala','trial-charts:2026-10-31',1);`);
+      assert.equal(sql(`select hosted_account_delete('${first.id}');`), 't');
+      assert.equal(sql(`select count(*) from auth.users where id='${first.id}';`), '0');
+      assert.equal(sql(`select (select count(*) from hosted_identities)+(select count(*) from hosted_documents)+(select count(*) from hosted_invites)+(select count(*) from hosted_user_activity)+(select count(*) from hosted_credit_usage);`), '0');
+      sql(`insert into hosted_payments values('txn_keep','${U}','mandala','sub',now(),now()+interval '1 month',false,now());`);
+      assert.throws(() => sql(`select hosted_account_delete('${U}');`), /billing_conflict/);
+      sql("delete from hosted_payments;");
+      // Anonymous and authenticated roles cannot reach the new tables or RPCs.
+      assert.throws(() => sql('set role authenticated; select count(*) from hosted_invites;'), /permission denied/);
+      assert.throws(() => sql(`set role authenticated; select hosted_metrics(7);`), /permission denied/);
     });
 
     await t.test('guest caps and 24-hour payload cleanup retain aggregate cost and trial tombstone', () => {

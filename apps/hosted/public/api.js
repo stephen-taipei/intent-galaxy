@@ -108,6 +108,23 @@ export class HostedApi {
 
   versions(id) { return this.request(`/api/documents/${encodeURIComponent(id)}/versions`); }
 
+  invites() { return this.request("/api/invites"); }
+
+  createInvite() { return this.request("/api/invites", { method: "POST", body: {} }); }
+
+  async redeemInvite(code, turnstileToken = "") {
+    const result = await this.request("/api/invites/redeem", { method: "POST", body: { code, turnstileToken } });
+    await this.refreshSession();
+    return result;
+  }
+
+  async deleteAccount() {
+    await this.request("/api/account", { method: "DELETE" });
+    return this.refreshSession();
+  }
+
+  event(name, product) { return this.request("/api/events", { method: "POST", body: { name, product } }); }
+
   checkout(product) {
     return this.request("/api/billing/checkout", { method: "POST", body: { product }, idempotencyKey: randomKey() });
   }

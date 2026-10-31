@@ -1,13 +1,13 @@
 import * as domain from '../domain/index.mjs';
 import { liveModelGate } from '../domain/providers.mjs';
 import { assert, modeFor, sameOrigin, constantTimeEqual, readJson, onlyKeys, idempotencyKey, sha256, stableJson, json, safeError } from './security.mjs';
-import { browserContext, loadSession, beginLogin, completeLogin, logout, createGuest, loadGuest, authEnabled } from './auth.mjs';
+import { browserContext, loadSession, beginLogin, completeLogin, logout, createGuest, loadGuest, authEnabled, googleEnabled, redeemInvite, inviteCode } from './auth.mjs';
 import { billingEnabled, createCheckout, createPortal, verifyPaddle, applyPaddleEvent } from './billing.mjs';
 import { PostgrestRepository } from './repository.mjs';
 import { DemoRepository } from './demo-repository.mjs';
 
 const demos = new WeakMap();
-const EVENTS = new Set(['page_view', 'template_selected', 'analysis_started', 'generation_started', 'evaluation_viewed', 'signup_started', 'checkout_started', 'document_saved', 'job_started', 'job_completed', 'mandala_action_toggled']);
+const EVENTS = new Set(['page_view', 'template_selected', 'analysis_started', 'generation_started', 'evaluation_viewed', 'signup_started', 'checkout_started', 'document_saved', 'job_started', 'job_completed', 'mandala_action_toggled', 'mandala_example_opened', 'invite_link_copied']);
 const EMPTY = { studio: { plan: 'guest', credits: 0, limits: { works: 0, templates: 0, goals: 0 } }, mandala: { plan: 'guest', credits: 0, limits: { works: 0, templates: 0, goals: 0 } } };
 
 function repository(env, mode, fetchImpl, clock) {
@@ -31,8 +31,20 @@ function budget(env, mode) {
 function mandalaTrialLimits(env) {
   const count = (value, fallback) => { const n = Number(value ?? fallback); return Number.isInteger(n) && n >= 0 ? n : 0; };
   return { mandalaOwnerDailyCharts: count(env.MANDALA_OWNER_DAILY_CHARTS, 3), mandalaOwnerDailyCalls: count(env.MANDALA_OWNER_DAILY_CALLS, 30),
+    mandalaInviteCharts: count(env.MANDALA_INVITE_CHARTS, 1), mandalaInviteCalls: count(env.MANDALA_INVITE_CALLS, 10),
     mandalaPlatformDailyCharts: count(env.MANDALA_PLATFORM_DAILY_CHARTS, 200), mandalaPlatformDailyCalls: count(env.MANDALA_PLATFORM_DAILY_CALLS, 2000) };
 }
+// Invite codes per signed-in account: created per Asia/Taipei day, unused at once, days valid.
+function inviteLimits(env) {
+  const count = (value, fallback, max) => { const n = Number(value ?? fallback); return Number.isInteger(n) && n >= 0 ? Math.min(n, max) : 0; };
+  return { dailyLimit: count(env.MANDALA_INVITES_DAILY, 3, 20), openLimit: count(env.MANDALA_INVITES_OPEN, 3, 20), ttlDays: count(env.MANDALA_INVITE_TTL_DAYS, 7, 30) };
+}
+function isAdmin(env, session) {
+  const email = session?.user?.email?.toLowerCase();
+  return Boolean(email) && (env.ADMIN_EMAILS || '').split(',').map(v => v.trim().toLowerCase()).filter(Boolean).includes(email);
+}
+async function touch(repo, userId) { try { await repo.touchActivity(userId); } catch { /* activity is best effort and never blocks the action */ } }
+async function convertInvite(repo, context, userId) { try { if (userId) await repo.inviteConvert(await sha256(context.browser.id), userId); } catch { /* attribution is best effort */ } }
 function aiEnabled(env, mode) { return mode === 'demo' || (mode === 'live' && liveModelGate(env) && budget(env, mode).dailyLimitMicros > 0 && budget(env, mode).monthlyLimitMicros > 0); }
 function publicJob(job) {
   return { id: job.id, status: job.status, ...(job.status === 'completed' ? { result: job.result } : {}), ...(['failed', 'unknown'].includes(job.status) ? { error: { code: job.error || 'job_failed', message: job.status === 'unknown' ? 'The provider outcome is unknown. This operation will not be sent again automatically.' : 'The operation failed. Reserved credits were released.' } } : {}) };
@@ -61,7 +73,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         if (env.ASSETS?.fetch) return secureResponse(await env.ASSETS.fetch(request), mode);
         return secureResponse(json({ error: { code: 'not_found', message: 'Not found.' } }, 404), mode);
       }
-      if (path === '/api/config' && request.method === 'GET') return secureResponse(json({ mode, authEnabled: authEnabled(env, mode), billingEnabled: billingEnabled(env, mode), turnstileSiteKey: mode === 'live' ? env.TURNSTILE_SITE_KEY || null : null, mandalaTrial: aiEnabled(env, mode) && Object.values(mandalaTrialLimits(env)).every(n => n > 0), models: aiEnabled(env, mode) ? engine.MODEL_REGISTRY : {} }), mode);
+      if (path === '/api/config' && request.method === 'GET') return secureResponse(json({ mode, authEnabled: authEnabled(env, mode), billingEnabled: billingEnabled(env, mode), turnstileSiteKey: mode === 'live' ? env.TURNSTILE_SITE_KEY || null : null, googleSignIn: googleEnabled(env, mode), mandalaTrial: aiEnabled(env, mode) && Object.values(mandalaTrialLimits(env)).every(n => n > 0), mandalaLimits: { dailyCharts: mandalaTrialLimits(env).mandalaOwnerDailyCharts, inviteCharts: mandalaTrialLimits(env).mandalaInviteCharts, invitesPerDay: inviteLimits(env).dailyLimit }, invites: authEnabled(env, mode) && Object.values(inviteLimits(env)).every(n => n > 0), models: aiEnabled(env, mode) ? engine.MODEL_REGISTRY : {} }), mode);
       assert(mode !== 'disabled', 503, 'service_disabled', 'The hosted service is not enabled.');
       const repo = injectedRepo || repository(env, mode, fetchImpl, clock);
       if (path === '/api/webhooks/paddle' && request.method === 'POST') {
@@ -83,12 +95,14 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
           entitlements.studio.credits = guest.remainingAnalyses + guest.remainingGenerations;
           entitlements.studio.limits = { ...entitlements.studio.limits, analyses: guest.remainingAnalyses, generations: guest.remainingGenerations, expiresAt: guest.expiresAt };
         }
-        response = json({ user: session?.user || null, csrfToken: session?.csrf || context.browser.csrf, entitlements });
+        response = json({ user: session?.user || null, csrfToken: session?.csrf || context.browser.csrf, entitlements, guest: guest ? { invite: guest.invite === true, expiresAt: guest.expiresAt } : null });
       } else if (path === '/api/auth/login' && request.method === 'GET') {
         assert(request.headers.get('Sec-Fetch-Site') !== 'cross-site', 403, 'origin_rejected', 'Start sign-in from this application.');
-        response = redirect(await beginLogin(context, env, mode, origin, repo, now));
+        const answer = await beginLogin(context, env, mode, origin, repo, now);
+        await convertInvite(repo, context, answer.userId); response = redirect(answer);
       } else if (path === '/api/auth/callback' && request.method === 'GET') {
-        response = redirect(await completeLogin(request, context, env, mode, repo, fetchImpl, now));
+        const answer = await completeLogin(request, context, env, mode, repo, fetchImpl, now);
+        await convertInvite(repo, context, answer.userId); response = redirect(answer);
       } else if (path === '/api/auth/logout' && request.method === 'POST') {
         response = json({ ok: true }); response.headers.append('Set-Cookie', await logout(session, context, env, mode, repo, fetchImpl));
       } else if (path === '/api/guest' && request.method === 'POST') {
@@ -118,6 +132,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
             catch { /* keep queued; polling and reconciliation expose the persisted state */ }
           }
         }
+        if (session && validated.product === 'mandala') await touch(repo, session.user.id);
         response = json({ job: { id: job.id, status: job.status } }, 202);
       } else if (/^\/api\/jobs\/[^/]+$/.test(path) && request.method === 'GET') {
         const guest = session ? null : await loadGuest(context, mode, repo, now);
@@ -131,6 +146,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         const userId = requireUser(session); const body = await readJson(request); onlyKeys(body, ['product', 'kind', 'title', 'data']);
         assert(productKind(body.product, body.kind), 400, 'invalid_document_kind', 'Choose a valid product and document kind.');
         response = json({ document: await repo.documentCreate(userId, await engine.validateDocument(body)) }, 201);
+        if (body.product === 'mandala') await touch(repo, userId);
       } else if (/^\/api\/documents\/[^/]+\/versions$/.test(path) && request.method === 'GET') {
         response = json({ versions: await repo.documentVersions(requireUser(session), path.split('/').at(-2)) });
       } else if (/^\/api\/documents\/[^/]+$/.test(path)) {
@@ -143,6 +159,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
           const current = await repo.documentGet(userId, id);
           const validated = await engine.validateDocument({ product: current.product, kind: current.kind, title: body.title, data: body.data });
           response = json({ document: await repo.documentUpdate(userId, id, { ...validated, revision: body.revision }) });
+          if (current.product === 'mandala') await touch(repo, userId);
         }
       } else if (['/api/billing/checkout', '/api/billing/portal'].includes(path) && request.method === 'POST') {
         const userId = requireUser(session); const body = await readJson(request, 1024); onlyKeys(body, ['product']);
@@ -150,6 +167,27 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         assert(billingEnabled(env, mode), 503, 'billing_disabled', 'Sandbox billing is not configured.');
         const args = { userId, product: body.product, env, repo, fetchImpl, origin };
         response = json({ url: path.endsWith('/checkout') ? await createCheckout({ ...args, key: idempotencyKey(request) }) : await createPortal(args) });
+      } else if (path === '/api/invites' && request.method === 'GET') {
+        response = json({ invites: await repo.inviteList(requireUser(session)) });
+      } else if (path === '/api/invites' && request.method === 'POST') {
+        const userId = requireUser(session); const limits = inviteLimits(env);
+        assert(Object.values(limits).every(n => n > 0), 503, 'invites_disabled', 'Invites are not enabled.');
+        const invite = await repo.inviteCreate({ userId, code: inviteCode(), browserHash: await sha256(context.browser.id), ...limits });
+        const link = new URL('/mandala', origin); link.searchParams.set('invite', invite.code);
+        response = json({ invite: { ...invite, url: link.href } }, 201);
+      } else if (path === '/api/invites/redeem' && request.method === 'POST') {
+        const body = await readJson(request, 8192); onlyKeys(body, ['code', 'turnstileToken']);
+        assert(!session, 409, 'already_signed_in', 'The signed-in account has its own allowance.');
+        const result = await redeemInvite(request, context, env, mode, repo, fetchImpl, now, body);
+        response = json({ guest: { invite: true, expiresAt: result.guest.expiresAt } }, 201);
+        response.headers.append('Set-Cookie', result.cookie);
+      } else if (path === '/api/account' && request.method === 'DELETE') {
+        await repo.accountDelete(requireUser(session));
+        response = json({ ok: true }); response.headers.append('Set-Cookie', await logout(session, context, env, mode, repo, fetchImpl));
+      } else if (path === '/api/admin/metrics' && request.method === 'GET') {
+        // Unknown to everyone but the operators listed in ADMIN_EMAILS.
+        assert(isAdmin(env, session), 404, 'not_found', 'Not found.');
+        response = json({ metrics: await repo.metrics(Math.min(180, Math.max(1, Number.parseInt(url.searchParams.get('days') || '30', 10) || 30))) });
       } else if (path === '/api/events' && request.method === 'POST') {
         const body = await readJson(request, 1024); onlyKeys(body, ['name', 'product', 'templateId']);
         const templateIds = new Set((env.TELEMETRY_TEMPLATE_IDS || 'message,weekly,compare').split(','));

@@ -34,6 +34,10 @@ Keep secrets in the Worker secret store, outside Git and client assets. Do not p
 | `MANDALA_OWNER_DAILY_CALLS` | Free Mandala AI: expansions and perspectives per guest or user per day, default 30 |
 | `MANDALA_PLATFORM_DAILY_CHARTS` | Free Mandala AI: theme proposals across the whole platform per day, default 200 |
 | `MANDALA_PLATFORM_DAILY_CALLS` | Free Mandala AI: expansions and perspectives across the platform per day, default 2000 |
+| `MANDALA_INVITE_CHARTS`, `MANDALA_INVITE_CALLS` | Free Mandala AI for a guest who redeemed an invite, for the guest's 24-hour lifetime; defaults 1 and 10 |
+| `MANDALA_INVITES_DAILY`, `MANDALA_INVITES_OPEN`, `MANDALA_INVITE_TTL_DAYS` | Invite codes per signed-in account: created per Asia/Taipei day, unused at once, days valid; defaults 3, 3, 7. Zero disables invites |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Direct Google sign-in (OpenID Connect). When both are set, sign-in uses Google directly instead of Supabase Auth. The secret is a Worker secret |
+| `ADMIN_EMAILS` | Comma-separated emails allowed to read `GET /api/admin/metrics`; everyone else gets 404 |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Challenge keys for the configured hostname; render with action `guest_trial` |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Independent direct-provider credentials; only configured providers can be requested |
 | `DECISIONS_ENABLED` | Must equal `true` to enable the optional OpenAI Decisions checks; unavailable checks remain `unknown` |
@@ -59,9 +63,9 @@ Session-cookie expiration is fixed at seven days. Browser trial/CSRF binding coo
 
 ## Self-hosted PostgreSQL instead of Supabase
 
-The Worker only needs a PostgREST endpoint at `/rest/v1`, so a self-hosted PostgreSQL with PostgREST can replace Supabase for the guest trial. Sign-in still requires Supabase Auth: leave `SUPABASE_ANON_KEY` unset and `authEnabled` stays false, which hides sign-in and keeps the free Mandala trial guest-only. Files are in `apps/hosted/selfhosted/`.
+The Worker only needs a PostgREST endpoint at `/rest/v1`, so a self-hosted PostgreSQL with PostgREST can replace Supabase. Sign-in then uses direct Google OpenID Connect (see below); leave `SUPABASE_ANON_KEY` unset. Files are in `apps/hosted/selfhosted/`.
 
-1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql` and `0002_mandala_trial.sql`. Never run `bootstrap.sql` on Supabase.
+1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql`, `0002_mandala_trial.sql` and `0003_google_invites_metrics.sql`. Never run `bootstrap.sql` on Supabase.
 2. Run PostgREST 12 with `postgrest.conf`. Pass `PGRST_DB_URI` and `PGRST_JWT_SECRET` through a mode-0600 environment file; the JWT secret is independent of every other secret. PostgREST listens on `127.0.0.1:3000` only, and PostgreSQL stays on loopback.
 3. Install `nginx-postgrest.conf`. It listens on `127.0.0.1:8088` and forwards only `POST /rest/v1/rpc/hosted_*`; everything else returns 403 or 404.
 4. Expose port 8088 through Cloudflare Tunnel (`cloudflared.yml`), so the server opens no inbound port.
@@ -69,6 +73,27 @@ The Worker only needs a PostgREST endpoint at `/rest/v1`, so a self-hosted Postg
 6. Back up the database (for example nightly `pg_dump` kept off the host) before opening the trial. Trial counters and job records live only there.
 
 The SQL suite applies the same `bootstrap.sql`, so a migration that needs another Supabase object fails in CI. PostgREST itself and the tunnel are not exercised by the tests; verify one real `hosted_reserve_job` call through the tunnel on staging.
+
+## Direct Google sign-in
+
+1. In Google Cloud Console, create an OAuth consent screen (External) with only the `openid` and `email` scopes, the application home page, and the privacy policy and terms URLs (`/privacy`, `/terms`). Fill in the bracketed placeholders in `apps/hosted/public/legal.js` first. Basic scopes do not require Google verification; move the app from Testing to In production so any Google account can sign in.
+2. Create an OAuth client of type Web application. The only authorized redirect URI is `${APP_ORIGIN}/api/auth/callback`.
+3. Set `GOOGLE_CLIENT_ID` as a var and `GOOGLE_CLIENT_SECRET` with `wrangler secret put`.
+
+The Worker sends the user to Google with PKCE (`S256`), a random `state` and a `nonce`, all bound to a ten-minute encrypted cookie. It exchanges the code server-side and reads the ID token returned by Google's token endpoint over TLS, which OpenID Connect Core 3.1.3.7 allows in place of a signature check. It still requires the issuer, audience, expiry, nonce and `email_verified`. `hosted_user_upsert` maps the Google subject to one `auth.users` row, so this mode targets the self-hosted bootstrap. The app keeps its own seven-day session and stores no Google tokens.
+
+## Free test period: invites, history and metrics
+
+`0003_google_invites_metrics.sql` sets the rules for the free test period:
+
+- **Guests** browse the pre-generated example library (`public/mandala-examples.json`) and edit charts by hand. They cannot run the Mandala AI unless they redeemed an invite (`trial_login_required`).
+- **Signed-in users** run `MANDALA_OWNER_DAILY_CHARTS` charts per day, keep up to 10 cloud charts, and see Mandala version history without Pro.
+- **Invites**: a signed-in user creates codes (`POST /api/invites`) within the daily and unused limits. A code works once, expires, cannot be redeemed from the browser that created it, and a browser can redeem only one code ever. Redeeming (`POST /api/invites/redeem`, Turnstile required) creates a 24-hour guest with the invite allowance. If that browser later signs in, the invite counts as joined.
+- **Activity**: each Mandala AI job or cloud save by a signed-in user records one row per user per Asia/Taipei day in `hosted_user_activity`.
+- **Metrics**: `GET /api/admin/metrics?days=30` (operators in `ADMIN_EMAILS` only) returns signups, daily active users, D1/D7/D30 retention by signup cohort, activated users (a cloud chart with at least 8 filled actions), invites created/redeemed/joined, trial charts per day and Mandala event counts.
+- **Account deletion**: `DELETE /api/account` removes the account and everything it owns. Accounts with payment records are refused (`billing_conflict`) so accounting records stay intact.
+
+Regenerate the example library with `ANTHROPIC_API_KEY=... node apps/hosted/scripts/generate-mandala-examples.mjs`. It keeps the hand-written seeds in `apps/hosted/examples/seed-examples.json`, generates one chart per goal in `examples/goals.json` (about USD 0.1 each), and skips goals already generated unless `--force` is given. Review the output before deploying it.
 
 ## Entitlements and documents
 
@@ -156,4 +181,4 @@ References used for protocol details: [Cloudflare Workflow retries](https://deve
 
 Mandala's AI is free to use during the trial; the Pro price on the pricing page is the planned price. Four operations bypass plan credits: `themes`, `expand_theme`, `expand_empty` and `perspectives`. They accept only `provider: "anthropic"` and `mode: "standard"`, and run on fixed models: `themes` on `claude-sonnet-5-5` at effort `low`, everything else on `claude-haiku-5-5` at effort `low`, each with a JSON-schema response format. `perspectives` makes four parallel calls, one per Intent Galaxy quadrant; `expand_empty` makes one call per titled theme with empty actions. The program, not a model, checks every result: the exact count, no blank entries, and no duplicates of each other or of what the user already wrote. Every result is a proposal the user applies.
 
-`hosted_reserve_job` (from `0002_mandala_trial.sql`) admits these operations for guests and every signed-in plan. It counts a theme proposal against the `charts` caps and any other trial call against the `calls` caps, both per owner and platform-wide (`owner_key = 'platform'` in `hosted_credit_usage`), per Asia/Taipei day. A cap that is reached raises `trial_limit` (HTTP 429). When a job fails, the owner's count is returned but the platform count is not, so a failing provider cannot push usage past the daily total. The existing daily, monthly and guest-trial USD budgets still apply on top of these counts. With the default `TRIAL_DAILY_BUDGET_USD` of 0.50, guests can hold at most seven theme reservations at USD 0.07 each at once. Raise it to match `MANDALA_PLATFORM_DAILY_CHARTS` before opening the trial to guests.
+`hosted_reserve_job` (from `0002_mandala_trial.sql`, replaced by `0003`) admits these operations for every signed-in plan and for guests who redeemed an invite. It counts a theme proposal against the `charts` caps and any other trial call against the `calls` caps, both per owner and platform-wide (`owner_key = 'platform'` in `hosted_credit_usage`), per Asia/Taipei day. A cap that is reached raises `trial_limit` (HTTP 429). When a job fails, the owner's count is returned but the platform count is not, so a failing provider cannot push usage past the daily total. The existing daily, monthly and guest-trial USD budgets still apply on top of these counts. With the default `TRIAL_DAILY_BUDGET_USD` of 0.50, guests can hold at most seven theme reservations at USD 0.07 each at once. Raise it to match `MANDALA_PLATFORM_DAILY_CHARTS` before opening the trial to guests.
