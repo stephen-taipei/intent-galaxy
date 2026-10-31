@@ -9,6 +9,7 @@ const ERRORS = {
   session_expired: [401, 'Please sign in again.'], billing_conflict: [409, 'Billing information needs reconciliation.'],
   trial_login_required: [403, 'Sign in to use the free Mandala AI, or open an invite link.'], invite_limit: [429, 'You have reached today’s invite limit or have too many unused invites.'],
   invite_invalid: [404, 'This invite code is invalid, used or expired.'], invite_used: [409, 'This browser has already used an invite.'],
+  profile_required: [409, 'Choose a nickname and an avatar before publishing.'], goal_required: [400, 'Write the goal before publishing.'],
 };
 
 /** Production persistence: every mutation is a service-only, atomic Postgres RPC.
@@ -68,4 +69,19 @@ export class PostgrestRepository {
   inviteConvert(browserHash, userId) { return this.rpc('invite_convert', { p_browser_hash: browserHash, p_user_id: userId }); }
   accountDelete(userId) { return this.rpc('account_delete', { p_user_id: userId }); }
   metrics(days) { return this.rpc('metrics', { p_days: days }); }
+  feedMetrics(days) { return this.rpc('feed_metrics', { p_days: days }); }
+  profileGet(userId) { return this.rpc('profile_get', { p_user_id: userId }); }
+  profileSet(userId, profile) { return this.rpc('profile_set', { p_user_id: userId, p_profile: profile }); }
+  publicPublish(userId, value) { return this.rpc('public_publish', { p_user_id: userId, p_publish: value }); }
+  publicUnpublish(userId, id) { return this.rpc('public_unpublish', { p_user_id: userId, p_id: id }); }
+  publicFeed(viewer, query) { return this.rpc('public_feed', { p_viewer: viewer, p_query: query }); }
+  publicGet(viewer, id) { return this.rpc('public_get', { p_viewer: viewer, p_id: id }); }
+  publicMine(userId) { return this.rpc('public_mine', { p_user_id: userId }); }
+  publicEncourage(userId, id, on) { return this.rpc('public_encourage', { p_user_id: userId, p_id: id, p_on: on }); }
+  publicCopy(userId, id) { return this.rpc('public_copy', { p_user_id: userId, p_id: id }); }
+  publicReport(userId, id, reason) { return this.rpc('public_report', { p_user_id: userId, p_id: id, p_reason: reason }); }
+  publicView(userId, id) { return this.rpc('public_view', { p_user_id: userId, p_id: id }); }
+  publicSeed(examples) { return this.rpc('public_seed', { p_examples: examples }); }
+  publicReviewList() { return this.rpc('public_review_list'); }
+  publicModerate(id, hidden) { return this.rpc('public_moderate', { p_id: id, p_hidden: hidden }); }
 }

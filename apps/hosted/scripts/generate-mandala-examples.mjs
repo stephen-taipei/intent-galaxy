@@ -7,7 +7,8 @@
 //   ANTHROPIC_API_KEY=... node apps/hosted/scripts/generate-mandala-examples.mjs [--only id] [--force]
 //
 // Generated examples already in the output are kept unless --force is given,
-// so a rerun only pays for new goals. Review the output before publishing.
+// so a rerun only pays for new goals. Review the output before publishing,
+// then POST /api/admin/examples as an operator to refresh the public feed.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { executeJob } from '../domain/index.mjs';
 
@@ -26,7 +27,7 @@ function chartFrom({ title, goal, themes = [] }) {
 const filled = chart => chart.themes.every(t => t.title && t.actions.every(a => a.text));
 
 const seeds = JSON.parse(readFileSync(new URL('examples/seed-examples.json', root), 'utf8')).examples
-  .map(seed => ({ id: seed.id, locale: seed.locale, source: 'seed', chart: chartFrom(seed) }));
+  .map(seed => ({ id: seed.id, locale: seed.locale, tags: seed.tags ?? [], source: 'seed', chart: chartFrom(seed) }));
 const previous = existsSync(OUTPUT) ? JSON.parse(readFileSync(OUTPUT, 'utf8')).examples.filter(e => e.source === 'generated') : [];
 const generated = new Map(previous.map(e => [e.id, e]));
 
@@ -47,7 +48,7 @@ if (!flag('--seeds-only')) {
         chart = expanded.chart; total += expanded.actualCostUsd ?? 0;
       }
       if (!filled(chart)) throw new Error('some cells are still empty');
-      generated.set(goal.id, { id: goal.id, locale: goal.locale, source: 'generated', chart });
+      generated.set(goal.id, { id: goal.id, locale: goal.locale, tags: goal.tags ?? [], source: 'generated', chart });
       console.log(`ok   ${goal.id}  running cost ≈ US$${total.toFixed(3)}`);
     } catch (error) { console.error(`fail ${goal.id}: ${error.code || ''} ${error.message}`); }
   }

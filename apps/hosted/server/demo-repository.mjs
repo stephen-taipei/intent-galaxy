@@ -16,6 +16,7 @@ export class DemoRepository {
     this.documents = new Map(); this.versions = new Map(); this.checkouts = new Map(); this.checkoutKeys = new Map();
     this.subscriptions = new Map(); this.billingLinks = new Map(); this.payments = new Map(); this.webhooks = new Map(); this.events = new Map();
     this.identities = new Map(); this.activity = new Set(); this.invites = new Map(); this.redemptions = new Map();
+    this.profiles = new Map(); this.publicCharts = new Map();
   }
   async sessionGet(id) { const s = this.sessions.get(id); return s && Date.parse(s.expiresAt) > this.clock() ? clone(s) : null; }
   async sessionCreate(value) { this.sessions.set(value.id, clone(value)); return true; }
@@ -120,7 +121,7 @@ export class DemoRepository {
     if (this.versions.get(id).length > 100) this.versions.get(id).splice(0, this.versions.get(id).length - 100);
     return this.documentGet(userId, id);
   }
-  async documentDelete(userId, id) { this.ownedDocument(userId, id); this.documents.delete(id); this.versions.delete(id); return true; }
+  async documentDelete(userId, id) { this.ownedDocument(userId, id); this.documents.delete(id); this.versions.delete(id); for (const [cid, c] of this.publicCharts) if (c.documentId === id) this.publicCharts.delete(cid); return true; }
   async documentVersions(userId, id) { const doc = this.ownedDocument(userId, id); if (doc.product !== 'mandala' && this.plan(userId, doc.product).plan !== 'pro') fail('pro_required', 403); return clone(this.versions.get(id)); }
   async checkoutBegin(userId, product, key) {
     const k = `${userId}:${key}`; const existing = this.checkouts.get(this.checkoutKeys.get(k));
@@ -210,12 +211,64 @@ export class DemoRepository {
     for (const [code, i] of this.invites) if (i.inviterId === userId) this.invites.delete(code);
     for (const key of this.credits.keys()) if (key.startsWith(`${userId}:`) || key.startsWith(`u:${userId}:`)) this.credits.delete(key);
     for (const key of this.activity) if (key.startsWith(`${userId}:`)) this.activity.delete(key);
+    this.profiles.delete(userId);
+    for (const [cid, c] of this.publicCharts) { if (c.userId === userId) this.publicCharts.delete(cid); c.encouragedBy.delete(userId); c.copiedBy.delete(userId); c.reports.delete(userId); for (const key of c.views.keys()) if (key.startsWith(`${userId}:`)) c.views.delete(key); }
     return true;
   }
   async metrics(days) {
     const invites = [...this.invites.values()];
     return { synthetic: true, days, signups: this.identities.size, activeUserDays: this.activity.size, invites: { created: invites.length, redeemed: invites.filter(i => i.redeemedAt).length, joined: invites.filter(i => i.convertedUserId).length } };
   }
+  // Mirrors 0004_public_feed.sql.
+  async profileGet(userId) { return clone(this.profiles.get(userId) ?? null); }
+  async profileSet(userId, profile) { this.profiles.set(userId, { nickname: profile.nickname.trim(), avatar: profile.avatar }); return this.profileGet(userId); }
+  publicJson(c, viewer) {
+    return { id: c.id, title: c.title, goal: c.goal, themes: clone(c.themes), tags: [...c.tags], progress: c.progress, publishedAt: c.publishedAt, updatedAt: c.updatedAt,
+      encourages: c.encouragedBy.size, copies: c.copiedBy.size, views: c.views.size, example: Boolean(c.exampleId),
+      author: c.exampleId ? { brand: true, avatar: 'brand' } : clone(this.profiles.get(c.userId) ?? null), mine: Boolean(viewer) && c.userId === viewer,
+      documentId: c.userId === viewer ? c.documentId : null, encouraged: c.encouragedBy.has(viewer) };
+  }
+  visible(id, viewer) { const c = this.publicCharts.get(id); if (!c || (c.hidden && (!viewer || c.userId !== viewer))) fail('not_found', 404); return c; }
+  async publicPublish(userId, { documentId, tags }) {
+    if (!this.profiles.has(userId)) fail('profile_required');
+    const doc = this.ownedDocument(userId, documentId); if (doc.product !== 'mandala') fail('not_found', 404);
+    if (!doc.data.goal?.trim()) fail('goal_required', 400);
+    const themes = doc.data.themes.map(t => ({ title: t.title, actions: t.actions.map(a => ({ text: a.text, done: a.done === true })) }));
+    const progress = themes.reduce((n, t) => n + t.actions.filter(a => a.done).length, 0); const now = new Date(this.clock()).toISOString();
+    let c = [...this.publicCharts.values()].find(item => item.documentId === documentId);
+    if (!c) { c = { id: crypto.randomUUID(), userId, documentId, publishedAt: now, hidden: false, encouragedBy: new Map(), copiedBy: new Map(), reports: new Map(), views: new Map() }; this.publicCharts.set(c.id, c); }
+    Object.assign(c, { title: doc.data.title?.trim() || doc.title, goal: doc.data.goal, themes, tags: [...new Set(tags)], progress, updatedAt: now });
+    return this.publicJson(c, userId);
+  }
+  async publicUnpublish(userId, id) { const c = this.publicCharts.get(id); if (!c || c.userId !== userId) fail('not_found', 404); this.publicCharts.delete(id); return true; }
+  async publicFeed(viewer, { sort = 'new', tag, offset = 0, limit = 20, window = '7d', source = 'all', lang }) {
+    const since = window === 'all' ? -Infinity : this.clock() - (window === '30d' ? 30 : 7) * 86400000; const recent = map => [...map.values()].filter(t => t >= since).length;
+    const rank = c => sort === 'hot' ? recent(c.encouragedBy) + 2 * recent(c.copiedBy) : sort === 'copied' ? recent(c.copiedBy) : sort === 'done' ? c.progress : 0;
+    const views = c => ['hot', 'copied'].includes(sort) ? recent(c.views) : 0;
+    return [...this.publicCharts.values()].filter(c => !c.hidden && (!tag || c.tags.includes(tag)) && (source === 'all' || (source === 'users') === !c.exampleId) && (!c.exampleId || !lang || c.locale === lang))
+      .sort((a, b) => rank(b) - rank(a) || views(b) - views(a) || b.publishedAt.localeCompare(a.publishedAt)).slice(offset, offset + limit).map(c => this.publicJson(c, viewer));
+  }
+  async publicView(userId, id) {
+    const c = this.publicCharts.get(id); const key = `${userId}:${new Date(this.clock() + 8 * 3600e3).toISOString().slice(0, 10)}`;
+    if (!c || c.hidden || c.userId === userId || c.views.has(key)) return false; c.views.set(key, this.clock()); return true;
+  }
+  async publicSeed(examples) {
+    const now = new Date(this.clock()).toISOString();
+    for (const e of examples) {
+      let c = [...this.publicCharts.values()].find(item => item.exampleId === e.id);
+      if (!c) { c = { id: crypto.randomUUID(), userId: null, exampleId: e.id, documentId: null, publishedAt: now, hidden: false, encouragedBy: new Map(), copiedBy: new Map(), reports: new Map(), views: new Map() }; this.publicCharts.set(c.id, c); }
+      Object.assign(c, { locale: e.locale, title: e.chart.title, goal: e.chart.goal, themes: e.chart.themes.map(t => ({ title: t.title, actions: t.actions.map(a => ({ text: a.text, done: false })) })), tags: [...new Set(e.tags || [])], progress: 0, updatedAt: now });
+    }
+    this.examplesSeeded = true; return examples.length;
+  }
+  async publicGet(viewer, id) { return this.publicJson(this.visible(id, viewer), viewer); }
+  async publicMine(userId) { return [...this.publicCharts.values()].filter(c => c.userId === userId).map(c => ({ ...this.publicJson(c, userId), hidden: c.hidden })); }
+  async publicEncourage(userId, id, on) { const c = this.visible(id, null); if (on) { if (!c.encouragedBy.has(userId)) c.encouragedBy.set(userId, this.clock()); } else c.encouragedBy.delete(userId); return this.publicJson(c, userId); }
+  async publicCopy(userId, id) { const c = this.visible(id, null); if (c.userId !== userId && !c.copiedBy.has(userId)) c.copiedBy.set(userId, this.clock()); return this.publicJson(c, userId); }
+  async publicReport(userId, id, reason) { const c = this.publicCharts.get(id); if (!c || c.userId === userId) fail('not_found', 404); c.reports.set(userId, reason); if (c.reports.size >= 3) c.hidden = true; return true; }
+  async publicReviewList() { return [...this.publicCharts.values()].filter(c => c.reports.size || c.hidden).map(c => ({ ...this.publicJson(c, null), hidden: c.hidden, reports: c.reports.size })); }
+  async publicModerate(id, hidden) { const c = this.publicCharts.get(id); if (!c) fail('not_found', 404); c.hidden = hidden; if (!hidden) c.reports.clear(); return true; }
+  async feedMetrics() { const charts = [...this.publicCharts.values()].filter(c => !c.exampleId); return { published: charts.length, views: [...this.publicCharts.values()].reduce((n, c) => n + c.views.size, 0), copies: charts.reduce((n, c) => n + c.copiedBy.size, 0), hidden: charts.filter(c => c.hidden).length }; }
   async recordEvent(_userId, name, product, templateId) { const k = `${new Date(this.clock()).toISOString().slice(0, 10)}:${name}:${product}:${templateId || ''}`; this.events.set(k, Math.min(1000000, (this.events.get(k) || 0) + 1)); return true; }
   async cleanup() {
     const now = this.clock(); let expiredGuests = 0;

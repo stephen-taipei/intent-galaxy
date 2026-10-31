@@ -19,6 +19,7 @@ const COPY = {
     pricing:"方案與價格", pricingLead:"兩項產品獨立訂閱，不共用點數。", studioPro:"AI 工作室 Pro", mandalaPro:"九宮格目標規劃 Pro", freePlan:"免費", perMonth:"／月", works:"已儲存工作", templates:"範本", cloudGoals:"雲端目標", freeStudio:"每月 20 點、5 份工作、3 個範本。", proStudio:"每月 200 點、100 份工作、50 個範本。", freeMandala:"完整手動編輯與匯出；登入後可存 1 個雲端目標；不含 AI 點數。", proMandala:"每月 100 點，可存 20 個雲端目標。", checkoutUnavailable:"伺服器尚未啟用結帳。", checkoutOff:"結帳尚未由伺服器啟用。", checkout:"升級方案", monthly:"每月", invalidCheckout:"伺服器沒有回傳有效的 HTTPS 結帳網址。",
     privacyLead:"本頁說明託管版前端如何呼叫服務。資料處理與保留細節以部署者公布的政策為準。", termsLead:"此託管版目前是可供檢視的服務草稿。付款與正式營運依伺服器設定開啟後才會生效。", privacyPage:"隱私說明", termsPage:"使用條款草稿", privacyOne:"登入與工作狀態由同源服務 API 管理。此介面只會在你明確開始操作時送出內容。", privacyTwo:"你輸入的目標、背景、分析結果與成果可能送往你選擇的 AI 服務商。請勿輸入不適合傳送的機密資料。", privacyThree:"文件儲存、刪除、帳務與資料保留期限由伺服器執行；此頁不假設尚未公開的保留細節。", termsOne:"AI 分析與建議可能出錯。使用者需自行檢查輸入、候選與成果。", termsTwo:"九宮格目標規劃的本機檔案由使用者裝置管理；雲端功能受帳戶、方案與伺服器額度限制。", termsThree:"此介面不會自動下單、付款、部署或對外傳送生成內容。付款跳轉只會在服務設定啟用結帳後，由使用者明確操作。", unsupportedRoute:"找不到這個頁面。",
     trialTitle:"免費 AI 體驗", trialLead:"先由 AI 提出 8 個主題，再逐格展開成行動。所有結果都要按「套用」才會寫入。", trialProvider:"使用 Anthropic Claude：主題由 Sonnet 產生，展開與多視角由 Haiku 產生。", trialUnavailable:"目前沒有開放免費 AI 體驗。", trialLimit:"今天的免費 AI 次數已用完，明天再試，或先手動編輯。", trialNeedsSession:"登入後每天可免費用 AI 產生 {charts} 張九宮格；收到朋友的兌換碼，也能免登入體驗一次。", trialInvite:"你正在使用朋友的兌換碼，可以免登入體驗 {charts} 張九宮格。登入後就能保存，並且每天免費使用。", trialDaily:"登入使用者每天可免費產生 {charts} 張九宮格。", trialLoginRequired:"登入後才能使用免費 AI，或請朋友分享兌換碼給你。", redeemTitle:"使用兌換碼", redeemLead:"朋友分享了九宮格 AI 體驗給你。完成驗證後，就能免登入體驗一次。", redeemCode:"兌換碼", redeemButton:"兌換並開始體驗", redeemed:"兌換成功，可以開始體驗了。", inviteInvalid:"兌換碼無效、已被使用或已過期。", inviteUsed:"這個瀏覽器已經用過兌換碼。登入後每天都能免費使用。", invitesTitle:"分享給朋友", invitesLead:"每天可產生 {n} 組兌換碼，朋友不用登入就能體驗一次。每組只能用一次，7 天內有效。", inviteCreate:"產生兌換碼", inviteCopy:"複製連結", inviteCopied:"已複製邀請連結。", inviteLimit:"今天的兌換碼已達上限，或還有太多組沒被使用。", inviteOpen:"未使用", inviteRedeemed:"已兌換", inviteJoined:"已加入", inviteExpired:"已過期", noInvites:"還沒有產生兌換碼。", examplesTitle:"範例九宮格", examplesLead:"不用登入也能看：這些範例由 AI 事先產生，打開後可以直接修改成你的版本。", examplesOpen:"開啟範例", examplesLoading:"正在載入範例…", examplesUnavailable:"目前無法載入範例。", exampleOpened:"已開啟範例。修改後記得儲存。", generateThemes:"AI 產生主題", expandTheme:"展開這個主題", expandEmpty:"展開所有空白主題", perspectives:"換個視角看看", perspectivesTitle:"其他視角的主題（點選後替換到指定格）", chooseTheme:"選擇主題", replaceSlot:"替換到", replace:"替換", lensQ1:"歸零者：從零重想", lensQ2:"老兵：前人做法", lensQ3:"越界者：跨領域借用", lensQ4:"驗屍官：先防失敗", skippedActions:"有 {n} 格與其他主題重複，已留白，可以再展開一次。", themeReplaced:"已替換主題，記得儲存。", noEmptyThemes:"8 個主題都已填寫。", 
+    feed:"動態牆", feedTitle:"大家的九宮格", feedLead:"看別人怎麼拆解目標，替他們加油，或複製一張改成你的。九宮格小編發布的範例也照同樣規則排名。", feedSignIn:"動態牆只開放登入的使用者瀏覽。登入後可以看大家公開的九宮格、加油和複製。", signInFeed:"登入看動態牆", sortNew:"最新", sortHot:"熱門", sortCopied:"最多複製", sortDone:"完成度", sortLabel:"排序", windowLabel:"時間範圍", window7d:"7 天", window30d:"30 天", windowAll:"全部", sourceLabel:"作者", sourceAll:"全部", sourceUsers:"只看用戶作品", sourceExamples:"只看範例", tagLabel:"分類", allTags:"全部分類", tag_health:"健康", tag_learning:"學習", tag_career:"職涯", tag_money:"理財", tag_sports:"運動", tag_creative:"創作", tag_family:"家庭", tag_life:"生活", brandName:"九宮格小編", exampleBadge:"範例", encourage:"加油", encouraged:"已加油", copyToMine:"複製到我的九宮格", copiedToMine:"已複製到編輯區，記得存檔。", share:"分享", shareSystem:"分享到…", shareCopyLink:"複製連結", shareLine:"LINE", shareFacebook:"Facebook", linkCopied:"已複製連結。", download:"下載", downloadPng:"圖片 PNG", downloadPdf:"PDF", downloadXlsx:"Excel", downloadFailed:"下載失敗，請再試一次。", report:"檢舉", reportConfirm:"確定要檢舉這張九宮格嗎？", reason_personal_data:"含個人資料", reason_harmful:"有害或冒犯", reason_spam:"廣告或垃圾訊息", reason_other:"其他", reported:"已收到檢舉，會由人工審查。", showActions:"看 64 個行動", feedEmpty:"這個條件下還沒有公開的九宮格。", feedEnd:"已經到底了。", feedLoading:"載入中…", loadMore:"載入更多", statEncourages:"{n} 個加油", statCopies:"{n} 次複製", statViews:"{n} 次瀏覽", profileTitle:"公開檔案", profileLead:"動態牆上顯示的暱稱與頭像，不會顯示你的 email。", nickname:"暱稱", avatar:"頭像", saveProfile:"儲存公開檔案", profileSaved:"已儲存公開檔案。", profileRequired:"請先設定暱稱與頭像。", publishTitle:"公開到動態牆", publishLead:"公開的是快照：標題、目標、主題、行動與完成狀態，備註和到期日不會公開。修改後要按「更新公開版本」才會同步。", publishNeedsCloud:"先把這張九宮格存到雲端，才能公開。", publishTags:"分類（最多 3 個）", publish:"公開", publishUpdate:"更新公開版本", unpublish:"取消公開", published:"已公開到動態牆。", unpublished:"已取消公開。", confirmUnpublish:"確定要取消公開嗎？收到的加油和複製紀錄會一起刪除。", publishedHidden:"這張九宮格因檢舉暫時隱藏，等待人工審查。", publicLink:"公開連結", tooManyTags:"最多選 3 個分類。", goalNeeded:"請先寫下中心目標。", sharedCta:"登入後可以替作者加油、複製這張九宮格，也能看更多人的目標。", makeOwn:"自己做一張", sharedMissing:"找不到這張九宮格，可能已取消公開或被隱藏。", backToFeed:"回到動態牆", downloadImage:"下載圖片", downloadPdfFile:"下載 PDF", downloadExcel:"下載 Excel", xlsxGrid:"九宮格", xlsxList:"行動清單", xlsxTheme:"主題", xlsxAction:"行動", xlsxDone:"完成",
     mandalaTitle:"九宮格目標規劃", mandalaLead:"以一個中心目標展開 8 個主題與 64 個可追蹤行動。手動編輯、儲存與匯出不需要 AI。", standalone:"獨立的目標規劃工具", chartTitle:"目標名稱", chartLabel:"九宮格目標規劃", themeTitle:"主題", action:"行動", done:"已完成", dueDate:"到期日", notes:"備註", progress:"完成進度", weeklyReview:"每週回顧", reviewDate:"回顧日期", reviewNote:"本週觀察與下一步", reviewProgress:"本週進度", saveReview:"儲存每週回顧", gridView:"81 格檢視", groupView:"主題分組檢視", mirrored:"主題鏡像", themesHint:"中央的 8 個主題會鏡像到周圍 8 個 3×3 區塊。", actionHint:"可填行動、完成狀態、日期與備註。", newChart:"新目標", saveLocal:"儲存到此裝置", saveCloud:"儲存到雲端", exportJson:"匯出 JSON", exportMarkdown:"匯出 Markdown", printPdf:"列印／存成 PDF", importJson:"匯入有效 JSON", importFailed:"匯入失敗。請選擇 schemaVersion 1 且含 8 個主題、每個主題 8 個行動的 JSON。", localSaved:"此裝置的目標", cloudSaved:"雲端目標", noGoals:"尚無目標。", goalCount:"目標數", localOnly:"手動目標表可在此裝置使用，不需要登入。", cloudLimit:"雲端目標數量由伺服器依方案限制。", localHistory:"本機回顧不會建立雲端版本。", useAI:"AI 建議", expand:"展開行動", review:"檢視目標", aiInstruction:"給 AI 的補充要求（選填）", applyProposal:"套用完整候選圖", proposalTitle:"AI 候選圖（尚未套用）", proposalReview:"AI 回饋", staleProposal:"圖表在產生建議後有變更。這份候選已過期，請重新執行 AI 操作。", noFullChart:"服務回傳建議文字，沒有可套用的完整候選圖。請依建議自行修改。", candidateInvalid:"服務回傳的候選圖不符合 8×8 格式，沒有套用。", proposalApplied:"已套用候選圖，請檢查內容並手動保存。", applyProposalHint:"候選圖只會在你按下套用後取代目前圖表。", saveGoalFirst:"先儲存雲端目標，才能查看雲端版本。", cloudHistory:"雲端版本", selectCloudGoal:"選擇雲端目標", noCloudDocs:"尚無雲端目標。", noHistory:"沒有可讀取的版本紀錄。", noHistoryPro:"版本紀錄需要 Pro 方案。", chooseDecision:"選擇並調整方案", useSelection:"使用此方案", previewSelection:"檢視選擇", copyDecision:"複製決策", titleRequired:"請填寫文件名稱。", goalRequired:"請先填寫中心目標。", status:"狀態", source:"來源", none:"無", version:"版本", current:"目前版本", comparison:"方案比較", compareVersions:"比較版本", chooseVersion:"選擇版本", chartValid:"有效的 8×8 圖表", invalidChart:"圖表格式不正確。", chartTooLarge:"圖表資料太大，請縮短行動或備註內容後再試。", noResult:"沒有結果。", signInFirst:"請登入或開始訪客體驗後再繼續。", signIn:"Google 登入", signOut:"登出", signedIn:"已登入", authDisabled:"此環境未啟用登入。", language:"介面語言", privacy:"隱私", terms:"使用條款", home:"首頁",
     needsLogin:"登入後才可使用雲端保存。", aiMandalaNoCredits:"九宮格目標規劃免費方案不含 AI 點數；手動編輯與匯出仍可使用。", signInToCloud:"登入後可使用雲端保存。", saveError:"儲存失敗。", confirmRemove:"要刪除這份已儲存資料嗎？", confirmDelete:"要刪除這份文件嗎？", saved:"已儲存。", savedLocal:"已儲存到此裝置。", cloudGoalSaved:"雲端目標已保存。", exportHint:"匯出內容只包含此份圖表資料。", importHelp:"匯入會先完整驗證，不會合併不完整資料。", noTemplates:"尚無範本。", noSaved:"目前沒有已儲存資料。", selectProvider:"選擇服務商", ready:"準備就緒", active:"使用中", updated:"已更新。", signInGoogle:"使用 Google 登入", billing:"帳務", checkoutMessage:"結帳由服務端啟用後才可使用。", supportUnavailable:"支援資訊尚未設定。", noAIForFree:"免費方案不含 Mandala AI 點數。", providerOpenAI:"OpenAI", providerAnthropic:"Anthropic", error:"錯誤", close:"關閉", remove:"刪除", open:"開啟", retry:"重新載入", loading:"載入中…",
     requestId:"工作識別碼", eventError:"伺服器回報錯誤", inputRequired:"請先填寫目標與背景輸入。", privacyNote:"只有在你按下 AI 操作按鈕後才會送出資料。頁面不會自動送出，也不會從生成內容執行外部動作。", modeDisabled:"服務未開放 AI 操作。", consentNeeded:"執行 AI 操作前，請先勾選資料傳送同意。", noRetries:"未知結果不會自動重送。", checkStatus:"查詢工作狀態", stillChecking:"仍在查詢同一工作。", jobUnknown:"工作狀態未知；伺服器沒有回報可確認的結果。", jobRecoverable:"可查詢這筆工作的伺服器狀態；頁面不會自動重送。", clearJob:"清除狀態提示", callUnknown:"送出結果未知", working:"工作進行中…", jobAccepted:"伺服器已接受工作。", statusQueued:"排入佇列", statusRunning:"正在執行", statusCompleted:"完成", statusFailed:"失敗", statusUnknown:"未知", jobFailed:"工作失敗", recovered:"已從伺服器查回工作結果。", malformedResponse:"伺服器回應格式不完整。", actionNo:"行動", completed:"工作完成。", details:"詳細資料", docsError:"無法讀取雲端文件。", groupViewHint:"手機版以主題分組，資料與 81 格檢視相同。", missingArtifact:"工作完成，但回應沒有成果內容。", noTurnstile:"請完成頁面上的人機驗證後重試。", previous:"比較版本 A", roleGoal:"中心目標", runningJob:"正在查詢工作狀態。", sessionError:"無法讀取登入狀態。", siteDraft:"服務草稿", templateSaved:"範本已保存。", themeNo:"主題", titleHint:"最多 160 字。", versionCompare:"版本比較", workContract:"需求摘要", workSaved:"工作已保存。", noOverage:"不會自動加購，也不會超額扣款。", freePeriod:"免費點數每月依 Asia/Taipei 時區重設。"
@@ -36,6 +37,7 @@ const COPY = {
     pricing:"Plans & pricing", pricingLead:"The two products have separate subscriptions and do not share credits.", studioPro:"Studio Pro", mandalaPro:"Mandala Pro", freePlan:"Free", perMonth:"/month", works:"saved works", templates:"templates", cloudGoals:"cloud goals", freeStudio:"20 credits/month, 5 works, and 3 templates.", proStudio:"200 credits/month, 100 works, and 50 templates.", freeMandala:"Full manual editing and export; one cloud goal after sign-in; no AI credits.", proMandala:"100 credits/month and up to 20 cloud goals.", checkoutUnavailable:"Checkout is not enabled by the server.", checkoutOff:"Checkout has not been enabled by the server.", checkout:"Upgrade", monthly:"Monthly", invalidCheckout:"The server did not return a valid HTTPS checkout URL.",
     privacyLead:"This page explains how the hosted frontend calls the service. Follow the operator's published policy for data handling and retention details.", termsLead:"This hosted frontend is a reviewable service draft. Payments and production operation depend on server settings.", privacyPage:"Privacy draft", termsPage:"Terms draft", privacyOne:"Sign-in and job state are managed by the same-origin service API. This interface submits content only after you explicitly start an operation.", privacyTwo:"Goals, background, analyses, and artifacts may be sent to the AI provider you choose. Do not enter confidential data that you should not share.", privacyThree:"The server controls document storage, deletion, billing, and retention. This page does not assume details that have not been published.", termsOne:"AI analysis and suggestions can be wrong. Review the input, proposals, and artifact yourself.", termsTwo:"Local Mandala files are managed on your device. Cloud features depend on your account, plan, and server limits.", termsThree:"This interface does not automatically buy, pay, deploy, or send generated content externally. Checkout redirects are available only when enabled by the service and initiated by you.", unsupportedRoute:"Page not found.",
     trialTitle:"Free AI trial", trialLead:"AI proposes 8 themes, then expands each theme into actions. Nothing is written until you click Apply.", trialProvider:"Uses Anthropic Claude: Sonnet proposes the themes; Haiku expands them and offers other perspectives.", trialUnavailable:"The free AI trial is not available right now.", trialLimit:"Today’s free AI limit has been reached. Try again tomorrow or keep editing by hand.", trialNeedsSession:"Signed-in users get {charts} free AI charts per day. With a friend’s invite code you can try one without signing in.", trialInvite:"You are using a friend’s invite: try {charts} chart without signing in. Sign in to save charts and use the AI every day.", trialDaily:"Signed-in users get {charts} free AI charts per day.", trialLoginRequired:"Sign in to use the free AI, or ask a friend for an invite code.", redeemTitle:"Use an invite code", redeemLead:"A friend shared a free Mandala AI trial with you. Complete the check to try it once without signing in.", redeemCode:"Invite code", redeemButton:"Redeem and start", redeemed:"Invite redeemed. You can start now.", inviteInvalid:"This invite code is invalid, used or expired.", inviteUsed:"This browser has already used an invite. Sign in to use the AI every day.", invitesTitle:"Share with friends", invitesLead:"Create up to {n} invite codes per day. Friends can try one chart without signing in. Each code works once and expires in 7 days.", inviteCreate:"Create invite code", inviteCopy:"Copy link", inviteCopied:"Invite link copied.", inviteLimit:"You have reached today’s invite limit or have too many unused codes.", inviteOpen:"Unused", inviteRedeemed:"Redeemed", inviteJoined:"Joined", inviteExpired:"Expired", noInvites:"No invite codes yet.", examplesTitle:"Example charts", examplesLead:"No sign-in needed: these examples were generated in advance. Open one and edit it into your own.", examplesOpen:"Open example", examplesLoading:"Loading examples…", examplesUnavailable:"Examples could not be loaded.", exampleOpened:"Example opened. Remember to save your changes.", generateThemes:"Propose themes", expandTheme:"Expand this theme", expandEmpty:"Expand all empty themes", perspectives:"Try other perspectives", perspectivesTitle:"Themes from other perspectives (pick one, then replace a slot)", chooseTheme:"Choose a theme", replaceSlot:"Replace", replace:"Replace", lensQ1:"Zero-Resetter: start from zero", lensQ2:"Veteran: what worked before", lensQ3:"Border-Crosser: borrow from elsewhere", lensQ4:"Coroner: prevent failure first", skippedActions:"{n} cells duplicated another theme and were left empty. Expand again to fill them.", themeReplaced:"Theme replaced. Remember to save.", noEmptyThemes:"All 8 themes already have titles.", 
+    feed:"Feed", feedTitle:"Everyone's charts", feedLead:"See how others break down their goals, cheer them on, or copy one and make it yours. The team's examples are ranked by the same rules.", feedSignIn:"The feed is for signed-in users. Sign in to browse public charts, cheer and copy.", signInFeed:"Sign in to see the feed", sortNew:"Newest", sortHot:"Popular", sortCopied:"Most copied", sortDone:"Most done", sortLabel:"Sort", windowLabel:"Period", window7d:"7 days", window30d:"30 days", windowAll:"All time", sourceLabel:"Author", sourceAll:"Everyone", sourceUsers:"Users only", sourceExamples:"Examples only", tagLabel:"Category", allTags:"All categories", tag_health:"Health", tag_learning:"Learning", tag_career:"Career", tag_money:"Money", tag_sports:"Sports", tag_creative:"Creative", tag_family:"Family", tag_life:"Life", brandName:"Mandala Team", exampleBadge:"Example", encourage:"Cheer", encouraged:"Cheered", copyToMine:"Copy to my chart", copiedToMine:"Copied into the editor. Remember to save.", share:"Share", shareSystem:"Share to…", shareCopyLink:"Copy link", shareLine:"LINE", shareFacebook:"Facebook", linkCopied:"Link copied.", download:"Download", downloadPng:"Image (PNG)", downloadPdf:"PDF", downloadXlsx:"Excel", downloadFailed:"Download failed. Try again.", report:"Report", reportConfirm:"Report this chart?", reason_personal_data:"Personal data", reason_harmful:"Harmful or offensive", reason_spam:"Ads or spam", reason_other:"Other", reported:"Thanks. A person will review this report.", showActions:"Show the 64 actions", feedEmpty:"No public charts match these filters yet.", feedEnd:"You have reached the end.", feedLoading:"Loading…", loadMore:"Load more", statEncourages:"{n} cheers", statCopies:"{n} copies", statViews:"{n} views", profileTitle:"Public profile", profileLead:"The nickname and avatar shown in the feed. Your email is never shown.", nickname:"Nickname", avatar:"Avatar", saveProfile:"Save profile", profileSaved:"Profile saved.", profileRequired:"Choose a nickname and an avatar first.", publishTitle:"Publish to the feed", publishLead:"A snapshot is published: title, goal, themes, actions and done marks. Notes and due dates stay private. After editing, click Update to refresh it.", publishNeedsCloud:"Save this chart to the cloud before publishing it.", publishTags:"Categories (up to 3)", publish:"Publish", publishUpdate:"Update public version", unpublish:"Unpublish", published:"Published to the feed.", unpublished:"Unpublished.", confirmUnpublish:"Unpublish this chart? Its cheers and copy records are deleted.", publishedHidden:"This chart is hidden after reports and waits for review.", publicLink:"Public link", tooManyTags:"Choose up to 3 categories.", goalNeeded:"Write the central goal first.", sharedCta:"Sign in to cheer, copy this chart and see more people's goals.", makeOwn:"Make your own", sharedMissing:"This chart could not be found. It may have been unpublished or hidden.", backToFeed:"Back to the feed", downloadImage:"Download image", downloadPdfFile:"Download PDF", downloadExcel:"Download Excel", xlsxGrid:"Chart", xlsxList:"Actions", xlsxTheme:"Theme", xlsxAction:"Action", xlsxDone:"Done",
     mandalaTitle:"Mandala goal planner", mandalaLead:"Expand one central goal into 8 themes and 64 trackable actions. Manual editing, saving, and export do not need AI.", standalone:"A standalone goal-planning tool", chartTitle:"Goal title", chartLabel:"Mandala chart", themeTitle:"Theme", action:"Action", done:"Done", dueDate:"Due date", notes:"Notes", progress:"Progress", weeklyReview:"Weekly review", reviewDate:"Review date", reviewNote:"Observations and next steps", reviewProgress:"Weekly progress", saveReview:"Save weekly review", gridView:"81-cell view", groupView:"Grouped by theme", mirrored:"Mirrored theme", themesHint:"The 8 inner themes mirror into the centers of the 8 surrounding 3×3 blocks.", actionHint:"Edit action text, completion, due date, and notes.", newChart:"New goal", saveLocal:"Save on this device", saveCloud:"Save to cloud", exportJson:"Export JSON", exportMarkdown:"Export Markdown", printPdf:"Print / save PDF", importJson:"Import valid JSON", importFailed:"Import failed. Choose schemaVersion 1 JSON with 8 themes and 8 actions per theme.", localSaved:"Goals on this device", cloudSaved:"Cloud goals", noGoals:"No goals yet.", goalCount:"goals", localOnly:"Manual planning works on this device without sign-in.", cloudLimit:"The server enforces your cloud goal limit.", localHistory:"Local reviews do not create cloud versions.", useAI:"AI proposals", expand:"Expand actions", review:"Review goal", aiInstruction:"Optional instruction for AI", applyProposal:"Apply complete proposal", proposalTitle:"AI proposal (not applied)", proposalReview:"AI feedback", staleProposal:"The chart changed after this proposal was created. Run the AI operation again.", noFullChart:"The service returned written suggestions without a complete chart. Apply changes by hand.", candidateInvalid:"The service returned an invalid 8×8 proposal. Nothing was applied.", proposalApplied:"Proposal applied. Review it and save manually.", applyProposalHint:"The current chart changes only after you click Apply.", saveGoalFirst:"Save the cloud goal before opening its versions.", cloudHistory:"Cloud versions", selectCloudGoal:"Choose a cloud goal", noCloudDocs:"No cloud goals saved yet.", noHistory:"No readable version history.", noHistoryPro:"Version history requires Pro.", chooseDecision:"Choose and adjust a plan", useSelection:"Use this plan", previewSelection:"Review selection", copyDecision:"Copy decision", titleRequired:"Enter a document title.", goalRequired:"Enter a central goal first.", status:"Status", source:"Source", none:"None", version:"Version", current:"Current version", compareVersions:"Compare versions", chooseVersion:"Choose a version", chartValid:"Valid 8×8 chart", invalidChart:"Invalid chart data.", chartTooLarge:"The chart is too large. Shorten action or note text and try again.", noResult:"No result.", needsLogin:"Sign in for cloud storage.", aiMandalaNoCredits:"The free Mandala plan has no AI credits. Manual editing and export remain available.", signInToCloud:"Sign in to use cloud storage.", saveError:"Save failed.", confirmRemove:"Delete this saved item?", confirmDelete:"Delete this document?", saved:"Saved.", savedLocal:"Saved on this device.", cloudGoalSaved:"Cloud goal saved.", exportHint:"Export contains only this chart's data.", importHelp:"The entire import is validated before it replaces the current chart.", ready:"Ready", active:"Active", updated:"Updated.", signInGoogle:"Sign in with Google", supportUnavailable:"Support information has not been configured.",
     notFound:"Page not found.", loading:"Loading…", retry:"Reload", close:"Close", error:"Error", privacyNote:"Data is sent only after you start an AI operation. The page will not submit automatically or run external actions from generated content.", demoBanner:"Demo mode: analysis and generation results are synthetic fixtures returned by the server, not real model output.", requestId:"Job ID", statusQueued:"Queued", statusRunning:"Running", statusCompleted:"Completed", statusFailed:"Failed", statusUnknown:"Unknown", actionNo:"Action", completed:"Job complete.", details:"Details", docsError:"Could not load cloud documents.", groupViewHint:"On phones, actions are grouped by theme. The same data powers the 81-cell view.", missingArtifact:"The job completed without artifact content.", noTurnstile:"Complete the human check on this page and try again.", previous:"Compare version A", roleGoal:"Central goal", runningJob:"Checking job status.", sessionError:"Could not read the sign-in state.", siteDraft:"Service draft", templateSaved:"Template saved.", themeNo:"Theme", titleHint:"Up to 160 characters.", versionCompare:"Version comparison", workContract:"Request summary", workSaved:"Work saved.", noOverage:"No automatic overage or additional purchases.", freePeriod:"Free credits reset monthly in the Asia/Taipei time zone."
   }
@@ -213,6 +215,7 @@ function clearAccountScopedCaches() {
   state.jobStatus = "";
   clearHostedAccountState(state);
   state.mandala.invites = null;
+  state.feed = emptyFeed();
 }
 function accountContext() { return { epoch: state.accountEpoch, session: state.session, transitioning: state.accountTransition }; }
 function captureAccountScope() { return captureHostedAccountScope(state.accountEpoch, state.session); }
@@ -351,6 +354,8 @@ function toMessage(error) {
   if (error.code === "invite_invalid") return tr("inviteInvalid");
   if (error.code === "invite_used") return tr("inviteUsed");
   if (error.code === "invite_limit") return tr("inviteLimit");
+  if (error.code === "profile_required") return tr("profileRequired");
+  if (error.code === "goal_required") return tr("goalNeeded");
   if (error.code === "guest_limit") return tr("guestTrialUsed");
   if (["trial_disabled", "turnstile_unavailable"].includes(error.code)) return tr("guestTrialUnavailable");
   if (["turnstile_required", "turnstile_rejected"].includes(error.code)) return tr("noTurnstile");
@@ -547,6 +552,8 @@ function render() {
   state.route = route;
   if (route === "/studio") renderStudio();
   else if (route === "/mandala") renderMandala();
+  else if (route === "/feed") renderFeed();
+  else if (/^\/mandala\/p\/[0-9a-f-]{36}$/.test(route)) renderSharedChart(route.split("/").at(-1));
   else if (route === "/pricing") renderPricing();
   else if (route === "/privacy") renderLegal("privacy");
   else if (route === "/terms") renderLegal("terms");
@@ -670,6 +677,8 @@ function renderPreflight(preflight) {
 function openDecision() {
   if (!state.studio.analysis) { notify(tr("missingAnalysis"), "error"); return; }
   if (!decisionGalaxy.setGalaxy(state.studio.analysis, { goal: state.studio.form.goal })) { decisionGalaxy.showMessage(tr("missingAnalysis")); return; }
+  // Built on first use: its icons use document-relative paths that only resolve on top-level routes.
+  if (!decisionView) setupDecisionView();
   if (state.studio.selectionDraft ?? state.studio.selection) decisionView.restoreDraft(state.studio.selectionDraft ?? state.studio.selection);
   decisionView.show(state.config?.mode === "demo" ? "demo" : "chat");
   decisionDialog.showModal();
@@ -1133,6 +1142,7 @@ function renderMandala() {
   const examples = renderMandalaExamples();
   const ai = renderMandalaAI(); ai.classList.add("mandala-ai");
   section.append(chartCard, trial);
+  if (isSignedIn()) section.append(renderPublishPanel());
   if (isSignedIn() && state.config?.invites) section.append(renderInvites());
   section.append(examples, review, saved, ai);
   page.append(section);
@@ -1148,6 +1158,7 @@ function renderMandalaControls() {
   left.append(btn(tr("saveCloud"), { cls: "button", disabled: !isSignedIn(), action: () => saveCloudChart() }));
   left.append(btn(tr("exportJson"), { cls: "button small", action: () => exportMandalaJson() }));
   left.append(btn(tr("exportMarkdown"), { cls: "button small", action: () => exportMandalaMarkdown() }));
+  left.append(downloadMenu(mandala.chart));
   left.append(btn(tr("printPdf"), { cls: "button small", action: () => window.print() }));
   const picker = input("", { type: "file" }); picker.accept = "application/json,.json"; picker.id = "mandalaImport"; picker.className = "sr-only"; picker.setAttribute("aria-label", tr("importJson")); picker.addEventListener("change", async () => {
     const file = picker.files?.[0]; if (!file) return;
@@ -1596,6 +1607,293 @@ function renderMandalaAI() {
   return box;
 }
 
+// Public feed: signed-in users browse charts others chose to publish, cheer,
+// copy, share, download or report them. Shared links open for anyone.
+const FEED_TAGS = ["health", "learning", "career", "money", "sports", "creative", "family", "life"];
+const AVATARS = Array.from({ length: 12 }, (_, i) => `a${String(i + 1).padStart(2, "0")}`);
+const REPORT_REASONS = ["personal_data", "harmful", "spam", "other"];
+function emptyFeed() { return { sort: "hot", window: "7d", source: "all", tag: "", items: null, loading: false, done: false, viewed: new Set(), profile: undefined, mine: null, shared: null, publishTags: null }; }
+state.feed = emptyFeed();
+let feedObserver = null;
+
+function avatarImg(author, size = 40) {
+  const img = el("img", "avatar"); img.width = size; img.height = size; img.alt = "";
+  const name = author?.brand ? "brand" : AVATARS.includes(author?.avatar) ? author.avatar : "a01";
+  img.src = `/avatars/${name}.svg`; return img;
+}
+function authorName(author) { return author?.brand ? tr("brandName") : author?.nickname ?? ""; }
+function publicUrl(id) { return new URL(`/mandala/p/${id}`, location.origin).href; }
+function chartFromPublic(item) {
+  const chart = createEmptyChart({ title: String(item.title ?? "").slice(0, 160), goal: String(item.goal ?? "").slice(0, 500) });
+  chart.themes.forEach((theme, ti) => {
+    theme.title = item.themes?.[ti]?.title ?? "";
+    theme.actions.forEach((action, ai) => { action.text = item.themes?.[ti]?.actions?.[ai]?.text ?? ""; });
+  });
+  return validateChart(chart);
+}
+// A small disclosure menu; the summary is the button.
+function menu(label, items) {
+  const box = el("details", "menu"); const summary = el("summary", "button small", label); box.append(summary);
+  const list = el("div", "menu-list");
+  for (const [text, action] of items) list.append(btn(text, { cls: "text-button", action: (event) => { box.open = false; action(event); } }));
+  box.append(list); return box;
+}
+function shareMenu(item) {
+  const url = publicUrl(item.id); const title = item.title || item.goal;
+  const shared = () => api.event("chart_shared", "mandala").catch(() => {});
+  const items = [];
+  if (navigator.share) items.push([tr("shareSystem"), () => navigator.share({ title, url }).then(shared).catch(() => {})]);
+  items.push([tr("shareCopyLink"), async () => { await navigator.clipboard?.writeText(url).then(() => notify(tr("linkCopied"), "success")).catch(() => notify(tr("copyFailed"), "error")); shared(); }]);
+  items.push([tr("shareLine"), () => { window.open(`https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}`, "_blank", "noopener"); shared(); }]);
+  items.push([tr("shareFacebook"), () => { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank", "noopener"); shared(); }]);
+  return menu(tr("share"), items);
+}
+// Image, PDF and Excel downloads share one renderer; the canvas is built only on demand.
+async function downloadChart(chart, format, author = "") {
+  try {
+    const { renderChartCanvas, canvasBlob, chartPdf, chartXlsx } = await import("./export.js");
+    const name = filenameFor(chart.title || chart.goal, "mandala");
+    let blob;
+    if (format === "xlsx") blob = chartXlsx(chart, { gridName: tr("xlsxGrid"), listName: tr("xlsxList"), headers: [tr("xlsxTheme"), tr("xlsxAction"), tr("xlsxDone")] });
+    else {
+      await document.fonts?.ready;
+      const canvas = renderChartCanvas(chart, { author, footer: `${location.host}/mandala` });
+      blob = format === "pdf" ? await chartPdf(canvas) : await canvasBlob(canvas);
+    }
+    const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = `${name}.${format}`; anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    api.event("chart_exported", "mandala").catch(() => {});
+  } catch { notify(tr("downloadFailed"), "error"); }
+}
+function downloadMenu(chart, author = "") {
+  return menu(tr("download"), [[tr("downloadPng"), () => downloadChart(chart, "png", author)], [tr("downloadPdf"), () => downloadChart(chart, "pdf", author)], [tr("downloadXlsx"), () => downloadChart(chart, "xlsx", author)]]);
+}
+// The 3×3 overview: goal in the middle, the 8 themes around it.
+function miniChart(item) {
+  const grid = el("div", "mini-chart");
+  const at = new Map(THEME_POSITIONS.map(([r, c], i) => [`${r},${c}`, i]));
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+    if (r === 1 && c === 1) { grid.append(el("div", "mini-cell goal", item.goal)); continue; }
+    const theme = item.themes?.[at.get(`${r},${c}`)] ?? { title: "", actions: [] };
+    const done = theme.actions.filter((a) => a.done).length;
+    const cell = el("div", "mini-cell", theme.title || "—"); if (done) cell.append(el("small", "", `${done}/8`));
+    grid.append(cell);
+  }
+  return grid;
+}
+function replaceCard(item) {
+  if (Array.isArray(state.feed.items)) state.feed.items = state.feed.items.map((other) => other.id === item.id ? { ...other, ...item } : other);
+  if (state.feed.shared?.id === item.id) state.feed.shared = { ...state.feed.shared, ...item };
+  document.querySelectorAll(`[data-chart="${item.id}"]`).forEach((card) => card.replaceWith(publicCard(item)));
+}
+function publicCard(item, { open = false } = {}) {
+  const card = el("article", "panel feed-card"); card.dataset.chart = item.id;
+  const head = el("header", "feed-head"); const who = el("div", "feed-author");
+  who.append(avatarImg(item.author), el("strong", "", authorName(item.author)));
+  if (item.example) who.append(el("span", "badge", tr("exampleBadge")));
+  head.append(who, el("time", "muted", new Date(item.publishedAt).toLocaleDateString(locale === "zh" ? "zh-TW" : "en")));
+  card.append(head);
+  const title = el("h2", "feed-title"); title.append(link(item.title || item.goal, `/mandala/p/${item.id}`, "")); card.append(title);
+  if (item.tags?.length) { const tags = el("div", "tag-row"); for (const tag of item.tags) tags.append(el("span", "tag", tr(`tag_${tag}`))); card.append(tags); }
+  card.append(miniChart(item));
+  const meter = el("div", "mandala-progress"); meter.append(el("span", "", `${tr("progress")}: ${item.progress}/64`));
+  const track = el("span", "progress-track"); const fill = el("span"); fill.style.width = `${Math.round(item.progress / 64 * 100)}%`; track.append(fill); meter.append(track); card.append(meter);
+  const details = el("details", "feed-actions-list"); details.open = open; details.append(el("summary", "", tr("showActions")));
+  for (const theme of item.themes ?? []) {
+    const group = el("div", "feed-theme"); group.append(el("h3", "", theme.title || "—"));
+    const list = el("ul"); for (const action of theme.actions) { const li = el("li", action.done ? "done" : "", action.text || "—"); list.append(li); } group.append(list); details.append(group);
+  }
+  // Opening the actions counts as a view (once per signed-in viewer per day, server side).
+  details.addEventListener("toggle", () => { if (details.open && isSignedIn() && !item.mine && !state.feed.viewed.has(item.id)) { state.feed.viewed.add(item.id); api.publicChart(item.id).catch(() => {}); } });
+  card.append(details);
+  const stats = el("p", "feed-stats muted", [tr("statEncourages", { n: item.encourages }), tr("statCopies", { n: item.copies }), ...(item.views ? [tr("statViews", { n: item.views })] : [])].join(" · "));
+  card.append(stats);
+  const actions = el("div", "button-row feed-buttons");
+  if (isSignedIn()) {
+    actions.append(btn(`${item.encouraged ? "♥" : "♡"} ${tr(item.encouraged ? "encouraged" : "encourage")}`, { cls: `button small${item.encouraged ? " secondary" : ""}`, disabled: item.mine, action: () => toggleEncourage(item) }));
+    actions.append(btn(tr("copyToMine"), { cls: "button small", action: () => copyPublic(item) }));
+  }
+  actions.append(shareMenu(item), downloadMenu(chartFromPublic(item), authorName(item.author)));
+  if (isSignedIn() && !item.mine) actions.append(menu(tr("report"), REPORT_REASONS.map((reason) => [tr(`reason_${reason}`), () => reportPublic(item, reason)])));
+  card.append(actions);
+  return card;
+}
+async function toggleEncourage(item) {
+  const scope = captureAccountScope();
+  try { const { chart } = await api.encourage(item.id, !item.encouraged); if (accountScopeCurrent(scope)) replaceCard(chart); }
+  catch (error) { if (accountScopeCurrent(scope)) notify(toMessage(error), "error"); }
+}
+async function copyPublic(item) {
+  const scope = captureAccountScope();
+  try {
+    const { chart } = await api.copyPublic(item.id); if (!accountScopeCurrent(scope)) return;
+    const mandala = state.mandala; mandala.chartEpoch++; mandala.chart = chartFromPublic(chart); mandala.localId = null; mandala.cloudDoc = null; mandala.proposal = null; mandala.proposalSnapshot = null; mandala.proposalStale = false; mandala.perspectives = null;
+    setNotice(tr("copiedToMine"), "success"); navigate("/mandala");
+  } catch (error) { if (accountScopeCurrent(scope)) notify(toMessage(error), "error"); }
+}
+async function reportPublic(item, reason) {
+  if (!confirm(tr("reportConfirm"))) return;
+  try { await api.report(item.id, reason); notify(tr("reported"), "success"); }
+  catch (error) { notify(toMessage(error), "error"); }
+}
+async function loadFeed() {
+  const feed = state.feed; if (feed.loading || feed.done) return;
+  const scope = captureAccountScope(); const key = feedKey(feed); feed.loading = key;
+  const query = { sort: feed.sort, window: feed.window, source: feed.source, tag: feed.tag || undefined, lang: locale, offset: feed.items?.length ?? 0 };
+  try {
+    const { items } = await api.feed(query);
+    // A filter change while this page was loading makes the answer stale.
+    if (!accountScopeCurrent(scope) || state.feed !== feed || feedKey(feed) !== key) return;
+    const known = new Set((feed.items ?? []).map((item) => item.id));
+    feed.items = [...(feed.items ?? []), ...items.filter((item) => !known.has(item.id))];
+    feed.done = items.length < 20 || feed.items.length >= 500;
+    if (query.offset === 0) api.event("feed_viewed", "mandala").catch(() => {});
+  } catch (error) { if (feedKey(feed) === key) { feed.done = true; feed.items ??= []; } if (accountScopeCurrent(scope)) notify(toMessage(error), "error"); }
+  finally { if (feed.loading === key) feed.loading = false; }
+  if (state.route === "/feed" && state.feed === feed) render();
+}
+function feedKey(feed) { return `${feed.sort}|${feed.window}|${feed.source}|${feed.tag}`; }
+function setFeedFilter(key, value) {
+  const feed = state.feed; if (feed[key] === value) return;
+  Object.assign(feed, { [key]: value, items: null, done: false, loading: false }); render();
+}
+function filterRow(label, key, options) {
+  const row = el("div", "filter-row"); row.setAttribute("role", "group"); row.setAttribute("aria-label", label);
+  for (const [value, text] of options) {
+    const chip = btn(text, { cls: `chip${state.feed[key] === value ? " active" : ""}`, action: () => setFeedFilter(key, value) });
+    chip.setAttribute("aria-pressed", String(state.feed[key] === value)); row.append(chip);
+  }
+  return row;
+}
+function renderFeed() {
+  const page = newPage("page-shell narrow feed-page");
+  page.append(heading(tr("feedTitle"), tr("feedLead")));
+  feedObserver?.disconnect(); feedObserver = null;
+  if (!isSignedIn()) {
+    page.append(infoBox(tr("feedSignIn")));
+    const row = el("div", "button-row"); if (state.config?.authEnabled) row.append(link(tr("signInFeed"), "/api/auth/login", "button primary")); row.append(link(tr("openMandala"), "/mandala", "button")); page.append(row);
+    return;
+  }
+  page.append(renderProfileEditor());
+  const filters = el("section", "panel feed-filters");
+  filters.append(filterRow(tr("sortLabel"), "sort", [["hot", tr("sortHot")], ["new", tr("sortNew")], ["copied", tr("sortCopied")], ["done", tr("sortDone")]]));
+  if (["hot", "copied"].includes(state.feed.sort)) filters.append(filterRow(tr("windowLabel"), "window", [["7d", tr("window7d")], ["30d", tr("window30d")], ["all", tr("windowAll")]]));
+  filters.append(filterRow(tr("sourceLabel"), "source", [["all", tr("sourceAll")], ["users", tr("sourceUsers")], ["examples", tr("sourceExamples")]]));
+  filters.append(filterRow(tr("tagLabel"), "tag", [["", tr("allTags")], ...FEED_TAGS.map((tag) => [tag, tr(`tag_${tag}`)])]));
+  page.append(filters);
+  const feed = state.feed;
+  if (feed.items === null) { page.append(el("p", "muted", tr("feedLoading"))); loadFeed(); return; }
+  if (!feed.items.length) { page.append(el("p", "empty-state", tr("feedEmpty"))); return; }
+  const list = el("div", "feed-list"); for (const item of feed.items) list.append(publicCard(item)); page.append(list);
+  if (feed.done) { page.append(el("p", "empty-state", tr("feedEnd"))); return; }
+  const more = btn(tr(feed.loading ? "feedLoading" : "loadMore"), { cls: "button", action: () => loadFeed() }); page.append(more);
+  if ("IntersectionObserver" in window) { feedObserver = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) loadFeed(); }, { rootMargin: "600px" }); feedObserver.observe(more); }
+}
+function renderProfileEditor({ open = false } = {}) {
+  const feed = state.feed;
+  if (feed.profile === undefined) { feed.profile = "loading"; loadProfile(); }
+  const box = el("details", "panel profile-editor"); box.open = open || feed.profile === null;
+  const summary = el("summary", "profile-summary");
+  const current = feed.profile && feed.profile !== "loading" ? feed.profile : null;
+  summary.append(avatarImg(current ?? { avatar: "a01" }, 32), el("strong", "", current?.nickname ?? tr("profileTitle")));
+  box.append(summary, el("p", "muted", tr("profileLead")));
+  const draft = { nickname: current?.nickname ?? "", avatar: current?.avatar ?? "" };
+  box.append(field(tr("nickname"), input(draft.nickname, { maxLength: 24, onInput: (event) => { draft.nickname = event.target.value; } })));
+  const picker = el("div", "avatar-picker"); picker.setAttribute("role", "radiogroup"); picker.setAttribute("aria-label", tr("avatar"));
+  for (const id of AVATARS) {
+    const option = el("button", `avatar-option${draft.avatar === id ? " active" : ""}`); option.type = "button"; option.setAttribute("role", "radio"); option.setAttribute("aria-checked", String(draft.avatar === id)); option.setAttribute("aria-label", `${tr("avatar")} ${id.slice(1)}`);
+    option.append(avatarImg({ avatar: id }, 48));
+    option.addEventListener("click", () => { draft.avatar = id; picker.querySelectorAll(".avatar-option").forEach((b) => { const on = b === option; b.classList.toggle("active", on); b.setAttribute("aria-checked", String(on)); }); });
+    picker.append(option);
+  }
+  box.append(el("span", "field-label", tr("avatar")), picker, btn(tr("saveProfile"), { cls: "button primary small", action: () => saveProfile(draft) }));
+  return box;
+}
+async function loadProfile() {
+  const scope = captureAccountScope();
+  try { const { profile } = await api.profile(); if (!accountScopeCurrent(scope)) return; state.feed.profile = profile ?? null; }
+  catch { if (accountScopeCurrent(scope)) state.feed.profile = null; }
+  if (["/feed", "/mandala"].includes(state.route)) render();
+}
+async function saveProfile(draft) {
+  if (!draft.nickname.trim() || !AVATARS.includes(draft.avatar)) { notify(tr("profileRequired"), "error"); return; }
+  const scope = captureAccountScope();
+  try {
+    const { profile } = await api.saveProfile({ nickname: draft.nickname.trim(), avatar: draft.avatar }); if (!accountScopeCurrent(scope)) return;
+    state.feed.profile = profile; state.feed.items = null; state.feed.done = false; state.feed.mine = null; notify(tr("profileSaved"), "success"); render();
+  } catch (error) { if (accountScopeCurrent(scope)) notify(toMessage(error), "error"); }
+}
+// Publishing from the Mandala page: needs a cloud copy and a profile.
+function renderPublishPanel() {
+  const mandala = state.mandala; const feed = state.feed;
+  const box = el("section", "panel mandala-publish"); box.append(sectionTitle(tr("publishTitle"), tr("publishLead")));
+  if (!mandala.cloudDoc) { box.append(el("p", "muted", tr("publishNeedsCloud"))); return box; }
+  if (feed.mine === null) { feed.mine = "loading"; loadMine(); }
+  if (feed.profile === undefined) { feed.profile = "loading"; loadProfile(); }
+  if (feed.profile === null) box.append(renderProfileEditor({ open: true }));
+  const current = Array.isArray(feed.mine) ? feed.mine.find((item) => item.documentId === mandala.cloudDoc.id) : null;
+  if (!feed.publishTags || feed.publishTags.doc !== mandala.cloudDoc.id) feed.publishTags = { doc: mandala.cloudDoc.id, tags: [...(current?.tags ?? [])] };
+  const tags = el("div", "filter-row"); tags.setAttribute("role", "group"); tags.setAttribute("aria-label", tr("publishTags"));
+  for (const tag of FEED_TAGS) {
+    const on = feed.publishTags.tags.includes(tag);
+    const chip = btn(tr(`tag_${tag}`), { cls: `chip${on ? " active" : ""}`, action: () => {
+      const list = feed.publishTags.tags;
+      if (on) list.splice(list.indexOf(tag), 1); else if (list.length >= 3) { notify(tr("tooManyTags"), "error"); return; } else list.push(tag);
+      render();
+    } });
+    chip.setAttribute("aria-pressed", String(on)); tags.append(chip);
+  }
+  box.append(el("span", "field-label", tr("publishTags")), tags);
+  if (current?.hidden) box.append(alertBox(tr("publishedHidden"), "warning"));
+  const row = el("div", "button-row");
+  row.append(btn(tr(current ? "publishUpdate" : "publish"), { cls: "button primary", disabled: !feed.profile || feed.profile === "loading", action: () => publishChart() }));
+  if (current) {
+    row.append(link(tr("publicLink"), `/mandala/p/${current.id}`, "button small"), shareMenu(current));
+    row.append(btn(tr("unpublish"), { cls: "button small danger", action: () => unpublishChart(current) }));
+  }
+  box.append(row); return box;
+}
+async function loadMine() {
+  const scope = captureAccountScope();
+  try { const { charts } = await api.myPublicCharts(); if (!accountScopeCurrent(scope)) return; state.feed.mine = charts ?? []; }
+  catch { if (accountScopeCurrent(scope)) state.feed.mine = []; }
+  if (state.route === "/mandala") render();
+}
+async function publishChart() {
+  const mandala = state.mandala; const scope = captureAccountScope();
+  if (!mandala.chart.goal.trim()) { notify(tr("goalNeeded"), "error"); return; }
+  try {
+    // Publish what is on screen: save first when the editor has changes.
+    if (JSON.stringify(chartDto(mandala.chart)) !== JSON.stringify(chartDto(mandala.cloudDoc.data))) await saveCloudChart();
+    if (!accountScopeCurrent(scope) || !mandala.cloudDoc) return;
+    const { chart } = await api.publish(mandala.cloudDoc.id, state.feed.publishTags?.tags ?? []); if (!accountScopeCurrent(scope)) return;
+    const mine = Array.isArray(state.feed.mine) ? state.feed.mine.filter((item) => item.id !== chart.id) : [];
+    state.feed.mine = [{ ...chart, hidden: false }, ...mine]; state.feed.items = null; state.feed.done = false;
+    notify(tr("published"), "success"); render();
+  } catch (error) { if (accountScopeCurrent(scope)) notify(toMessage(error), "error"); }
+}
+async function unpublishChart(item) {
+  if (!confirm(tr("confirmUnpublish"))) return;
+  const scope = captureAccountScope();
+  try { await api.unpublish(item.id); if (!accountScopeCurrent(scope)) return; state.feed.mine = (state.feed.mine ?? []).filter((other) => other.id !== item.id); state.feed.items = null; state.feed.done = false; notify(tr("unpublished")); render(); }
+  catch (error) { if (accountScopeCurrent(scope)) notify(toMessage(error), "error"); }
+}
+// /mandala/p/:id: the shared chart, readable without an account.
+function renderSharedChart(id) {
+  const page = newPage("page-shell narrow feed-page"); const feed = state.feed;
+  if (!feed.shared || feed.shared.id !== id) {
+    if (feed.shared?.loading !== id) { feed.shared = { loading: id }; api.publicChart(id).then(({ chart }) => { feed.shared = chart; }).catch(() => { feed.shared = { missing: id }; }).finally(() => { if (state.route === `/mandala/p/${id}`) render(); }); }
+    if (feed.shared?.missing === id) { page.append(heading(tr("sharedMissing")), link(tr("makeOwn"), "/mandala", "button primary")); return; }
+    page.append(el("p", "muted", tr("feedLoading"))); return;
+  }
+  document.title = `${feed.shared.title || feed.shared.goal}｜${tr("mandala")}`;
+  page.append(publicCard(feed.shared, { open: true }));
+  const row = el("div", "button-row");
+  if (isSignedIn()) row.append(link(tr("backToFeed"), "/feed", "button"));
+  else { page.append(infoBox(tr("sharedCta"))); if (state.config?.authEnabled) row.append(link(tr("signIn"), "/api/auth/login", "button primary")); }
+  row.append(link(tr("makeOwn"), "/mandala", "button secondary")); page.append(row);
+}
+
 async function init() {
   languageSelect.value = locale;
   themeToggle.addEventListener("click", () => {
@@ -1621,7 +1919,6 @@ async function init() {
   try {
     await localeReady;
     await chooseLocale(locale === "zh" ? "zh-Hant-TW" : "en");
-    setupDecisionView();
     const storedTheme = localStorage.getItem("ig:theme"); if (storedTheme === "dark" || storedTheme === "light") document.documentElement.dataset.theme = storedTheme;
     const bootstrap = await api.bootstrap();
     state.config = bootstrap.config; setSession(bootstrap.session); state.studioContinuation = readStudioContinuation(); state.pending = readStoredPending(); state.ready = true;

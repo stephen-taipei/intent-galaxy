@@ -37,7 +37,7 @@ Keep secrets in the Worker secret store, outside Git and client assets. Do not p
 | `MANDALA_INVITE_CHARTS`, `MANDALA_INVITE_CALLS` | Free Mandala AI for a guest who redeemed an invite, for the guest's 24-hour lifetime; defaults 1 and 10 |
 | `MANDALA_INVITES_DAILY`, `MANDALA_INVITES_OPEN`, `MANDALA_INVITE_TTL_DAYS` | Invite codes per signed-in account: created per Asia/Taipei day, unused at once, days valid; defaults 3, 3, 7. Zero disables invites |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Direct Google sign-in (OpenID Connect). When both are set, sign-in uses Google directly instead of Supabase Auth. The secret is a Worker secret |
-| `ADMIN_EMAILS` | Comma-separated emails allowed to read `GET /api/admin/metrics`; everyone else gets 404 |
+| `ADMIN_EMAILS` | Comma-separated emails allowed to use `/api/admin/*` (metrics, report review, example seeding); everyone else gets 404 |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Challenge keys for the configured hostname; render with action `guest_trial` |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Independent direct-provider credentials; only configured providers can be requested |
 | `DECISIONS_ENABLED` | Must equal `true` to enable the optional OpenAI Decisions checks; unavailable checks remain `unknown` |
@@ -65,7 +65,7 @@ Session-cookie expiration is fixed at seven days. Browser trial/CSRF binding coo
 
 The Worker only needs a PostgREST endpoint at `/rest/v1`, so a self-hosted PostgreSQL with PostgREST can replace Supabase. Sign-in then uses direct Google OpenID Connect (see below); leave `SUPABASE_ANON_KEY` unset. Files are in `apps/hosted/selfhosted/`.
 
-1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql`, `0002_mandala_trial.sql` and `0003_google_invites_metrics.sql`. Never run `bootstrap.sql` on Supabase.
+1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql`, `0002_mandala_trial.sql`, `0003_google_invites_metrics.sql` and `0004_public_feed.sql`. Never run `bootstrap.sql` on Supabase.
 2. Run PostgREST 12 with `postgrest.conf`. Pass `PGRST_DB_URI` and `PGRST_JWT_SECRET` through a mode-0600 environment file; the JWT secret is independent of every other secret. PostgREST listens on `127.0.0.1:3000` only, and PostgreSQL stays on loopback.
 3. Install `nginx-postgrest.conf`. It listens on `127.0.0.1:8088` and forwards only `POST /rest/v1/rpc/hosted_*`; everything else returns 403 or 404.
 4. Expose port 8088 through Cloudflare Tunnel (`cloudflared.yml`), so the server opens no inbound port.
@@ -94,6 +94,18 @@ The Worker sends the user to Google with PKCE (`S256`), a random `state` and a `
 - **Account deletion**: `DELETE /api/account` removes the account and everything it owns. Accounts with payment records are refused (`billing_conflict`) so accounting records stay intact.
 
 Regenerate the example library with `ANTHROPIC_API_KEY=... node apps/hosted/scripts/generate-mandala-examples.mjs`. It keeps the hand-written seeds in `apps/hosted/examples/seed-examples.json`, generates one chart per goal in `examples/goals.json` (about USD 0.1 each), and skips goals already generated unless `--force` is given. Review the output before deploying it.
+
+## Public feed, sharing and exports
+
+`0004_public_feed.sql` adds the public Mandala feed:
+
+- **Who sees what.** `/feed` and `GET /api/feed` need a signed-in account. A share link `/mandala/p/:id` opens for anyone; the Worker injects the chart's title and description as Open Graph tags with `noindex`. Publishing needs a cloud-saved chart and a public profile (nickname 1–24 characters, one of the avatars `a01`–`a12` in `public/avatars/`). The snapshot holds the title, goal, themes, actions and done marks; notes and due dates are never copied. Publishing again refreshes the snapshot; deleting the chart or the account deletes it.
+- **Ranking.** Sorts are newest, popular (cheers + 2 × copies), most copied and most done. Popular and most copied count only interactions inside the chosen window (`7d` default, `30d`, `all`). Views break ties: one per signed-in viewer per chart per Asia/Taipei day, counted when the chart is opened or its actions are expanded; anonymous opens and the author's own opens are not counted. Each user cheers and copies a chart at most once.
+- **Examples in the feed.** The charts in `public/mandala-examples.json` are published under the brand account (`user_id` null, shown as 九宮格小編 / Mandala Team with `avatars/brand.svg`) and ranked by the same rules. Their counts start at zero; nothing is pre-filled. Examples only show in the viewer's language. After deploying a new examples file, an operator calls `POST /api/admin/examples` while signed in (it reads the deployed file and upserts by example id; counts are kept). The demo seeds itself on the first feed request. Each example needs 1–3 `tags` from `health, learning, career, money, sports, creative, family, life`.
+- **Reports.** Reasons are personal data, harmful, spam and other. Three reports from different users hide a chart; the author still sees it. `GET /api/admin/public` lists reported or hidden charts with reason counts; `POST /api/admin/public/:id {"hidden": false}` restores a chart and clears its reports, `{"hidden": true}` keeps it hidden.
+- **Metrics.** `GET /api/admin/metrics` includes `feed`: charts published by users, publishers, cheers, copies and views in the period, and hidden charts. Events `feed_viewed`, `chart_shared` and `chart_exported` are counted per day.
+- **Exports** run in the browser with no dependencies (`public/export.js`): a 1080×1350 PNG, a one-page PDF holding that image (text is not selectable), and an `.xlsx` with the 9×9 chart and a flat action list. Saving to Google Drive is not implemented.
+- **Avatars** in `public/avatars/` are placeholders from `scripts/generate-avatars.mjs`. Replace any file with final artwork of the same name and size ratio (square SVG or same-named PNG after changing the extension in `app.js`).
 
 ## Entitlements and documents
 

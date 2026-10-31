@@ -25,7 +25,7 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
   const args = ['-h', root, '-p', '5432', '-U', 'hosted_test', '-d', 'postgres', '-X', '-q', '-t', '-A', '-v', 'ON_ERROR_STOP=1'];
   const sql = text => execFileSync('psql', [...args, '-c', text], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   const rpc = (name, value) => JSON.parse(sql(`select hosted_${name}(${literal(value)});`));
-  const reset = () => sql(`truncate hosted_sessions,hosted_jobs,hosted_guests,hosted_trials,hosted_credit_usage,hosted_budgets,hosted_documents,hosted_checkouts,hosted_billing_links,hosted_subscriptions,hosted_payments,hosted_webhook_events,hosted_events,hosted_invites,hosted_invite_redemptions,hosted_user_activity restart identity cascade; delete from hosted_identities; delete from auth.users where id not in ('${U}','${V}');`);
+  const reset = () => sql(`truncate hosted_sessions,hosted_jobs,hosted_guests,hosted_trials,hosted_credit_usage,hosted_budgets,hosted_documents,hosted_checkouts,hosted_billing_links,hosted_subscriptions,hosted_payments,hosted_webhook_events,hosted_events,hosted_invites,hosted_invite_redemptions,hosted_user_activity,hosted_profiles,hosted_public_charts,hosted_public_views restart identity cascade; delete from hosted_identities; delete from auth.users where id not in ('${U}','${V}');`);
   try {
     execFileSync('initdb', ['-D', data, '--no-locale', '--encoding=UTF8', '--auth=trust', '--username=hosted_test'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     execFileSync('pg_ctl', ['-D', data, '-l', join(root, 'postgres.log'), '-o', `-c listen_addresses= -c unix_socket_directories=${root} -c port=5432`, '-w', 'start'], { stdio: 'ignore' });
@@ -41,6 +41,7 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
     const trialMigration = readFileSync(new URL('../migrations/0002_mandala_trial.sql', import.meta.url), 'utf8');
     execFileSync('psql', [...args], { input: trialMigration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     execFileSync('psql', [...args], { input: readFileSync(new URL('../migrations/0003_google_invites_metrics.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    execFileSync('psql', [...args], { input: readFileSync(new URL('../migrations/0004_public_feed.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
 
     await t.test('RLS hides other tenants and authenticated callers cannot run service RPCs', () => {
       reset();
@@ -264,6 +265,76 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       // Anonymous and authenticated roles cannot reach the new tables or RPCs.
       assert.throws(() => sql('set role authenticated; select count(*) from hosted_invites;'), /permission denied/);
       assert.throws(() => sql(`set role authenticated; select hosted_metrics(7);`), /permission denied/);
+    });
+
+    await t.test('public feed: profile required, snapshot without notes, encourage, copy, report hides, operator review, ranking', () => {
+      reset(); const W = '33333333-3333-4333-8333-333333333333'; sql(`insert into auth.users values('${W}') on conflict do nothing;`);
+      const chartData = { schemaVersion: 1, title: '讀書', goal: '半年讀 12 本', themes: Array.from({ length: 8 }, (_, t) => ({ id: `t${t}`, title: `主題${t}`, actions: Array.from({ length: 8 }, (_, a) => ({ id: `a${t}_${a}`, text: `行動${t}-${a}`, done: a < 2, notes: 'private note', dueDate: '2026-12-01' })) })) };
+      const doc = JSON.parse(sql(`select hosted_document_create('${U}',${literal({ product: 'mandala', kind: 'goal', title: '讀書', data: chartData })});`));
+      const publish = (user, value) => JSON.parse(sql(`select hosted_public_publish('${user}',${literal(value)});`));
+      assert.throws(() => publish(U, { documentId: doc.id, tags: ['learning'] }), /profile_required/);
+      sql(`select hosted_profile_set('${U}',${literal({ nickname: '小明', avatar: 'a03' })});`);
+      assert.throws(() => sql(`select hosted_profile_set('${V}',${literal({ nickname: 'x', avatar: 'a99' })});`), /check constraint/);
+      sql(`select hosted_profile_set('${V}',${literal({ nickname: '阿華', avatar: 'a01' })}); select hosted_profile_set('${W}',${literal({ nickname: '小美', avatar: 'a02' })});`);
+      // Someone else's document cannot be published, and unknown tags are rejected.
+      assert.throws(() => publish(V, { documentId: doc.id, tags: [] }), /not_found/);
+      assert.throws(() => publish(U, { documentId: doc.id, tags: ['politics'] }), /check constraint/);
+      const chart = publish(U, { documentId: doc.id, tags: ['learning', 'learning'] });
+      assert.equal(chart.progress, 16); assert.deepEqual(chart.tags, ['learning']); assert.equal(chart.author.nickname, '小明');
+      assert.ok(!JSON.stringify(chart).includes('private note') && !JSON.stringify(chart).includes('2026-12-01'));
+      assert.equal(publish(U, { documentId: doc.id, tags: ['health'] }).id, chart.id);
+      const encourage = (user, on) => JSON.parse(sql(`select hosted_public_encourage('${user}','${chart.id}',${on});`));
+      assert.equal(encourage(V, true).encourages, 1); assert.equal(encourage(V, true).encourages, 1); assert.equal(encourage(V, true).encouraged, true);
+      assert.equal(JSON.parse(sql(`select hosted_public_copy('${V}','${chart.id}');`)).copies, 1);
+      assert.equal(JSON.parse(sql(`select hosted_public_copy('${U}','${chart.id}');`)).copies, 1);
+      const feed = (viewer, query) => JSON.parse(sql(`select hosted_public_feed('${viewer}',${literal(query)});`));
+      assert.equal(feed(V, { sort: 'hot' })[0].id, chart.id); assert.equal(feed(V, { tag: 'health' }).length, 1); assert.equal(feed(V, { tag: 'money' }).length, 0);
+      assert.equal(feed(V, {})[0].mine, false); assert.equal(feed(U, {})[0].mine, true); assert.equal(feed(V, {})[0].documentId, null);
+      // Reports: the author cannot report; three users hide it; the operator restores it.
+      assert.throws(() => sql(`select hosted_public_report('${U}','${chart.id}','spam');`), /not_found/);
+      const reporters = [V, W, '44444444-4444-4444-8444-444444444444'];
+      sql(`insert into auth.users values('${reporters[2]}') on conflict do nothing;`);
+      for (const r of reporters) sql(`select hosted_public_report('${r}','${chart.id}','personal_data');`);
+      assert.equal(feed(V, {}).length, 0);
+      assert.throws(() => sql(`select hosted_public_get('${V}','${chart.id}');`), /not_found/);
+      assert.equal(JSON.parse(sql(`select hosted_public_get('${U}','${chart.id}');`)).id, chart.id);
+      assert.equal(JSON.parse(sql('select hosted_public_review_list();'))[0].reasons.personal_data, 3);
+      sql(`select hosted_public_moderate('${chart.id}',false);`);
+      assert.equal(feed(V, {}).length, 1);
+      // Deleting the cloud document unpublishes it; deleting the account removes the profile.
+      sql(`select hosted_document_delete('${U}','${doc.id}');`);
+      assert.equal(sql('select count(*) from hosted_public_charts;'), '0');
+      assert.equal(JSON.parse(sql('select hosted_feed_metrics(30);')).copies, 0);
+      assert.throws(() => sql('set role authenticated; select count(*) from hosted_public_charts;'), /permission denied/);
+    });
+
+    await t.test('public feed: brand examples rank by the same rules, windows, views break ties, language filter', () => {
+      reset(); sql(`select hosted_profile_set('${U}',${literal({ nickname: '小明', avatar: 'a03' })});`);
+      const ex = (id, locale, tags) => ({ id, locale, tags, chart: { title: `範例 ${id}`, goal: `目標 ${id}`, themes: [{ title: '主題', actions: [{ text: '行動', done: true }] }] } });
+      assert.equal(sql(`select hosted_public_seed(${literal([ex('ex-a', 'zh', ['learning']), ex('ex-b', 'zh', []), ex('ex-en', 'en', [])])});`), '3');
+      const feed = (viewer, query) => JSON.parse(sql(`select hosted_public_feed(${viewer ? `'${viewer}'` : 'null'},${literal(query)});`));
+      const zh = feed(U, { lang: 'zh' });
+      assert.equal(zh.length, 2); assert.equal(zh[0].example, true); assert.deepEqual(zh[0].author, { brand: true, avatar: 'brand' });
+      assert.equal(zh[0].progress, 0); assert.equal(zh[0].encourages, 0); assert.equal(zh[0].themes[0].actions[0].done, false);
+      assert.equal(feed(U, {}).length, 3); assert.equal(feed(U, { lang: 'zh', source: 'users' }).length, 0);
+      const [a, b] = ['ex-a', 'ex-b'].map(id => sql(`select id from hosted_public_charts where example_id='${id}';`));
+      // A copy outranks an encouragement; old interactions leave the 7-day window but stay in "all".
+      sql(`select hosted_public_encourage('${U}','${a}',true); select hosted_public_copy('${V}','${b}');`);
+      assert.equal(feed(U, { sort: 'hot', lang: 'zh' })[0].id, b);
+      sql(`update hosted_copies set created_at=now()-interval '10 days';`);
+      assert.equal(feed(U, { sort: 'hot', lang: 'zh' })[0].id, a);
+      assert.equal(feed(U, { sort: 'hot', lang: 'zh', window: '30d' })[0].id, b);
+      assert.equal(feed(U, { sort: 'copied', lang: 'zh', window: 'all' })[0].id, b);
+      // Views: once per viewer per day; they break ties only.
+      sql(`select hosted_public_encourage('${V}','${b}',true); delete from hosted_copies;`);
+      assert.equal(sql(`select hosted_public_view('${V}','${b}');`), 't'); assert.equal(sql(`select hosted_public_view('${V}','${b}');`), 'f');
+      assert.equal(feed(U, { sort: 'hot', lang: 'zh' })[0].id, b); assert.equal(feed(U, { sort: 'hot', lang: 'zh' })[0].views, 1);
+      // Re-seeding refreshes the content and keeps the counts; examples can be reported like any chart.
+      sql(`select hosted_public_seed(${literal([{ ...ex('ex-b', 'zh', ['money']), chart: { ...ex('ex-b').chart, title: '新標題' } }])});`);
+      const refreshed = JSON.parse(sql(`select hosted_public_get(null,'${b}');`)); assert.equal(refreshed.title, '新標題'); assert.equal(refreshed.encourages, 1);
+      assert.equal(sql(`select hosted_public_report('${U}','${b}','spam');`), 't');
+      assert.throws(() => sql(`select hosted_public_feed('${U}',${literal({ window: '1y' })});`), /not_found/);
+      assert.throws(() => sql(`insert into hosted_public_charts(title,goal,snapshot,progress) values('x','y','[]',0);`), /check constraint/);
     });
 
     await t.test('guest caps and 24-hour payload cleanup retain aggregate cost and trial tombstone', () => {
