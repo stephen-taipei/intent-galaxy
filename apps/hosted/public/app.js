@@ -2036,6 +2036,19 @@ function mini9(chart) {
   }
   return grid;
 }
+// The centre 3×3 with text: goal in the middle, the 8 theme titles around it. Used on feed cards.
+function core9(chart) {
+  const grid = el("div", "core9"); grid.setAttribute("role", "img"); grid.setAttribute("aria-label", chart.title || chart.goal || tr("chartLabel"));
+  const at = new Map(THEME_POSITIONS.map(([r, c], i) => [`${r},${c}`, i]));
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+    if (r === 1 && c === 1) { grid.append(el("div", "k g", chart.goal || chart.title || "")); continue; }
+    const theme = chart.themes?.[at.get(`${r},${c}`)] ?? { title: "", actions: [] };
+    const cell = el("div", theme.title ? "k" : "k e", theme.title || "");
+    const done = (theme.actions ?? []).filter((a) => a.done).length; if (done) cell.append(el("small", "", `${done}/8`));
+    grid.append(cell);
+  }
+  return grid;
+}
 const miniDocCache = new Map();
 function mini9FromDoc(doc) {
   const holder = el("div"); const cached = miniDocCache.get(doc.id);
@@ -2225,7 +2238,7 @@ function publicCard(item, { open = false } = {}) {
   if (open && item.title && item.goal && item.goal !== item.title) card.append(el("p", "lead", item.goal));
   if (item.tags?.length) { const tags = el("div", "tag-row"); for (const tag of item.tags) tags.append(el("span", "tag", tr(`tag_${tag}`))); card.append(tags); }
   if (open) { card.append(chartView(chartFromPublic(item))); countView(item); }
-  else { const thumb = link("", `/mandala/p/${item.id}`, "mini-link"); thumb.setAttribute("aria-label", tr("open9x9")); thumb.append(mini9(item)); card.append(thumb); }
+  else { const thumb = link("", `/mandala/p/${item.id}`, "mini-link"); thumb.setAttribute("aria-label", tr("open9x9")); thumb.append(core9(item)); card.append(thumb); }
   const meter = el("div", "mandala-progress"); meter.append(el("span", "", `${tr("progress")}: ${item.progress}/64`));
   const track = el("span", "progress-track"); const fill = el("span"); fill.style.width = `${Math.round(item.progress / 64 * 100)}%`; track.append(fill); meter.append(track); card.append(meter);
   const stats = el("p", "feed-stats muted", [tr("statEncourages", { n: item.encourages }), tr("statCopies", { n: item.copies }), ...(item.views ? [tr("statViews", { n: item.views })] : [])].join(" · "));
