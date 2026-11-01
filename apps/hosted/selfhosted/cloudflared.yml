@@ -1,0 +1,8 @@
+# Cloudflare Tunnel: the server opens no inbound port. Replace the tunnel ID
+# and hostname, then route the hostname with `cloudflared tunnel route dns`.
+tunnel: <TUNNEL_ID>
+credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
+ingress:
+  - hostname: ig-db.example.com
+    service: http://127.0.0.1:8088
+  - service: http_status:404

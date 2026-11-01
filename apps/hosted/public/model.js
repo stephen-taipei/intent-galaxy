@@ -25,6 +25,7 @@ const toChartDto = (chart) => ({
       id: action.id,
       text: action.text,
       done: action.done,
+      ...(action.skipped === true ? { skipped: true } : {}),
       ...(action.dueDate ? { dueDate: action.dueDate } : {}),
       ...(action.notes ? { notes: action.notes } : {}),
     })),
@@ -73,6 +74,7 @@ export function validateChart(chart) {
       addId(action.id, `action ${ti + 1}.${ai + 1}`);
       cleanText(action.text, 500, `action ${ti + 1}.${ai + 1} text`);
       if (typeof action.done !== "boolean") throw new TypeError(`action ${ti + 1}.${ai + 1} done must be boolean`);
+      if (action.skipped !== undefined && typeof action.skipped !== "boolean") throw new TypeError(`action ${ti + 1}.${ai + 1} skipped must be boolean`);
       if (action.dueDate !== undefined && action.dueDate !== "" && !validDate(action.dueDate)) throw new TypeError(`action ${ti + 1}.${ai + 1} dueDate must be a real YYYY-MM-DD date`);
       if (action.notes !== undefined) cleanText(action.notes, 1000, `action ${ti + 1}.${ai + 1} notes`);
     }
@@ -98,7 +100,7 @@ export function chartMarkdown(chart) {
     lines.push(`## ${i + 1}. ${theme.title || "Untitled theme"}`, "");
     for (const action of theme.actions) {
       const due = action.dueDate ? ` — due ${action.dueDate}` : "";
-      lines.push(`- [${action.done ? "x" : " "}] ${action.text || "Untitled action"}${due}`);
+      lines.push(`- [${action.done ? "x" : action.skipped ? "-" : " "}] ${action.skipped ? `~~${action.text || "Untitled action"}~~` : (action.text || "Untitled action")}${due}`);
       if (action.notes) lines.push(`  - ${action.notes}`);
     }
     lines.push("");

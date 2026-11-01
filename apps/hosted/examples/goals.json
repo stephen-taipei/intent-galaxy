@@ -1,0 +1,28 @@
+{
+  "goals": [
+    { "id": "learn-english-speaking", "tags": ["learning", "career"], "locale": "zh", "title": "半年英文口說能自在對話", "goal": "半年內能用英文自在進行 15 分鐘的工作會議" },
+    { "id": "lose-weight-healthy", "tags": ["health"], "locale": "zh", "title": "健康減重 6 公斤", "goal": "六個月內以健康的方式減重 6 公斤並維持" },
+    { "id": "pass-certificate", "tags": ["learning", "career"], "locale": "zh", "title": "一次考取專業證照", "goal": "四個月內一次考取工作需要的專業證照" },
+    { "id": "side-project-launch", "tags": ["creative", "career"], "locale": "zh", "title": "三個月上線個人作品", "goal": "三個月內把個人 Side Project 上線並取得 100 位使用者" },
+    { "id": "career-switch-engineer", "tags": ["career", "learning"], "locale": "zh", "title": "一年轉職軟體工程師", "goal": "一年內從非本科轉職成為軟體工程師" },
+    { "id": "promotion", "tags": ["career"], "locale": "zh", "title": "明年升上主管", "goal": "一年內升上團隊主管" },
+    { "id": "start-freelance", "tags": ["career", "money"], "locale": "zh", "title": "接案月收入 5 萬", "goal": "一年內讓接案收入穩定達到每月 5 萬元" },
+    { "id": "learn-japanese-n3", "tags": ["learning"], "locale": "zh", "title": "一年考過日檢 N3", "goal": "一年內從零開始考過日檢 N3" },
+    { "id": "better-sleep", "tags": ["health"], "locale": "zh", "title": "三個月改善睡眠", "goal": "三個月內養成每天 11 點前睡、睡滿 7 小時的習慣" },
+    { "id": "write-blog", "tags": ["creative"], "locale": "zh", "title": "一年寫 50 篇部落格", "goal": "一年內每週發一篇部落格文章，累積 50 篇" },
+    { "id": "youtube-channel", "tags": ["creative"], "locale": "zh", "title": "YouTube 頻道 1,000 訂閱", "goal": "一年內讓自己的 YouTube 頻道達到 1,000 位訂閱者" },
+    { "id": "first-investment", "tags": ["money"], "locale": "zh", "title": "開始第一筆長期投資", "goal": "三個月內建立自己的長期投資計畫並開始定期定額" },
+    { "id": "family-time", "tags": ["family"], "locale": "zh", "title": "多陪家人", "goal": "這一年每週至少有一個完整半天陪伴家人" },
+    { "id": "public-speaking", "tags": ["career", "life"], "locale": "zh", "title": "上台分享不緊張", "goal": "半年內能在 50 人面前做 20 分鐘的分享" },
+    { "id": "half-marathon", "tags": ["sports", "health"], "locale": "zh", "title": "完成第一場半馬", "goal": "六個月內完成第一場半程馬拉松" },
+    { "id": "learn-guitar", "tags": ["creative", "learning"], "locale": "zh", "title": "半年自彈自唱 10 首歌", "goal": "半年內學會吉他自彈自唱 10 首歌" },
+    { "id": "small-business", "tags": ["money", "career"], "locale": "zh", "title": "網路小店月營收 10 萬", "goal": "一年內讓網路小店的月營收達到 10 萬元" },
+    { "id": "team-lead-new", "tags": ["career"], "locale": "zh", "title": "當好新手主管", "goal": "成為主管的前六個月建立團隊信任並穩定交付" },
+    { "id": "school-exam", "tags": ["learning"], "locale": "zh", "title": "學測拿到理想分數", "goal": "一年內準備學測並考上理想的科系" },
+    { "id": "home-organize", "tags": ["life", "family"], "locale": "zh", "title": "三個月整理好家裡", "goal": "三個月內完成全家斷捨離並維持整齊" },
+    { "id": "baseball-pitcher", "tags": ["sports"], "locale": "zh", "title": "成為球隊王牌投手", "goal": "兩年內成為校隊的王牌投手" },
+    { "id": "digital-detox", "tags": ["life", "health"], "locale": "zh", "title": "減少滑手機時間", "goal": "兩個月內把每天滑手機時間降到 2 小時以內" },
+    { "id": "travel-solo", "tags": ["life"], "locale": "zh", "title": "完成第一次自助旅行", "goal": "半年內規劃並完成第一次出國自助旅行" },
+    { "id": "learn-ai-tools", "tags": ["career", "learning"], "locale": "zh", "title": "用 AI 工具提升工作效率", "goal": "三個月內用 AI 工具把每週重複性工作時間減少一半" }
+  ]
+}

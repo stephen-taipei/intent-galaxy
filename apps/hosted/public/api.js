@@ -108,6 +108,60 @@ export class HostedApi {
 
   versions(id) { return this.request(`/api/documents/${encodeURIComponent(id)}/versions`); }
 
+  invites() { return this.request("/api/invites"); }
+
+  createInvite() { return this.request("/api/invites", { method: "POST", body: {} }); }
+
+  async redeemInvite(code, turnstileToken = "") {
+    const result = await this.request("/api/invites/redeem", { method: "POST", body: { code, turnstileToken } });
+    await this.refreshSession();
+    return result;
+  }
+
+  async deleteAccount() {
+    await this.request("/api/account", { method: "DELETE" });
+    return this.refreshSession();
+  }
+
+  topics() { return this.request("/api/topics"); }
+
+  createTopic(title) { return this.request("/api/topics", { method: "POST", body: { title } }); }
+
+  renameTopic(id, title) { return this.request(`/api/topics/${encodeURIComponent(id)}`, { method: "PUT", body: { title } }); }
+
+  deleteTopic(id) { return this.request(`/api/topics/${encodeURIComponent(id)}`, { method: "DELETE" }); }
+
+  setDocumentTopic(documentId, topicId) { return this.request(`/api/documents/${encodeURIComponent(documentId)}/topic`, { method: "PUT", body: { topicId } }); }
+
+  exportTopic(id) { return this.request(`/api/topics/${encodeURIComponent(id)}/export`); }
+
+  profile() { return this.request("/api/profile"); }
+
+  saveProfile(profile) { return this.request("/api/profile", { method: "PUT", body: profile }); }
+
+  feed({ sort = "new", window = "7d", source = "all", lang, tag, offset = 0 } = {}) {
+    const params = new URLSearchParams({ sort, window, source, offset: String(offset) });
+    if (lang) params.set("lang", lang);
+    if (tag) params.set("tag", tag);
+    return this.request(`/api/feed?${params}`);
+  }
+
+  publicChart(id) { return this.request(`/api/public/${encodeURIComponent(id)}`); }
+
+  myPublicCharts() { return this.request("/api/public/mine"); }
+
+  publish(documentId, tags) { return this.request("/api/public", { method: "POST", body: { documentId, tags } }); }
+
+  unpublish(id) { return this.request(`/api/public/${encodeURIComponent(id)}`, { method: "DELETE" }); }
+
+  encourage(id, on) { return this.request(`/api/public/${encodeURIComponent(id)}/encourage`, { method: "POST", body: { on } }); }
+
+  copyPublic(id) { return this.request(`/api/public/${encodeURIComponent(id)}/copy`, { method: "POST", body: {} }); }
+
+  report(id, reason) { return this.request(`/api/public/${encodeURIComponent(id)}/report`, { method: "POST", body: { reason } }); }
+
+  event(name, product, templateId) { return this.request("/api/events", { method: "POST", body: { name, product, ...(templateId ? { templateId } : {}) } }); }
+
   checkout(product) {
     return this.request("/api/billing/checkout", { method: "POST", body: { product }, idempotencyKey: randomKey() });
   }
