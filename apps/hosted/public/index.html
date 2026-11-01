@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Intent Galaxy Studio and Mandala goal planner">
+  <meta name="description" content="Stephen 的工具園區：九宮格目標規劃、Intent Galaxy 決策工作室，用主題串起來。">
   <title>apps.stephen.taipei · Stephen 的工具園區</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/galaxy/apps/web/decision-view.css">
@@ -13,33 +13,31 @@
   <a class="skip-link" href="#main" data-i18n="skip"></a>
   <header class="topbar">
     <a class="brand" href="/" aria-label="apps.stephen.taipei home"><span class="brand-mark" aria-hidden="true">✦</span><span>apps.stephen.taipei</span></a>
+    <span id="demoBanner" class="demo-banner" hidden role="status"></span>
     <nav class="topnav" aria-label="Primary navigation">
-      <a href="/mandala" data-i18n="mandala"></a>
-      <a href="/studio" data-i18n="studio"></a>
-      <a href="/feed" data-i18n="feed"></a>
-      <a href="/topics" data-i18n="topicsNav"></a>
-      <a href="/pricing" data-i18n="pricing"></a>
+      <a href="/" data-nav="home" data-i18n="navGalaxy"></a>
+      <a href="/feed" data-nav="feed" data-i18n="navExplore"></a>
+      <a href="/tools" data-nav="tools" data-i18n="navTools"></a>
     </nav>
     <div class="top-controls">
-      <label class="sr-only" for="language" data-i18n="language"></label>
-      <select id="language" aria-label="Language">
-        <option value="zh">繁體中文</option>
-        <option value="en">English</option>
-      </select>
-      <button id="themeToggle" class="icon-button" type="button" aria-label="Toggle color theme" title="Toggle color theme">◐</button>
+      <span id="quota" class="quota"></span>
       <div id="account"></div>
     </div>
   </header>
-
-  <div id="demoBanner" class="demo-banner" hidden role="status"></div>
-  <main id="main" tabindex="-1"><div class="loading-state" role="status">Loading Intent Galaxy…</div></main>
+  <main id="main" tabindex="-1"><div class="loading-state" role="status">Loading…</div></main>
   <footer class="site-footer">
-    <span>Intent Galaxy</span>
+    <span data-i18n="parkName"></span>
     <nav aria-label="Legal">
       <a href="/privacy" data-i18n="privacy"></a>
       <a href="/terms" data-i18n="terms"></a>
     </nav>
+    <span class="foot-note" data-i18n="parkFoot"></span>
   </footer>
+  <nav class="tabbar" aria-label="Primary navigation">
+    <a href="/" data-nav="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z" fill="currentColor"/></svg><span data-i18n="navGalaxy"></span></a>
+    <a href="/feed" data-nav="feed"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span data-i18n="navExplore"></span></a>
+    <a href="/tools" data-nav="tools"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="13" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="8" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span data-i18n="navTools"></span></a>
+  </nav>
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
   <dialog id="decisionDialog" aria-labelledby="decisionDialogTitle">

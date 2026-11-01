@@ -8,7 +8,7 @@ import { applyHostedAccountResponse, applyMandalaProposalIfCurrent, buildStudioR
 
 const COPY = {
   zh: {
-    skip:"跳到主要內容", studio:"決策工作室", mandala:"九宮格目標規劃", pricing:"方案與價格", privacy:"隱私", terms:"使用條款", language:"介面語言", theme:"切換明暗主題", close:"關閉", primaryNavigation:"主要導覽", legalNavigation:"法律資訊", signIn:"Google 登入", signOut:"登出", signedIn:"已登入", signedOut:"已登出。此帳戶的雲端資料已從此頁清除。", demoBanner:"示範模式：畫面中的分析與生成結果由伺服器提供合成資料，不代表真實模型輸出。",
+    navGalaxy:"我的星系", navExplore:"探索", navTools:"工具", parkName:"Stephen 的工具園區", demoTag:"示範", quotaDaily:"每日 AI {n} 張", quotaGuest:"AI 要登入", menuLanguage:"語言", menuTheme:"深淺色", askTitle:"把一件事，想清楚。", askLabel:"你最近在想什麼事？", askPlaceholder:"例如：明年要不要轉職產品經理", askCreate:"建立主題", askStart:"開始", askLensHint:"先用哪個鏡頭看它？", lensMandala:"展開脈絡", lensStudio:"做出決定", lensMind:"收進記憶", lensMindSub:"Mind Galaxy · 僅限你", askNeedTitle:"先寫下你在想的事。", myTopics:"我的主題", topicsPrivate:"{n} 個 · 只有你看得到", viewList:"清單", viewMap:"星圖", viewMapSoon:"星圖是第二階段", colTopic:"主題", colUpdated:"更新", countCharts:"{n} 張", countWorks:"{n} 份", notYet:"還沒有", notIn:"尚未收進", topicExplain:"同一個主題在九宮格、Intent Galaxy、Mind Galaxy 裡用同一顆星。點進主題，就能在鏡頭之間跳。", noTopicsYet:"還沒有主題。在上面寫下一件事，就會長出第一顆星。", exploreCardTitle:"大家公開的九宮格", exploreCardBody:"看別人怎麼拆一個目標，替他們加油，或複製一張改成你的。", mapCardEyebrow:"星圖 · 第二階段", mapCardTitle:"主題越多，星圖越亮", guestExampleTitle:"一張填好的九宮格長這樣", guestExampleBody:"中心是目標，周圍 8 個主題，每個主題再展開 8 個行動。不用登入就能手動編輯、匯出。", today:"今天", daysAgo:"{n} 天前", topicCreatedOn:"{d} 建立", topicLensCount:"3 個鏡頭 · 只有你看得到", nextStep:"下一步", nextExpand:"這個主題還沒有九宮格。先把它展開成 8 個主題、64 個行動，看清楚全貌。", nextDecide:"九宮格有了，但還沒做決定。用 Intent Galaxy 攤開選項和盲區，鎖定一個方向。", nextContinue:"九宮格和決策都有了。回九宮格把行動做完，完成的會留在歷程裡。", newChartInTopic:"在這個主題開一張九宮格", newDecisionInTopic:"用 Intent Galaxy 決策這個主題", mindAutoLead:"鎖定的決策與完成的行動會留在這個主題的歷程裡。", mindExportHere:"目前先匯出 JSON 到你本機的 Mind Galaxy。", mindLater:"Mind Galaxy 搬進園區排在第三階段。", noMemory:"還沒有記憶", topicHistory:"這個主題的歷程", historyCreated:"建立主題「{t}」", historyMandala:"九宮格「{t}」更新", historyStudio:"決策「{t}」更新", historyHint:"這條歷程就是未來 Mind Galaxy 的雛形：鎖定的決策、完成的行動、改過的想法都會留在這裡。", expandActions:"展開行動", proposeThemesShort:"請 AI 提主題", moreActions:"更多：匯出、列印、匯入、版本", publicBtn:"公開", gridHint:"點任何一格直接打字。虛線格是還沒填的；按「展開行動」讓 AI 填空格，你改完再套用。", aiCardTitle:"AI 提案", consentFirst:"先在右側「AI 提案」勾選同意，才會送出資料。", sameTopicDecision:"同主題的決策", openTopic:"看主題", noTopicYet:"還沒歸到主題", libraryTitle:"已存的九宮格", toolsTitle:"工具", toolsLead:"一個帳號用所有工具。工具之間用「主題」串起來，所以通常從「我的星系」進來，不是從這裡。", groupLenses:"鏡頭 · 看同一件事的三種方式", groupPlaces:"場所", planTitle:"方案", planLead:"整個園區一套方案。測試期間全部免費，只有每日 AI 額度上限；不會自動加購，也不會超額扣款。", planCanDo:"每天可以", planAiCharts:"AI 九宮格", planAiCalls:"AI 呼叫", planInviteCodes:"分享碼", planManual:"手動編輯、匯出 PNG／PDF／Excel", planCloud:"雲端保存、版本", planTopics:"主題、跨工具跳轉", planExplore:"探索：看、加油、複製、公開", planStudio:"Intent Galaxy 決策", planPrice:"價格", planFreeShort:"免費", planCan:"可以", planNo:"—", planTierUp:"依用量分級提高", planMore:"更多", planGuestInvite:"0 · 朋友的分享碼可體驗 1 張", planLocalOnly:"只存在這台裝置", planCloudCount:"{n} 張，含版本", planShareOnly:"只能看分享連結", planGuest24h:"訪客工作 24 小時後到期", planSave:"可以保存", planPriceNote:"價格和額度依測試期實際用量決定，測試期間不收費", planFoot:"付費切法是「所有工具都能用，依 AI 用量分級」，不是依工具鎖。", nCharts:"{n} 張", nTimes:"{n} 次", nCodes:"{n} 組，7 天有效", lensMandalaDesc:"展開脈絡。一個目標拆成 8 個主題、64 個行動，AI 可以提主題、填空格，你改完再套用。", lensStudioDesc:"做出決定。60 秒攤開所有選項和盲區，鎖定一個決策，產出可執行的需求摘要。", lensMindDesc:"收進記憶。鎖定的決策和完成的行動會留在主題歷程裡。目前只有你的帳號看得到，第三階段搬進園區。", exploreDesc:"大家公開的九宮格。加油、複製、看範例。登入後使用。", fromTopicPage:"從主題頁匯出 JSON", windowLabelShort:"區間", myProfile:"我的公開檔案", feedMore:"往下捲會載入更多。範例和用戶作品用同一套排序，數字都從 0 開始。", open9x9:"看完整九宮格", skip:"跳到主要內容", studio:"決策工作室", mandala:"九宮格目標規劃", pricing:"方案與價格", privacy:"隱私", terms:"使用條款", language:"介面語言", theme:"切換明暗主題", close:"關閉", primaryNavigation:"主要導覽", legalNavigation:"法律資訊", signIn:"Google 登入", signOut:"登出", signedIn:"已登入", signedOut:"已登出。此帳戶的雲端資料已從此頁清除。", demoBanner:"示範模式：畫面中的分析與生成結果由伺服器提供合成資料，不代表真實模型輸出。",
     homeEyebrow:"從想法到可執行的工作", homeTitle:"先釐清真正要做的事，再交給 AI。", homeLead:"AI 工作室把決策整理成清楚的需求摘要；九宮格目標規劃把一個目標展開為 8 個主題與 64 個行動。", studioCard:"把複雜問題整理成可確認的需求摘要，再產生可編輯、可評估的成果。", mandalaCard:"免費手動整理 81 格目標地圖；你可以把目標存到雲端或請 AI 提出修改建議。", openStudio:"開啟 AI 工作室", openMandala:"開啟九宮格目標規劃", learnPricing:"查看方案", homeFoot:"AI 工作室與九宮格目標規劃各自計費、各自使用點數。", home:"首頁",
     guest:"訪客", free:"免費", pro:"Pro", credits:"點數", guestTrial:"訪客可體驗 1 次分析與 1 次生成。", guestTrialActive:"免費體驗已開始", guestTrialUsed:"此瀏覽器已無可用訪客額度，可能是已使用或逾期；服務試用名額也可能已滿。登入後可繼續使用免費方案。", guestTrialUsedShort:"訪客體驗已使用或逾期。", guestTrialUnavailable:"目前無法提供免費體驗。", guestStart:"開始免費體驗", guestClaim:"訪客工作會在 24 小時後到期；登入後必須明確選擇儲存才能認領。", signInFirst:"請登入或開始訪客體驗後再繼續。", authLoading:"正在讀取帳戶…", csrfError:"工作階段已過期，請重新載入頁面。", apiError:"無法連線到服務。請稍後再試。", appError:"操作失敗。", modeDisabled:"服務未開放 AI 操作。", noCredits:"目前點數不足，無法執行這項操作。",
     standard:"一般（1 點）", deep:"深度（10 點）", standardCost:"一般操作 1 點", deepCost:"深度操作 10 點", provider:"AI 服務商", providerOpenAI:"OpenAI", providerAnthropic:"Anthropic", operationMode:"操作模式", providerConsent:"我同意把此工作資料傳送給所選服務商，以完成分析與生成。", decisionsConsent:"我另外同意把此工作資料交給 OpenAI 做 AI 檢查。", decisionsConsentHelp:"不勾選仍可使用 Anthropic 分析與生成；AI 檢查會標示為「未知」，不會把資料送給 OpenAI。", consentNeeded:"執行 AI 操作前，請先同意把資料傳送給所選服務商。", privacyNote:"只有在你按下 AI 操作按鈕後才會送出資料。頁面不會自動送出，也不會從生成內容執行外部動作。", inputSavedLocally:"輸入不會自動存到伺服器文件。", inputRequired:"請先填寫目標與背景輸入。", guestStartHelp:"訪客工作會在 24 小時後到期；登入後必須明確選擇儲存才能認領。",
@@ -27,7 +27,7 @@ const COPY = {
     requestId:"工作識別碼", eventError:"伺服器回報錯誤", inputRequired:"請先填寫目標與背景輸入。", privacyNote:"只有在你按下 AI 操作按鈕後才會送出資料。頁面不會自動送出，也不會從生成內容執行外部動作。", modeDisabled:"服務未開放 AI 操作。", consentNeeded:"執行 AI 操作前，請先勾選資料傳送同意。", noRetries:"未知結果不會自動重送。", checkStatus:"查詢工作狀態", stillChecking:"仍在查詢同一工作。", jobUnknown:"工作狀態未知；伺服器沒有回報可確認的結果。", jobRecoverable:"可查詢這筆工作的伺服器狀態；頁面不會自動重送。", clearJob:"清除狀態提示", callUnknown:"送出結果未知", working:"工作進行中…", jobAccepted:"伺服器已接受工作。", statusQueued:"排入佇列", statusRunning:"正在執行", statusCompleted:"完成", statusFailed:"失敗", statusUnknown:"未知", jobFailed:"工作失敗", recovered:"已從伺服器查回工作結果。", malformedResponse:"伺服器回應格式不完整。", actionNo:"行動", completed:"工作完成。", details:"詳細資料", docsError:"無法讀取雲端文件。", groupViewHint:"手機版以主題分組，資料與 81 格檢視相同。", missingArtifact:"工作完成，但回應沒有成果內容。", noTurnstile:"請完成頁面上的人機驗證後重試。", previous:"比較版本 A", roleGoal:"中心目標", runningJob:"正在查詢工作狀態。", sessionError:"無法讀取登入狀態。", siteDraft:"服務草稿", templateSaved:"範本已保存。", themeNo:"主題", titleHint:"最多 160 字。", versionCompare:"版本比較", workContract:"需求摘要", workSaved:"工作已保存。", noOverage:"不會自動加購，也不會超額扣款。", freePeriod:"免費點數每月依 Asia/Taipei 時區重設。"
   },
   en: {
-    skip:"Skip to main content", studio:"Decision Studio", mandala:"Mandala planner", pricing:"Plans & pricing", privacy:"Privacy", terms:"Terms", language:"Language", theme:"Toggle light and dark theme", close:"Close", primaryNavigation:"Primary navigation", legalNavigation:"Legal information", signIn:"Sign in with Google", signOut:"Sign out", signedIn:"Signed in", signedOut:"Signed out. This account's cloud data has been cleared from this page.", demoBanner:"Demo mode: analysis and generation results are synthetic fixtures returned by the server, not real model output.",
+    navGalaxy:"My galaxy", navExplore:"Explore", navTools:"Tools", parkName:"Stephen's tool park", demoTag:"Demo", quotaDaily:"{n} AI charts a day", quotaGuest:"AI needs sign-in", menuLanguage:"Language", menuTheme:"Theme", askTitle:"Think one thing through.", askLabel:"What have you been thinking about?", askPlaceholder:"For example: should I move into product management next year", askCreate:"Create topic", askStart:"Start", askLensHint:"Which lens first?", lensMandala:"Map the context", lensStudio:"Make the decision", lensMind:"Keep the memory", lensMindSub:"Mind Galaxy · only you", askNeedTitle:"Write down what you are thinking about first.", myTopics:"My topics", topicsPrivate:"{n} · visible only to you", viewList:"List", viewMap:"Star map", viewMapSoon:"The star map is phase two", colTopic:"Topic", colUpdated:"Updated", countCharts:"{n} charts", countWorks:"{n} works", notYet:"None yet", notIn:"Not kept yet", topicExplain:"One topic keeps the same star across Mandala, Intent Galaxy and Mind Galaxy. Open a topic to jump between lenses.", noTopicsYet:"No topics yet. Write one thing above and the first star appears.", exploreCardTitle:"Charts people made public", exploreCardBody:"See how others break a goal down, cheer them on, or copy one and make it yours.", mapCardEyebrow:"Star map · phase two", mapCardTitle:"More topics, brighter map", guestExampleTitle:"A finished chart looks like this", guestExampleBody:"The goal in the middle, 8 themes around it, 8 actions per theme. Edit and export by hand without signing in.", today:"Today", daysAgo:"{n} days ago", topicCreatedOn:"Created {d}", topicLensCount:"3 lenses · visible only to you", nextStep:"Next step", nextExpand:"This topic has no chart yet. Expand it into 8 themes and 64 actions to see the whole picture.", nextDecide:"The chart exists but nothing is decided. Lay out the options and blind spots in Intent Galaxy and lock a direction.", nextContinue:"Chart and decision are both here. Go back to the chart and finish the actions; completed ones stay in the history.", newChartInTopic:"Start a chart in this topic", newDecisionInTopic:"Decide this topic with Intent Galaxy", mindAutoLead:"Locked decisions and completed actions stay in this topic's history.", mindExportHere:"For now, export JSON into your local Mind Galaxy.", mindLater:"Moving Mind Galaxy into the park is phase three.", noMemory:"No memory yet", topicHistory:"History of this topic", historyCreated:"Topic \"{t}\" created", historyMandala:"Chart \"{t}\" updated", historyStudio:"Decision \"{t}\" updated", historyHint:"This history is the seed of Mind Galaxy: locked decisions, completed actions and changed minds stay here.", expandActions:"Expand actions", proposeThemesShort:"Ask AI for themes", moreActions:"More: export, print, import, versions", publicBtn:"Publish", gridHint:"Click any cell and type. Dashed cells are empty; press Expand actions to let AI fill them, then apply after reviewing.", aiCardTitle:"AI proposal", consentFirst:"Tick the consent box in the AI proposal card first.", sameTopicDecision:"Decision in this topic", openTopic:"Open topic", noTopicYet:"Not in a topic yet", libraryTitle:"Saved charts", toolsTitle:"Tools", toolsLead:"One account for every tool. Tools connect through topics, so you usually arrive from My galaxy, not from here.", groupLenses:"Lenses · three ways to look at one thing", groupPlaces:"Places", planTitle:"Plan", planLead:"One plan for the whole park. Everything is free during the test period, with daily AI limits; no automatic purchases or overage.", planCanDo:"Per day", planAiCharts:"AI charts", planAiCalls:"AI calls", planInviteCodes:"Invite codes", planManual:"Manual editing, PNG/PDF/Excel export", planCloud:"Cloud saving, versions", planTopics:"Topics, cross-tool jumps", planExplore:"Explore: browse, cheer, copy, publish", planStudio:"Intent Galaxy decisions", planPrice:"Price", planFreeShort:"Free", planCan:"Yes", planNo:"—", planTierUp:"Higher by usage tier", planMore:"More", planGuestInvite:"0 · a friend's code gives 1 chart", planLocalOnly:"This device only", planCloudCount:"{n} charts with versions", planShareOnly:"Shared links only", planGuest24h:"Guest work expires after 24 hours", planSave:"Saved", planPriceNote:"Prices and limits follow real test-period usage; nothing is charged during the test", planFoot:"The paid split is every tool included with AI-usage tiers, not per-tool locks.", nCharts:"{n} charts", nTimes:"{n} calls", nCodes:"{n} codes, valid 7 days", lensMandalaDesc:"Map the context. One goal becomes 8 themes and 64 actions; AI can propose themes and fill blanks, you apply after reviewing.", lensStudioDesc:"Make the decision. Lay out every option and blind spot in 60 seconds, lock one, and get an actionable brief.", lensMindDesc:"Keep the memory. Locked decisions and completed actions stay in the topic history. Visible to your account only; moving in is phase three.", exploreDesc:"Charts people made public. Cheer, copy, browse examples. Sign in to use.", fromTopicPage:"Export JSON from a topic page", windowLabelShort:"Window", myProfile:"My public profile", feedMore:"Scroll for more. Examples and user charts share one ranking; every count starts at zero.", open9x9:"Open the full chart", skip:"Skip to main content", studio:"Decision Studio", mandala:"Mandala planner", pricing:"Plans & pricing", privacy:"Privacy", terms:"Terms", language:"Language", theme:"Toggle light and dark theme", close:"Close", primaryNavigation:"Primary navigation", legalNavigation:"Legal information", signIn:"Sign in with Google", signOut:"Sign out", signedIn:"Signed in", signedOut:"Signed out. This account's cloud data has been cleared from this page.", demoBanner:"Demo mode: analysis and generation results are synthetic fixtures returned by the server, not real model output.",
     homeEyebrow:"From intent to work", homeTitle:"Clarify what you need before you hand it to AI.", homeLead:"AI Studio turns a decision into a clear request summary. The 81-cell goal planner expands one goal into 8 themes and 64 actions.", studioCard:"Turn a complex request into a confirmed summary and an editable, evaluated artifact.", mandalaCard:"Build an 81-cell goal map by hand for free. Save it to the cloud or ask AI for a proposal when useful.", openStudio:"Open Decision Studio", openMandala:"Open Mandala", learnPricing:"View plans", homeFoot:"Studio and Mandala are independent products with separate subscriptions and credits.", home:"Home",
     guest:"Guest", free:"Free", pro:"Pro", credits:"credits", guestTrial:"Guests can try one analysis and one generation.", guestTrialActive:"Free trial is active.", guestTrialUsed:"This browser has no guest credits left. It may have used or expired its trial, or the service may have reached its trial cap. Sign in to continue on the free plan.", guestTrialUsedShort:"Guest trial used or expired.", guestTrialUnavailable:"The free trial is not available right now.", guestStart:"Start free trial", guestClaim:"Guest work expires after 24 hours. After sign-in, you must explicitly save it to claim it.", signInFirst:"Sign in or start a guest trial to continue.", authLoading:"Loading account…", csrfError:"Your session expired. Reload this page.", apiError:"Could not reach the service. Try again later.", appError:"The action failed.", modeDisabled:"AI operations are disabled for this service.", noCredits:"There are not enough credits for this operation.",
     standard:"Standard (1 credit)", deep:"Deep (10 credits)", standardCost:"Standard operations cost 1 credit", deepCost:"Deep operations cost 10 credits", provider:"AI provider", providerOpenAI:"OpenAI", providerAnthropic:"Anthropic", operationMode:"Operation mode", providerConsent:"I agree to send this work data to the selected provider for analysis and generation.", decisionsConsent:"I separately agree to send this work data to OpenAI for an AI review.", decisionsConsentHelp:"You can use Anthropic for analysis and generation without this choice. The AI review will be marked unknown and no data will be sent to OpenAI.", consentNeeded:"Agree to send data to the selected provider before starting an AI operation.", privacyNote:"Data is sent only after you start an AI operation. The page does not submit automatically or run external actions from generated content.", inputSavedLocally:"Inputs are not automatically saved as server documents.", inputRequired:"Enter a goal and background first.", guestStartHelp:"Guest work expires after 24 hours. After sign-in, choose Save to claim it.",
@@ -53,8 +53,10 @@ const main = document.getElementById("main");
 const toast = document.getElementById("toast");
 const account = document.getElementById("account");
 const demoBanner = document.getElementById("demoBanner");
-const languageSelect = document.getElementById("language");
-const themeToggle = document.getElementById("themeToggle");
+const quotaBox = document.getElementById("quota");
+const languageSelect = document.createElement("select"); languageSelect.id = "language";
+for (const [value, label] of [["zh", "繁體中文"], ["en", "English"]]) { const option = document.createElement("option"); option.value = value; option.textContent = label; languageSelect.append(option); }
+const themeToggle = document.createElement("button"); themeToggle.type = "button"; themeToggle.id = "themeToggle"; themeToggle.className = "icon-button"; themeToggle.textContent = "◐";
 const decisionDialog = document.getElementById("decisionDialog");
 const decisionGalaxy = document.getElementById("selectionGalaxy");
 const decisionMount = document.getElementById("decisionMount");
@@ -305,12 +307,28 @@ function planText(plan) { return plan === "pro" ? tr("pro") : plan === "guest" ?
 function refreshAccount() {
   account.replaceChildren();
   const session = state.session;
+  renderQuota();
   if (!session) { account.append(el("span", "account", tr("authLoading"))); return; }
-  const wrap = el("div", "account");
-  if (session.user?.email) wrap.append(el("span", "", session.user.email));
-  const studio = getEntitlement("studio");
-  wrap.append(el("span", "badge", `${planText(studio.plan)} · ${studio.credits ?? 0} ${tr("credits")}`));
-  if (session.user) wrap.append(btn(tr("signOut"), { cls: "text-button", disabled: state.accountTransition, action: async () => {
+  if (!session.user) {
+    const wrap = el("div", "account");
+    if (state.config?.authEnabled) wrap.append(link(tr("signIn"), "/api/auth/login", "button small primary"));
+    wrap.append(menuShell(el("span", "", "☰")));
+    account.append(wrap); return;
+  }
+  const initial = (session.user.email ?? "?").trim().charAt(0).toUpperCase() || "?";
+  account.append(menuShell(el("span", "", initial), session.user.email));
+}
+// The avatar menu holds everything that is not a page: language, theme,
+// sign-out, and the owner-only Mind Galaxy link.
+function menuShell(face, email = "") {
+  const details = el("details", "account-menu"); const summary = el("summary"); summary.setAttribute("aria-label", tr("menuLanguage")); summary.append(face); details.append(summary);
+  const list = el("div", "menu-list");
+  if (email) list.append(el("div", "menu-email", email));
+  const lang = el("label", "menu-row"); lang.append(el("span", "", tr("menuLanguage")), languageSelect); list.append(lang);
+  const theme = el("div", "menu-row"); theme.append(el("span", "", tr("menuTheme")), themeToggle); list.append(theme);
+  if (!state.session?.user && state.config?.authEnabled) list.append(link(tr("signIn"), "/api/auth/login", ""));
+  if (state.session?.owner) list.append(link("Mind Galaxy", "/mind", ""));
+  if (state.session?.user) list.append(btn(tr("signOut"), { cls: "text-button", disabled: state.accountTransition, action: async () => {
     if (state.accountTransition) return;
     const previousSession = state.session;
     state.accountEpoch++;
@@ -332,8 +350,19 @@ function refreshAccount() {
       refreshAccount(); render(); notify(toMessage(error), "error");
     }
   } }));
-  else if (state.config?.authEnabled) wrap.append(link(tr("signIn"), "/api/auth/login", "button small"));
-  account.append(wrap);
+  details.append(list);
+  document.addEventListener("click", (event) => { if (details.open && !details.contains(event.target)) details.open = false; });
+  return details;
+}
+// The server does not expose today's usage, so the ring shows the daily allowance, never a made-up count.
+function renderQuota() {
+  quotaBox.replaceChildren();
+  const limits = state.config?.mandalaLimits ?? {};
+  if (!state.config?.mandalaTrial) return;
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("viewBox", "0 0 26 26"); svg.setAttribute("width", "24"); svg.setAttribute("height", "24"); svg.setAttribute("aria-hidden", "true");
+  svg.innerHTML = `<circle cx="13" cy="13" r="10" fill="none" stroke="var(--line)" stroke-width="3"/><circle cx="13" cy="13" r="10" fill="none" stroke="var(--gold)" stroke-width="3" stroke-dasharray="${isSignedIn() ? "62.8" : "0"} 62.8" stroke-linecap="round" transform="rotate(-90 13 13)"/>`;
+  const text = el("span", "quota-text", isSignedIn() ? tr("quotaDaily", { n: limits.dailyCharts ?? 3 }) : tr("quotaGuest"));
+  quotaBox.append(svg, text); quotaBox.title = text.textContent;
 }
 function applyStaticCopy() {
   document.documentElement.lang = locale === "zh" ? "zh-Hant-TW" : "en";
@@ -345,7 +374,10 @@ function applyStaticCopy() {
   document.querySelector(".site-footer nav")?.setAttribute("aria-label", tr("legalNavigation"));
   document.querySelectorAll("[data-i18n]").forEach((item) => { const key = item.dataset.i18n; item.textContent = tr(key); });
   demoBanner.hidden = state.config?.mode !== "demo";
-  demoBanner.textContent = tr("demoBanner");
+  demoBanner.textContent = tr("demoTag"); demoBanner.title = tr("demoBanner");
+  const route = location.pathname.replace(/\/$/, "") || "/";
+  const current = route === "/feed" || route.startsWith("/mandala/p/") ? "feed" : ["/tools", "/pricing"].includes(route) ? "tools" : ["/privacy", "/terms"].includes(route) ? "" : "home";
+  document.querySelectorAll("[data-nav]").forEach((item) => { if (item.dataset.nav === current) item.setAttribute("aria-current", "page"); else item.removeAttribute("aria-current"); });
   refreshAccount();
 }
 function toMessage(error) {
@@ -558,11 +590,12 @@ function render() {
   state.route = route;
   if (route === "/studio") { applyStudioUrl(); renderStudio(); }
   else if (route === "/mandala") { applyMandalaUrl(); renderMandala(); }
-  else if (route === "/topics") renderTopics();
+  else if (route === "/topics") renderParkHome();
+  else if (/^\/t\/[0-9a-f-]{36}$/.test(route)) renderTopic(route.split("/").at(-1));
   else if (route === "/mind") renderMind();
   else if (route === "/feed") renderFeed();
   else if (/^\/mandala\/p\/[0-9a-f-]{36}$/.test(route)) renderSharedChart(route.split("/").at(-1));
-  else if (route === "/pricing") renderParkPricing();
+  else if (route === "/pricing" || route === "/tools") renderTools();
   else if (route === "/privacy") renderLegal("privacy");
   else if (route === "/terms") renderLegal("terms");
   else if (route === "/") renderParkHome();
@@ -1133,6 +1166,18 @@ async function deleteAccount(legal) {
   finally { state.accountTransition = false; refreshAccount(); render(); }
 }
 
+function resetMandalaChart(chart = createEmptyChart()) {
+  const mandala = state.mandala;
+  mandala.chartEpoch++; mandala.chart = chart; mandala.localId = null; mandala.cloudDoc = null; mandala.reviewFor = null; mandala.reviewNote = "";
+  mandala.proposal = null; mandala.proposalSnapshot = null; mandala.proposalText = ""; mandala.proposalStale = false; mandala.perspectives = null;
+}
+function mandalaTrialReady() { return !!state.config?.mandalaTrial && (isSignedIn() || (!isSignedIn() && state.session?.guest?.invite === true)); }
+function progressMeter(chart) {
+  const progress = chartProgress(chart);
+  const meter = el("div", "mandala-progress"); meter.id = "mandalaProgress"; meter.append(el("span", "", `${tr("progress")}: ${progress.done}/64`));
+  const track = el("span", "progress-track"); const fill = el("span"); fill.style.width = `${Math.round(progress.done / 64 * 100)}%`; track.append(fill); meter.append(track);
+  return meter;
+}
 function renderMandala() {
   const mandala = state.mandala;
   if (mandala.openDocId && mandala.cloudLoaded) {
@@ -1141,64 +1186,91 @@ function renderMandala() {
   }
   const reviewFor = mandala.localId ?? mandala.cloudDoc?.id ?? "current";
   if (mandala.reviewFor !== reviewFor) { mandala.reviewFor = reviewFor; mandala.reviewDate = new Date().toISOString().slice(0,10); mandala.reviewNote = ""; loadReview(reviewFor); }
-  const page = newPage();
-  const head = heading(tr("mandalaTitle"), tr("mandalaLead"), tr("standalone"));
-  page.append(head, creditsPanel("mandala"));
-  if (!isSignedIn() && state.config?.authEnabled) page.append(link(tr("signIn"), "/api/auth/login", "button small"));
+  if (isSignedIn() && state.topics === null) loadTopics();
+  const page = newPage("page-shell wide mandala-page");
+  page.append(renderMandalaHead());
   showJobStatus(page);
-  const section = el("section", "stack mandala-section"); section.dataset.view = mandala.view;
-  section.append(renderMandalaControls());
-  const chartCard = el("section", "panel"); chartCard.append(sectionTitle(tr("chartLabel"), tr("themesHint")));
-  const title = input(mandala.chart.title, { maxLength: 160, placeholder: tr("chartTitle"), onInput: (event) => { mandala.chart.title = event.target.value; touchChart(); } });
-  chartCard.append(field(tr("chartTitle"), title, tr("titleHint")));
+  const layout = el("div", "mandala-layout");
+  const mainCol = el("div", "mandala-main stack mandala-section"); mainCol.dataset.view = mandala.view;
   const goal = textarea(mandala.chart.goal, { rows: 2, maxLength: 500, placeholder: tr("goal"), className: "compact", onInput: (event) => { mandala.chart.goal = event.target.value; touchChart(); } });
-  chartCard.append(field(tr("roleGoal"), goal));
-  chartCard.append(renderMandalaGrid(mandala.chart), renderMandalaGroups(mandala.chart));
-  const progress = chartProgress(mandala.chart);
-  const meter = el("div", "mandala-progress"); meter.id = "mandalaProgress"; meter.append(el("span", "", `${tr("progress")}: ${progress.done}/64`));
-  const track = el("span", "progress-track"); const fill = el("span"); fill.style.width = `${Math.round(progress.done / 64 * 100)}%`; track.append(fill); meter.append(track); chartCard.append(meter);
-  const review = renderWeeklyReview();
-  const saved = renderMandalaSaved(); saved.classList.add("mandala-saved");
-  const trial = renderMandalaTrial(); trial.classList.add("mandala-ai");
-  const examples = renderMandalaExamples();
-  const ai = renderMandalaAI(); ai.classList.add("mandala-ai");
-  section.append(chartCard, trial);
-  if (isSignedIn()) section.append(renderTopicPanel(mandala.cloudDoc, { fallbackTitle: mandala.chart.title || mandala.chart.goal, actions: mandalaTopicActions() }), renderPublishPanel());
-  if (isSignedIn() && state.config?.invites) section.append(renderInvites());
-  section.append(examples, review, saved, ai);
-  page.append(section);
+  const goalField = field(tr("roleGoal"), goal); goalField.classList.add("goal-field");
+  mainCol.append(goalField, renderMandalaGrid(mandala.chart), renderMandalaGroups(mandala.chart), el("p", "grid-hint muted", tr("gridHint")));
+  const aside = el("aside", "mandala-aside");
+  const trial = renderMandalaTrial(); trial.classList.add("ai-card", "mandala-ai"); trial.id = "aiCard"; aside.append(trial);
+  const topic = mandala.cloudDoc ? topicOf(mandala.cloudDoc.id) : null;
+  if (isSignedIn()) {
+    const decision = link("", `/studio?goal=${encodeURIComponent(mandala.chart.goal || mandala.chart.title)}${topic ? `&topic=${topic.id}` : ""}`, "night decision-card");
+    const eyebrow = el("p", "eyebrow"); eyebrow.append(el("span", "dot studio"), document.createTextNode(tr("sameTopicDecision")));
+    decision.append(eyebrow, el("strong", "", tr("newDecisionInTopic")), el("span", "muted", tr("lensStudioDesc")));
+    aside.append(decision);
+    aside.append(renderTopicPanel(mandala.cloudDoc, { fallbackTitle: mandala.chart.title || mandala.chart.goal, actions: mandalaTopicActions() }));
+    const publish = renderPublishPanel(); publish.id = "publishPanel"; aside.append(publish);
+  }
+  const fold = (title, body, open = false) => { const d = el("details", "panel"); d.open = open; d.append(el("summary", "", title)); body.classList.remove("panel"); d.append(body); return d; };
+  aside.append(fold(tr("examplesTitle"), renderMandalaExamples(), mandala.examplesOpen));
+  aside.append(fold(tr("libraryTitle"), renderMandalaSaved()));
+  aside.append(fold(tr("weeklyReview"), renderWeeklyReview()));
+  if (isSignedIn() && state.config?.invites) aside.append(fold(tr("invitesTitle"), renderInvites()));
+  if (state.config?.mode !== "disabled") aside.append(fold(tr("useAI"), renderMandalaAI(), mandala.proposalSource && mandala.proposalSource !== "trial"));
+  layout.append(mainCol, aside); page.append(layout);
   if (!mandala.cloudLoaded && isSignedIn()) loadMandalaCloudGoals();
 }
-
-function renderMandalaControls() {
+function renderMandalaHead() {
   const mandala = state.mandala;
-  const toolbar = el("section", "panel mandala-toolbar");
-  const left = el("div", "button-row");
-  left.append(btn(tr("newChart"), { cls: "button", action: () => { state.mandala.chartEpoch++; state.mandala.chart = createEmptyChart(); state.mandala.localId = null; state.mandala.cloudDoc = null; state.mandala.proposal = null; state.mandala.proposalSnapshot = null; state.mandala.proposalText = ""; state.mandala.proposalStale = false; state.mandala.reviewNote = ""; render(); } }));
-  left.append(btn(tr("saveLocal"), { cls: "button primary", action: () => saveLocalChart() }));
-  left.append(btn(tr("saveCloud"), { cls: "button", disabled: !isSignedIn(), action: () => saveCloudChart() }));
-  left.append(btn(tr("exportJson"), { cls: "button small", action: () => exportMandalaJson() }));
-  left.append(btn(tr("exportMarkdown"), { cls: "button small", action: () => exportMandalaMarkdown() }));
-  left.append(downloadMenu(mandala.chart));
-  left.append(btn(tr("printPdf"), { cls: "button small", action: () => window.print() }));
+  const head = el("div", "mandala-head");
+  const topic = mandala.cloudDoc ? topicOf(mandala.cloudDoc.id) : null;
+  const crumb = link("", topic ? `/t/${topic.id}` : "/", "crumb");
+  if (topic) crumb.append(topicStar(topic.id, 18), el("span", "", topic.title)); else crumb.append(el("span", "", tr("navGalaxy")));
+  head.append(crumb, el("span", "sep", "›"));
+  const titleWrap = el("div", "chart-title"); titleWrap.append(el("span", "dot mandala"));
+  const title = input(mandala.chart.title, { maxLength: 160, placeholder: tr("chartTitle"), onInput: (event) => { mandala.chart.title = event.target.value; touchChart(); } }); title.setAttribute("aria-label", tr("chartTitle"));
+  titleWrap.append(title); head.append(titleWrap, progressMeter(mandala.chart));
+  const actions = el("div", "head-actions");
+  const emptyThemes = mandala.chart.themes.filter((t) => !t.title.trim()).length;
+  const primaryOp = emptyThemes ? "themes" : "expand_empty";
+  const primary = btn(tr(emptyThemes ? "proposeThemesShort" : "expandActions"), { cls: "button primary small", disabled: state.jobBusy, title: mandalaTrialReady() ? "" : tr("trialNeedsSession", { charts: state.config?.mandalaLimits?.dailyCharts ?? 3 }), action: () => {
+    const card = document.getElementById("aiCard");
+    if (!mandalaTrialReady()) { card?.scrollIntoView({ behavior: "smooth", block: "center" }); notify(tr("trialNeedsSession", { charts: state.config?.mandalaLimits?.dailyCharts ?? 3 }), "warning"); return; }
+    if (!mandala.consent) { card?.scrollIntoView({ behavior: "smooth", block: "center" }); card?.querySelector("input[type=checkbox]")?.focus(); notify(tr("consentFirst"), "warning"); return; }
+    runMandalaTrial(primaryOp);
+  } });
+  actions.append(primary);
+  if (isSignedIn()) actions.append(btn(tr("publicBtn"), { cls: "button small", action: async () => {
+    if (!mandala.cloudDoc) { await saveCloudChart(); }
+    const panel = document.getElementById("publishPanel"); panel?.scrollIntoView({ behavior: "smooth", block: "center" });
+  } }));
   const picker = input("", { type: "file" }); picker.accept = "application/json,.json"; picker.id = "mandalaImport"; picker.className = "sr-only"; picker.setAttribute("aria-label", tr("importJson")); picker.addEventListener("change", async () => {
     const file = picker.files?.[0]; if (!file) return;
-    try { const imported = parseChartJson(await file.text()); state.mandala.chartEpoch++; state.mandala.chart = structuredClone(imported); state.mandala.localId = null; state.mandala.cloudDoc = null; state.mandala.reviewFor = null; state.mandala.reviewNote = ""; state.mandala.proposal = null; state.mandala.proposalSnapshot = null; state.mandala.proposalStale = false; render(); notify(tr("chartValid"), "success"); }
+    try { const imported = parseChartJson(await file.text()); resetMandalaChart(structuredClone(imported)); render(); notify(tr("chartValid"), "success"); }
     catch { notify(tr("importFailed"), "error"); }
     finally { picker.value = ""; }
   });
-  const importLabel = el("label", "button small", tr("importJson")); importLabel.htmlFor = picker.id; importLabel.append(picker); left.append(importLabel);
-  const right = el("div", "button-row");
-  right.append(btn(tr(mandala.view === "grid" ? "groupView" : "gridView"), { cls: "button small view-toggle", action: () => { mandala.view = mandala.view === "grid" ? "group" : "grid"; render(); } }));
-  toolbar.append(left, right); return toolbar;
+  const more = menu("⋯", [
+    [tr("newChart"), () => { resetMandalaChart(); render(); }],
+    [tr("saveLocal"), () => saveLocalChart()],
+    ...(isSignedIn() ? [[tr("saveCloud"), () => saveCloudChart()]] : []),
+    [tr("exportJson"), () => exportMandalaJson()],
+    [tr("exportMarkdown"), () => exportMandalaMarkdown()],
+    [tr("downloadPng"), () => downloadChart(mandala.chart, "png")],
+    [tr("downloadPdf"), () => downloadChart(mandala.chart, "pdf")],
+    [tr("downloadXlsx"), () => downloadChart(mandala.chart, "xlsx")],
+    [tr("printPdf"), () => window.print()],
+    [tr("importJson"), () => picker.click()],
+    [tr(mandala.view === "grid" ? "groupView" : "gridView"), () => { mandala.view = mandala.view === "grid" ? "group" : "grid"; render(); }],
+  ]);
+  more.classList.add("right"); more.querySelector("summary").setAttribute("aria-label", tr("moreActions")); more.querySelector("summary").title = tr("moreActions");
+  actions.append(more, picker);
+  head.append(actions);
+  return head;
 }
+
 function touchChart() {
   const mandala = state.mandala;
   mandala.chartEpoch++;
   if (mandala.proposalSnapshot && !mandalaOperationSnapshotMatches(mandala.proposalSnapshot, mandala)) mandala.proposalStale = true;
   document.querySelectorAll("[data-mirror]").forEach((mirror) => {
     const theme = mandala.chart.themes.find((item) => item.id === mirror.dataset.mirror);
-    if (theme) mirror.textContent = theme.title || tr("themeTitle");
+    if (theme) { mirror.textContent = theme.title || tr("themeTitle"); mirror.classList.toggle("empty", !theme.title.trim()); }
   });
   const progress = chartProgress(mandala.chart);
   const meter = document.getElementById("mandalaProgress");
@@ -1207,9 +1279,10 @@ function touchChart() {
 function makeActionEditor(action, ti, ai, { grouped = false } = {}) {
   const wrap = el(grouped ? "div" : "article", grouped ? "group-action" : "mandala-cell");
   if (!grouped) wrap.dataset.role = "action";
-  const body = textarea(action.text, { rows: 2, maxLength: 500, placeholder: `${tr("actionNo")} ${ai + 1}`, onInput: (event) => { state.mandala.chart.themes[ti].actions[ai].text = event.target.value; touchChart(); } });
+  const paint = () => { wrap.classList.toggle("empty", !action.text.trim()); wrap.classList.toggle("done", !!action.done); }; paint();
+  const body = textarea(action.text, { rows: 2, maxLength: 500, placeholder: `${tr("actionNo")} ${ai + 1}`, onInput: (event) => { state.mandala.chart.themes[ti].actions[ai].text = event.target.value; paint(); touchChart(); } });
   body.setAttribute("aria-label", `${tr("themeNo")} ${ti + 1}, ${tr("actionNo")} ${ai + 1}`);
-  const check = input("", { type: "checkbox", checked: action.done, onInput: (event) => { state.mandala.chart.themes[ti].actions[ai].done = event.target.checked; touchChart(); } });
+  const check = input("", { type: "checkbox", checked: action.done, onInput: (event) => { state.mandala.chart.themes[ti].actions[ai].done = event.target.checked; paint(); touchChart(); } });
   const label = el("label", "action-check"); label.append(check, document.createTextNode(tr("done")));
   const meta = el("details"); meta.append(el("summary", "", tr("details")));
   const due = input(action.dueDate ?? "", { type: "date", onInput: (event) => { state.mandala.chart.themes[ti].actions[ai].dueDate = event.target.value; touchChart(); } }); due.setAttribute("aria-label", tr("dueDate"));
@@ -1236,16 +1309,16 @@ function renderMandalaGrid(chart) {
         cell.dataset.role = "goal"; cell.append(el("span", "cell-index", tr("roleGoal")));
         const area = textarea(chart.goal, { rows: 4, maxLength: 500, placeholder: tr("goal"), className: "goal-input", onInput: (event) => { state.mandala.chart.goal = event.target.value; touchChart(); } }); area.setAttribute("aria-label", tr("roleGoal")); cell.append(area);
       } else {
-        const ti = themeIndexByCell.get(`${innerRow},${innerCol}`); const theme = chart.themes[ti]; cell.dataset.role = "theme";
+        const ti = themeIndexByCell.get(`${innerRow},${innerCol}`); const theme = chart.themes[ti]; cell.dataset.role = "theme"; cell.classList.toggle("empty", !theme.title.trim());
         cell.append(el("span", "cell-index", `${tr("themeNo")} ${ti + 1}`));
-        const themeInput = input(theme.title, { maxLength: 200, placeholder: tr("themeTitle"), className: "theme-input", onInput: (event) => { state.mandala.chart.themes[ti].title = event.target.value; touchChart(); } }); themeInput.setAttribute("aria-label", `${tr("themeNo")} ${ti + 1}`); cell.append(themeInput);
+        const themeInput = input(theme.title, { maxLength: 200, placeholder: tr("themeTitle"), className: "theme-input", onInput: (event) => { state.mandala.chart.themes[ti].title = event.target.value; cell.classList.toggle("empty", !event.target.value.trim()); touchChart(); } }); themeInput.setAttribute("aria-label", `${tr("themeNo")} ${ti + 1}`); cell.append(themeInput);
       }
       table.append(cell); continue;
     }
     const themeIndex = blockThemeIndex.get(`${macroRow},${macroCol}`);
     const theme = chart.themes[themeIndex];
     if (innerRow === 1 && innerCol === 1) {
-      const mirror = el("div", "mandala-cell", theme.title || tr("themeTitle")); mirror.dataset.role = "mirror"; mirror.dataset.mirror = theme.id; mirror.title = tr("mirrored"); table.append(mirror); continue;
+      const mirror = el("div", `mandala-cell${theme.title ? "" : " empty"}`, theme.title || tr("themeTitle")); mirror.dataset.role = "mirror"; mirror.dataset.mirror = theme.id; mirror.title = tr("mirrored"); table.append(mirror); continue;
     }
     const ai = actionPositions.findIndex(([r,c]) => r === innerRow && c === innerCol);
     table.append(makeActionEditor(theme.actions[ai], themeIndex, ai));
@@ -1401,9 +1474,18 @@ function renderMandalaVersionCompare(doc, versions) {
 }
 // The free trial runs on fixed Anthropic models; the paid AI panel below
 // keeps its own provider and mode choices.
+function runMandalaTrial(operation, extra = {}) {
+  const mandala = state.mandala;
+  try { validateChart(mandala.chart); } catch (error) { notify(chartError(error), "error"); return; }
+  if (!mandala.chart.goal.trim()) { notify(tr("goalRequired"), "error"); return; }
+  const payload = { chart: chartDto(mandala.chart), ...extra }; if (mandala.instruction.trim()) payload.instruction = mandala.instruction.trim();
+  const snapshot = createMandalaOperationSnapshot({ chart: payload.chart, localId: mandala.localId, cloudDoc: mandala.cloudDoc, epoch: mandala.chartEpoch });
+  if (!snapshot) { notify(tr("candidateInvalid"), "error"); return; }
+  runJob({ product: "mandala", operation, provider: "anthropic", mode: "standard", consentDecisions: false, payload }, processJobResult, { providerConsent: mandala.consent, mandalaSnapshot: snapshot });
+}
 function renderMandalaTrial() {
   const mandala = state.mandala;
-  const box = el("section", "panel"); box.append(sectionTitle(tr("trialTitle"), tr("trialLead")), el("p", "help", tr("trialProvider")));
+  const box = el("section", "panel"); box.append(sectionTitle(tr("aiCardTitle"), tr("trialLead")), el("p", "help", tr("trialProvider")));
   if (!state.config?.mandalaTrial) { box.append(alertBox(tr("trialUnavailable"), "warning")); return box; }
   const charts = state.config?.mandalaLimits ?? {};
   const inviteGuest = !isSignedIn() && state.session?.guest?.invite === true;
@@ -1418,14 +1500,7 @@ function renderMandalaTrial() {
   box.append(el("p", "help", inviteGuest ? tr("trialInvite", { charts: charts.inviteCharts ?? 1 }) : tr("trialDaily", { charts: charts.dailyCharts ?? 3 })));
   const consent = input("", { type: "checkbox", checked: mandala.consent, onInput: (event) => { mandala.consent = event.target.checked; update(); } });
   const consentLine = el("label", "check-line"); consentLine.append(consent, el("span", "", tr("providerConsent"))); box.append(consentLine);
-  const run = (operation, extra = {}) => {
-    try { validateChart(mandala.chart); } catch (error) { notify(chartError(error), "error"); return; }
-    if (!mandala.chart.goal.trim()) { notify(tr("goalRequired"), "error"); return; }
-    const payload = { chart: chartDto(mandala.chart), ...extra }; if (mandala.instruction.trim()) payload.instruction = mandala.instruction.trim();
-    const snapshot = createMandalaOperationSnapshot({ chart: payload.chart, localId: mandala.localId, cloudDoc: mandala.cloudDoc, epoch: mandala.chartEpoch });
-    if (!snapshot) { notify(tr("candidateInvalid"), "error"); return; }
-    runJob({ product: "mandala", operation, provider: "anthropic", mode: "standard", consentDecisions: false, payload }, processJobResult, { providerConsent: mandala.consent, mandalaSnapshot: snapshot });
-  };
+  const run = runMandalaTrial;
   const buttons = [];
   const add = (row, button) => { buttons.push(button); row.append(button); };
   const themeRow = el("div", "action-row");
@@ -1523,7 +1598,7 @@ async function loadExamples() {
     const data = response.ok ? await response.json() : null;
     state.mandala.examples = (Array.isArray(data?.examples) ? data.examples : []).filter((item) => (item.locale ?? "zh") === locale || !data.examples.some((other) => (other.locale ?? "zh") === locale));
   } catch { state.mandala.examples = []; }
-  if (state.route === "/mandala") render();
+  if (state.route === "/mandala" || state.route === "/") render();
 }
 function openExample(example) {
   try {
@@ -1641,7 +1716,7 @@ async function loadTopics() {
   const scope = captureAccountScope(); state.topics = "loading";
   try { const { topics } = await api.topics(); if (!accountScopeCurrent(scope)) return; state.topics = topics ?? []; }
   catch (error) { if (accountScopeCurrent(scope)) { state.topics = []; if (error.status !== 401) notify(toMessage(error), "error"); } }
-  if (["/mandala", "/studio", "/topics", "/mind"].includes(state.route)) render();
+  if (["/", "/mandala", "/studio", "/topics", "/mind"].includes(state.route) || state.route.startsWith("/t/")) render();
 }
 function topicOf(docId) { return topicsReady() ? state.topics.find((t) => t.documents.some((d) => d.id === docId)) ?? null : null; }
 function docHref(doc) { return doc.product === "mandala" ? `/mandala?doc=${doc.id}` : `/studio?doc=${doc.id}`; }
@@ -1728,31 +1803,188 @@ function studioTopicActions() {
   const params = new URLSearchParams({ goal }); if (topic) params.set("topic", topic.id);
   return [link(tr("expandToMandala"), `/mandala?${params}`, "button small secondary")];
 }
-function renderParkHome() {
-  const page = newPage();
-  const hero = el("section", "hero"); hero.append(el("p", "eyebrow", "apps.stephen.taipei"), el("h1", "", tr("parkTitle")), el("p", "lead", tr("parkLead"))); page.append(hero);
-  renderStudioContinuationPrompt(page);
-  const grid = el("section", "cards-3 app-grid");
-  for (const app of visibleApps(state.session)) {
-    const card = el("article", "product-card app-card"); card.dataset.app = app.id;
-    const head = el("div", "app-card-head"); head.append(el("div", "icon", app.icon), el("span", `badge status-${app.status}`, tr({ live: "statusLive", beta: "statusBeta", soon: "statusSoon", owner: "statusOwner" }[app.status])));
-    card.append(head, el("h2", "", tr(`app_${app.id}_name`)), el("p", "", tr(`app_${app.id}_desc`)));
-    if (app.status === "soon") card.append(el("span", "muted", tr("statusSoon")));
-    else if (app.signedIn && !isSignedIn()) card.append(state.config?.authEnabled ? link(tr("signInToUse"), "/api/auth/login", "button small") : el("span", "muted", tr("signInToUse")));
-    else card.append(link(tr("openApp"), app.path, "button small primary"));
-    grid.append(card);
-  }
-  page.append(grid, infoBox(tr("parkFoot")));
+// Visual identity of a topic: a star whose hue and point count come from its id,
+// so the same topic looks the same on every page.
+function topicStar(id, size = 36) {
+  let h = 0; for (const ch of String(id || "")) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  const hue = h % 360, points = 5 + (h >> 8) % 4, inner = 0.42 + ((h >> 12) % 10) / 50;
+  const pts = []; for (let k = 0; k < points * 2; k++) { const r = k % 2 ? inner * 10 : 10; const a = -Math.PI / 2 + k * Math.PI / points; pts.push(`${(12 + r * Math.cos(a)).toFixed(2)},${(12 + r * Math.sin(a)).toFixed(2)}`); }
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("width", size); svg.setAttribute("height", size); svg.setAttribute("aria-hidden", "true"); svg.classList.add("star");
+  svg.innerHTML = `<polygon points="${pts.join(" ")}" fill="hsl(${hue} 55% 88%)" stroke="hsl(${hue} 45% 42%)" stroke-width="1.1" stroke-linejoin="round"/>`;
+  return svg;
 }
-function renderTopics() {
-  const page = newPage("page-shell narrow"); page.append(heading(tr("topicsTitle"), tr("topicsLead")));
-  if (!isSignedIn()) { const row = el("div", "button-row"); if (state.config?.authEnabled) row.append(link(tr("signIn"), "/api/auth/login", "button primary")); page.append(row); return; }
+function whenText(iso) {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 864e5);
+  if (days <= 0) return tr("today"); if (days < 7) return tr("daysAgo", { n: days });
+  return new Date(iso).toLocaleDateString(locale === "zh" ? "zh-TW" : "en", { month: "numeric", day: "numeric" });
+}
+function topicDocs(topic, product) { return topic.documents.filter((d) => d.product === product); }
+// The ask box: the one entry point. Signed in it creates a topic; guests go straight to a tool.
+function askBox({ compact = false } = {}) {
+  const box = el("section", "ask");
+  if (!compact) box.append(el("h1", "", tr("askTitle")));
+  const form = el("form"); form.addEventListener("submit", (event) => { event.preventDefault(); go("topic"); });
+  const label = el("label", "ask-label", tr("askLabel")); label.htmlFor = "ask"; form.append(label);
+  const row = el("div", "ask-box"); row.append(topicStar("new", 26));
+  const field = input("", { maxLength: 120, placeholder: tr("askPlaceholder") }); field.id = "ask"; row.append(field);
+  const submit = btn(tr(isSignedIn() ? "askCreate" : "askStart"), { cls: "button primary" }); submit.type = "submit"; row.append(submit); form.append(row);
+  const lenses = el("div", "lens-row"); lenses.append(el("span", "", tr("askLensHint")));
+  const lens = (cls, label, sub, product) => { const a = el("a", "lens"); a.href = "#"; a.append(el("span", `dot ${cls}`), document.createTextNode(label), el("span", "muted", sub)); a.addEventListener("click", (event) => { event.preventDefault(); go(product); }); return a; };
+  lenses.append(lens("mandala", tr("lensMandala"), tr("mandala"), "mandala"), lens("studio", tr("lensStudio"), "Intent Galaxy", "studio"));
+  const mind = el("span", "lens disabled"); mind.append(el("span", "dot mind"), document.createTextNode(tr("lensMind")), el("span", "muted", tr("lensMindSub"))); lenses.append(mind);
+  form.append(lenses); box.append(form);
+  async function go(product) {
+    const title = field.value.trim(); if (!title) { notify(tr("askNeedTitle"), "error"); field.focus(); return; }
+    const goal = encodeURIComponent(title);
+    if (!isSignedIn()) { navigate(product === "studio" ? `/studio?goal=${goal}` : `/mandala?goal=${goal}`); return; }
+    const topic = await createTopic(title); if (!topic) return;
+    if (product === "mandala") navigate(`/mandala?goal=${goal}&topic=${topic.id}`);
+    else if (product === "studio") navigate(`/studio?goal=${goal}&topic=${topic.id}`);
+    else navigate(`/t/${topic.id}`);
+  }
+  return box;
+}
+function renderParkHome() {
+  const page = newPage(); page.classList.add("stack"); page.style.gap = "48px";
+  page.append(askBox());
+  renderStudioContinuationPrompt(page);
+  if (isSignedIn()) { page.append(renderMyTopics()); }
+  else page.append(renderGuestExample());
+  const grid = el("section", "home-grid");
+  const explore = el("a", "home-card"); explore.href = "/feed"; explore.append(el("p", "eyebrow", tr("navExplore")), el("strong", "", tr("exploreCardTitle")), el("span", "muted", tr("exploreCardBody"))); grid.append(explore);
+  const map = el("div", "home-card night"); map.append(el("p", "eyebrow", tr("mapCardEyebrow")), el("strong", "", tr("mapCardTitle")));
+  const sky = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sky.setAttribute("viewBox", "0 0 360 80"); sky.setAttribute("height", "80"); sky.setAttribute("aria-hidden", "true"); sky.style.width = "100%";
+  sky.innerHTML = '<line x1="70" y1="40" x2="180" y2="30" stroke="#2A3350"/><line x1="180" y1="30" x2="290" y2="46" stroke="#2A3350"/><circle cx="70" cy="40" r="7" fill="#F3E6C8"/><circle cx="56" cy="30" r="2.5" fill="#B8862B"/><circle cx="84" cy="30" r="2.5" fill="#1FB2C6"/><circle cx="180" cy="30" r="9" fill="#D9E8F5"/><circle cx="166" cy="20" r="2.5" fill="#B8862B"/><circle cx="290" cy="46" r="6" fill="#E6DDF5"/><circle cx="304" cy="36" r="2.5" fill="#1FB2C6"/><circle cx="278" cy="56" r="2.5" fill="#9B7FE8"/>';
+  map.append(sky); grid.append(map); page.append(grid);
+}
+function renderGuestExample() {
+  const box = el("section", "stack");
+  const head = el("div", "section-head"); head.append(el("h2", "", tr("guestExampleTitle")), el("span", "muted", tr("guestExampleBody"))); box.append(head);
+  const mandala = state.mandala;
+  if (mandala.examples === null) { mandala.examples = "loading"; loadExamples(); }
+  const example = Array.isArray(mandala.examples) ? mandala.examples[0] : null;
+  if (!example) { box.append(el("p", "muted", tr("examplesLoading"))); return box; }
+  const card = el("article", "panel poster"); card.append(chartView(example.chart));
+  const row = el("div", "button-row"); row.append(btn(tr("examplesOpen"), { cls: "button primary", action: () => openExample(example) }), link(tr("navExplore"), "/feed", "button")); card.append(row);
+  box.append(card); return box;
+}
+// Signed-in home: every topic as a row, with each lens's state.
+function renderMyTopics() {
+  const box = el("section", "stack");
   if (state.topics === null) loadTopics();
+  const head = el("div", "section-head"); head.append(el("h2", "", tr("myTopics")));
+  if (topicsReady()) head.append(el("span", "muted", tr("topicsPrivate", { n: state.topics.length })));
+  const seg = el("div", "seg"); const list = el("button", "active", tr("viewList")); list.type = "button"; const map = el("button", "", tr("viewMap")); map.type = "button"; map.disabled = true; map.title = tr("viewMapSoon"); seg.append(list, map); head.append(seg); box.append(head);
+  if (!topicsReady()) { box.append(el("p", "muted", tr("feedLoading"))); return box; }
+  if (!state.topics.length) { box.append(el("p", "empty-state", tr("noTopicsYet"))); return box; }
+  const table = el("div", "topic-table");
+  const headRow = el("div", "topic-row head"); headRow.append(el("span"), el("span", "", tr("colTopic")), el("span", "", tr("mandala")), el("span", "t-studio", "Intent Galaxy"), el("span", "t-mind", "Mind Galaxy"), el("span", "t-when", tr("colUpdated"))); table.append(headRow);
+  for (const topic of state.topics) {
+    const row = el("a", "topic-row"); row.href = `/t/${topic.id}`; row.append(topicStar(topic.id, 36));
+    const charts = topicDocs(topic, "mandala"), works = topicDocs(topic, "studio");
+    const title = el("span", "t-title"); title.append(el("b", "", topic.title)); const latest = topic.documents[0]; if (latest) title.append(el("small", "", latest.title)); row.append(title);
+    const m = el("span", `t-cell${charts.length ? " on" : ""}`); m.append(el("span", "dot mandala"), document.createTextNode(charts.length ? tr("countCharts", { n: charts.length }) : tr("notYet"))); row.append(m);
+    const st = el("span", `t-cell t-studio${works.length ? " on" : ""}`); st.append(el("span", "dot studio"), document.createTextNode(works.length ? tr("countWorks", { n: works.length }) : tr("notYet"))); row.append(st);
+    const mi = el("span", "t-cell t-mind"); mi.append(el("span", "dot mind"), document.createTextNode(tr("notIn"))); row.append(mi);
+    row.append(el("span", "t-when", whenText(topic.updatedAt)));
+    table.append(row);
+  }
+  box.append(table, el("p", "muted", tr("topicExplain")));
+  return box;
+}
+// /t/:id: the topic page, where cross-tool navigation happens.
+function renderTopic(id) {
+  if (!isSignedIn()) { const page = newPage("page-shell narrow"); page.append(heading(tr("topicsTitle"), tr("topicsLead"))); if (state.config?.authEnabled) page.append(link(tr("signIn"), "/api/auth/login", "button primary")); return; }
+  if (state.topics === null) loadTopics();
+  const page = newPage(); page.classList.add("stack"); page.style.gap = "32px";
   if (!topicsReady()) { page.append(el("p", "muted", tr("feedLoading"))); return; }
-  const add = el("div", "button-row"); const name = input("", { maxLength: 120, placeholder: tr("topicNew") }); name.setAttribute("aria-label", tr("topicNew"));
-  add.append(name, btn(tr("topicCreate"), { cls: "button small primary", action: async () => { if (await createTopic(name.value)) render(); } })); page.append(add);
-  if (!state.topics.length) { page.append(el("p", "empty-state", tr("noTopics"))); return; }
-  for (const topic of state.topics) page.append(topicCard(topic, { exportable: false }));
+  const topic = state.topics.find((t) => t.id === id);
+  if (!topic) { renderNotFound(); return; }
+  const crumb = el("nav", "muted"); crumb.style.fontSize = "13px"; crumb.append(link(tr("navGalaxy"), "/", ""), document.createTextNode(" › "), document.createTextNode(topic.title)); page.append(crumb);
+  const head = el("section", "topic-head"); head.append(topicStar(topic.id, 64));
+  const title = el("div", "topic-title"); title.append(el("h1", "", topic.title), el("p", "lead", `${tr("topicCreatedOn", { d: whenText(topic.createdAt ?? topic.updatedAt) })} · ${tr("topicLensCount")}`)); head.append(title);
+  const actions = el("div", "button-row");
+  actions.append(btn(tr("topicRename"), { cls: "button small", action: async () => {
+    const next = prompt(tr("topicRename"), topic.title); if (next === null) return;
+    if (!next.trim() || next.trim().length > 120) { notify(tr("topicTitleInvalid"), "error"); return; }
+    try { const { topic: renamed } = await api.renameTopic(topic.id, next.trim()); state.topics = state.topics.map((t) => t.id === renamed.id ? renamed : t); render(); } catch (error) { notify(toMessage(error), "error"); }
+  } }));
+  actions.append(btn(tr("topicDelete"), { cls: "button small danger", action: async () => {
+    if (!confirm(tr("topicDeleteConfirm"))) return;
+    try { await api.deleteTopic(topic.id); state.topics = state.topics.filter((t) => t.id !== topic.id); navigate("/"); } catch (error) { notify(toMessage(error), "error"); }
+  } }));
+  head.append(actions); page.append(head);
+  const charts = topicDocs(topic, "mandala"), works = topicDocs(topic, "studio");
+  const goal = encodeURIComponent(topic.title);
+  const mandalaHref = `/mandala?goal=${goal}&topic=${topic.id}`, studioHref = `/studio?goal=${goal}&topic=${topic.id}`;
+  // Next step is a rule, not a model: which lens is still empty.
+  const next = el("section", "next-step"); const text = el("div"); text.append(el("p", "eyebrow", tr("nextStep")));
+  if (!charts.length) { text.append(el("span", "", tr("nextExpand"))); next.append(text, link(tr("newChartInTopic"), mandalaHref, "button primary")); }
+  else if (!works.length) { text.append(el("span", "", tr("nextDecide"))); next.append(text, link(tr("newDecisionInTopic"), studioHref, "button primary")); }
+  else { text.append(el("span", "", tr("nextContinue"))); next.append(text, link(tr("open"), docHref(charts[0]), "button primary")); }
+  page.append(next);
+  const lenses = el("section", "lens-cards");
+  const docList = (docs) => { const list = el("div", "saved-list"); for (const doc of docs) { const row = el("div", "saved-item"); row.append(el("span", "item-title", doc.title), link(tr("open"), docHref(doc), "text-button")); list.append(row); } return list; };
+  const mandalaCard = el("article", `lens-card${charts.length ? "" : " empty"}`); const mh = el("div", "lens-head"); mh.append(el("span", "dot mandala"), document.createTextNode(`${tr("mandala")} · ${tr("lensMandala")}`)); mandalaCard.append(mh);
+  const mp = el("div", "lens-preview"); mp.append(charts.length ? mini9FromDoc(charts[0]) : document.createTextNode(tr("notYet"))); mandalaCard.append(mp);
+  if (charts.length) mandalaCard.append(docList(charts));
+  const mf = el("div", "lens-foot"); mf.append(link(charts.length ? tr("newChart") : tr("newChartInTopic"), mandalaHref, charts.length ? "button small" : "button small primary")); mandalaCard.append(mf); lenses.append(mandalaCard);
+  const studioCard = el("article", `lens-card${works.length ? "" : " empty"}`); const sh = el("div", "lens-head"); sh.append(el("span", "dot studio"), document.createTextNode(`Intent Galaxy · ${tr("lensStudio")}`)); studioCard.append(sh);
+  const sp = el("div", "lens-preview night"); const sky = document.createElementNS("http://www.w3.org/2000/svg", "svg"); sky.setAttribute("viewBox", "0 0 260 120"); sky.setAttribute("aria-hidden", "true"); sky.style.width = "100%";
+  sky.innerHTML = works.length ? '<line x1="130" y1="60" x2="60" y2="26" stroke="#1FB2C6" stroke-width="1.5"/><line x1="130" y1="60" x2="70" y2="96" stroke="#1FB2C6" stroke-width="1.5"/><line x1="130" y1="60" x2="200" y2="26" stroke="#2A3350"/><line x1="130" y1="60" x2="196" y2="96" stroke="#2A3350"/><circle cx="130" cy="60" r="8" fill="#1FB2C6"/><circle cx="60" cy="26" r="5" fill="#1FB2C6"/><circle cx="70" cy="96" r="5" fill="#1FB2C6"/><circle cx="200" cy="26" r="4" fill="#4C5878"/><circle cx="196" cy="96" r="4" fill="#4C5878"/><circle cx="214" cy="110" r="3" fill="#E0725C"/>' : '<circle cx="130" cy="60" r="8" fill="#2A3350"/><circle cx="60" cy="26" r="4" fill="#2A3350"/><circle cx="70" cy="96" r="4" fill="#2A3350"/><circle cx="200" cy="26" r="4" fill="#2A3350"/><circle cx="196" cy="96" r="4" fill="#2A3350"/>';
+  sp.append(sky); studioCard.append(sp);
+  if (works.length) studioCard.append(docList(works));
+  const sf = el("div", "lens-foot"); sf.append(link(tr("newDecisionInTopic"), studioHref, works.length ? "button small" : "button small primary")); studioCard.append(sf); lenses.append(studioCard);
+  const mindCard = el("article", "lens-card empty"); const mih = el("div", "lens-head"); mih.append(el("span", "dot mind"), document.createTextNode(`Mind Galaxy · ${tr("lensMind")}`), el("span", "badge", tr("statusOwner"))); mindCard.append(mih);
+  const mpv = el("div", "lens-preview", tr("noMemory")); mindCard.append(mpv, el("p", "muted", `${tr("mindAutoLead")} ${state.session?.owner ? tr("mindExportHere") : tr("mindLater")}`));
+  const mif = el("div", "lens-foot"); if (state.session?.owner) mif.append(btn(tr("mindExport"), { cls: "button small", action: () => exportTopic(topic) })); mindCard.append(mif); lenses.append(mindCard);
+  page.append(lenses);
+  const hist = el("section", "stack"); hist.append(el("h2", "", tr("topicHistory")));
+  const list = el("ol", "timeline");
+  for (const doc of topic.documents) { const li = el("li", doc.product === "studio" ? "studio" : ""); li.append(el("time", "", whenText(doc.updatedAt)), el("span", "", tr(doc.product === "studio" ? "historyStudio" : "historyMandala", { t: doc.title }))); list.append(li); }
+  const start = el("li", "start"); start.append(el("time", "", whenText(topic.createdAt ?? topic.updatedAt)), el("span", "", tr("historyCreated", { t: topic.title }))); list.append(start);
+  hist.append(list, el("p", "muted", tr("historyHint"))); page.append(hist);
+}
+// A 9×9 thumbnail with no text: filled, theme, goal and empty cells only.
+function mini9(chart) {
+  const grid = el("div", "mini9"); grid.setAttribute("role", "img"); grid.setAttribute("aria-label", tr("chartLabel"));
+  const at = new Map(THEME_POSITIONS.map(([r, c], i) => [`${r},${c}`, i]));
+  const actionPositions = [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1],[2,0],[1,0]];
+  for (let row = 0; row < 9; row++) for (let col = 0; col < 9; col++) {
+    const mr = Math.floor(row / 3), mc = Math.floor(col / 3), ir = row % 3, ic = col % 3;
+    if (mr === 1 && mc === 1) { grid.append(el("span", ir === 1 && ic === 1 ? "c" : (chart.themes?.[at.get(`${ir},${ic}`)]?.title ? "t" : "e"))); continue; }
+    const theme = chart.themes?.[at.get(`${mr},${mc}`)] ?? { title: "", actions: [] };
+    if (ir === 1 && ic === 1) { grid.append(el("span", theme.title ? "t" : "e")); continue; }
+    const ai = actionPositions.findIndex(([r, c]) => r === ir && c === ic); const action = theme.actions?.[ai];
+    grid.append(el("span", action?.done ? "d" : action?.text ? "" : "e"));
+  }
+  return grid;
+}
+const miniDocCache = new Map();
+function mini9FromDoc(doc) {
+  const holder = el("div"); const cached = miniDocCache.get(doc.id);
+  if (cached) { holder.append(mini9(cached)); return holder; }
+  holder.append(el("span", "muted", tr("feedLoading")));
+  api.getDocument(doc.id).then((response) => { const data = response?.document?.data ?? response?.data; if (data?.themes) { miniDocCache.set(doc.id, data); holder.replaceChildren(mini9(data)); } }).catch(() => { holder.replaceChildren(); });
+  return holder;
+}
+// The full read-only chart with text, used on share pages and for examples.
+function chartView(chart) {
+  const grid = el("div", "chart-view"); grid.setAttribute("role", "img"); grid.setAttribute("aria-label", chart.title || chart.goal || tr("chartLabel"));
+  const at = new Map(THEME_POSITIONS.map(([r, c], i) => [`${r},${c}`, i]));
+  const actionPositions = [[0,0],[0,1],[0,2],[1,2],[2,2],[2,1],[2,0],[1,0]];
+  for (let row = 0; row < 9; row++) for (let col = 0; col < 9; col++) {
+    const mr = Math.floor(row / 3), mc = Math.floor(col / 3), ir = row % 3, ic = col % 3;
+    if (mr === 1 && mc === 1) {
+      if (ir === 1 && ic === 1) { grid.append(el("div", "v c", chart.goal || "")); continue; }
+      const theme = chart.themes?.[at.get(`${ir},${ic}`)]; grid.append(el("div", theme?.title ? "v t" : "v e", theme?.title ?? "")); continue;
+    }
+    const theme = chart.themes?.[at.get(`${mr},${mc}`)] ?? { title: "", actions: [] };
+    if (ir === 1 && ic === 1) { grid.append(el("div", theme.title ? "v t" : "v e", theme.title)); continue; }
+    const ai = actionPositions.findIndex(([r, c]) => r === ir && c === ic); const action = theme.actions?.[ai];
+    grid.append(el("div", action?.text ? `v${action.done ? " d" : ""}` : "v e", action?.text ?? ""));
+  }
+  return grid;
 }
 function topicCard(topic, { exportable }) {
   const card = el("section", "panel topic-card"); card.dataset.topic = topic.id;
@@ -1782,7 +2014,7 @@ function renderMind() {
   const page = newPage("page-shell narrow"); page.append(heading(tr("mindTitle"), tr("mindLead"), tr("statusOwner")));
   if (state.topics === null) loadTopics();
   if (!topicsReady()) { page.append(el("p", "muted", tr("feedLoading"))); return; }
-  if (!state.topics.length) { page.append(el("p", "empty-state", tr("noTopics")), link(tr("topicsTitle"), "/topics", "button")); return; }
+  if (!state.topics.length) { page.append(el("p", "empty-state", tr("noTopics")), link(tr("topicsTitle"), "/", "button")); return; }
   for (const topic of state.topics) page.append(topicCard(topic, { exportable: true }));
 }
 async function exportTopic(topic) {
@@ -1792,15 +2024,48 @@ async function exportTopic(topic) {
     notify(tr("mindExported"), "success");
   } catch (error) { notify(toMessage(error), "error"); }
 }
-function renderParkPricing() {
-  const page = newPage("page-shell narrow");
-  page.append(heading(tr("pricing"), tr("parkPricingLead")));
-  const limits = state.config?.mandalaLimits ?? {};
-  const grid = el("div", "pricing-grid");
-  for (const [title, body] of [[tr("planGuestTitle"), tr("planGuest")], [tr("planFreeTitle"), tr("planFree", { charts: limits.dailyCharts ?? 3, invites: limits.invitesPerDay ?? 3 })], [tr("planProTitle"), tr("planPro")]]) {
-    const card = el("article", "pricing-card"); card.append(el("h2", "", title), el("p", "muted", body)); grid.append(card);
+function renderTools() {
+  const page = newPage(); page.classList.add("stack"); page.style.gap = "40px";
+  page.append(heading(tr("toolsTitle"), tr("toolsLead")));
+  const apps = visibleApps(state.session);
+  const lenses = el("section", "tool-group"); lenses.append(el("h2", "", tr("groupLenses")));
+  const cards = el("div", "tool-cards");
+  const thumbMandala = () => { const t = el("div", "tool-thumb"); for (let k = 0; k < 9; k++) t.append(el("span", k === 4 ? "c" : "")); return t; };
+  const sky = (on) => { const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"); svg.setAttribute("viewBox", "0 0 72 72"); svg.setAttribute("width", "72"); svg.setAttribute("height", "72"); svg.setAttribute("aria-hidden", "true"); svg.style.cssText = `background:${on ? "#0E1220" : "var(--surface-2)"};border-radius:8px`; svg.innerHTML = on ? '<line x1="36" y1="36" x2="16" y2="18" stroke="#1FB2C6" stroke-width="1.5"/><line x1="36" y1="36" x2="18" y2="54" stroke="#1FB2C6" stroke-width="1.5"/><circle cx="36" cy="36" r="6" fill="#1FB2C6"/><circle cx="16" cy="18" r="3.5" fill="#1FB2C6"/><circle cx="18" cy="54" r="3.5" fill="#1FB2C6"/><circle cx="56" cy="18" r="3" fill="#4C5878"/><circle cx="54" cy="54" r="3" fill="#4C5878"/>' : '<line x1="12" y1="56" x2="60" y2="56" stroke="var(--line)" stroke-width="1.5"/><circle cx="20" cy="56" r="3" fill="#6B4FBB"/><circle cx="36" cy="56" r="3" fill="#6B4FBB"/><circle cx="52" cy="56" r="3" fill="#6B4FBB"/><line x1="36" y1="56" x2="36" y2="30" stroke="var(--line)"/><circle cx="36" cy="26" r="5" fill="#E6DDF5" stroke="#6B4FBB" stroke-width="1.2"/>'; return svg; };
+  const statusKey = { live: "statusLive", beta: "statusBeta", soon: "statusSoon", owner: "statusOwner" };
+  const card = (app, name, desc, art, dot) => {
+    const node = el(app.status === "owner" ? "div" : "a", `tool-card${app.status === "owner" ? " owner" : ""}`); if (node.tagName === "A") node.href = app.path;
+    const head = el("div", "tool-head"); head.append(el("span", `dot ${dot}`), el("strong", "", name), el("span", "badge", tr(statusKey[app.status]))); node.append(head, art, el("p", "", desc));
+    node.append(el("span", "tool-open", app.status === "owner" ? tr("fromTopicPage") : `${tr("openApp")} →`)); return node;
+  };
+  for (const app of apps) {
+    if (app.id === "mandala") cards.append(card(app, tr("mandala"), tr("lensMandalaDesc"), thumbMandala(), "mandala"));
+    if (app.id === "galaxy") cards.append(card(app, "Intent Galaxy", tr("lensStudioDesc"), sky(true), "studio"));
+    if (app.id === "mind") cards.append(card(app, "Mind Galaxy", tr("lensMindDesc"), sky(false), "mind"));
   }
-  page.append(grid, infoBox(tr("noOverage")));
+  lenses.append(cards); page.append(lenses);
+  const places = el("section", "tool-group"); places.append(el("h2", "", tr("groupPlaces")));
+  const feedCard = el("a", "tool-card row"); feedCard.href = "/feed";
+  const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg"); icon.setAttribute("viewBox", "0 0 48 48"); icon.setAttribute("width", "44"); icon.setAttribute("height", "44"); icon.setAttribute("aria-hidden", "true"); icon.innerHTML = '<circle cx="22" cy="22" r="13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M32 32l9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
+  const body = el("div"); body.append(el("strong", "", tr("navExplore")), el("p", "", tr("exploreDesc"))); feedCard.append(icon, body, el("span", "badge", tr("statusLive"))); places.append(feedCard); page.append(places);
+  const limits = state.config?.mandalaLimits ?? {};
+  const plan = el("section", "stack"); const ph = el("div", "section-head"); ph.append(el("h2", "", tr("planTitle")), el("span", "muted", tr("planLead"))); plan.append(ph);
+  const wrap = el("div", "plan-table"); const table = el("table");
+  const thead = el("thead"); const hr = el("tr"); for (const t of [tr("planCanDo"), tr("planGuestTitle"), tr("planFreeTitle"), tr("planProTitle")]) hr.append(el("th", "", t)); thead.append(hr); table.append(thead);
+  const tbody = el("tbody");
+  const rows = [
+    [tr("planAiCharts"), tr("planGuestInvite"), tr("nCharts", { n: limits.dailyCharts ?? 3 }), tr("planTierUp")],
+    [tr("planAiCalls"), "0", tr("nTimes", { n: 30 }), tr("planTierUp")],
+    [tr("planInviteCodes"), tr("planNo"), tr("nCodes", { n: limits.invitesPerDay ?? 3 }), tr("planMore")],
+    [tr("planManual"), tr("planCan"), tr("planCan"), tr("planCan")],
+    [tr("planCloud"), tr("planLocalOnly"), tr("planCloudCount", { n: 10 }), tr("planMore")],
+    [tr("planTopics"), tr("planNo"), tr("planCan"), tr("planCan")],
+    [tr("planExplore"), tr("planShareOnly"), tr("planCan"), tr("planCan")],
+    [tr("planStudio"), tr("planGuest24h"), tr("planSave"), tr("planCan")],
+    [tr("planPrice"), tr("planFreeShort"), tr("planFreeShort"), tr("planPriceNote")],
+  ];
+  for (const [label, ...cells] of rows) { const trow = el("tr"); trow.append(el("th", "", label)); cells.forEach((c, k) => { const td = el("td"); if (k === 1 && /^\d/.test(c)) { td.append(el("strong", "", c.split(" ")[0]), document.createTextNode(" " + c.split(" ").slice(1).join(" "))); } else td.textContent = c; trow.append(td); }); tbody.append(trow); }
+  table.append(tbody); wrap.append(table); plan.append(wrap, el("p", "muted", `${tr("planFoot")} ${tr("noOverage")}`)); page.append(plan);
 }
 
 // Public feed: signed-in users browse charts others chose to publish, cheer,
@@ -1865,43 +2130,28 @@ function downloadMenu(chart, author = "") {
   return menu(tr("download"), [[tr("downloadPng"), () => downloadChart(chart, "png", author)], [tr("downloadPdf"), () => downloadChart(chart, "pdf", author)], [tr("downloadXlsx"), () => downloadChart(chart, "xlsx", author)]]);
 }
 // The 3×3 overview: goal in the middle, the 8 themes around it.
-function miniChart(item) {
-  const grid = el("div", "mini-chart");
-  const at = new Map(THEME_POSITIONS.map(([r, c], i) => [`${r},${c}`, i]));
-  for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
-    if (r === 1 && c === 1) { grid.append(el("div", "mini-cell goal", item.goal)); continue; }
-    const theme = item.themes?.[at.get(`${r},${c}`)] ?? { title: "", actions: [] };
-    const done = theme.actions.filter((a) => a.done).length;
-    const cell = el("div", "mini-cell", theme.title || "—"); if (done) cell.append(el("small", "", `${done}/8`));
-    grid.append(cell);
-  }
-  return grid;
-}
 function replaceCard(item) {
   if (Array.isArray(state.feed.items)) state.feed.items = state.feed.items.map((other) => other.id === item.id ? { ...other, ...item } : other);
   if (state.feed.shared?.id === item.id) state.feed.shared = { ...state.feed.shared, ...item };
   document.querySelectorAll(`[data-chart="${item.id}"]`).forEach((card) => card.replaceWith(publicCard(item)));
 }
+function countView(item) {
+  if (isSignedIn() && !item.mine && !state.feed.viewed.has(item.id)) { state.feed.viewed.add(item.id); api.publicChart(item.id).catch(() => {}); }
+}
 function publicCard(item, { open = false } = {}) {
-  const card = el("article", "panel feed-card"); card.dataset.chart = item.id;
+  const card = el("article", `panel feed-card${open ? " poster" : ""}`); card.dataset.chart = item.id;
   const head = el("header", "feed-head"); const who = el("div", "feed-author");
-  who.append(avatarImg(item.author), el("strong", "", authorName(item.author)));
+  who.append(avatarImg(item.author, open ? 40 : 28), el("strong", "", authorName(item.author)));
   if (item.example) who.append(el("span", "badge", tr("exampleBadge")));
   head.append(who, el("time", "muted", new Date(item.publishedAt).toLocaleDateString(locale === "zh" ? "zh-TW" : "en")));
   card.append(head);
-  const title = el("h2", "feed-title"); title.append(link(item.title || item.goal, `/mandala/p/${item.id}`, "")); card.append(title);
+  const title = el(open ? "h1" : "h2", "feed-title"); if (open) title.textContent = item.title || item.goal; else title.append(link(item.title || item.goal, `/mandala/p/${item.id}`, "")); card.append(title);
+  if (open && item.title && item.goal && item.goal !== item.title) card.append(el("p", "lead", item.goal));
   if (item.tags?.length) { const tags = el("div", "tag-row"); for (const tag of item.tags) tags.append(el("span", "tag", tr(`tag_${tag}`))); card.append(tags); }
-  card.append(miniChart(item));
+  if (open) { card.append(chartView(chartFromPublic(item))); countView(item); }
+  else { const thumb = link("", `/mandala/p/${item.id}`, "mini-link"); thumb.setAttribute("aria-label", tr("open9x9")); thumb.append(mini9(item)); card.append(thumb); }
   const meter = el("div", "mandala-progress"); meter.append(el("span", "", `${tr("progress")}: ${item.progress}/64`));
   const track = el("span", "progress-track"); const fill = el("span"); fill.style.width = `${Math.round(item.progress / 64 * 100)}%`; track.append(fill); meter.append(track); card.append(meter);
-  const details = el("details", "feed-actions-list"); details.open = open; details.append(el("summary", "", tr("showActions")));
-  for (const theme of item.themes ?? []) {
-    const group = el("div", "feed-theme"); group.append(el("h3", "", theme.title || "—"));
-    const list = el("ul"); for (const action of theme.actions) { const li = el("li", action.done ? "done" : "", action.text || "—"); list.append(li); } group.append(list); details.append(group);
-  }
-  // Opening the actions counts as a view (once per signed-in viewer per day, server side).
-  details.addEventListener("toggle", () => { if (details.open && isSignedIn() && !item.mine && !state.feed.viewed.has(item.id)) { state.feed.viewed.add(item.id); api.publicChart(item.id).catch(() => {}); } });
-  card.append(details);
   const stats = el("p", "feed-stats muted", [tr("statEncourages", { n: item.encourages }), tr("statCopies", { n: item.copies }), ...(item.views ? [tr("statViews", { n: item.views })] : [])].join(" · "));
   card.append(stats);
   const actions = el("div", "button-row feed-buttons");
@@ -1909,8 +2159,10 @@ function publicCard(item, { open = false } = {}) {
     actions.append(btn(`${item.encouraged ? "♥" : "♡"} ${tr(item.encouraged ? "encouraged" : "encourage")}`, { cls: `button small${item.encouraged ? " secondary" : ""}`, disabled: item.mine, action: () => toggleEncourage(item) }));
     actions.append(btn(tr("copyToMine"), { cls: "button small", action: () => copyPublic(item) }));
   }
-  actions.append(shareMenu(item), downloadMenu(chartFromPublic(item), authorName(item.author)));
-  if (isSignedIn() && !item.mine) actions.append(menu(tr("report"), REPORT_REASONS.map((reason) => [tr(`reason_${reason}`), () => reportPublic(item, reason)])));
+  if (open) {
+    actions.append(shareMenu(item), downloadMenu(chartFromPublic(item), authorName(item.author)));
+    if (isSignedIn() && !item.mine) actions.append(menu(tr("report"), REPORT_REASONS.map((reason) => [tr(`reason_${reason}`), () => reportPublic(item, reason)])));
+  } else actions.append(link(tr("open9x9"), `/mandala/p/${item.id}`, "button small"));
   card.append(actions);
   return card;
 }
@@ -1953,6 +2205,13 @@ function setFeedFilter(key, value) {
   const feed = state.feed; if (feed[key] === value) return;
   Object.assign(feed, { [key]: value, items: null, done: false, loading: false }); render();
 }
+function segRow(label, key, options) {
+  const row = el("div", "seg"); row.setAttribute("role", "group"); row.setAttribute("aria-label", label);
+  for (const [value, text] of options) {
+    const b = btn(text, { cls: "", action: () => setFeedFilter(key, value) }); b.setAttribute("aria-pressed", String(state.feed[key] === value)); row.append(b);
+  }
+  return row;
+}
 function filterRow(label, key, options) {
   const row = el("div", "filter-row"); row.setAttribute("role", "group"); row.setAttribute("aria-label", label);
   for (const [value, text] of options) {
@@ -1962,7 +2221,7 @@ function filterRow(label, key, options) {
   return row;
 }
 function renderFeed() {
-  const page = newPage("page-shell narrow feed-page");
+  const page = newPage("page-shell feed-page");
   page.append(heading(tr("feedTitle"), tr("feedLead")));
   feedObserver?.disconnect(); feedObserver = null;
   if (!isSignedIn()) {
@@ -1970,25 +2229,26 @@ function renderFeed() {
     const row = el("div", "button-row"); if (state.config?.authEnabled) row.append(link(tr("signInFeed"), "/api/auth/login", "button primary")); row.append(link(tr("openMandala"), "/mandala", "button")); page.append(row);
     return;
   }
-  page.append(renderProfileEditor());
-  const filters = el("section", "panel feed-filters");
-  filters.append(filterRow(tr("sortLabel"), "sort", [["hot", tr("sortHot")], ["new", tr("sortNew")], ["copied", tr("sortCopied")], ["done", tr("sortDone")]]));
-  if (["hot", "copied"].includes(state.feed.sort)) filters.append(filterRow(tr("windowLabel"), "window", [["7d", tr("window7d")], ["30d", tr("window30d")], ["all", tr("windowAll")]]));
-  filters.append(filterRow(tr("sourceLabel"), "source", [["all", tr("sourceAll")], ["users", tr("sourceUsers")], ["examples", tr("sourceExamples")]]));
-  filters.append(filterRow(tr("tagLabel"), "tag", [["", tr("allTags")], ...FEED_TAGS.map((tag) => [tag, tr(`tag_${tag}`)])]));
-  page.append(filters);
+  const toolbar = el("div", "feed-toolbar");
+  toolbar.append(segRow(tr("sortLabel"), "sort", [["hot", tr("sortHot")], ["new", tr("sortNew")], ["copied", tr("sortCopied")], ["done", tr("sortDone")]]));
+  if (["hot", "copied"].includes(state.feed.sort)) { const win = select(state.feed.window, [["7d", tr("window7d")], ["30d", tr("window30d")], ["all", tr("windowAll")]], (event) => setFeedFilter("window", event.target.value), ""); win.setAttribute("aria-label", tr("windowLabelShort")); toolbar.append(win); }
+  const source = segRow(tr("sourceLabel"), "source", [["all", tr("sourceAll")], ["users", tr("sourceUsers")], ["examples", tr("sourceExamples")]]); source.classList.add("right"); toolbar.append(source);
+  page.append(toolbar);
+  const tags = filterRow(tr("tagLabel"), "tag", [["", tr("allTags")], ...FEED_TAGS.map((tag) => [tag, tr(`tag_${tag}`)])]); tags.classList.add("scroll"); page.append(tags);
+  const profile = renderProfileEditor(); profile.querySelector("summary strong").textContent = state.feed.profile && state.feed.profile !== "loading" ? state.feed.profile.nickname : tr("myProfile"); page.append(profile);
   const feed = state.feed;
   if (feed.items === null) { page.append(el("p", "muted", tr("feedLoading"))); loadFeed(); return; }
   if (!feed.items.length) { page.append(el("p", "empty-state", tr("feedEmpty"))); return; }
   const list = el("div", "feed-list"); for (const item of feed.items) list.append(publicCard(item)); page.append(list);
   if (feed.done) { page.append(el("p", "empty-state", tr("feedEnd"))); return; }
+  page.append(el("p", "muted", tr("feedMore")));
   const more = btn(tr(feed.loading ? "feedLoading" : "loadMore"), { cls: "button", action: () => loadFeed() }); page.append(more);
   if ("IntersectionObserver" in window) { feedObserver = new IntersectionObserver((entries) => { if (entries.some((e) => e.isIntersecting)) loadFeed(); }, { rootMargin: "600px" }); feedObserver.observe(more); }
 }
 function renderProfileEditor({ open = false } = {}) {
   const feed = state.feed;
   if (feed.profile === undefined) { feed.profile = "loading"; loadProfile(); }
-  const box = el("details", "panel profile-editor"); box.open = open || feed.profile === null;
+  const box = el("details", "panel profile-editor"); box.open = open;
   const summary = el("summary", "profile-summary");
   const current = feed.profile && feed.profile !== "loading" ? feed.profile : null;
   summary.append(avatarImg(current ?? { avatar: "a01" }, 32), el("strong", "", current?.nickname ?? tr("profileTitle")));
@@ -2085,13 +2345,12 @@ function renderSharedChart(id) {
   document.title = `${feed.shared.title || feed.shared.goal}｜${tr("mandala")}`;
   page.append(publicCard(feed.shared, { open: true }));
   const row = el("div", "button-row");
-  if (isSignedIn()) row.append(link(tr("backToFeed"), "/feed", "button"));
-  else { page.append(infoBox(tr("sharedCta"))); if (state.config?.authEnabled) row.append(link(tr("signIn"), "/api/auth/login", "button primary")); }
-  row.append(link(tr("makeOwn"), "/mandala", "button secondary")); page.append(row);
+  if (isSignedIn()) row.append(btn(tr("makeOwn"), { cls: "button primary", action: () => copyPublic(feed.shared) }), link(tr("backToFeed"), "/feed", "button"));
+  else { page.append(infoBox(tr("sharedCta"))); row.append(link(tr("makeOwn"), "/mandala", "button primary")); if (state.config?.authEnabled) row.append(link(tr("signIn"), "/api/auth/login", "button")); }
+  page.append(row);
 }
 
 async function init() {
-  languageSelect.value = locale;
   themeToggle.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
