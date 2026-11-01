@@ -307,15 +307,21 @@ h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.35; font-weight: 700; }
 .mandala-cell.done textarea { color: var(--muted); }
 .mandala-cell.skipped textarea { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--ink); }
 .cell-tick { position: absolute; top: -5px; right: -5px; display: none; width: 18px; height: 18px; border-radius: 50%; background: var(--gold); color: #fff; font-size: 12px; font-weight: 700; line-height: 18px; text-align: center; box-shadow: 0 0 0 2px var(--surface); pointer-events: none; }
-.mandala-cell.done > .cell-tick, .mandala-cell.complete > .cell-tick { display: block; }
-.mandala-cell[data-role="goal"] > .cell-tick { background: var(--ink); }
+.mandala-cell.done > .cell-tick { display: block; }
+/* A finished theme fills solid gold; the goal turns dark with a gold ring. Both read at a glance next to the white action cells. */
+.mandala-cell[data-role="theme"].complete, .mandala-cell[data-role="mirror"].complete { background: var(--gold); color: #fff; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--gold) 70%, #000); }
+.mandala-cell[data-role="theme"].complete .theme-input { color: #fff; font-weight: 700; }
+.mandala-cell[data-role="theme"].complete .theme-input::placeholder { color: #fff9; }
+.mandala-cell[data-role="theme"].complete > .cell-tick, .mandala-cell[data-role="mirror"].complete > .cell-tick { display: block; top: 4px; right: 4px; width: 16px; height: 16px; background: #fff; color: var(--gold); box-shadow: none; line-height: 16px; font-size: 11px; }
+.cell-count { position: absolute; left: 6px; bottom: 5px; padding: 0 6px; border-radius: 999px; background: var(--surface); color: var(--gold); font-size: 10px; font-weight: 700; line-height: 16px; pointer-events: none; }
+.cell-count[hidden] { display: none; }
+.mandala-cell[data-role="goal"].complete { background: var(--ink); box-shadow: 0 0 0 3px var(--gold), 0 0 0 6px color-mix(in srgb, var(--gold) 35%, transparent); }
+.mandala-cell[data-role="goal"].complete > .cell-tick { display: block; top: 6px; right: 6px; width: 20px; height: 20px; background: var(--gold); color: var(--ink); box-shadow: none; line-height: 20px; font-size: 13px; }
 .mandala-cell .cell-marks { position: absolute; right: 4px; bottom: 4px; display: none; gap: 3px; }
-.mandala-cell:hover .cell-marks, .mandala-cell:focus-within .cell-marks, .mandala-cell.done .cell-marks, .mandala-cell.skipped .cell-marks { display: flex; }
+.mandala-cell:hover .cell-marks, .mandala-cell:focus-within .cell-marks { display: flex; }
 .cell-mark { padding: 1px 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--muted); font-size: 10px; line-height: 1.5; cursor: pointer; }
 .cell-mark:hover { color: var(--ink); border-color: var(--ink); }
 .cell-mark[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
-.mandala-cell.done .cell-marks, .mandala-cell.skipped .cell-marks { opacity: .55; }
-.mandala-cell.done:hover .cell-marks, .mandala-cell.skipped:hover .cell-marks, .mandala-cell:focus-within .cell-marks { opacity: 1; }
 .mandala-cell textarea { padding-bottom: 20px; }
 .mandala-cell .cell-index { display: none; }
 .mandala-cell input[type="text"], .mandala-cell textarea { min-width: 0; width: 100%; padding: 3px 4px; border: 1px solid transparent; border-radius: 4px; color: inherit; background: transparent; font-size: 12px; line-height: 1.4; }

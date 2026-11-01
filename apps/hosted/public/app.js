@@ -1278,9 +1278,14 @@ function touchChart() {
 }
 function themeHandled(theme) { return theme.actions.every((a) => a.done || a.skipped); }
 // Paint the theme cell (and its mirror in the centre block) when all 8 actions are done or skipped; the goal when all 8 themes are.
+function themeCount(theme) { return theme.actions.filter((a) => a.done || a.skipped).length; }
+function themeBadge(theme) { const n = themeCount(theme); const badge = el("span", "cell-count", n > 0 && n < 8 ? `${n}/8` : ""); badge.hidden = !(n > 0 && n < 8); return badge; }
 function paintTheme(ti) {
-  const chart = state.mandala.chart; const theme = chart.themes[ti]; const complete = themeHandled(theme);
-  document.querySelectorAll(`[data-theme-cell="${theme.id}"]`).forEach((cell) => { cell.classList.toggle("complete", complete); cell.title = complete ? tr("themeComplete") : ""; });
+  const chart = state.mandala.chart; const theme = chart.themes[ti]; const complete = themeHandled(theme); const n = themeCount(theme);
+  document.querySelectorAll(`[data-theme-cell="${theme.id}"]`).forEach((cell) => {
+    cell.classList.toggle("complete", complete); cell.title = complete ? tr("themeComplete") : "";
+    const badge = cell.querySelector(".cell-count"); if (badge) { badge.textContent = n > 0 && n < 8 ? `${n}/8` : ""; badge.hidden = !(n > 0 && n < 8); }
+  });
   const all = chart.themes.every(themeHandled);
   document.querySelectorAll('.mandala-cell[data-role="goal"]').forEach((cell) => { cell.classList.toggle("complete", all); cell.title = all ? tr("goalComplete") : ""; });
 }
@@ -1332,7 +1337,7 @@ function renderMandalaGrid(chart) {
         cell.dataset.role = "goal"; cell.classList.toggle("complete", chart.themes.every(themeHandled)); cell.append(el("span", "cell-index", tr("roleGoal")), el("span", "cell-tick", "✓"));
         const area = textarea(chart.goal, { rows: 4, maxLength: 500, placeholder: tr("goal"), className: "goal-input", onInput: (event) => { state.mandala.chart.goal = event.target.value; touchChart(); } }); area.setAttribute("aria-label", tr("roleGoal")); cell.append(area);
       } else {
-        const ti = themeIndexByCell.get(`${innerRow},${innerCol}`); const theme = chart.themes[ti]; cell.dataset.role = "theme"; cell.dataset.themeCell = theme.id; cell.classList.toggle("empty", !theme.title.trim()); cell.classList.toggle("complete", themeHandled(theme)); cell.append(el("span", "cell-tick", "✓"));
+        const ti = themeIndexByCell.get(`${innerRow},${innerCol}`); const theme = chart.themes[ti]; cell.dataset.role = "theme"; cell.dataset.themeCell = theme.id; cell.classList.toggle("empty", !theme.title.trim()); cell.classList.toggle("complete", themeHandled(theme)); cell.append(el("span", "cell-tick", "✓"), themeBadge(theme));
         cell.append(el("span", "cell-index", `${tr("themeNo")} ${ti + 1}`));
         const themeInput = input(theme.title, { maxLength: 200, placeholder: tr("themeTitle"), className: "theme-input", onInput: (event) => { state.mandala.chart.themes[ti].title = event.target.value; cell.classList.toggle("empty", !event.target.value.trim()); touchChart(); } }); themeInput.setAttribute("aria-label", `${tr("themeNo")} ${ti + 1}`); cell.append(themeInput);
       }
@@ -1341,7 +1346,7 @@ function renderMandalaGrid(chart) {
     const themeIndex = blockThemeIndex.get(`${macroRow},${macroCol}`);
     const theme = chart.themes[themeIndex];
     if (innerRow === 1 && innerCol === 1) {
-      const mirror = el("div", `mandala-cell${theme.title ? "" : " empty"}${themeHandled(theme) ? " complete" : ""}`, theme.title || tr("themeTitle")); mirror.dataset.role = "mirror"; mirror.dataset.themeCell = theme.id; mirror.append(el("span", "cell-tick", "✓")); mirror.dataset.mirror = theme.id; mirror.title = tr("mirrored"); table.append(mirror); continue;
+      const mirror = el("div", `mandala-cell${theme.title ? "" : " empty"}${themeHandled(theme) ? " complete" : ""}`, theme.title || tr("themeTitle")); mirror.dataset.role = "mirror"; mirror.dataset.themeCell = theme.id; mirror.append(el("span", "cell-tick", "✓"), themeBadge(theme)); mirror.dataset.mirror = theme.id; mirror.title = tr("mirrored"); table.append(mirror); continue;
     }
     const ai = actionPositions.findIndex(([r,c]) => r === innerRow && c === innerCol);
     table.append(makeActionEditor(theme.actions[ai], themeIndex, ai));
