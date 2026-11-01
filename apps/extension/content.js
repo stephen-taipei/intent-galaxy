@@ -162,7 +162,8 @@
     }
     const mount = findMount(editor);
     const existing = document.getElementById(PILL_ID);
-    if (existing && existing.dataset.owner === INSTANCE && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
+    // force（例如語系剛載入）一律重畫：狀態沒變但標題與無障礙標籤可能要換成新語言。
+    if (!force && existing && existing.dataset.owner === INSTANCE && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
     existing?.remove();
     mount.parent.insertBefore(makePill(mount.kind), mount.before);
   }
@@ -887,9 +888,12 @@
 
   // ── 等使用者送出：輸入框暫時唯讀＋停用（避免改到提示詞），送出鍵放大發光；提示詞離開輸入框（送出或被清掉）就復原 ──
   function findSend(editor) {
-    const scope = editor.closest("form, fieldset") ?? editor.parentElement?.parentElement?.parentElement ?? document;
-    const send = [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b));
-    return send ? sendBox(send, editor, editor.closest("form, fieldset")) : null;
+    // 先找 form／fieldset；沒有時（例如 ChatGPT 新版輸入框）往上找到第一個含送出鍵的祖先，送出鍵常在輸入框外 5 層以上。
+    const pick = (scope) => [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b));
+    const form = editor.closest("form, fieldset");
+    let send = form ? pick(form) : null;
+    for (let up = editor.parentElement, i = 0; !send && up && i < 10; up = up.parentElement, i++) send = pick(up);
+    return send ? sendBox(send, editor, form) : null;
   }
   /** 把輸入框鎖成唯讀，回傳復原函式（只還原我們改過的屬性）。 */
   function lockEditor(el) {
@@ -901,8 +905,13 @@
     el.setAttribute("aria-readonly", "true");
     el.setAttribute("data-ig-locked", ""); // 掃描識別碼時仍算輸入框，不會被當成已送出
     Object.assign(el.style, { opacity: "0.45", cursor: "not-allowed", transition: "opacity .2s" });
+    // ProseMirror 等編輯器會自己把 contenteditable 改回 true：再擋一層輸入、貼上與拖放，提示詞才不會被改到。
+    const block = (e) => { e.preventDefault(); e.stopImmediatePropagation(); };
+    const events = ["beforeinput", "paste", "drop"];
+    for (const type of events) el.addEventListener(type, block, true);
     el.blur();
     return () => {
+      for (const type of events) el.removeEventListener(type, block, true);
       for (const [a, v] of attrs) v == null ? el.removeAttribute(a) : el.setAttribute(a, v);
       Object.assign(el.style, style);
     };
@@ -924,7 +933,8 @@
       return hideCue();
     }
     // 網站（例如 ProseMirror 重畫）把可編輯狀態改回來時再鎖一次。
-    if (editor.getAttribute("aria-readonly") !== "true") { cue.restore(); cue.restore = lockEditor(editor); }
+    const reopened = !(editor instanceof HTMLTextAreaElement) && editor.getAttribute("contenteditable") !== "false";
+    if (editor.getAttribute("aria-readonly") !== "true" || reopened) { cue.restore(); cue.restore = lockEditor(editor); }
     const send = findSend(editor);
     if (send === cue.send) return;
     cue.anim?.cancel();
