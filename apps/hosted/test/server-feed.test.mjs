@@ -112,3 +112,28 @@ test('brand examples join the feed with zero counts, rank by the same rules, and
   assert.equal((await reader.request(`/api/public/${second.id}`, { method: 'DELETE' })).response.status, 404);
   assert.equal((await admin.request('/api/admin/metrics')).data.metrics.feed.published, 0);
 });
+
+test('topics link a user\'s documents across tools; Mind Galaxy export is owner-only', async () => {
+  const repo = new DemoRepository(); const app = createApplication({ repo });
+  const owner = await signed(app, repo, 'admin@example.test'); const other = await signed(app, repo, 'other@example.test');
+  assert.equal((await owner.request('/api/session')).data.owner, true);
+  assert.equal((await other.request('/api/session')).data.owner, false);
+  const topic = (await owner.request('/api/topics', { method: 'POST', body: { title: ' 轉職 ' } })).data.topic;
+  assert.equal(topic.title, '轉職');
+  assert.equal((await owner.request('/api/topics', { method: 'POST', body: { title: '' } })).response.status, 400);
+  const doc = (await owner.request('/api/documents', { method: 'POST', body: { product: 'mandala', kind: 'goal', title: '轉職', data: chart() } })).data.document;
+  assert.equal((await owner.request(`/api/documents/${doc.id}/topic`, { method: 'PUT', body: { topicId: topic.id } })).data.topic.documents[0].id, doc.id);
+  assert.equal((await owner.request('/api/topics')).data.topics[0].documents.length, 1);
+  // Another account cannot see, link, rename or export it.
+  assert.deepEqual((await other.request('/api/topics')).data.topics, []);
+  assert.equal((await other.request(`/api/documents/${doc.id}/topic`, { method: 'PUT', body: { topicId: null } })).response.status, 404);
+  assert.equal((await other.request(`/api/topics/${topic.id}`, { method: 'PUT', body: { title: 'x' } })).response.status, 404);
+  assert.equal((await other.request(`/api/topics/${topic.id}/export`)).response.status, 404);
+  const exported = await owner.request(`/api/topics/${topic.id}/export`);
+  assert.equal(exported.data.format, 'intent-galaxy.topic-export'); assert.equal(exported.data.documents[0].data.goal, '半年讀 12 本書');
+  assert.match(exported.response.headers.get('Content-Disposition'), /attachment/);
+  // Deleting the topic keeps the chart.
+  assert.equal((await owner.request(`/api/topics/${topic.id}`, { method: 'DELETE' })).response.status, 200);
+  assert.equal((await owner.request(`/api/documents/${doc.id}`)).response.status, 200);
+  assert.deepEqual((await owner.request('/api/topics')).data.topics, []);
+});

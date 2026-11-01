@@ -9,7 +9,7 @@ const ERRORS = {
   session_expired: [401, 'Please sign in again.'], billing_conflict: [409, 'Billing information needs reconciliation.'],
   trial_login_required: [403, 'Sign in to use the free Mandala AI, or open an invite link.'], invite_limit: [429, 'You have reached today’s invite limit or have too many unused invites.'],
   invite_invalid: [404, 'This invite code is invalid, used or expired.'], invite_used: [409, 'This browser has already used an invite.'],
-  profile_required: [409, 'Choose a nickname and an avatar before publishing.'], goal_required: [400, 'Write the goal before publishing.'],
+  topic_limit: [409, 'You have reached the topic limit.'], profile_required: [409, 'Choose a nickname and an avatar before publishing.'], goal_required: [400, 'Write the goal before publishing.'],
 };
 
 /** Production persistence: every mutation is a service-only, atomic Postgres RPC.
@@ -82,6 +82,11 @@ export class PostgrestRepository {
   publicReport(userId, id, reason) { return this.rpc('public_report', { p_user_id: userId, p_id: id, p_reason: reason }); }
   publicView(userId, id) { return this.rpc('public_view', { p_user_id: userId, p_id: id }); }
   publicSeed(examples) { return this.rpc('public_seed', { p_examples: examples }); }
+  topicList(userId) { return this.rpc('topic_list', { p_user_id: userId }); }
+  topicSave(userId, topic) { return this.rpc('topic_save', { p_user_id: userId, p_topic: topic }); }
+  topicDelete(userId, id) { return this.rpc('topic_delete', { p_user_id: userId, p_id: id }); }
+  documentSetTopic(userId, documentId, topicId) { return this.rpc('document_set_topic', { p_user_id: userId, p_document_id: documentId, p_topic_id: topicId }); }
+  topicExport(userId, id) { return this.rpc('topic_export', { p_user_id: userId, p_id: id }); }
   publicReviewList() { return this.rpc('public_review_list'); }
   publicModerate(id, hidden) { return this.rpc('public_moderate', { p_id: id, p_hidden: hidden }); }
 }

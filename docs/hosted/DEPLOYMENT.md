@@ -38,6 +38,7 @@ Keep secrets in the Worker secret store, outside Git and client assets. Do not p
 | `MANDALA_INVITES_DAILY`, `MANDALA_INVITES_OPEN`, `MANDALA_INVITE_TTL_DAYS` | Invite codes per signed-in account: created per Asia/Taipei day, unused at once, days valid; defaults 3, 3, 7. Zero disables invites |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Direct Google sign-in (OpenID Connect). When both are set, sign-in uses Google directly instead of Supabase Auth. The secret is a Worker secret |
 | `ADMIN_EMAILS` | Comma-separated emails allowed to use `/api/admin/*` (metrics, report review, example seeding); everyone else gets 404 |
+| `OWNER_EMAILS` | Comma-separated emails that see owner-only park tools (currently Mind Galaxy at `/mind`). Empty falls back to `ADMIN_EMAILS`. The demo treats every account as owner |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Challenge keys for the configured hostname; render with action `guest_trial` |
 | `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Independent direct-provider credentials; only configured providers can be requested |
 | `DECISIONS_ENABLED` | Must equal `true` to enable the optional OpenAI Decisions checks; unavailable checks remain `unknown` |
@@ -65,7 +66,7 @@ Session-cookie expiration is fixed at seven days. Browser trial/CSRF binding coo
 
 The Worker only needs a PostgREST endpoint at `/rest/v1`, so a self-hosted PostgreSQL with PostgREST can replace Supabase. Sign-in then uses direct Google OpenID Connect (see below); leave `SUPABASE_ANON_KEY` unset. Files are in `apps/hosted/selfhosted/`.
 
-1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql`, `0002_mandala_trial.sql`, `0003_google_invites_metrics.sql` and `0004_public_feed.sql`. Never run `bootstrap.sql` on Supabase.
+1. As a superuser, run `bootstrap.sql`, then set a password for `authenticator`. It creates the `anon`, `authenticated`, `service_role` and `authenticator` roles plus `auth.users` and `auth.uid()`. Then apply `migrations/0001_hosted.sql`, `0002_mandala_trial.sql`, `0003_google_invites_metrics.sql`, `0004_public_feed.sql` and `0005_topics.sql`. Never run `bootstrap.sql` on Supabase.
 2. Run PostgREST 12 with `postgrest.conf`. Pass `PGRST_DB_URI` and `PGRST_JWT_SECRET` through a mode-0600 environment file; the JWT secret is independent of every other secret. PostgREST listens on `127.0.0.1:3000` only, and PostgreSQL stays on loopback.
 3. Install `nginx-postgrest.conf`. It listens on `127.0.0.1:8088` and forwards only `POST /rest/v1/rpc/hosted_*`; everything else returns 403 or 404.
 4. Expose port 8088 through Cloudflare Tunnel (`cloudflared.yml`), so the server opens no inbound port.
@@ -106,6 +107,26 @@ Regenerate the example library with `ANTHROPIC_API_KEY=... node apps/hosted/scri
 - **Metrics.** `GET /api/admin/metrics` includes `feed`: charts published by users, publishers, cheers, copies and views in the period, and hidden charts. Events `feed_viewed`, `chart_shared` and `chart_exported` are counted per day.
 - **Exports** run in the browser with no dependencies (`public/export.js`): a 1080×1350 PNG, a one-page PDF holding that image (text is not selectable), and an `.xlsx` with the 9×9 chart and a flat action list. Saving to Google Drive is not implemented.
 - **Avatars** in `public/avatars/` are placeholders from `scripts/generate-avatars.mjs`. Replace any file with final artwork of the same name and size ratio (square SVG or same-named PNG after changing the extension in `app.js`).
+
+## Tool park at apps.stephen.taipei
+
+The hosted app is one Worker on one origin, `https://apps.stephen.taipei`, with tools split by path. One login, one set of daily quotas and (later) one plan cover every tool.
+
+| Path | Tool | Status |
+|---|---|---|
+| `/` | Park catalog | live |
+| `/mandala`, `/mandala/p/:id` | Mandala chart, share page | live |
+| `/studio` | Intent Galaxy decision studio | beta |
+| `/feed` | Public Mandala feed | live, signed in |
+| `/topics` | My topics | live, signed in |
+| `/mind` | Mind Galaxy export | owner only (`OWNER_EMAILS`) |
+| `/pricing` | One plan for the whole park | test period free |
+
+- **Domain.** `wrangler.jsonc` declares `apps.stephen.taipei` as a Workers custom domain, so the `stephen.taipei` zone must be on Cloudflare DNS. Set `APP_ORIGIN` to `https://apps.stephen.taipei` and add `https://apps.stephen.taipei/api/auth/callback` as the Google OAuth redirect URI.
+- **Topics.** `0005_topics.sql` adds private per-user topics (at most 200, title 1–120 characters) that tie documents across tools. `hosted_documents.topic_id` links a document; deleting a topic only unlinks its documents. Routes: `GET/POST /api/topics`, `PUT/DELETE /api/topics/:id`, `PUT /api/documents/:id/topic {"topicId": id|null}`. Topics are never public.
+- **Cross-tool links.** A Mandala chart in a topic offers "decide in Intent Galaxy" (`/studio?goal=&topic=`); a studio work offers "expand to Mandala" (`/mandala?goal=&topic=`). The first save on the target links it to the same topic. `?doc=<id>` opens a saved document.
+- **Mind Galaxy.** Mind Galaxy stays a local personal app. The park only exports one topic as JSON (`GET /api/topics/:id/export`, format `intent-galaxy.topic-export` version 1, owner only, others get 404). The importer on the Mind Galaxy side is not written yet.
+- **Billing.** Per-product Paddle prices stay disabled. Pricing shows guest / free / planned paid tiers, all free during the test period; the paid tier will be AI-usage tiers across all tools, not per-tool locks.
 
 ## Entitlements and documents
 

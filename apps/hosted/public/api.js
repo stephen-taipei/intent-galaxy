@@ -123,6 +123,18 @@ export class HostedApi {
     return this.refreshSession();
   }
 
+  topics() { return this.request("/api/topics"); }
+
+  createTopic(title) { return this.request("/api/topics", { method: "POST", body: { title } }); }
+
+  renameTopic(id, title) { return this.request(`/api/topics/${encodeURIComponent(id)}`, { method: "PUT", body: { title } }); }
+
+  deleteTopic(id) { return this.request(`/api/topics/${encodeURIComponent(id)}`, { method: "DELETE" }); }
+
+  setDocumentTopic(documentId, topicId) { return this.request(`/api/documents/${encodeURIComponent(documentId)}/topic`, { method: "PUT", body: { topicId } }); }
+
+  exportTopic(id) { return this.request(`/api/topics/${encodeURIComponent(id)}/export`); }
+
   profile() { return this.request("/api/profile"); }
 
   saveProfile(profile) { return this.request("/api/profile", { method: "PUT", body: profile }); }

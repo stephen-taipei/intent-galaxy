@@ -16,7 +16,7 @@ export class DemoRepository {
     this.documents = new Map(); this.versions = new Map(); this.checkouts = new Map(); this.checkoutKeys = new Map();
     this.subscriptions = new Map(); this.billingLinks = new Map(); this.payments = new Map(); this.webhooks = new Map(); this.events = new Map();
     this.identities = new Map(); this.activity = new Set(); this.invites = new Map(); this.redemptions = new Map();
-    this.profiles = new Map(); this.publicCharts = new Map();
+    this.profiles = new Map(); this.publicCharts = new Map(); this.topics = new Map();
   }
   async sessionGet(id) { const s = this.sessions.get(id); return s && Date.parse(s.expiresAt) > this.clock() ? clone(s) : null; }
   async sessionCreate(value) { this.sessions.set(value.id, clone(value)); return true; }
@@ -104,8 +104,8 @@ export class DemoRepository {
     Object.assign(job, { status, result: clone(result), error, actualMicros: cost, updatedAt: new Date(this.clock()).toISOString() }); return true;
   }
   ownedDocument(userId, id) { const doc = this.documents.get(id); if (!doc || doc.userId !== userId) fail('not_found', 404); return doc; }
-  async documentList(userId, product, kind) { return clone([...this.documents.values()].filter(v => v.userId === userId && v.product === product && v.kind === kind).map(({ userId: _u, ...doc }) => doc)); }
-  async documentGet(userId, id) { const { userId: _u, ...doc } = this.ownedDocument(userId, id); return clone(doc); }
+  async documentList(userId, product, kind) { return clone([...this.documents.values()].filter(v => v.userId === userId && v.product === product && v.kind === kind).map(({ userId: _u, topicId: _t, ...doc }) => doc)); }
+  async documentGet(userId, id) { const { userId: _u, topicId: _t, ...doc } = this.ownedDocument(userId, id); return clone(doc); }
   async documentCreate(userId, value) {
     const limits = (await this.entitlements(userId))[value.product].limits;
     const limit = limits[{ work: 'works', template: 'templates', goal: 'goals' }[value.kind]];
@@ -212,12 +212,37 @@ export class DemoRepository {
     for (const key of this.credits.keys()) if (key.startsWith(`${userId}:`) || key.startsWith(`u:${userId}:`)) this.credits.delete(key);
     for (const key of this.activity) if (key.startsWith(`${userId}:`)) this.activity.delete(key);
     this.profiles.delete(userId);
+    for (const [id, t] of this.topics) if (t.userId === userId) this.topics.delete(id);
     for (const [cid, c] of this.publicCharts) { if (c.userId === userId) this.publicCharts.delete(cid); c.encouragedBy.delete(userId); c.copiedBy.delete(userId); c.reports.delete(userId); for (const key of c.views.keys()) if (key.startsWith(`${userId}:`)) c.views.delete(key); }
     return true;
   }
   async metrics(days) {
     const invites = [...this.invites.values()];
     return { synthetic: true, days, signups: this.identities.size, activeUserDays: this.activity.size, invites: { created: invites.length, redeemed: invites.filter(i => i.redeemedAt).length, joined: invites.filter(i => i.convertedUserId).length } };
+  }
+  // Mirrors 0005_topics.sql.
+  topicJson(t) {
+    const documents = [...this.documents.values()].filter(d => d.topicId === t.id && d.userId === t.userId).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
+      .map(d => ({ id: d.id, product: d.product, kind: d.kind, title: d.title, updatedAt: d.updatedAt }));
+    return { id: t.id, title: t.title, updatedAt: t.updatedAt, documents };
+  }
+  ownedTopic(userId, id) { const t = this.topics.get(id); if (!t || t.userId !== userId) fail('not_found', 404); return t; }
+  async topicList(userId) { return [...this.topics.values()].filter(t => t.userId === userId).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).map(t => this.topicJson(t)); }
+  async topicSave(userId, topic) {
+    const now = new Date(this.clock()).toISOString(); const title = topic.title.trim();
+    if (topic.id) { const t = this.ownedTopic(userId, topic.id); Object.assign(t, { title, updatedAt: now }); return this.topicJson(t); }
+    if ([...this.topics.values()].filter(t => t.userId === userId).length >= 200) fail('topic_limit');
+    const t = { id: crypto.randomUUID(), userId, title, createdAt: now, updatedAt: now }; this.topics.set(t.id, t); return this.topicJson(t);
+  }
+  async topicDelete(userId, id) { this.ownedTopic(userId, id); this.topics.delete(id); for (const d of this.documents.values()) if (d.topicId === id) d.topicId = null; return true; }
+  async documentSetTopic(userId, documentId, topicId) {
+    const t = topicId ? this.ownedTopic(userId, topicId) : null; const doc = this.ownedDocument(userId, documentId);
+    doc.topicId = topicId; if (t) t.updatedAt = new Date(this.clock()).toISOString(); return t ? this.topicJson(t) : null;
+  }
+  async topicExport(userId, id) {
+    const t = this.ownedTopic(userId, id);
+    return { format: 'intent-galaxy.topic-export', version: 1, exportedAt: new Date(this.clock()).toISOString(), topic: { id: t.id, title: t.title, createdAt: t.createdAt, updatedAt: t.updatedAt },
+      documents: [...this.documents.values()].filter(d => d.topicId === t.id && d.userId === userId).map(d => ({ id: d.id, product: d.product, kind: d.kind, title: d.title, revision: d.revision, updatedAt: d.updatedAt, data: clone(d.data) })) };
   }
   // Mirrors 0004_public_feed.sql.
   async profileGet(userId) { return clone(this.profiles.get(userId) ?? null); }

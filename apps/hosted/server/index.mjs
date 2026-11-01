@@ -43,6 +43,19 @@ function isAdmin(env, session) {
   const email = session?.user?.email?.toLowerCase();
   return Boolean(email) && (env.ADMIN_EMAILS || '').split(',').map(v => v.trim().toLowerCase()).filter(Boolean).includes(email);
 }
+// Owner-only tools (Mind Galaxy for now). OWNER_EMAILS falls back to
+// ADMIN_EMAILS; in the local demo every signed-in session is the owner.
+function isOwner(env, mode, session) {
+  if (!session?.user) return false;
+  if (mode === 'demo') return true;
+  const email = session.user.email?.toLowerCase();
+  return Boolean(email) && (env.OWNER_EMAILS || env.ADMIN_EMAILS || '').split(',').map(v => v.trim().toLowerCase()).filter(Boolean).includes(email);
+}
+function topicTitle(body) {
+  const title = typeof body.title === 'string' ? body.title.trim() : '';
+  assert(title.length >= 1 && title.length <= 120 && !/[\u0000-\u001f\u007f]/.test(title), 400, 'invalid_topic', 'Use a topic title of 1 to 120 characters.');
+  return title;
+}
 async function touch(repo, userId) { try { await repo.touchActivity(userId); } catch { /* activity is best effort and never blocks the action */ } }
 async function convertInvite(repo, context, userId) { try { if (userId) await repo.inviteConvert(await sha256(context.browser.id), userId); } catch { /* attribution is best effort */ } }
 const TAGS = ['health', 'learning', 'career', 'money', 'sports', 'creative', 'family', 'life'];
@@ -129,7 +142,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
           entitlements.studio.credits = guest.remainingAnalyses + guest.remainingGenerations;
           entitlements.studio.limits = { ...entitlements.studio.limits, analyses: guest.remainingAnalyses, generations: guest.remainingGenerations, expiresAt: guest.expiresAt };
         }
-        response = json({ user: session?.user || null, csrfToken: session?.csrf || context.browser.csrf, entitlements, guest: guest ? { invite: guest.invite === true, expiresAt: guest.expiresAt } : null });
+        response = json({ user: session?.user || null, owner: isOwner(env, mode, session), csrfToken: session?.csrf || context.browser.csrf, entitlements, guest: guest ? { invite: guest.invite === true, expiresAt: guest.expiresAt } : null });
       } else if (path === '/api/auth/login' && request.method === 'GET') {
         assert(request.headers.get('Sec-Fetch-Site') !== 'cross-site', 403, 'origin_rejected', 'Start sign-in from this application.');
         const answer = await beginLogin(context, env, mode, origin, repo, now);
@@ -181,6 +194,24 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         assert(productKind(body.product, body.kind), 400, 'invalid_document_kind', 'Choose a valid product and document kind.');
         response = json({ document: await repo.documentCreate(userId, await engine.validateDocument(body)) }, 201);
         if (body.product === 'mandala') await touch(repo, userId);
+      } else if (/^\/api\/documents\/[^/]+\/topic$/.test(path) && request.method === 'PUT') {
+        const userId = requireUser(session); const body = await readJson(request, 256); onlyKeys(body, ['topicId']);
+        assert(body.topicId === null || UUID.test(body.topicId || ''), 400, 'invalid_topic', 'Send a topic id or null.');
+        response = json({ topic: await repo.documentSetTopic(userId, publicId(path.split('/').at(-2)), body.topicId) });
+      } else if (path === '/api/topics' && request.method === 'GET') {
+        response = json({ topics: await repo.topicList(requireUser(session)) });
+      } else if (path === '/api/topics' && request.method === 'POST') {
+        const userId = requireUser(session); const body = await readJson(request, 1024); onlyKeys(body, ['title']);
+        response = json({ topic: await repo.topicSave(userId, { title: topicTitle(body) }) }, 201);
+      } else if (/^\/api\/topics\/[^/]+$/.test(path) && ['PUT', 'DELETE'].includes(request.method)) {
+        const userId = requireUser(session); const id = publicId(path.split('/').at(-1));
+        if (request.method === 'DELETE') { await repo.topicDelete(userId, id); response = json({ ok: true }); }
+        else { const body = await readJson(request, 1024); onlyKeys(body, ['title']); response = json({ topic: await repo.topicSave(userId, { id, title: topicTitle(body) }) }); }
+      } else if (/^\/api\/topics\/[^/]+\/export$/.test(path) && request.method === 'GET') {
+        // Export for Mind Galaxy, which is open to the owner only for now.
+        assert(isOwner(env, mode, session), 404, 'not_found', 'Not found.');
+        const exported = await repo.topicExport(session.user.id, publicId(path.split('/').at(-2)));
+        response = json(exported); response.headers.set('Content-Disposition', 'attachment; filename="topic-export.json"');
       } else if (/^\/api\/documents\/[^/]+\/versions$/.test(path) && request.method === 'GET') {
         response = json({ versions: await repo.documentVersions(requireUser(session), path.split('/').at(-2)) });
       } else if (/^\/api\/documents\/[^/]+$/.test(path)) {

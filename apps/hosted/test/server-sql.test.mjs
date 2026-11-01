@@ -25,7 +25,7 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
   const args = ['-h', root, '-p', '5432', '-U', 'hosted_test', '-d', 'postgres', '-X', '-q', '-t', '-A', '-v', 'ON_ERROR_STOP=1'];
   const sql = text => execFileSync('psql', [...args, '-c', text], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
   const rpc = (name, value) => JSON.parse(sql(`select hosted_${name}(${literal(value)});`));
-  const reset = () => sql(`truncate hosted_sessions,hosted_jobs,hosted_guests,hosted_trials,hosted_credit_usage,hosted_budgets,hosted_documents,hosted_checkouts,hosted_billing_links,hosted_subscriptions,hosted_payments,hosted_webhook_events,hosted_events,hosted_invites,hosted_invite_redemptions,hosted_user_activity,hosted_profiles,hosted_public_charts,hosted_public_views restart identity cascade; delete from hosted_identities; delete from auth.users where id not in ('${U}','${V}');`);
+  const reset = () => sql(`truncate hosted_sessions,hosted_jobs,hosted_guests,hosted_trials,hosted_credit_usage,hosted_budgets,hosted_documents,hosted_checkouts,hosted_billing_links,hosted_subscriptions,hosted_payments,hosted_webhook_events,hosted_events,hosted_invites,hosted_invite_redemptions,hosted_user_activity,hosted_profiles,hosted_public_charts,hosted_public_views,hosted_topics restart identity cascade; delete from hosted_identities; delete from auth.users where id not in ('${U}','${V}');`);
   try {
     execFileSync('initdb', ['-D', data, '--no-locale', '--encoding=UTF8', '--auth=trust', '--username=hosted_test'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
     execFileSync('pg_ctl', ['-D', data, '-l', join(root, 'postgres.log'), '-o', `-c listen_addresses= -c unix_socket_directories=${root} -c port=5432`, '-w', 'start'], { stdio: 'ignore' });
@@ -42,6 +42,7 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
     execFileSync('psql', [...args], { input: trialMigration, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     execFileSync('psql', [...args], { input: readFileSync(new URL('../migrations/0003_google_invites_metrics.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
     execFileSync('psql', [...args], { input: readFileSync(new URL('../migrations/0004_public_feed.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
+    execFileSync('psql', [...args], { input: readFileSync(new URL('../migrations/0005_topics.sql', import.meta.url), 'utf8'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
 
     await t.test('RLS hides other tenants and authenticated callers cannot run service RPCs', () => {
       reset();
@@ -335,6 +336,37 @@ test('PostgreSQL migration, RLS and atomic service RPC integration', { timeout: 
       assert.equal(sql(`select hosted_public_report('${U}','${b}','spam');`), 't');
       assert.throws(() => sql(`select hosted_public_feed('${U}',${literal({ window: '1y' })});`), /not_found/);
       assert.throws(() => sql(`insert into hosted_public_charts(title,goal,snapshot,progress) values('x','y','[]',0);`), /check constraint/);
+    });
+
+    await t.test('topics: private per user, link documents across tools, unlink on delete, export, limit', () => {
+      reset();
+      const save = (user, value) => JSON.parse(sql(`select hosted_topic_save('${user}',${literal(value)});`));
+      const topic = save(U, { title: ' 轉職 ' }); assert.equal(topic.title, '轉職'); assert.deepEqual(topic.documents, []);
+      assert.throws(() => save(U, { title: '   ' }), /check constraint/);
+      const chart = JSON.parse(sql(`select hosted_document_create('${U}',${literal({ product: 'mandala', kind: 'goal', title: '轉職', data: { schemaVersion: 1, title: '轉職', goal: 'g', themes: [] } })});`));
+      const work = JSON.parse(sql(`select hosted_document_create('${U}',${literal({ product: 'studio', kind: 'work', title: '要不要轉職', data: { contract: {} } })});`));
+      for (const doc of [chart, work]) sql(`select hosted_document_set_topic('${U}','${doc.id}','${topic.id}');`);
+      const listed = JSON.parse(sql(`select hosted_topic_list('${U}');`));
+      assert.equal(listed.length, 1); assert.deepEqual(listed[0].documents.map(d => d.product).sort(), ['mandala', 'studio']);
+      // Another user sees nothing, cannot link into it, rename it, export it or link their document to it.
+      assert.deepEqual(JSON.parse(sql(`select hosted_topic_list('${V}');`)), []);
+      assert.throws(() => sql(`select hosted_document_set_topic('${V}','${chart.id}',null);`), /not_found/);
+      const other = JSON.parse(sql(`select hosted_document_create('${V}',${literal({ product: 'mandala', kind: 'goal', title: 'x', data: { schemaVersion: 1, title: 'x', goal: 'g', themes: [] } })});`));
+      assert.throws(() => sql(`select hosted_document_set_topic('${V}','${other.id}','${topic.id}');`), /not_found/);
+      assert.throws(() => save(V, { id: topic.id, title: 'mine' }), /not_found/);
+      assert.throws(() => sql(`select hosted_topic_export('${V}','${topic.id}');`), /not_found/);
+      const exported = JSON.parse(sql(`select hosted_topic_export('${U}','${topic.id}');`));
+      assert.equal(exported.format, 'intent-galaxy.topic-export'); assert.equal(exported.documents.length, 2); assert.ok(exported.documents[0].data);
+      assert.equal(save(U, { id: topic.id, title: '轉職工程師' }).title, '轉職工程師');
+      // Unlinking and deleting the topic keep the documents.
+      sql(`select hosted_document_set_topic('${U}','${work.id}',null);`);
+      assert.equal(JSON.parse(sql(`select hosted_topic_list('${U}');`))[0].documents.length, 1);
+      sql(`select hosted_topic_delete('${U}','${topic.id}');`);
+      assert.equal(sql(`select count(*) from hosted_documents where user_id='${U}';`), '2');
+      assert.equal(sql(`select count(*) from hosted_documents where topic_id is not null;`), '0');
+      sql(`insert into hosted_topics(user_id,title) select '${U}','t'||g from generate_series(1,200) g;`);
+      assert.throws(() => save(U, { title: 'one more' }), /topic_limit/);
+      assert.throws(() => sql('set role authenticated; select count(*) from hosted_topics;'), /permission denied/);
     });
 
     await t.test('guest caps and 24-hour payload cleanup retain aggregate cost and trial tombstone', () => {

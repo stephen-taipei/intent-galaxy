@@ -199,6 +199,18 @@ h3 { margin: 0 0 9px; font-size: 18px; line-height: 1.3; }
 #selectionGalaxy { display: none; }
 .legal-card h2 { margin-top: 25px; }
 .legal-card p, .legal-card li { color: var(--muted); }
+/* Tool park */
+.app-card { display: grid; align-content: start; gap: 8px; }
+.app-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.app-card .button { justify-self: start; }
+.status-beta { color: var(--warn); }
+.status-owner { color: var(--brand-2); border-color: color-mix(in srgb,var(--brand-2) 40%,var(--line)); }
+.topic-panel { display: grid; gap: 10px; }
+.topic-panel .button-row { margin-top: 0; }
+.topic-panel input, .page-shell .button-row > input { flex: 1; min-width: 160px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
+.topic-card .panel-header { margin-bottom: 10px; }
+.topic-card h2 { margin: 0; font-size: 18px; }
+.saved-item .badge { flex: none; }
 /* Public feed */
 .feed-page { max-width: 760px; }
 .feed-filters { display: grid; gap: 10px; }

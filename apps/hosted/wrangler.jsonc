@@ -6,10 +6,12 @@
   "build": { "command": "node ../../tools/build-hosted.mjs" },
   "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": true, "not_found_handling": "single-page-application" },
   "workflows": [{ "binding": "JOB_WORKFLOW", "name": "intent-galaxy-jobs", "class_name": "HostedJobWorkflow" }],
+  "routes": [{ "pattern": "apps.stephen.taipei", "custom_domain": true }],
   "triggers": { "crons": ["*/15 * * * *"] },
   "observability": { "enabled": false },
   "vars": {
     "APP_MODE": "disabled",
+    "APP_ORIGIN": "https://apps.stephen.taipei",
     "LIVE_AI_ENABLED": "false",
     "MODEL_QUALITY_APPROVED": "false",
     "AI_DAILY_BUDGET_USD": "0",
@@ -29,6 +31,7 @@
     "MANDALA_INVITES_OPEN": "3",
     "MANDALA_INVITE_TTL_DAYS": "7",
     "GOOGLE_CLIENT_ID": "",
-    "ADMIN_EMAILS": ""
+    "ADMIN_EMAILS": "",
+    "OWNER_EMAILS": ""
   }
 }
