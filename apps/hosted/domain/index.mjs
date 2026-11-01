@@ -30,7 +30,7 @@ export async function executeJob(raw, { env, fetchImpl = fetch }) {
   if (r.product === 'mandala') {
     if (demo) return { demo: true, ...(r.operation === 'expand' ? { chart: demoExpandedChart(r.payload.chart) } : { suggestions: ['【合成示例】選出本週可完成的三項行動，記錄實際完成證據，再調整尚未開始的項目。'] }), actualCostUsd: 0 };
     const schema = r.operation === 'expand'
-      ? 'Return {"chart": <same chart schema>}. Preserve every theme/action ID, all nonempty user text, done values, dueDate and notes. Fill empty theme titles and action text with specific feasible proposals. Exactly eight themes with eight actions each. Proposals must not imply guaranteed success.'
+      ? 'Return {"chart": <same chart schema>}. Preserve every theme/action ID, all nonempty user text, done and skipped values, dueDate and notes. Fill empty theme titles and action text with specific feasible proposals. Exactly eight themes with eight actions each. Proposals must not imply guaranteed success.'
       : 'Return {"suggestions": [up to 8 concise review prompts based on actual checked actions and notes]}. Do not claim actions are complete without a done=true flag. Do not modify the chart.';
     const generated = await generateJSON({ provider: r.provider, mode: r.mode, system: SAFE_SYSTEM + schema, input: r.payload }, context);
     let result;

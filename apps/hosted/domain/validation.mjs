@@ -40,12 +40,12 @@ export function validateChart(raw) {
     themes: c.themes.map(t => {
       if (!object(t) || !Array.isArray(t.actions) || t.actions.length !== 8) fail('Each theme requires eight actions.');
       return { id: id(t.id), title: text(t.title ?? '', 'theme', 200, true), actions: t.actions.map(a => {
-        if (!object(a) || typeof a.done !== 'boolean') fail('Invalid action.');
+        if (!object(a) || typeof a.done !== 'boolean' || (a.skipped !== undefined && typeof a.skipped !== 'boolean')) fail('Invalid action.');
         if (a.dueDate) {
           const date = new Date(`${a.dueDate}T00:00:00Z`);
           if (!/^\d{4}-\d{2}-\d{2}$/.test(a.dueDate) || !Number.isFinite(date.valueOf()) || date.toISOString().slice(0, 10) !== a.dueDate) fail('Invalid due date.');
         }
-        return { id: id(a.id), text: text(a.text ?? '', 'action', 500, true), done: a.done,
+        return { id: id(a.id), text: text(a.text ?? '', 'action', 500, true), done: a.done, ...(a.skipped === true ? { skipped: true } : {}),
           ...(a.dueDate ? { dueDate: a.dueDate } : {}), ...(a.notes ? { notes: text(a.notes, 'notes', 1000) } : {}) };
       }) };
     }),
