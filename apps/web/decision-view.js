@@ -13,10 +13,12 @@ const labels = () => ({ must: t("ast.must"), guard: t("ast.guard"), mustNot: t("
   title: t("ast.title"), deciding: t("ast.deciding"), goal: t("ast.goal"), closing: t("ast.closing", { must: t("ast.must"), mustNot: t("ast.mustNot"), guard: t("ast.guard") }) });
 
 export class DecisionView {
-  constructor(galaxy, { onDraft = () => {}, onFill = async () => {}, textOverrides = {}, contextOverrides = {}, locales = LOCALES, showAutoLocale = true, showLanguage = true } = {}) {
+  constructor(galaxy, { onDraft = () => {}, onFill = async () => {}, textOverrides = {}, contextOverrides = {}, locales = LOCALES, showAutoLocale = true, showLanguage = true, directFill = false } = {}) {
     this.galaxy = galaxy;
     this.onDraft = onDraft;
     this.onFill = onFill;
+    // directFill: the host confirms the choice itself, so the primary action fills without the preview step.
+    this.directFill = directFill === true;
     // Consumers may rename consumer-facing actions without changing extension copy.
     // Values may be functions so a hosted wrapper can follow the active locale.
     this.textOverrides = textOverrides;
@@ -266,7 +268,10 @@ export class DecisionView {
       q("v2-footer-actions").innerHTML = button("fill", this.text("fill", "v2.fill"), { cls: "v2-primary", glyph: "corner-down-left", attrs: this.busy || !output ? "disabled" : "" }) + button("copy", this.text("copy", "v2.copy"), { cls: "v2-link", glyph: "copy" });
       q("v2-footer-hint").textContent = this.context("preserve", "v2.preserve");
     } else {
-      q("v2-footer-actions").innerHTML = (this.view === "galaxy" ? button("back", t("v2.back"), { cls: "v2-secondary", glyph: "arrow-left" }) : "") + button("preview", this.text("preview", "v2.preview"), { cls: "v2-primary", glyph: "arrow-right", attrs: !output ? "disabled" : "" });
+      const primary = this.directFill
+        ? button("fill", this.text("fill", "v2.fill"), { cls: "v2-primary", glyph: "corner-down-left", attrs: this.busy || !output ? "disabled" : "" })
+        : button("preview", this.text("preview", "v2.preview"), { cls: "v2-primary", glyph: "arrow-right", attrs: !output ? "disabled" : "" });
+      q("v2-footer-actions").innerHTML = (this.view === "galaxy" ? button("back", t("v2.back"), { cls: "v2-secondary", glyph: "arrow-left" }) : "") + primary;
       q("v2-footer-hint").textContent = sol.status !== "SAT" ? t("v2.unsat") : output ? this.context("previewHint", "v2.previewHint") : t("v2.empty");
     }
     if (focusAction) {

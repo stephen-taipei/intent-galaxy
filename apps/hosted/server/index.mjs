@@ -1,5 +1,6 @@
 import * as domain from '../domain/index.mjs';
 import { liveModelGate } from '../domain/providers.mjs';
+import { MANDALA_TRIAL_OPERATIONS } from '../domain/validation.mjs';
 import { assert, modeFor, sameOrigin, constantTimeEqual, readJson, onlyKeys, idempotencyKey, sha256, stableJson, json, safeError } from './security.mjs';
 import { browserContext, loadSession, beginLogin, completeLogin, logout, createGuest, loadGuest, authEnabled, googleEnabled, redeemInvite, inviteCode } from './auth.mjs';
 import { billingEnabled, createCheckout, createPortal, verifyPaddle, applyPaddleEvent } from './billing.mjs';
@@ -90,6 +91,23 @@ async function sharePage(request, env, mode, repo, id) {
   html = html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`).replace('</head>', `${meta}</head>`);
   return new Response(html, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
+// The operator picks the AI provider for the whole site; users never choose.
+// STUDIO_PROVIDER wins when valid, otherwise the first configured key, otherwise Anthropic.
+export function studioProvider(env, mode) {
+  const wanted = String(env.STUDIO_PROVIDER ?? '').trim().toLowerCase();
+  if (['openai', 'anthropic'].includes(wanted)) return wanted;
+  if (mode === 'demo') return 'anthropic';
+  if (env.ANTHROPIC_API_KEY) return 'anthropic';
+  if (env.OPENAI_API_KEY) return 'openai';
+  return 'anthropic';
+}
+// Cross-provider OpenAI Decisions review is an operator decision too (DECISIONS_ENABLED and a key).
+function studioDecisions(env, mode) { return mode === 'live' && env.DECISIONS_ENABLED === 'true' && !!env.OPENAI_API_KEY; }
+function applyOperatorProvider(validated, env, mode) {
+  if (validated.product === 'mandala' && MANDALA_TRIAL_OPERATIONS.includes(validated.operation)) return validated;
+  const provider = studioProvider(env, mode);
+  return { ...validated, provider, consentDecisions: provider === 'openai' || studioDecisions(env, mode) };
+}
 function aiEnabled(env, mode) { return mode === 'demo' || (mode === 'live' && liveModelGate(env) && budget(env, mode).dailyLimitMicros > 0 && budget(env, mode).monthlyLimitMicros > 0); }
 function publicJob(job) {
   return { id: job.id, status: job.status, ...(job.status === 'completed' ? { result: job.result } : {}), ...(['failed', 'unknown'].includes(job.status) ? { error: { code: job.error || 'job_failed', message: job.status === 'unknown' ? 'The provider outcome is unknown. This operation will not be sent again automatically.' : 'The operation failed. Reserved credits were released.' } } : {}) };
@@ -120,7 +138,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         if (env.ASSETS?.fetch) return secureResponse(await env.ASSETS.fetch(request), mode);
         return secureResponse(json({ error: { code: 'not_found', message: 'Not found.' } }, 404), mode);
       }
-      if (path === '/api/config' && request.method === 'GET') return secureResponse(json({ mode, authEnabled: authEnabled(env, mode), billingEnabled: billingEnabled(env, mode), turnstileSiteKey: mode === 'live' ? env.TURNSTILE_SITE_KEY || null : null, googleSignIn: googleEnabled(env, mode), mandalaTrial: aiEnabled(env, mode) && Object.values(mandalaTrialLimits(env)).every(n => n > 0), mandalaLimits: { dailyCharts: mandalaTrialLimits(env).mandalaOwnerDailyCharts, inviteCharts: mandalaTrialLimits(env).mandalaInviteCharts, invitesPerDay: inviteLimits(env).dailyLimit }, invites: authEnabled(env, mode) && Object.values(inviteLimits(env)).every(n => n > 0), models: aiEnabled(env, mode) ? engine.MODEL_REGISTRY : {} }), mode);
+      if (path === '/api/config' && request.method === 'GET') return secureResponse(json({ mode, authEnabled: authEnabled(env, mode), billingEnabled: billingEnabled(env, mode), turnstileSiteKey: mode === 'live' ? env.TURNSTILE_SITE_KEY || null : null, googleSignIn: googleEnabled(env, mode), mandalaTrial: aiEnabled(env, mode) && Object.values(mandalaTrialLimits(env)).every(n => n > 0), mandalaLimits: { dailyCharts: mandalaTrialLimits(env).mandalaOwnerDailyCharts, inviteCharts: mandalaTrialLimits(env).mandalaInviteCharts, invitesPerDay: inviteLimits(env).dailyLimit }, invites: authEnabled(env, mode) && Object.values(inviteLimits(env)).every(n => n > 0), models: aiEnabled(env, mode) ? engine.MODEL_REGISTRY : {}, studioProvider: studioProvider(env, mode), studioDecisions: studioDecisions(env, mode) }), mode);
       assert(mode !== 'disabled', 503, 'service_disabled', 'The hosted service is not enabled.');
       const repo = injectedRepo || repository(env, mode, fetchImpl, clock);
       if (path === '/api/webhooks/paddle' && request.method === 'POST') {
@@ -160,7 +178,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
         if (result.cookie) response.headers.append('Set-Cookie', result.cookie);
       } else if (path === '/api/jobs' && request.method === 'POST') {
         assert(aiEnabled(env, mode), 503, 'ai_disabled', 'AI is not enabled or its platform budget is unavailable.');
-        const body = await readJson(request); const validated = await engine.validateJobRequest(body);
+        const body = await readJson(request); const validated = applyOperatorProvider(await engine.validateJobRequest(body), env, mode);
         assert(mode === 'demo' || (validated.provider === 'openai' ? env.OPENAI_API_KEY : env.ANTHROPIC_API_KEY), 503, 'provider_unavailable', 'The selected provider is not configured.');
         const guest = session ? null : await loadGuest(context, mode, repo, now);
         assert(session || guest, 401, 'trial_or_sign_in_required', 'Start the browser trial or sign in.');

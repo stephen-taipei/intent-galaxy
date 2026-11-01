@@ -308,3 +308,23 @@ test('asset responses have CSP with Turnstile support and never bypass a live or
   assert.match(response.headers.get('Content-Security-Policy'), /script-src 'self' https:\/\/challenges.cloudflare.com/);
   assert.equal((await app(new Request('https://wrong.example/studio'), env)).status, 503);
 });
+
+test('the operator picks the AI provider; the client value is ignored and never selects an unconfigured key', async () => {
+  const repo = new DemoRepository(); const env = liveEnv();
+  const c = await signedClient(createApplication({ repo }), env, repo);
+  const asked = { ...operation(), provider: 'anthropic', consentDecisions: true };
+  const { response } = await c.request('/api/jobs', { method: 'POST', body: asked, key: 'operator-provider' });
+  assert.equal(response.status, 202, 'only OPENAI_API_KEY is configured, so the job runs on OpenAI instead of failing');
+  const stored = [...repo.jobs.values()][0].request;
+  assert.equal(stored.provider, 'openai');
+  assert.equal(stored.consentDecisions, true, 'OpenAI as primary covers its own Decisions review');
+  const forced = { ...liveEnv(), STUDIO_PROVIDER: 'anthropic', ANTHROPIC_API_KEY: 'test-anthropic-key' };
+  const repo2 = new DemoRepository(); const c2 = await signedClient(createApplication({ repo: repo2 }), forced, repo2);
+  await c2.request('/api/jobs', { method: 'POST', body: { ...operation(), provider: 'openai' }, key: 'operator-forced' });
+  const stored2 = [...repo2.jobs.values()][0].request;
+  assert.equal(stored2.provider, 'anthropic');
+  assert.equal(stored2.consentDecisions, false, 'cross-provider review stays off unless DECISIONS_ENABLED');
+  const config = await (await createApplication({ repo: repo2 })(new Request('https://app.example/api/config'), forced)).json();
+  assert.equal(config.studioProvider, 'anthropic');
+  assert.equal(config.studioDecisions, false);
+});

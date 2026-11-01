@@ -574,3 +574,11 @@ h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.35; font-weight: 700; }
 .mini-link:hover .core9 { box-shadow: 0 0 0 2px var(--gold-soft); }
 @media (max-width: 680px) { .core9 .k { font-size: 12px; padding: 6px; } }
 .mini-link, .mini-link:hover { text-decoration: none; color: inherit; }
+
+/* Studio: one ask box, options folded, consent stated under the button. */
+.ask-card .ask-goal { font-size: 1.1rem; padding: 0.8rem 0.9rem; }
+.ask-card textarea { font-size: 1rem; }
+.more-options { border: 1px dashed var(--line, #d9d2c3); border-radius: 12px; padding: 0.4rem 0.9rem; }
+.more-options > summary { cursor: pointer; color: var(--muted, #6b6459); font-size: 0.9rem; padding: 0.4rem 0; }
+.more-options[open] > summary { margin-bottom: 0.5rem; }
+.send-note { display: block; color: var(--muted, #6b6459); margin-top: 0.4rem; }

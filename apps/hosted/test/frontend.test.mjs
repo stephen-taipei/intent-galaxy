@@ -301,11 +301,13 @@ test("logout clears cloud account bindings while preserving independent manual M
   assert.equal(localState.mandala.localId, "local-A");
 });
 
-test("Studio request-summary and artifact stages expose the restored provider consent controls", async () => {
+test("Studio never lets the user pick a provider; pressing an AI button is the consent", async () => {
   const source = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
-  assert.match(source, /box\.append\(renderStudioConsent\(studio\.form, updateGenerateAvailability\)\)/, "step 3 can regain primary and optional secondary consent");
-  assert.match(source, /artifactCard\.append\(renderStudioConsent\(studio\.form, updateArtifactAiAvailability\)\)/, "step 4 can regain consent without discarding the artifact");
-  assert.match(source, /我另外同意把此工作資料交給 OpenAI 做 AI 檢查/);
+  assert.doesNotMatch(source, /select\(form\.provider/, "the studio form has no provider selector");
+  assert.doesNotMatch(source, /renderStudioConsent/, "no consent checkboxes remain in the studio");
+  assert.match(source, /function studioConsentByAction\(form\) \{ form\.provider = siteProvider\(\); form\.providerConsent = true;/);
+  assert.match(source, /sendNoteLine\(\)/, "every AI button states where the text goes");
+  assert.match(source, /await generateFromSelection\(\);/, "locking a strategy card generates at once");
 });
 
 test("Mandala chart DTO is accepted and sanitized by the real domain validator", () => {

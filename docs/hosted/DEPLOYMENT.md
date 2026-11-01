@@ -40,8 +40,9 @@ Keep secrets in the Worker secret store, outside Git and client assets. Do not p
 | `ADMIN_EMAILS` | Comma-separated emails allowed to use `/api/admin/*` (metrics, report review, example seeding); everyone else gets 404 |
 | `OWNER_EMAILS` | Comma-separated emails that see owner-only park tools (currently Mind Galaxy at `/mind`). Empty falls back to `ADMIN_EMAILS`. The demo treats every account as owner |
 | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Challenge keys for the configured hostname; render with action `guest_trial` |
-| `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Independent direct-provider credentials; only configured providers can be requested |
-| `DECISIONS_ENABLED` | Must equal `true` to enable the optional OpenAI Decisions checks; unavailable checks remain `unknown` |
+| `OPENAI_API_KEY`, `ANTHROPIC_API_KEY` | Independent direct-provider credentials for the provider the operator selects |
+| `STUDIO_PROVIDER` | `anthropic` or `openai`: the provider every studio and paid Mandala job runs on. Users never choose; the client value is ignored. Unset: Anthropic when its key exists, else OpenAI |
+| `DECISIONS_ENABLED` | Must equal `true` (with `OPENAI_API_KEY`) to run the optional OpenAI Decisions checks on Anthropic output; this is the operator's choice, unavailable checks remain `unknown` |
 | `JOB_WORKFLOW` | Cloudflare Workflow binding to `HostedJobWorkflow` |
 | `ASSETS` | Built static-asset binding |
 | `BILLING_ENABLED` | Explicit opt-in, default `false` |
