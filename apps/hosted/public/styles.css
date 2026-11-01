@@ -553,3 +553,14 @@ h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.35; font-weight: 700; }
 .account { display: flex; align-items: center; gap: 8px; }
 @media (max-width: 680px) { .quota { display: none; } .account .button { padding-inline: 10px; font-size: 13px; } main { padding-bottom: 24px; } }
 @media (max-width: 680px) { .demo-banner { display: none; } .brand { font-size: 15px; } .account > .button { display: none; } }
+
+/* Star map */
+.star-map { position: relative; aspect-ratio: 100 / 62; min-height: 320px; overflow: hidden; border-radius: 16px; background: radial-gradient(circle, rgba(255,255,255,.55) .7px, transparent 1.3px) 7px 11px / 97px 83px, radial-gradient(circle, rgba(255,255,255,.35) .6px, transparent 1.2px) 41px 57px / 131px 109px, radial-gradient(circle, rgba(255,255,255,.25) .5px, transparent 1px) 23px 29px / 59px 71px, radial-gradient(ellipse at 30% 20%, #1a2238 0%, var(--night) 60%); }
+.star-map > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.star-node { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; transform: translate(-50%, -50%); color: var(--night-ink); text-decoration: none; }
+.star-node .star { filter: drop-shadow(0 0 6px rgba(255,255,255,.35)); transition: transform .15s ease; }
+.star-node:hover .star, .star-node:focus-visible .star { transform: scale(1.15); }
+.star-node .star-label { max-width: 150px; padding: 1px 6px; border-radius: 6px; background: rgba(14,18,32,.7); font-size: 12px; line-height: 1.4; white-space: nowrap; }
+.star-node .star-dots { display: flex; gap: 3px; } .star-node .star-dots .dot, .star-legend .dot { width: 6px; height: 6px; }
+.star-legend { position: absolute; left: 14px; bottom: 10px; display: flex; gap: 14px; color: var(--night-muted); font-size: 12px; } .star-legend span { display: inline-flex; align-items: center; gap: 6px; }
+@media (max-width: 680px) { .star-map { aspect-ratio: auto; height: 420px; } .star-node .star-label { font-size: 11px; max-width: 110px; } }
