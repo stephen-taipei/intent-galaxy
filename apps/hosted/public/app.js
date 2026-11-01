@@ -1871,14 +1871,16 @@ function renderStarMap(topics) {
       for (const n of nodes) { n.x = Math.min(W - pad, Math.max(pad, n.x)); n.y = Math.min(H - pad * ky, Math.max(pad * ky, n.y)); }
     }
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    let dust = ""; // background dust comes from CSS; the SVG only carries the constellation lines
+    // Dust is drawn as tiny squares: Chromium painted some tiny stretched circles as bright dashes.
+    const seed = hashOf(topics.map((t) => t.id).join(""));
+    let dust = ""; for (let i = 0; i < 90; i++) { const h = hashOf(`${seed}-${i}`); const k = 100 / Math.max(1, width) * 1.6; dust += `<rect x="${(h % 10000) / 100}" y="${((h >>> 8) % 1000) / 1000 * H}" width="${k}" height="${k}" fill="#fff" opacity="${0.15 + (h >>> 16) % 5 * 0.1}"/>`; }
     let lines = "";
     for (const a of nodes) {
       let best = null, bestD = Infinity;
       for (const b of nodes) { if (b === a) continue; const d = Math.hypot(b.x - a.x, (b.y - a.y) / ky); if (d < bestD) { bestD = d; best = b; } }
       if (best) lines += `<line x1="${a.x}" y1="${a.y}" x2="${best.x}" y2="${best.y}" stroke="#fff" stroke-opacity=".22" stroke-width="1" vector-effect="non-scaling-stroke"/>`;
     }
-    svg.innerHTML = lines;
+    svg.innerHTML = dust + lines;
     for (const n of nodes) { n.el.style.left = `${n.x}%`; n.el.style.top = `${n.y / H * 100}%`; }
   };
   layout(62);

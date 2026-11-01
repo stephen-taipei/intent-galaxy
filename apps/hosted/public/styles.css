@@ -555,7 +555,7 @@ h3 { margin: 0 0 8px; font-size: 16px; line-height: 1.35; font-weight: 700; }
 @media (max-width: 680px) { .demo-banner { display: none; } .brand { font-size: 15px; } .account > .button { display: none; } }
 
 /* Star map */
-.star-map { position: relative; aspect-ratio: 100 / 62; min-height: 320px; overflow: hidden; border-radius: 16px; background: radial-gradient(circle, rgba(255,255,255,.55) .7px, transparent 1.3px) 7px 11px / 97px 83px, radial-gradient(circle, rgba(255,255,255,.35) .6px, transparent 1.2px) 41px 57px / 131px 109px, radial-gradient(circle, rgba(255,255,255,.25) .5px, transparent 1px) 23px 29px / 59px 71px, radial-gradient(ellipse at 30% 20%, #1a2238 0%, var(--night) 60%); }
+.star-map { position: relative; aspect-ratio: 100 / 62; min-height: 320px; overflow: hidden; border-radius: 16px; background: radial-gradient(ellipse at 30% 20%, #1a2238 0%, var(--night) 60%); }
 .star-map > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .star-node { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 2px; transform: translate(-50%, -50%); color: var(--night-ink); text-decoration: none; }
 .star-node .star { filter: drop-shadow(0 0 6px rgba(255,255,255,.35)); transition: transform .15s ease; }
