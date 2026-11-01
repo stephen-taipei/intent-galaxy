@@ -2,7 +2,7 @@
 // status: live | beta | soon | owner (visible to the owner account only).
 export const APPS = [
   { id: "mandala", path: "/mandala", icon: "▦", status: "live" },
-  { id: "galaxy", path: "/studio", icon: "✧", status: "beta" },
+  { id: "galaxy", path: "/studio", icon: "✧", status: "owner" },
   { id: "feed", path: "/feed", icon: "◎", status: "live", signedIn: true },
   { id: "topics", path: "/topics", icon: "◇", status: "live", signedIn: true },
   { id: "mind", path: "/mind", icon: "✺", status: "owner" },

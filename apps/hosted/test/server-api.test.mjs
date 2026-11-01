@@ -12,7 +12,7 @@ const SECRET = 'test-only-session-secret-32-characters-long';
 const U = '11111111-1111-4111-8111-111111111111';
 const V = '22222222-2222-4222-8222-222222222222';
 const operation = () => ({ product: 'studio', operation: 'analyze', provider: 'openai', mode: 'standard', consentDecisions: false, payload: { taskType: 'message', goal: 'Draft a factual update', input: 'The release is awaiting review.', requirements: [] } });
-const liveEnv = () => ({ APP_MODE: 'live', APP_ORIGIN: 'https://app.example', SUPABASE_URL: 'https://auth.example', SUPABASE_ANON_KEY: 'test-anon-key', SUPABASE_SERVICE_ROLE_KEY: 'test-service-key', SESSION_SECRET: SECRET, LIVE_AI_ENABLED: 'true', MODEL_QUALITY_APPROVED: 'true', AI_DAILY_BUDGET_USD: '5', AI_MONTHLY_BUDGET_USD: '100', OPENAI_API_KEY: 'test-provider-key', TURNSTILE_SITE_KEY: 'test-site', TURNSTILE_SECRET_KEY: 'test-turnstile-secret', ABUSE_HASH_SECRET: SECRET, JOB_WORKFLOW: { create: async () => ({}) } });
+const liveEnv = () => ({ APP_MODE: 'live', APP_ORIGIN: 'https://app.example', SUPABASE_URL: 'https://auth.example', SUPABASE_ANON_KEY: 'test-anon-key', SUPABASE_SERVICE_ROLE_KEY: 'test-service-key', SESSION_SECRET: SECRET, LIVE_AI_ENABLED: 'true', MODEL_QUALITY_APPROVED: 'true', AI_DAILY_BUDGET_USD: '5', AI_MONTHLY_BUDGET_USD: '100', OPENAI_API_KEY: 'test-provider-key', TURNSTILE_SITE_KEY: 'test-site', TURNSTILE_SECRET_KEY: 'test-turnstile-secret', ABUSE_HASH_SECRET: SECRET, OWNER_EMAILS: 'owner@example.test', JOB_WORKFLOW: { create: async () => ({}) } });
 const billingEnv = () => ({ ...liveEnv(), BILLING_ENABLED: 'true', PADDLE_ENV: 'sandbox', PADDLE_API_KEY: 'test-paddle', PADDLE_WEBHOOK_SECRET: 'test-webhook-secret', PADDLE_PRICE_STUDIO: 'pri_studio', PADDLE_PRICE_MANDALA: 'pri_mandala' });
 
 function client(app, env) {
@@ -73,21 +73,15 @@ test('HttpOnly CSRF cookie, exact Origin and body restrictions protect all unsaf
   assert.equal((await c.request('/api/billing/checkout', { method: 'POST', body: { product: 'studio', price_id: 'pri_attack' }, key: 'billing-forge' })).response.status, 400);
 });
 
-test('browser trial is explicit, one analysis per browser, owner-bound, and reports remaining allowance', async () => {
+test('browser trial: guests still get a session, but the owner-only studio stays hidden from them', async () => {
   const repo = new DemoRepository(); const env = { APP_MODE: 'demo' }; const app = createApplication({ repo }); const c = client(app, env);
   await c.request('/api/session');
-  assert.equal((await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'before-trial' })).response.status, 401);
+  assert.equal((await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'before-trial' })).response.status, 404);
   assert.equal((await c.request('/api/guest', { method: 'POST', body: {} })).response.status, 201);
-  const first = await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'first-analysis' });
-  assert.equal(first.response.status, 202); await Promise.all(c.pending);
-  const polled = await c.request(`/api/jobs/${first.data.job.id}`);
-  assert.equal(polled.data.job.status, 'completed'); assert.equal(polled.data.job.result.demo, true);
-  assert.equal((await c.request('/api/session')).data.entitlements.studio.credits, 1);
-  const repeat = await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'first-analysis' });
-  assert.equal(repeat.data.job.id, first.data.job.id); assert.equal(repo.jobs.size, 1);
-  assert.equal((await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'another-analysis' })).response.status, 429);
-  const other = client(app, env); await other.request('/api/session'); await other.request('/api/guest', { method: 'POST', body: {} });
-  assert.equal((await other.request(`/api/jobs/${first.data.job.id}`)).response.status, 404);
+  // A guest is never the owner, so the studio answers 404 and reserves nothing; Mandala's free AI is the guest path now.
+  assert.equal((await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'first-analysis' })).response.status, 404);
+  assert.equal(repo.jobs.size, 0);
+  assert.equal((await c.request('/api/session')).data.owner, false);
   assert.equal((await c.request('/api/documents', { method: 'POST', body: { product: 'studio', kind: 'work', title: 'claim', data: {} } })).response.status, 401);
   c.jar.delete('ig-guest');
   assert.equal((await c.request('/api/guest', { method: 'POST', body: {} })).response.status, 429);
@@ -327,4 +321,17 @@ test('the operator picks the AI provider; the client value is ignored and never 
   const config = await (await createApplication({ repo: repo2 })(new Request('https://app.example/api/config'), forced)).json();
   assert.equal(config.studioProvider, 'anthropic');
   assert.equal(config.studioDecisions, false);
+});
+
+test('Intent Galaxy (studio) is owner-only: other accounts get 404 for studio jobs and documents, Mandala stays open', async () => {
+  const env = { ...liveEnv(), OWNER_EMAILS: 'someone-else@example.test' };
+  const repo = new DemoRepository(); const c = await signedClient(createApplication({ repo }), env, repo);
+  assert.equal((await c.request('/api/jobs', { method: 'POST', body: operation(), key: 'studio-non-owner' })).response.status, 404);
+  assert.equal(repo.jobs.size, 0, 'nothing is reserved for a hidden tool');
+  assert.equal((await c.request('/api/documents', { method: 'POST', body: { product: 'studio', kind: 'template', title: 'T', data: { taskType: 'message', goal: 'g', input: 'i', requirements: [] } } })).response.status, 404);
+  const session = (await c.request('/api/session')).data;
+  assert.equal(session.owner, false);
+  const repo2 = new DemoRepository(); const owner = await signedClient(createApplication({ repo: repo2 }), liveEnv(), repo2);
+  assert.equal((await owner.request('/api/session')).data.owner, true, 'OWNER_EMAILS unlocks the studio');
+  assert.equal((await owner.request('/api/jobs', { method: 'POST', body: operation(), key: 'studio-owner' })).response.status, 202);
 });

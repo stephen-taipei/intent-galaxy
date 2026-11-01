@@ -179,6 +179,8 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
       } else if (path === '/api/jobs' && request.method === 'POST') {
         assert(aiEnabled(env, mode), 503, 'ai_disabled', 'AI is not enabled or its platform budget is unavailable.');
         const body = await readJson(request); const validated = applyOperatorProvider(await engine.validateJobRequest(body), env, mode);
+        // Intent Galaxy (studio) is owner-only for now, like Mind Galaxy: hidden, not just disabled.
+        assert(validated.product !== 'studio' || isOwner(env, mode, session), 404, 'not_found', 'Not found.');
         assert(mode === 'demo' || (validated.provider === 'openai' ? env.OPENAI_API_KEY : env.ANTHROPIC_API_KEY), 503, 'provider_unavailable', 'The selected provider is not configured.');
         const guest = session ? null : await loadGuest(context, mode, repo, now);
         assert(session || guest, 401, 'trial_or_sign_in_required', 'Start the browser trial or sign in.');
@@ -210,6 +212,7 @@ export function createApplication({ repo: injectedRepo, engine = domain, fetchIm
       } else if (path === '/api/documents' && request.method === 'POST') {
         const userId = requireUser(session); const body = await readJson(request); onlyKeys(body, ['product', 'kind', 'title', 'data']);
         assert(productKind(body.product, body.kind), 400, 'invalid_document_kind', 'Choose a valid product and document kind.');
+        assert(body.product !== 'studio' || isOwner(env, mode, session), 404, 'not_found', 'Not found.');
         response = json({ document: await repo.documentCreate(userId, await engine.validateDocument(body)) }, 201);
         if (body.product === 'mandala') await touch(repo, userId);
       } else if (/^\/api\/documents\/[^/]+\/topic$/.test(path) && request.method === 'PUT') {
