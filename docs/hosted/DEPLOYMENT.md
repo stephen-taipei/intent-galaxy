@@ -120,13 +120,13 @@ The hosted app is one Worker on one origin, `https://apps.stephen.taipei`, with 
 | `/studio` | Intent Galaxy decision studio | beta |
 | `/feed` | Public Mandala feed | live, signed in |
 | `/topics` | My topics | live, signed in |
-| `/mind` | Mind Galaxy export | owner only (`OWNER_EMAILS`) |
+| `/mind` | Mind Galaxy export (Markdown note) | owner only (`OWNER_EMAILS`) |
 | `/pricing` | One plan for the whole park | test period free |
 
 - **Domain.** `wrangler.jsonc` declares `apps.stephen.taipei` as a Workers custom domain, so the `stephen.taipei` zone must be on Cloudflare DNS. Set `APP_ORIGIN` to `https://apps.stephen.taipei` and add `https://apps.stephen.taipei/api/auth/callback` as the Google OAuth redirect URI.
 - **Topics.** `0005_topics.sql` adds private per-user topics (at most 200, title 1–120 characters) that tie documents across tools. `hosted_documents.topic_id` links a document; deleting a topic only unlinks its documents. Routes: `GET/POST /api/topics`, `PUT/DELETE /api/topics/:id`, `PUT /api/documents/:id/topic {"topicId": id|null}`. Topics are never public.
 - **Cross-tool links.** A Mandala chart in a topic offers "decide in Intent Galaxy" (`/studio?goal=&topic=`); a studio work offers "expand to Mandala" (`/mandala?goal=&topic=`). The first save on the target links it to the same topic. `?doc=<id>` opens a saved document.
-- **Mind Galaxy.** Mind Galaxy stays a local personal app. The park only exports one topic as JSON (`GET /api/topics/:id/export`, format `intent-galaxy.topic-export` version 1, owner only, others get 404). The importer on the Mind Galaxy side is not written yet.
+- **Mind Galaxy.** Mind Galaxy (v0.14) stays a local personal app, a companion to Obsidian. `GET /api/topics/:id/export` (format `intent-galaxy.topic-export` version 1, owner only, others get 404) feeds the browser, which turns the topic into one Markdown note in Mind Galaxy's V-2 flat frontmatter (`apps/hosted/public/mind-galaxy-note.js`). Mind Galaxy imports that file as-is through its existing `POST /imports`, and it can also go straight into an Obsidian vault, so Mind Galaxy itself needs no change. The note is deterministic, so re-exporting an unchanged topic is skipped as `already_imported`; a changed topic imports as a new note. `why` stays empty because V-2 reserves it for the user's own words.
 - **Billing.** Per-product Paddle prices stay disabled. Pricing shows guest / free / planned paid tiers, all free during the test period; the paid tier will be AI-usage tiers across all tools, not per-tool locks.
 
 ## Entitlements and documents
