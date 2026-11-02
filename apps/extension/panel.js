@@ -40,6 +40,7 @@ const dropped = new Set(); // 改用本機生成後不再理會的網頁 run（�
 /** 面板改為顯示某個網頁 run：記下識別碼，它的通知也重新接收。 */
 const bindNonce = (n) => { nonce = n ?? ""; dropped.delete(nonce); };
 const loading = document.getElementById("waiting-view");
+document.body.dataset.booted = "1"; // panel-boot.js：模組已開始執行
 const decision = new DecisionView(galaxy, {
   onDraft: (draft) => { if (shown === "galaxy" && nonce && decision.source === "chat" && !demoShown && !cliBusy) toParent({ type: "intent-draft", nonce, ...draft }); },
   onFill: commitDecision,

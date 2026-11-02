@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ Генерация",
  "ct.pillTitle": "Intent Galaxy: развернуть цель из поля ввода в галактику, а затем подставить выбранный план обратно в чат (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Не отправлено",
+ "ct.undoPrompt": "↩ Вернуть мой вопрос",
+ "ct.undoPromptTitle": "Отменить этот анализ: вернуть ваш исходный вопрос в поле ввода и разблокировать его",
  "ext.actionTitle": "Intent Galaxy: открыть галактику намерений в этом чате с ИИ (Cmd/Ctrl+Shift+G)",
  "ext.description": "Добавляет кнопку Intent Galaxy в чаты с ИИ, такие как Claude, ChatGPT и Gemini, чтобы разобраться, чего вы на самом деле хотите.",
  "ext.unsupportedSite": "Intent Galaxy работает только на этих сайтах ИИ: {sites}",

@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ ກຳລັງສ້າງ",
  "ct.pillTitle": "Intent Galaxy: ຂະຫຍາຍເປົ້າໝາຍໃນກ່ອງຂໍ້ຄວາມໃຫ້ເປັນກາແລັກຊີ, ແລ້ວນຳແຜນທີ່ເລືອກໃສ່ກັບຄືນລົງໃນກ່ອງສົນທະນາ (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ ຍັງບໍ່ໄດ້ສົ່ງ",
+ "ct.undoPrompt": "↩ ກູ້ຄືນຄຳຖາມຂອງຂ້ອຍ",
+ "ct.undoPromptTitle": "ຍົກເລີກການວິເຄາະນີ້: ເອົາຄຳຖາມເດີມຂອງທ່ານກັບຄືນໃສ່ກ່ອງປ້ອນຂໍ້ມູນ ແລະ ປົດລັອກມັນ",
  "ext.actionTitle": "Intent Galaxy: ເປີດກາແລັກຊີໃນແຊັດ AI ນີ້ (Cmd/Ctrl+Shift+G)",
  "ext.description": "ເພີ່ມປຸ່ມ Intent Galaxy ໃນແຊັດ AI ເຊັ່ນ Claude, ChatGPT ແລະ Gemini ເພື່ອຊ່ວຍທ່ານຈັດລຽງໃຫ້ຊັດເຈນວ່າຕ້ອງການຫຍັງແທ້ໆ.",
  "ext.unsupportedSite": "Intent Galaxy ໃຊ້ໄດ້ສະເພາະເວັບໄຊ AI ເຫຼົ່ານີ້: {sites}",

@@ -32,6 +32,8 @@
  "ct.pillGenerating": " ⋯ Generant",
  "ct.pillTitle": "Intent Galaxy: desplega l'objectiu del quadre de text en una galàxia i omple el pla escollit al xat (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ No enviat",
+ "ct.undoPrompt": "↩ Restaura la pregunta",
+ "ct.undoPromptTitle": "Cancel·la aquesta anàlisi: torna a posar la teva pregunta original al quadre d'entrada i desbloqueja'l",
  "ext.actionTitle": "Intent Galaxy: obre la galàxia d’intencions en aquest xat d’IA (Cmd/Ctrl+Maj+G)",
  "ext.description": "Afegeix un botó Intent Galaxy als xats d’IA com Claude, ChatGPT i Gemini per aclarir què vols de debò.",
  "ext.unsupportedSite": "Intent Galaxy només funciona en aquests llocs d’IA: {sites}",

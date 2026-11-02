@@ -86,5 +86,13 @@
  "ct.extraNote": {
   "zh-Hant-TW": "補充：{text}",
   "en": "Notes: {text}"
+ },
+ "ct.undoPrompt": {
+  "zh-Hant-TW": "↩ 還原問題",
+  "en": "↩ Restore my question"
+ },
+ "ct.undoPromptTitle": {
+  "zh-Hant-TW": "取消這次分析：輸入框換回你原本的問題，並解除唯讀",
+  "en": "Cancel this analysis: put your original question back in the input box and unlock it"
  }
 }

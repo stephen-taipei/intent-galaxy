@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ 生成中",
  "ct.pillTitle": "Intent Galaxy：入力欄の目標を銀河へと展開し、選んだプランをチャット欄に戻します（Cmd/Ctrl+Shift+G）",
  "ct.pillUnsent": " ⋯ 未送信",
+ "ct.undoPrompt": "↩ 質問を元に戻す",
+ "ct.undoPromptTitle": "この分析をキャンセル: 元の質問を入力欄に戻してロックを解除します",
  "ext.actionTitle": "Intent Galaxy：この AI チャットで銀河を開く（Cmd/Ctrl+Shift+G）",
  "ext.description": "Claude・ChatGPT・Gemini などの AI チャットに Intent Galaxy ボタンを追加し、本当に望んでいることを整理します。",
  "ext.unsupportedSite": "Intent Galaxy は次の AI サイトでのみ動作します：{sites}",

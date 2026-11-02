@@ -8,7 +8,7 @@
   if (window.__intentGalaxyMounted && window.__intentGalaxyAlive?.()) return;
   try { window.__intentGalaxyTeardown?.(); } catch { /* 舊版沒有提供，或已無法執行 */ }
   // 舊版留下的按鈕與面板（Firefox 會直接銷毀舊的 content script，來不及自己清）
-  document.querySelectorAll("#intent-galaxy-mod-pill, intent-galaxy-frame").forEach((el) => el.remove());
+  document.querySelectorAll("#intent-galaxy-mod-pill, #intent-galaxy-undo, intent-galaxy-frame").forEach((el) => el.remove());
   window.__intentGalaxyMounted = true;
 
   const api = globalThis.browser ?? globalThis.chrome;
@@ -29,6 +29,7 @@
     unlisten.forEach((off) => { try { off(); } catch { /* context 已失效 */ } });
     observer?.disconnect();
     document.getElementById(PILL_ID)?.remove();
+    document.getElementById(UNDO_ID)?.remove();
     document.querySelector("intent-galaxy-frame")?.remove();
     hideCue();
     if (window.__intentGalaxyToggle === togglePanel) delete window.__intentGalaxyToggle;
@@ -39,6 +40,7 @@
   /** 掛在頁面（document、window）上的監聽：teardown 時一併移除，新版才不會被舊的攔截。 */
   const listen = (target, type, fn, opts) => { target.addEventListener(type, fn, opts); unlisten.push(() => target.removeEventListener(type, fn, opts)); };
   const PILL_ID = "intent-galaxy-mod-pill";
+  const UNDO_ID = "intent-galaxy-undo"; // 提示詞還沒送出時，膠囊旁的「還原問題」按鈕
   // 方案剛填回輸入框：iG 先移到右下角顯示「✓ 星系完成」，輸入框內容被使用者改動（打字、送出）後才回到工具列。
   // text：填回後輸入框的內容（等網站處理完才記下，null 表示還在等）。
   let fillWatch = null; // { text, since }
@@ -147,8 +149,47 @@
     return btn;
   }
 
+  // ── 還原問題：提示詞放進輸入框但還沒送出時，隨時能取消，輸入框換回原本的問題並解除唯讀 ──
+  function syncUndo() {
+    const pill = document.getElementById(PILL_ID);
+    const run = localRun?.unsent && current?.nonce === localRun.nonce ? localRun : null;
+    let undo = document.getElementById(UNDO_ID);
+    if (dead || !pill || !run) { undo?.remove(); return; }
+    if (!undo || undo.dataset.owner !== INSTANCE) {
+      undo?.remove();
+      undo = document.createElement("button");
+      undo.id = UNDO_ID;
+      undo.type = "button";
+      undo.dataset.owner = INSTANCE;
+      undo.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); cancelUnsent(); });
+    }
+    const floating = pill.dataset.kind === "floating";
+    undo.textContent = t("ct.undoPrompt");
+    undo.title = t("ct.undoPromptTitle");
+    undo.setAttribute("aria-label", undo.title);
+    undo.style.cssText = "all:unset; box-sizing:border-box; cursor:pointer; font:600 11.5px/1 -apple-system,BlinkMacSystemFont,sans-serif; padding:5px 9px; margin:0 4px; border-radius:6px;"
+      + " color:#0f172a; background:#fff; border:1px solid #cbd5e1; white-space:nowrap;"
+      + (floating ? " position:fixed; bottom:62px; right:18px; z-index:2147483646; font-size:13px; padding:8px 13px; border-radius:999px;" : "");
+    if (pill.nextElementSibling !== undo) pill.after(undo);
+  }
+  async function cancelUnsent() {
+    const run = localRun;
+    if (!run?.unsent) return;
+    restoreEditor(run.nonce, run.goal);
+    localRun = null;
+    cache.delete(run.nonce);
+    if (current?.nonce === run.nonce) current = null;
+    if (panelNonce === run.nonce) { toPanel(run.nonce, { type: "ig-reset" }); minimizePanel(); }
+    if (!run.ephemeral) await save(runKey(run.nonce), null);
+    mountPill(true);
+  }
+
   let lastMountCheck = 0;
   function mountPill(force = false) {
+    mountPillOnly(force);
+    syncUndo();
+  }
+  function mountPillOnly(force = false) {
     if (dead) return;
     const current = document.getElementById(PILL_ID);
     // 串流時 DOM 每個畫格都在變：按鈕還在、狀態沒變時，最多每秒重新找一次掛載點。

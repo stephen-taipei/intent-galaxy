@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ Gerando",
  "ct.pillTitle": "Intent Galaxy: transforma o objetivo da caixa de texto em uma galáxia e depois coloca o plano escolhido no chat (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Não enviado",
+ "ct.undoPrompt": "↩ Restaurar minha pergunta",
+ "ct.undoPromptTitle": "Cancelar esta análise: coloca sua pergunta original de volta na caixa de entrada e a desbloqueia",
  "ext.actionTitle": "Intent Galaxy: abrir a galáxia neste chat de IA (Cmd/Ctrl+Shift+G)",
  "ext.description": "Adiciona um botão Intent Galaxy a chats de IA como Claude, ChatGPT e Gemini para você descobrir o que realmente quer.",
  "ext.unsupportedSite": "O Intent Galaxy só funciona nestes sites de IA: {sites}",

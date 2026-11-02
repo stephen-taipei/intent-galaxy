@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ Đang tạo",
  "ct.pillTitle": "Intent Galaxy: mở rộng mục tiêu trong ô nhập liệu thành một thiên hà, sau đó điền kế hoạch đã chọn trở lại khung chat (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Chưa gửi",
+ "ct.undoPrompt": "↩ Khôi phục câu hỏi",
+ "ct.undoPromptTitle": "Hủy phân tích này: đặt lại câu hỏi ban đầu của bạn vào ô nhập liệu và mở khóa",
  "ext.actionTitle": "Intent Galaxy: mở thiên hà trong cuộc trò chuyện AI này (Cmd/Ctrl+Shift+G)",
  "ext.description": "Thêm nút Intent Galaxy vào các cuộc trò chuyện AI như Claude, ChatGPT, Gemini để làm rõ điều bạn thật sự muốn.",
  "ext.unsupportedSite": "Intent Galaxy chỉ hoạt động trên các trang AI sau: {sites}",

@@ -32,6 +32,8 @@
  "ct.pillGenerating": " ⋯ 生成緊",
  "ct.pillTitle": "Intent Galaxy：將輸入框入面嘅目標展開成星系，揀好方案再填返入對話框（Cmd/Ctrl+Shift+G）",
  "ct.pillUnsent": " ⋯ 未送出",
+ "ct.undoPrompt": "↩ 還原我嘅問題",
+ "ct.undoPromptTitle": "取消呢次分析：將你原本嘅問題放返入輸入框，並解除鎖定",
  "ext.actionTitle": "Intent Galaxy：喺呢個 AI 對話展開意圖星系（Cmd/Ctrl+Shift+G）",
  "ext.description": "喺 Claude、ChatGPT、Gemini 等 AI 對話加個 Intent Galaxy 按鈕，幫你理清自己真正想要乜。",
  "ext.unsupportedSite": "Intent Galaxy 只可以喺以下 AI 網站用：{sites}",

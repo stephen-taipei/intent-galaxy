@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ יוצר",
  "ct.pillTitle": "Intent Galaxy: פורס את המטרה שבתיבת הקלט לגלקסיה, ואחרי שתבחר תוכנית מחזיר אותה לתיבת הצ'אט (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ לא נשלח",
+ "ct.undoPrompt": "↩ שחזר את השאלה",
+ "ct.undoPromptTitle": "ביטול הניתוח הזה: החזרת השאלה המקורית שלך לתיבת הקלט ושחרור הנעילה שלה",
  "ext.actionTitle": "Intent Galaxy: פתיחת גלקסיית הכוונות בצ׳אט ה־AI הזה (Cmd/Ctrl+Shift+G)",
  "ext.description": "מוסיף כפתור Intent Galaxy לצ׳אטים של AI כמו Claude, ChatGPT ו־Gemini, ועוזר לכם להבין מה אתם באמת רוצים.",
  "ext.unsupportedSite": "Intent Galaxy פועל רק באתרי ה־AI האלה: {sites}",

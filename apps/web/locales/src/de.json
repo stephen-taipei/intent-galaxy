@@ -32,6 +32,8 @@
  "ct.pillGenerating": " ⋯ Wird erstellt",
  "ct.pillTitle": "Intent Galaxy: Das Ziel im Eingabefeld in eine Galaxie auffächern und den gewählten Plan zurück in den Chat einfügen (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Nicht gesendet",
+ "ct.undoPrompt": "↩ Frage wiederherstellen",
+ "ct.undoPromptTitle": "Diese Analyse abbrechen: Ursprüngliche Frage wieder ins Eingabefeld einfügen und entsperren",
  "ext.actionTitle": "Intent Galaxy: Galaxie in diesem KI-Chat öffnen (Cmd/Strg+Umschalt+G)",
  "ext.description": "Fügt KI-Chats wie Claude, ChatGPT und Gemini einen Intent Galaxy-Button hinzu, damit du klärst, was du wirklich willst.",
  "ext.unsupportedSite": "Intent Galaxy funktioniert nur auf diesen KI-Websites: {sites}",

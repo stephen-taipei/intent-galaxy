@@ -33,6 +33,8 @@ export default {
  "ct.pillGenerating": " ⋯ ဖန်တီးနေသည်",
  "ct.pillTitle": "Intent Galaxy- ရိုက်ထည့်ထားသော ပန်းတိုင်ကို ဂလက်ဆီ အဖြစ် ဖြန့်ကျက်ပြီး ရွေးချယ်ထားသော အစီအစဉ်ကို chat box ထဲသို့ ပြန်လည်ဖြည့်သွင်းပါ (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ မပို့ရသေးပါ",
+ "ct.undoPrompt": "↩ မူရင်းမေးခွန်း ပြန်ယူရန်",
+ "ct.undoPromptTitle": "ဤဆန်းစစ်မှုကို ပယ်ဖျက်မည်- မူရင်းမေးခွန်းကို စာရိုက်သည့်အကွက်ထဲ ပြန်ထည့်ပြီး လော့ခ်ဖွင့်ပေးပါ",
  "ext.actionTitle": "Intent Galaxy: ဤ AI ချတ်တွင် ဂလက်ဆီကို ဖွင့်ရန် (Cmd/Ctrl+Shift+G)",
  "ext.description": "Claude၊ ChatGPT၊ Gemini စသည့် AI ချတ်များတွင် Intent Galaxy ခလုတ်ထည့်ပေးပြီး သင်တကယ်လိုချင်တာကို ရှင်းအောင် စီစဉ်ပေးသည်။",
  "ext.unsupportedSite": "Intent Galaxy သည် ဤ AI ဝက်ဘ်ဆိုက်များတွင်သာ အလုပ်လုပ်သည်- {sites}",
