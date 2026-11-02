@@ -814,10 +814,19 @@
     if (!anyRuns && !localRun) { if (current) { current = null; mountPill(); } return; } // 從沒用過：不必掃描頁面
     refreshing = (async () => {
       const { page, editor } = tags();
-      const missing = page.map((t) => t.nonce).filter((n) => !cache.has(n));
+      const missing = [...new Set([...page.map((t) => t.nonce), ...editor])].filter((n) => !cache.has(n));
       if (missing.length) {
         const got = await loadMany(missing.map(runKey));
         for (const n of missing) if (got[runKey(n)]) cache.set(n, got[runKey(n)]);
+      }
+      // 重新整理後網站（例如 ChatGPT）把還沒送出的提示詞還原到輸入框：接回這個 run，輸入框照樣唯讀、送出鍵照樣發光。
+      if (!localRun) {
+        const restored = [...editor].map((n) => cache.get(n)).findLast((r) => r?.status === "waiting" && r.unsent && !r.ephemeral);
+        if (restored) localRun = Object.assign(restored, { pathFrom: location.pathname });
+      }
+      if (localRun?.unsent && editor.has(localRun.nonce) && cue?.nonce !== localRun.nonce) {
+        const box = findEditor();
+        if (box && editorText(box).includes(tagOf(localRun.nonce))) showCue(box, localRun.nonce);
       }
       const onPage = page.filter((t) => cache.has(t.nonce));
       // 這個頁面的 run：頁面上最後一個有記錄的識別碼；這個分頁剛送出的 run 若還在輸入框或剛送出，優先。
@@ -855,7 +864,7 @@
   // 有等待中的 run 時每 1.5 秒讀一次頁面；沒有時每 5 秒輕量檢查（換對話、別的分頁送出的 run 出現在頁面上）。
   let lastRefresh = 0;
   every(1500, () => {
-    const busy = current?.status === "waiting" || localRun;
+    const busy = current?.status === "waiting" || localRun || tags().editor.size > 0; // 輸入框裡有識別碼（例如重新整理後網站還原了草稿）也要盡快接回
     if (busy || Date.now() - lastRefresh > 5000) { lastRefresh = Date.now(); refresh(); }
   });
   listen(document, "visibilitychange", () => { if (!document.hidden && alive()) refresh(); });
