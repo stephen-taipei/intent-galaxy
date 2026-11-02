@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Luodaan",
  "ct.pillTitle": "Intent Galaxy: levitä syöttökentän tavoite galaksiksi ja vie valitsemasi suunnitelma takaisin keskustelukenttään (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Ei lähetetty",
- "ct.undoPrompt": "↩ Palauta kysymykseni",
+ "ct.undoPrompt": "↩ Takaisin alkuperäiseen kysymykseen",
  "ct.undoPromptTitle": "Peruuta tämä analyysi: palauta alkuperäinen kysymyksesi tekstikenttään ja avaa sen lukitus",
  "ext.actionTitle": "Intent Galaxy: avaa galaksi tässä tekoälychatissa (Cmd/Ctrl+Shift+G)",
  "ext.description": "Lisää Intent Galaxy-painikkeen tekoälychatteihin, kuten Claude, ChatGPT ja Gemini, ja auttaa selvittämään, mitä oikeasti haluat.",

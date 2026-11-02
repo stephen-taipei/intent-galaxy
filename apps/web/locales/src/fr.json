@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Génération en cours",
  "ct.pillTitle": "Intent Galaxy : déployez l'objectif de la zone de texte en galaxie, puis réinsérez le plan choisi dans la discussion (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Non envoyé",
- "ct.undoPrompt": "↩ Restaurer ma question",
+ "ct.undoPrompt": "↩ Retour à la question initiale",
  "ct.undoPromptTitle": "Annuler cette analyse : remettre votre question d'origine dans la zone de saisie et la déverrouiller",
  "ext.actionTitle": "Intent Galaxy : ouvrir la galaxie d’intentions dans ce chat IA (Cmd/Ctrl+Maj+G)",
  "ext.description": "Ajoute un bouton Intent Galaxy aux chats IA comme Claude, ChatGPT et Gemini pour clarifier ce que vous voulez vraiment.",

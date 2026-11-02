@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ جارٍ الإنشاء",
  "ct.pillTitle": "Intent Galaxy: يحوّل الهدف المكتوب في مربع الإدخال إلى مجرة، وبعد اختيار خطة يضعها في مربع المحادثة (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ لم تُرسل",
- "ct.undoPrompt": "↩ استعادة سؤالي",
+ "ct.undoPrompt": "↩ الرجوع إلى السؤال الأصلي",
  "ct.undoPromptTitle": "إلغاء هذا التحليل: إعادة سؤالك الأصلي إلى مربع الإدخال وإلغاء قفله",
  "ext.actionTitle": "Intent Galaxy: افتح مجرة النوايا في محادثة الذكاء الاصطناعي هذه (Cmd/Ctrl+Shift+G)",
  "ext.description": "يضيف زر Intent Galaxy إلى محادثات الذكاء الاصطناعي مثل Claude وChatGPT وGemini ليساعدك على معرفة ما تريده فعلًا.",

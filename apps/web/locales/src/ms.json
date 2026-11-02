@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Menjana",
  "ct.pillTitle": "Intent Galaxy: kembangkan matlamat dalam kotak input menjadi galaksi, kemudian masukkan pelan yang dipilih semula ke dalam kotak sembang (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Belum dihantar",
- "ct.undoPrompt": "↩ Pulihkan soalan saya",
+ "ct.undoPrompt": "↩ Kembali ke soalan asal",
  "ct.undoPromptTitle": "Batalkan analisis ini: masukkan semula soalan asal anda ke dalam kotak input dan buka kuncinya",
  "ext.actionTitle": "Intent Galaxy: buka galaksi dalam sembang AI ini (Cmd/Ctrl+Shift+G)",
  "ext.description": "Menambah butang Intent Galaxy pada sembang AI seperti Claude, ChatGPT dan Gemini supaya anda jelas apa yang anda mahu.",

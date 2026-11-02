@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Generálás folyamatban",
  "ct.pillTitle": "Intent Galaxy: a beviteli mezőben lévő cél kibontása galaxissá, majd a kiválasztott terv visszatöltése a csevegőmezőbe (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Nincs elküldve",
- "ct.undoPrompt": "↩ Kérdésem visszaállítása",
+ "ct.undoPrompt": "↩ Vissza az eredeti kérdéshez",
  "ct.undoPromptTitle": "Elemzés visszavonása: eredeti kérdés visszatöltése a beviteli mezőbe és feloldása",
  "ext.actionTitle": "Intent Galaxy: a szándékgalaxis megnyitása ebben az AI-csevegésben (Cmd/Ctrl+Shift+G)",
  "ext.description": "Intent Galaxy gombot ad az olyan AI-csevegőkhöz, mint a Claude, a ChatGPT és a Gemini, hogy tisztázd, mit akarsz valójában.",

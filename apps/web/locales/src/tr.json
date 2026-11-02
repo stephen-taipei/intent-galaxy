@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Oluşturuluyor",
  "ct.pillTitle": "Intent Galaxy: giriş kutusundaki hedefi bir galaksiye genişletin, ardından seçilen planı sohbet kutusuna geri doldurun (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Gönderilmedi",
- "ct.undoPrompt": "↩ Sorumu geri yükle",
+ "ct.undoPrompt": "↩ Orijinal soruya dön",
  "ct.undoPromptTitle": "Bu analizi iptal et: Orijinal sorunuzu giriş kutusuna geri koyun ve kilidini açın",
  "ext.actionTitle": "Intent Galaxy: bu yapay zekâ sohbetinde galaksiyi aç (Cmd/Ctrl+Shift+G)",
  "ext.description": "Claude, ChatGPT ve Gemini gibi yapay zekâ sohbetlerine Intent Galaxy düğmesi ekler; gerçekte ne istediğinizi netleştirir.",

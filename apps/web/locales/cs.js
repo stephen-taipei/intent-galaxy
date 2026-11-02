@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Generování",
  "ct.pillTitle": "Intent Galaxy: rozbalí cíl ze zadávacího pole do galaxie a zvolený plán vloží zpět do chatu (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Neodesláno",
- "ct.undoPrompt": "↩ Obnovit můj dotaz",
+ "ct.undoPrompt": "↩ Zpět k původní otázce",
  "ct.undoPromptTitle": "Zrušit tuto analýzu: vrátit původní dotaz do zadávacího pole a odemknout jej",
  "ext.actionTitle": "Intent Galaxy: otevřít galaxii záměrů v tomto AI chatu (Cmd/Ctrl+Shift+G)",
  "ext.description": "Přidá tlačítko Intent Galaxy do AI chatů jako Claude, ChatGPT a Gemini, abyste si ujasnili, co opravdu chcete.",

@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ जनरेट हो रहा है",
  "ct.pillTitle": "Intent Galaxy: इनपुट बॉक्स के लक्ष्य को गैलेक्सी में बदलें, फिर चुने हुए प्लान को चैट बॉक्स में वापस भरें (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ भेजा नहीं गया",
- "ct.undoPrompt": "↩ मेरा प्रश्न पुनर्स्थापित करें",
+ "ct.undoPrompt": "↩ मूल प्रश्न पर वापस",
  "ct.undoPromptTitle": "इस विश्लेषण को रद्द करें: अपना मूल प्रश्न इनपुट बॉक्स में वापस लाएं और इसे अनलॉक करें",
  "ext.actionTitle": "Intent Galaxy: इस AI चैट में गैलेक्सी खोलें (Cmd/Ctrl+Shift+G)",
  "ext.description": "Claude, ChatGPT और Gemini जैसी AI चैट में Intent Galaxy बटन जोड़ता है, ताकि साफ़ हो जाए कि आप असल में क्या चाहते हैं।",

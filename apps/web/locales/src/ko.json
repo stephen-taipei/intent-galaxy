@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ 생성 중",
  "ct.pillTitle": "Intent Galaxy: 입력창의 목표를 은하로 펼치고, 선택한 계획을 대화창에 다시 채워 넣습니다 (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ 전송 대기",
- "ct.undoPrompt": "↩ 원래 질문 복원",
+ "ct.undoPrompt": "↩ 원래 질문으로 복원",
  "ct.undoPromptTitle": "이 분석 취소: 입력창에 원래 질문을 다시 넣고 잠금을 해제합니다",
  "ext.actionTitle": "Intent Galaxy: 이 AI 채팅에서 은하 열기 (Cmd/Ctrl+Shift+G)",
  "ext.description": "Claude, ChatGPT, Gemini 같은 AI 채팅에 Intent Galaxy 버튼을 추가해 정말 원하는 것을 정리해 줍니다.",

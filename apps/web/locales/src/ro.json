@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Se generează",
  "ct.pillTitle": "Intent Galaxy: transformă obiectivul din căsuța de text într-o galaxie, apoi trimite planul ales înapoi în conversație (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Netrimis",
- "ct.undoPrompt": "↩ Restaurează întrebarea mea",
+ "ct.undoPrompt": "↩ Înapoi la întrebarea inițială",
  "ct.undoPromptTitle": "Anulează această analiză: repune întrebarea inițială în caseta de introducere și deblocheaz-o",
  "ext.actionTitle": "Intent Galaxy: deschide galaxia intențiilor în acest chat AI (Cmd/Ctrl+Shift+G)",
  "ext.description": "Adaugă un buton Intent Galaxy în chaturile AI precum Claude, ChatGPT și Gemini, ca să clarifici ce vrei cu adevărat.",

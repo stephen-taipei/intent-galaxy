@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ A gerar",
  "ct.pillTitle": "Intent Galaxy: transforma o objetivo da caixa de texto numa galáxia e depois coloca o plano escolhido na conversa (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Por enviar",
- "ct.undoPrompt": "↩ Restaurar a minha pergunta",
+ "ct.undoPrompt": "↩ Voltar à pergunta original",
  "ct.undoPromptTitle": "Cancelar esta análise: repor a sua pergunta original na caixa de texto e desbloqueá-la",
  "ext.actionTitle": "Intent Galaxy: abrir a galáxia nesta conversa com IA (Cmd/Ctrl+Shift+G)",
  "ext.description": "Adiciona um botão Intent Galaxy a conversas com IA como o Claude, o ChatGPT e o Gemini para perceber o que quer realmente.",

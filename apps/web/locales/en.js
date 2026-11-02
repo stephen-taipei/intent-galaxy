@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Generating",
  "ct.pillTitle": "Intent Galaxy: expand the goal in the input box into a galaxy, then fill the chosen plan back into the chat box (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Not sent",
- "ct.undoPrompt": "↩ Restore my question",
+ "ct.undoPrompt": "↩ Back to original question",
  "ct.undoPromptTitle": "Cancel this analysis: put your original question back in the input box and unlock it",
  "ext.actionTitle": "Intent Galaxy: open the intent galaxy in this AI chat (Cmd/Ctrl+Shift+G)",
  "ext.description": "Adds an Intent Galaxy button to AI chats like Claude, ChatGPT and Gemini to help you sort out what you really want.",

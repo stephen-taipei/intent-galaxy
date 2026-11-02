@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Generowanie",
  "ct.pillTitle": "Intent Galaxy: rozłóż cel z pola czatu na galaktykę, a potem wstaw wybrany plan z powrotem do czatu (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Niewysłane",
- "ct.undoPrompt": "↩ Przywróć moje pytanie",
+ "ct.undoPrompt": "↩ Wróć do oryginalnego pytania",
  "ct.undoPromptTitle": "Anuluj tę analizę: przywróć pierwotne pytanie w polu wprowadzania i odblokuj je",
  "ext.actionTitle": "Intent Galaxy: otwórz galaktykę intencji w tym czacie AI (Cmd/Ctrl+Shift+G)",
  "ext.description": "Dodaje przycisk Intent Galaxy do czatów AI, takich jak Claude, ChatGPT i Gemini, by ustalić, czego naprawdę chcesz.",

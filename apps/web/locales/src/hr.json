@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Generiranje",
  "ct.pillTitle": "Intent Galaxy: razvij cilj iz polja za unos u galaksiju, a zatim vrati odabrani plan u polje za razgovor (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Nije poslano",
- "ct.undoPrompt": "↩ Vrati moje pitanje",
+ "ct.undoPrompt": "↩ Natrag na izvorno pitanje",
  "ct.undoPromptTitle": "Otkaži ovu analizu: vrati izvorno pitanje u polje za unos i otključaj ga",
  "ext.actionTitle": "Intent Galaxy: otvori galaksiju namjera u ovom AI razgovoru (Cmd/Ctrl+Shift+G)",
  "ext.description": "Dodaje gumb Intent Galaxy u AI razgovore poput Claudea, ChatGPT-a i Geminija da razjasnite što zapravo želite.",

@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Genererer",
  "ct.pillTitle": "Intent Galaxy: udfold målet i tekstfeltet til en galakse, og indsæt derefter den valgte plan tilbage i chatfeltet (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Ikke sendt",
- "ct.undoPrompt": "↩ Gendan mit spørgsmål",
+ "ct.undoPrompt": "↩ Tilbage til oprindeligt spørgsmål",
  "ct.undoPromptTitle": "Annuller denne analyse: sæt dit oprindelige spørgsmål tilbage i inputfeltet og lås det op",
  "ext.actionTitle": "Intent Galaxy: åbn galaksen i denne AI-chat (Cmd/Ctrl+Shift+G)",
  "ext.description": "Tilføjer en Intent Galaxy-knap til AI-chats som Claude, ChatGPT og Gemini, så du får styr på, hvad du egentlig vil.",

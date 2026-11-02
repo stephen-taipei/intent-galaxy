@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Skapar",
  "ct.pillTitle": "Intent Galaxy: utveckla målet i textrutan till en galax och fyll sedan i den valda planen i chatten (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Inte skickat",
- "ct.undoPrompt": "↩ Återställ min fråga",
+ "ct.undoPrompt": "↩ Tillbaka till ursprunglig fråga",
  "ct.undoPromptTitle": "Avbryt den här analysen: lägg tillbaka din ursprungliga fråga i inmatningsfältet och lås upp det",
  "ext.actionTitle": "Intent Galaxy: öppna galaxen i den här AI-chatten (Cmd/Ctrl+Shift+G)",
  "ext.description": "Lägger till en Intent Galaxy-knapp i AI-chattar som Claude, ChatGPT och Gemini så att du reder ut vad du egentligen vill.",

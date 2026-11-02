@@ -32,7 +32,7 @@
  "ct.pillGenerating": " ⋯ Ginagawa pa",
  "ct.pillTitle": "Intent Galaxy: palawakin ang layunin sa input box upang maging isang galaxy, pagkatapos ay ilagay ang napiling plano pabalik sa chat box (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Hindi pa naipadala",
- "ct.undoPrompt": "↩ Ibalik ang tanong",
+ "ct.undoPrompt": "↩ Bumalik sa orihinal na tanong",
  "ct.undoPromptTitle": "Kanselahin ang pagsusuring ito: ibalik ang iyong orihinal na tanong sa input box at i-unlock ito",
  "ext.actionTitle": "Intent Galaxy: buksan ang galaxy sa AI chat na ito (Cmd/Ctrl+Shift+G)",
  "ext.description": "Naglalagay ng Intent Galaxy button sa mga AI chat gaya ng Claude, ChatGPT at Gemini para malaman mo kung ano talaga ang gusto mo.",

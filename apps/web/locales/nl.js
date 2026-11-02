@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Bezig met genereren",
  "ct.pillTitle": "Intent Galaxy: vouw het doel in het invoerveld uit tot een sterrenstelsel en vul het gekozen plan terug in het chatveld in (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Niet verzonden",
- "ct.undoPrompt": "↩ Mijn vraag herstellen",
+ "ct.undoPrompt": "↩ Terug naar oorspronkelijke vraag",
  "ct.undoPromptTitle": "Deze analyse annuleren: zet je oorspronkelijke vraag terug in het invoerveld en ontgrendel het",
  "ext.actionTitle": "Intent Galaxy: open het sterrenstelsel in deze AI-chat (Cmd/Ctrl+Shift+G)",
  "ext.description": "Voegt een Intent Galaxy-knop toe aan AI-chats zoals Claude, ChatGPT en Gemini, zodat je helder hebt wat je echt wilt.",

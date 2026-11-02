@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Генерація",
  "ct.pillTitle": "Intent Galaxy: розгорнути ціль із поля вводу в галактику, а потім вставити обраний план назад у чат (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Не надіслано",
- "ct.undoPrompt": "↩ Відновити моє запитання",
+ "ct.undoPrompt": "↩ Повернутися до початкового запитання",
  "ct.undoPromptTitle": "Скасувати цей аналіз: повернути початкове запитання в поле введення та розблокувати його",
  "ext.actionTitle": "Intent Galaxy: відкрити галактику намірів у цьому чаті з ШІ (Cmd/Ctrl+Shift+G)",
  "ext.description": "Додає кнопку Intent Galaxy у чати з ШІ, як-от Claude, ChatGPT і Gemini, щоб розібратися, чого ви насправді хочете.",

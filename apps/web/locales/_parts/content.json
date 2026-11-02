@@ -88,8 +88,8 @@
   "en": "Notes: {text}"
  },
  "ct.undoPrompt": {
-  "zh-Hant-TW": "↩ 還原問題",
-  "en": "↩ Restore my question"
+  "zh-Hant-TW": "↩ 返回原始提問",
+  "en": "↩ Back to original question"
  },
  "ct.undoPromptTitle": {
   "zh-Hant-TW": "取消這次分析：輸入框換回你原本的問題，並解除唯讀",

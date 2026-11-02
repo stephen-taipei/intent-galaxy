@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Δημιουργία",
  "ct.pillTitle": "Intent Galaxy: αναπτύξτε τον στόχο από το πλαίσιο εισαγωγής σε έναν γαλαξία και έπειτα εισαγάγετε το επιλεγμένο πλάνο πίσω στη συνομιλία (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Δεν στάλθηκε",
- "ct.undoPrompt": "↩ Επαναφορά ερώτησής μου",
+ "ct.undoPrompt": "↩ Επιστροφή στην αρχική ερώτηση",
  "ct.undoPromptTitle": "Ακύρωση αυτής της ανάλυσης: επαναφορά της αρχικής ερώτησης στο πλαίσιο εισαγωγής και ξεκλείδωμά του",
  "ext.actionTitle": "Intent Galaxy: άνοιγμα του γαλαξία προθέσεων σε αυτή τη συνομιλία AI (Cmd/Ctrl+Shift+G)",
  "ext.description": "Προσθέτει κουμπί Intent Galaxy σε συνομιλίες AI όπως Claude, ChatGPT και Gemini, για να ξεκαθαρίσετε τι θέλετε πραγματικά.",

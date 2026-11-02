@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ กำลังสร้าง",
  "ct.pillTitle": "Intent Galaxy: ขยายเป้าหมายในช่องข้อความเป็นกาแล็กซี แล้วใส่แผนที่เลือกลงกลับไปในช่องแชต (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ ยังไม่ส่ง",
- "ct.undoPrompt": "↩ คืนค่าคำถามของฉัน",
+ "ct.undoPrompt": "↩ กลับไปที่คำถามเดิม",
  "ct.undoPromptTitle": "ยกเลิกการวิเคราะห์นี้: ใส่คำถามเดิมของคุณกลับเข้าไปในช่องข้อความและปลดล็อก",
  "ext.actionTitle": "Intent Galaxy: เปิดกาแล็กซีในแชต AI นี้ (Cmd/Ctrl+Shift+G)",
  "ext.description": "เพิ่มปุ่ม Intent Galaxy ในแชต AI อย่าง Claude, ChatGPT และ Gemini ช่วยให้รู้ว่าคุณต้องการอะไรจริง ๆ",

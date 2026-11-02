@@ -33,7 +33,7 @@ export default {
  "ct.pillGenerating": " ⋯ Membuat",
  "ct.pillTitle": "Intent Galaxy: uraikan tujuan di kotak input menjadi galaksi, lalu masukkan rencana yang dipilih kembali ke kotak obrolan (Cmd/Ctrl+Shift+G)",
  "ct.pillUnsent": " ⋯ Belum dikirim",
- "ct.undoPrompt": "↩ Pulihkan pertanyaan saya",
+ "ct.undoPrompt": "↩ Kembali ke pertanyaan awal",
  "ct.undoPromptTitle": "Batalkan analisis ini: kembalikan pertanyaan awal Anda ke kotak input dan buka kuncinya",
  "ext.actionTitle": "Intent Galaxy: buka galaksi di obrolan AI ini (Cmd/Ctrl+Shift+G)",
  "ext.description": "Menambahkan tombol Intent Galaxy di obrolan AI seperti Claude, ChatGPT, dan Gemini agar kamu tahu apa yang benar-benar kamu mau.",
