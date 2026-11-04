@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="apps.stephen.taipei">
+  <rect width="120" height="120" rx="16" fill="#C8312A"/>
+  <rect x="10" y="10" width="100" height="100" rx="7" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <path d="M80 34H40V58H80V86H40" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="miter"/>
+  <circle cx="80" cy="34" r="8" fill="#FFFFFF"/>
+  <circle cx="80" cy="34" r="3" fill="#C8312A"/>
+  <circle cx="40" cy="86" r="8" fill="#FFFFFF"/>
+  <circle cx="40" cy="86" r="3" fill="#C8312A"/>
+</svg>
