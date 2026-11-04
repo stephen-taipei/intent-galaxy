@@ -2,6 +2,17 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
+## Unreleased
+
+- **Extension panel is now three steps**: compare the three options side by side, optionally open the galaxy to read the reasons or adjust views, then preview the exact text before it goes into the chat box. You still press Send on the site yourself. Switching between steps never asks the AI again.
+- **One shared decision state** (`DecisionSession` in `libs/core`): choosing a card, inspecting nodes and advanced edits all use it, with undo/redo; leaving an already-undecided node undecided no longer clears redo.
+- **Your choice and notes come back** when you reopen or refresh a conversation whose galaxy the website AI generated (not in incognito windows or ChatGPT temporary chats).
+- **The chat-box button shows only the Intent Galaxy logo** (no "iG" text); hints now say "press the Intent Galaxy icon next to the input box" (all 41 locales).
+- **Filling back into another conversation is refused** and the panel stays on your plan with a notice, instead of switching to the "generation failed" screen.
+- **Compact galaxy keeps its layout** while you move between nodes; the preview notes that other text you typed in the chat box is added at the end.
+- Panel opens docked on the right (up to 720px wide) in a light theme; the summary/cards layout buttons in the title bar were removed.
+- `npm run preview:ext` opens a local preview of the panel with sample data.
+
 ## 0.1.9 — 2026-10-21
 
 - **Incomplete AI reply prompts for a stronger model**: when the galaxy JSON in the AI's reply is incomplete, the extension panel pops up a dialog suggesting a higher-tier model (such as Pro) or a stronger reasoning setting (such as a Thinking mode) on that site, with "Done, try again", "Paste JSON" and "Cancel" (all 41 locales).

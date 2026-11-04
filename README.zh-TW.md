@@ -43,7 +43,7 @@
 | ---- | ---- | ---- | :--: |
 | **CLI** | 工程師 | `npx @stephen.taipei/intent-galaxy`：127.0.0.1 星系伺服器，可選 Claude、Codex、Gemini、agy CLI 或 12 家 API 生成 | ✅ |
 | **MCP** | 工程師 | Stdio MCP Server：`intent_spawner_prompt` → `intent_open_galaxy`，Claude Code、Codex、Gemini CLI、agy 都能掛 | ✅ |
-| **Extension** | 一般使用者 | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 輸入框旁加 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG** 膠囊，直接請該網頁的 AI 生成星系 | ✅ |
+| **Extension** | 一般使用者 | Chrome / Firefox：在 Claude、ChatGPT、Gemini、Grok、DeepSeek、Qwen、Perplexity、Copilot、Mistral、Kimi 輸入框旁加入 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **Intent Galaxy** 圖示按鈕；比較方案後可選擇查看星系或進階調整，再預覽並填回輸入框，由你自行送出 | ✅ |
 | **Kill-gate** | 工程師 | `.intent.lock.json`（RFC 8785 JCS + SHA-256）與 14 天後的 commit 驗屍守門員 | ✅ |
 
 <br>
@@ -230,26 +230,30 @@ npm run build:ext    # 同步到 apps/extension 與 apps/extension-firefox，可
 npm run pack:ext     # 另外產出 dist-ext/intent-galaxy-{chrome,firefox}-<version>.zip 供上架
 ```
 
-在輸入框打一句你正在猶豫的事，點 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **iG**（或工具列圖示、`Cmd/Ctrl+Shift+G`）：
+在輸入框打一句你正在猶豫的事，點 <img src="https://raw.githubusercontent.com/stephen-taipei/intent-galaxy/main/docs/brand/intent-galaxy-mark.svg" height="14" alt="Intent Galaxy logo"> **Intent Galaxy** 圖示（或工具列圖示、`Cmd/Ctrl+Shift+G`）：
+
+若這個對話已有分析，直接接續以下比較流程。首次使用時，擴充功能會先把生成提示詞填入輸入框；由你送出並等待網頁 AI 回覆後，再開始以下比較與預覽流程。
 
 ```mermaid
 flowchart LR
-    A["點 iG"] --> B{"這個對話<br/>生成過？"}
-    B -- 是 --> C["直接顯示星系"]
-    B -- 否 --> D["提示詞放進輸入框<br/>由你按送出"]
-    D --> E["網頁 AI 回覆 JSON"]
-    E --> F["自動畫出星系<br/>提示詞與回覆折疊成一行"]
-    B -. 本機 CLI 在線 .-> G["可改按「改用本機 AI」<br/>對話裡不出現提示詞"]
-    G --> F
+    A["點 Intent Galaxy 圖示"] --> B["比較方案"]
+    B --> C{"要查看星系或<br/>進階調整？"}
+    C -- 是 --> D["選擇性查看星系<br/>或進階調整觀點"]
+    C -- 否 --> E["預覽所選方案"]
+    D --> E
+    E --> F["填回對話輸入框"]
+    F --> G["由你在網頁按送出"]
 ```
+
+切換檢視時不會再次呼叫 AI。
 
 | 功能 | 說明 |
 | --- | --- |
-| 生成來源 | 預設請當前網頁的 AI（看得到對話前文）；本機 CLI 在線時多一個「改用本機 AI」按鈕。擴充功能不會自動送出 |
+| 生成來源 | 預設由目前對話的 AI 分析並列出方案；本機 CLI 在線時可選本機 AI。預覽後由擴充功能填回所選方案，送出由你自行操作 |
 | 折疊 | 只折疊擴充功能自己送出、能確認身分的那一則；認不出網站結構時不折疊，點一下可展開 |
 | 等待 | 推理型高階模型可能要 5–15 分鐘；超過 20 秒會提示，可先縮小面板，完成時按鈕顯示「✓ 星系完成」 |
 | 讀不到回覆 | 網站把長程式碼區塊收合時，按「貼上 JSON」手動載入 |
-| 記憶 | 同一個對話重新打開或重新整理會直接顯示已生成的星系；只存在擴充功能裡，保存 30 天；無痕視窗與 ChatGPT 暫時對話不保存 |
+| 記憶 | 同一個對話重開或重新整理，會帶回已生成的星系、你選的方案和補充。只有網頁 AI 生成的星系會記住你的選擇；本機 AI、從頁面讀到的星系和示範每次都重新開始。只存在擴充功能裡 30 天；無痕視窗與 ChatGPT 暫時對話都不存 |
 | 隱私 | 面板與網頁之間只走擴充功能內部訊息，網站自己的腳本讀不到你的問題與星系 |
 | 鎖檔 | 只有本機 CLI 生成的星系會寫入 `.intent.lock.json`；網頁 AI、貼上或示範的星系只把方案填回輸入框 |
 | 面板 | 拖曳標題列移動、拖右下角縮放、雙擊標題列放大，可調透明度 |
@@ -266,6 +270,8 @@ flowchart LR
 | `npm test` | libs 單元測試、CLI 整合測試、擴充功能同步、npm pack 端到端 |
 | `npm start` | 直接從原始碼啟動（Node 執行期剝除 TypeScript 型別） |
 | `npm run build` | 產生 `dist/`（npm 套件內容；npm pack / publish 前會自動執行） |
+| `npm run build:ext` | 建置並同步擴充功能檔案到 `apps/extension` 與 `apps/extension-firefox`，供本機載入 |
+| `npm run preview:ext` | 在 `http://127.0.0.1:4789/` 用範例資料開啟本機預覽；不會測試真實的 AI 網站 |
 | `npm run bench:latency -- --providers claude,codex` | 以固定 10 題量測生成延遲（會實際呼叫模型），結果寫到 `bench/latency.jsonl` |
 
 架構與資料結構以 [`INTENT-SPEC-FINAL.md`](INTENT-SPEC-FINAL.md) 為準。

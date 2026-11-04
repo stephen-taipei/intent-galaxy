@@ -3,3 +3,4 @@ export * from "./compiler.ts";
 export * from "./repair.ts";
 export * from "./galaxy.ts";
 export * from "./lock.ts";
+export * from "./session.ts";

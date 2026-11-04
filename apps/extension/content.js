@@ -1,4 +1,4 @@
-// Content Script：在 Claude / ChatGPT / Gemini / Grok / DeepSeek / Qwen / Perplexity / Copilot / Mistral / Kimi 輸入框工具列（或 Claude Code Mod 狀態列）掛載 `iG` logo 膠囊，
+// Content Script：在 Claude / ChatGPT / Gemini / Grok / DeepSeek / Qwen / Perplexity / Copilot / Mistral / Kimi 輸入框工具列（或 Claude Code Mod 狀態列）掛載 Intent Galaxy 品牌標記，
 // 點擊或按 Cmd/Ctrl+Shift+G 於輸入框上方展開星系面板（擴充功能 iframe），Enter 鎖定後把 LOCKED INTENT AST 寫回輸入框。
 //
 // 每次「用網頁上的 AI 生成」都是一筆 run：提示詞結尾帶唯一識別碼 [ig:<nonce>]，記錄存在 storage（ig:run:<nonce>）。
@@ -8,7 +8,7 @@
   if (window.__intentGalaxyMounted && window.__intentGalaxyAlive?.()) return;
   try { window.__intentGalaxyTeardown?.(); } catch { /* 舊版沒有提供，或已無法執行 */ }
   // 舊版留下的按鈕與面板（Firefox 會直接銷毀舊的 content script，來不及自己清）
-  document.querySelectorAll("#intent-galaxy-mod-pill, intent-galaxy-frame").forEach((el) => el.remove());
+  document.querySelectorAll("#intent-galaxy-mod-pill, #intent-galaxy-undo, intent-galaxy-frame").forEach((el) => el.remove());
   window.__intentGalaxyMounted = true;
 
   const api = globalThis.browser ?? globalThis.chrome;
@@ -29,6 +29,7 @@
     unlisten.forEach((off) => { try { off(); } catch { /* context 已失效 */ } });
     observer?.disconnect();
     document.getElementById(PILL_ID)?.remove();
+    document.getElementById(UNDO_ID)?.remove();
     document.querySelector("intent-galaxy-frame")?.remove();
     hideCue();
     if (window.__intentGalaxyToggle === togglePanel) delete window.__intentGalaxyToggle;
@@ -39,6 +40,7 @@
   /** 掛在頁面（document、window）上的監聽：teardown 時一併移除，新版才不會被舊的攔截。 */
   const listen = (target, type, fn, opts) => { target.addEventListener(type, fn, opts); unlisten.push(() => target.removeEventListener(type, fn, opts)); };
   const PILL_ID = "intent-galaxy-mod-pill";
+  const UNDO_ID = "intent-galaxy-undo"; // 提示詞還沒送出時，膠囊旁的「還原問題」按鈕
   // 方案剛填回輸入框：iG 先移到右下角顯示「✓ 星系完成」，輸入框內容被使用者改動（打字、送出）後才回到工具列。
   // text：填回後輸入框的內容（等網站處理完才記下，null 表示還在等）。
   let fillWatch = null; // { text, since }
@@ -126,12 +128,17 @@
     const btn = document.createElement("button");
     btn.id = PILL_ID;
     btn.type = "button";
-    // 掛不進輸入框工具列時改成右下角浮動按鈕：寫出全名，避免被當成頁面本身的小圖示。
+    // 掛不進輸入框工具列時改成右下角浮動按鈕；品牌名稱與狀態保留在無障礙標籤與提示文字。
     const status = current?.status;
-    // 已填回過方案的 run，回到工具列後只顯示「iG」。
     const badge = status === "done" && !frameVisible() && (fillWatch || !current.filled) ? t("ct.pillDone") : status === "waiting" ? (current.unsent ? t("ct.pillUnsent") : t("ct.pillGenerating")) : status === "failed" ? t("ct.pillFailed") : "";
-    btn.append(logoMark(), (kind === "floating" ? "Intent Galaxy" : "iG") + badge);
-    btn.title = t("ct.pillTitle");
+    const failure = String(current?.detail ?? "").trim();
+    const statusText = status === "failed" ? (failure ? `${failure.slice(0, 157)}${failure.length > 160 ? "…" : ""}` : t("ct.pillFailed").trim())
+      : status === "waiting" ? (current.unsent ? t("ct.pillUnsent") : t("ct.pillGenerating")).trim()
+        : status === "done" ? t("ct.pillDone").trim() : "";
+    btn.append(logoMark());
+    if (badge) btn.append(document.createTextNode(badge));
+    btn.title = `${t("ct.pillTitle")}${statusText ? ` · ${statusText}` : ""}`;
+    btn.setAttribute("aria-label", btn.title);
     btn.dataset.kind = kind;
     btn.dataset.state = pillState();
     btn.dataset.owner = INSTANCE; // 舊版（已失效）留下的按鈕會被換掉
@@ -142,8 +149,47 @@
     return btn;
   }
 
+  // ── 還原問題：提示詞放進輸入框但還沒送出時，隨時能取消，輸入框換回原本的問題並解除唯讀 ──
+  function syncUndo() {
+    const pill = document.getElementById(PILL_ID);
+    const run = localRun?.unsent && current?.nonce === localRun.nonce ? localRun : null;
+    let undo = document.getElementById(UNDO_ID);
+    if (dead || !pill || !run) { undo?.remove(); return; }
+    if (!undo || undo.dataset.owner !== INSTANCE) {
+      undo?.remove();
+      undo = document.createElement("button");
+      undo.id = UNDO_ID;
+      undo.type = "button";
+      undo.dataset.owner = INSTANCE;
+      undo.addEventListener("click", (e) => { e.preventDefault(); e.stopPropagation(); cancelUnsent(); });
+    }
+    const floating = pill.dataset.kind === "floating";
+    undo.textContent = t("ct.undoPrompt");
+    undo.title = t("ct.undoPromptTitle");
+    undo.setAttribute("aria-label", undo.title);
+    undo.style.cssText = "all:unset; box-sizing:border-box; cursor:pointer; font:600 11.5px/1 -apple-system,BlinkMacSystemFont,sans-serif; padding:5px 9px; margin:0 4px; border-radius:6px;"
+      + " color:#0f172a; background:#fff; border:1px solid #cbd5e1; white-space:nowrap;"
+      + (floating ? " position:fixed; bottom:62px; right:18px; z-index:2147483646; font-size:13px; padding:8px 13px; border-radius:999px;" : "");
+    if (pill.nextElementSibling !== undo) pill.after(undo);
+  }
+  async function cancelUnsent() {
+    const run = localRun;
+    if (!run?.unsent) return;
+    restoreEditor(run.nonce, run.goal);
+    localRun = null;
+    cache.delete(run.nonce);
+    if (current?.nonce === run.nonce) current = null;
+    if (panelNonce === run.nonce) { toPanel(run.nonce, { type: "ig-reset" }); minimizePanel(); }
+    if (!run.ephemeral) await save(runKey(run.nonce), null);
+    mountPill(true);
+  }
+
   let lastMountCheck = 0;
   function mountPill(force = false) {
+    mountPillOnly(force);
+    syncUndo();
+  }
+  function mountPillOnly(force = false) {
     if (dead) return;
     const current = document.getElementById(PILL_ID);
     // 串流時 DOM 每個畫格都在變：按鈕還在、狀態沒變時，最多每秒重新找一次掛載點。
@@ -157,7 +203,8 @@
     }
     const mount = findMount(editor);
     const existing = document.getElementById(PILL_ID);
-    if (existing && existing.dataset.owner === INSTANCE && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
+    // force（例如語系剛載入）一律重畫：狀態沒變但標題與無障礙標籤可能要換成新語言。
+    if (!force && existing && existing.dataset.owner === INSTANCE && existing.dataset.kind === mount.kind && existing.isConnected && existing.parentElement === mount.parent && existing.dataset.state === pillState()) return;
     existing?.remove();
     mount.parent.insertBefore(makePill(mount.kind), mount.before);
   }
@@ -178,7 +225,7 @@
   const cache = new Map();     // nonce → 記錄
   let frame = null, panel = null, panelId = "", panelPath = "", panelNonce = "", panelBusy = false, targetEditor = null, openGoal = "";
   const frameVisible = () => !!frame && !frame.hidden;
-  const pillState = () => `${current?.status ?? "idle"}${current?.unsent ? "-unsent" : ""}${fillWatch ? "-filled" : ""}-${frameVisible() ? "open" : "closed"}`;
+  const pillState = () => `${current?.status ?? "idle"}${current?.unsent ? "-unsent" : ""}${current?.status === "failed" ? `:${String(current.detail ?? "").slice(0, 160)}` : ""}${fillWatch ? "-filled" : ""}-${frameVisible() ? "open" : "closed"}`;
   const UI_KEY = "ig:ui";
   const RUN_PREFIX = "ig:run:";
   const MAX_RUNS = 100;
@@ -237,23 +284,58 @@
 
   // ── 星系面板：可拖曳、縮放、調透明度的浮動視窗；內容是擴充功能來源的 iframe（與頁面 CSS / CSP 隔離）──
   const FRAME_CSS = `
-    :host { all: initial; box-sizing: border-box; position: fixed; z-index: 2147483647; display: flex; flex-direction: column; min-width: 420px; min-height: 300px;
-      border: 1px solid #0071FE; border-radius: 14px; background: #080b11; box-shadow: 0 18px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(122,59,241,.25); overflow: hidden; resize: both; color-scheme: dark; }
+    :host { all: initial; box-sizing: border-box; position: fixed; z-index: 2147483647; display: flex; flex-direction: column; min-width: 360px; min-height: 260px;
+      border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; box-shadow: 0 16px 48px rgba(15,23,42,.2), 0 2px 8px rgba(15,23,42,.08); overflow: hidden; resize: both; color-scheme: light; }
     :host([hidden]) { display: none; }
-    header { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; background: #111723; border-bottom: 1px solid #1e293b; cursor: move; user-select: none;
-      font: 600 12px/1 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; color: #e2e8f0; }
+    header { display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; background: #fff; border-bottom: 1px solid #e2e8f0; cursor: move; user-select: none;
+      font: 600 12px/1 -apple-system, BlinkMacSystemFont, "PingFang TC", sans-serif; color: #0f172a; }
     header .title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 6px; }
     header .title svg { height: 14px; width: auto; flex: none; }
-    header label { display: flex; align-items: center; gap: 4px; color: #94a3b8; font-weight: 400; font-size: 11px; cursor: default; }
+    header label { display: flex; align-items: center; gap: 4px; color: #64748b; font-weight: 400; font-size: 11px; cursor: default; }
     header input { width: 70px; accent-color: #0071FE; cursor: pointer; }
-    header button { all: unset; cursor: pointer; width: 24px; height: 24px; border-radius: 6px; display: grid; place-items: center; color: #cbd5e1; font-size: 14px; }
-    header button:hover { background: #1e293b; color: #fff; }
-    header button.close:hover { background: #be123c; }
-    header button[aria-pressed="true"] { color: #60a5fa; background: rgba(0,113,254,.18); }
-    iframe { flex: 1; width: 100%; border: 0; background: #080b11; }
+    header button { all: unset; cursor: pointer; width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; color: #475569; font-size: 14px; }
+    header button:hover { background: #f1f5f9; color: #0f172a; }
+    header button.close:hover { background: #ffe4e6; color: #be123c; }
+    iframe { flex: 1; width: 100%; border: 0; background: #fff; }
+    @media (max-width: 640px) { :host { min-width: 0; min-height: 0; border-radius: 12px; } header { gap: 5px; padding: 6px 7px 6px 10px; } header label { gap: 2px; } header input { width: 52px; } }
     :host(.dragging) iframe { pointer-events: none; }`;
 
-  const runInfo = (r) => r && { goal: r.goal, nonce: r.nonce, status: r.status, elapsedSec: Math.round((Date.now() - (r.sentAt ?? r.startedAt)) / 1000), analysis: r.analysis ?? null, detail: r.detail ?? "", jsonFail: !!r.failedKey, unsent: !!r.unsent, picks: r.picks ?? null };
+  const runInfo = (r) => r && { goal: r.goal, nonce: r.nonce, status: r.status, elapsedSec: Math.round((Date.now() - (r.sentAt ?? r.startedAt)) / 1000), analysis: r.analysis ?? null, detail: r.detail ?? "", jsonFail: !!r.failedKey, unsent: !!r.unsent, picks: r.picks ?? null, draft: r.draft ?? null };
+  const draftTimers = new Map();
+  const stableJson = (value, field = "") => {
+    if (value === null || typeof value !== "object") return JSON.stringify(value) ?? "undefined";
+    if (Array.isArray(value)) return `[${value.map((item) => stableJson(item)).join(",")}]`;
+    // Override order carries oldest/newest priority across a saved session.
+    const keys = Object.keys(value);
+    if (field !== "overrides") keys.sort();
+    return `{${keys.filter((key) => value[key] !== undefined).map((key) => `${JSON.stringify(key)}:${stableJson(value[key], key)}`).join(",")}}`;
+  };
+  const sameValue = (a, b) => stableJson(a ?? null) === stableJson(b ?? null);
+  function sameRunExceptDraft(a, b) {
+    if (!a || !b || sameValue(a.draft, b.draft)) return false;
+    const before = { ...a }, after = { ...b };
+    delete before.draft;
+    delete after.draft;
+    return sameValue(before, after);
+  }
+  function normalizeDraft(msg) {
+    if (!["compare", "galaxy", "preview"].includes(msg.view)) return null;
+    if (msg.overrides != null && (typeof msg.overrides !== "object" || Array.isArray(msg.overrides))) return null;
+    if (msg.baseKey != null && typeof msg.baseKey !== "string") return null;
+    if (msg.focusedNode != null && typeof msg.focusedNode !== "string") return null;
+    if (msg.notes != null && typeof msg.notes !== "string") return null;
+    try {
+      const draft = {
+        baseKey: msg.baseKey ?? null,
+        overrides: msg.overrides ?? {},
+        view: msg.view,
+        focusedNode: msg.focusedNode ?? null,
+        notes: msg.notes ?? "",
+      };
+      const json = JSON.stringify(draft);
+      return json.length <= 262144 ? JSON.parse(json) : null;
+    } catch { return null; }
+  }
   const sendPanel = (msg) => { if (panel) api.runtime.sendMessage({ ...msg, id: panelId }).catch?.(() => {}); };
   /** 關於某個 run 的通知：只送給正在顯示這個 run（或還沒綁定 run）的面板。 */
   const toPanel = (nonce, msg) => { if (panel && (!panelNonce || panelNonce === nonce)) sendPanel({ ...msg, nonce }); };
@@ -304,8 +386,6 @@
     const root = frame.attachShadow({ mode: "closed" });
     root.innerHTML = `<style>${FRAME_CSS}</style><header><span class="title">Intent Galaxy</span>
       <label title="${escAttr(t("ct.opacityTitle"))}">${escAttr(t("ct.opacity"))} <input type="range" min="30" max="100" step="5"></label>
-      <button type="button" class="lay-summary" aria-pressed="false" title="${escAttr(t("ct.toggleSummaryTitle"))}"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="14" height="12" rx="2.5"/><rect x="9.5" y="3" width="3.5" height="8" rx="1" fill="currentColor" stroke="none"/></svg></button>
-      <button type="button" class="lay-cards" aria-pressed="true" title="${escAttr(t("ct.toggleCardsTitle"))}"><svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="14" height="12" rx="2.5"/><rect x="3" y="8" width="10" height="3" rx="1" fill="currentColor" stroke="none"/></svg></button>
       <button type="button" class="max" title="${escAttr(t("ct.maximizeTitle"))}">⤢</button>
       <button type="button" class="min" title="${escAttr(t("ct.minimizeTitle"))}">—</button>
       <button type="button" class="close" title="${escAttr(t("ct.closeTitle"))}">✕</button></header>`;
@@ -334,10 +414,6 @@
     wireDrag(root.querySelector("header"));
     root.querySelector(".max").addEventListener("click", toggleMaximize);
     root.querySelector(".min").addEventListener("click", minimizePanel);
-    // 版面切換（方案側欄、方案卡列）交給面板裡的星系元件；按下狀態由面板回報（intent-layout）。
-    root.querySelector(".lay-summary").addEventListener("click", () => sendPanel({ type: "ig-layout", toggle: "summary" }));
-    root.querySelector(".lay-cards").addEventListener("click", () => sendPanel({ type: "ig-layout", toggle: "cards" }));
-    frameLayoutButtons = { summary: root.querySelector(".lay-summary"), cards: root.querySelector(".lay-cards") };
     root.querySelector(".close").addEventListener("click", closePanel);
     // 只記錄使用者拖右下角造成的大小變化：與程式最後設定的實際尺寸相同（初次、還原、自動夾回）就不算。
     new ResizeObserver((entries) => {
@@ -373,19 +449,24 @@
   }
   function placeFrame(saved) {
     const vw = window.innerWidth, vh = window.innerHeight;
-    let { left, top, width, height } = saved ?? {};
-    // 預設接近滿版（四周各留視窗短邊的 1%，至少 8px）：面板在送出後才出現，不必讓出輸入框；視窗大小改變時跟著調整。
-    // 使用者拖過或調過大小（saved）才沿用記錄。
-    frame.dataset.auto = !width || !height ? "1" : "";
+    const margin = frameMargin();
+    const savedBox = saved && [saved.left, saved.top, saved.width, saved.height].every(Number.isFinite) && saved.width > 0 && saved.height > 0 ? saved : null;
+    let { left, top, width, height } = savedBox ?? {};
+    // 預設停靠右側，保留桌面對話區；使用者另存的尺寸與位置優先。
+    frame.dataset.auto = savedBox ? "" : "1";
     if (frame.dataset.auto) {
-      const m = frameMargin();
-      ({ left, top, width, height } = { left: m, top: m, width: vw - 2 * m, height: vh - 2 * m });
+      width = Math.min(720, vw - 2 * margin);
+      height = vh - 2 * margin;
+      left = vw - width - margin;
+      top = margin;
     }
-    width = Math.min(width, vw - 16); height = Math.min(height, vh - 16);
-    left = Math.min(Math.max(8, left), vw - width - 8); top = Math.min(Math.max(8, top), vh - height - 8);
+    width = Math.min(width, Math.max(1, vw - 2 * margin));
+    height = Math.min(height, Math.max(1, vh - 2 * margin));
+    left = Math.min(Math.max(margin, left), Math.max(margin, vw - width - margin));
+    top = Math.min(Math.max(margin, top), Math.max(margin, vh - height - margin));
     setRect({ left, top, width, height });
   }
-  const frameMargin = () => Math.max(8, Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.01));
+  const frameMargin = () => window.innerWidth <= 640 ? 8 : 12;
   const fillViewport = () => { const m = frameMargin(); setRect({ left: m, top: m, width: window.innerWidth - 2 * m, height: window.innerHeight - 2 * m }); };
   const clampFrame = () => { if (frame && !frame.hidden) frame.dataset.max ? fillViewport() : placeFrame(frame.dataset.auto ? null : frame.getBoundingClientRect()); };
 
@@ -774,10 +855,19 @@
     if (!anyRuns && !localRun) { if (current) { current = null; mountPill(); } return; } // 從沒用過：不必掃描頁面
     refreshing = (async () => {
       const { page, editor } = tags();
-      const missing = page.map((t) => t.nonce).filter((n) => !cache.has(n));
+      const missing = [...new Set([...page.map((t) => t.nonce), ...editor])].filter((n) => !cache.has(n));
       if (missing.length) {
         const got = await loadMany(missing.map(runKey));
         for (const n of missing) if (got[runKey(n)]) cache.set(n, got[runKey(n)]);
+      }
+      // 重新整理後網站（例如 ChatGPT）把還沒送出的提示詞還原到輸入框：接回這個 run，輸入框照樣唯讀、送出鍵照樣發光。
+      if (!localRun) {
+        const restored = [...editor].map((n) => cache.get(n)).findLast((r) => r?.status === "waiting" && r.unsent && !r.ephemeral);
+        if (restored) localRun = Object.assign(restored, { pathFrom: location.pathname });
+      }
+      if (localRun?.unsent && editor.has(localRun.nonce) && cue?.nonce !== localRun.nonce) {
+        const box = findEditor();
+        if (box && editorText(box).includes(tagOf(localRun.nonce))) showCue(box, localRun.nonce);
       }
       const onPage = page.filter((t) => cache.has(t.nonce));
       // 這個頁面的 run：頁面上最後一個有記錄的識別碼；這個分頁剛送出的 run 若還在輸入框或剛送出，優先。
@@ -815,7 +905,7 @@
   // 有等待中的 run 時每 1.5 秒讀一次頁面；沒有時每 5 秒輕量檢查（換對話、別的分頁送出的 run 出現在頁面上）。
   let lastRefresh = 0;
   every(1500, () => {
-    const busy = current?.status === "waiting" || localRun;
+    const busy = current?.status === "waiting" || localRun || tags().editor.size > 0; // 輸入框裡有識別碼（例如重新整理後網站還原了草稿）也要盡快接回
     if (busy || Date.now() - lastRefresh > 5000) { lastRefresh = Date.now(); refresh(); }
   });
   listen(document, "visibilitychange", () => { if (!document.hidden && alive()) refresh(); });
@@ -848,9 +938,12 @@
 
   // ── 等使用者送出：輸入框暫時唯讀＋停用（避免改到提示詞），送出鍵放大發光；提示詞離開輸入框（送出或被清掉）就復原 ──
   function findSend(editor) {
-    const scope = editor.closest("form, fieldset") ?? editor.parentElement?.parentElement?.parentElement ?? document;
-    const send = [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b));
-    return send ? sendBox(send, editor, editor.closest("form, fieldset")) : null;
+    // 先找 form／fieldset；沒有時（例如 ChatGPT 新版輸入框）往上找到第一個含送出鍵的祖先，送出鍵常在輸入框外 5 層以上。
+    const pick = (scope) => [...scope.querySelectorAll(SEND_BUTTON)].find((b) => b.id !== PILL_ID && visible(b));
+    const form = editor.closest("form, fieldset");
+    let send = form ? pick(form) : null;
+    for (let up = editor.parentElement, i = 0; !send && up && i < 10; up = up.parentElement, i++) send = pick(up);
+    return send ? sendBox(send, editor, form) : null;
   }
   /** 把輸入框鎖成唯讀，回傳復原函式（只還原我們改過的屬性）。 */
   function lockEditor(el) {
@@ -862,8 +955,13 @@
     el.setAttribute("aria-readonly", "true");
     el.setAttribute("data-ig-locked", ""); // 掃描識別碼時仍算輸入框，不會被當成已送出
     Object.assign(el.style, { opacity: "0.45", cursor: "not-allowed", transition: "opacity .2s" });
+    // ProseMirror 等編輯器會自己把 contenteditable 改回 true：再擋一層輸入、貼上與拖放，提示詞才不會被改到。
+    const block = (e) => { e.preventDefault(); e.stopImmediatePropagation(); };
+    const events = ["beforeinput", "paste", "drop"];
+    for (const type of events) el.addEventListener(type, block, true);
     el.blur();
     return () => {
+      for (const type of events) el.removeEventListener(type, block, true);
       for (const [a, v] of attrs) v == null ? el.removeAttribute(a) : el.setAttribute(a, v);
       Object.assign(el.style, style);
     };
@@ -885,7 +983,8 @@
       return hideCue();
     }
     // 網站（例如 ProseMirror 重畫）把可編輯狀態改回來時再鎖一次。
-    if (editor.getAttribute("aria-readonly") !== "true") { cue.restore(); cue.restore = lockEditor(editor); }
+    const reopened = !(editor instanceof HTMLTextAreaElement) && editor.getAttribute("contenteditable") !== "false";
+    if (editor.getAttribute("aria-readonly") !== "true" || reopened) { cue.restore(); cue.restore = lockEditor(editor); }
     const send = findSend(editor);
     if (send === cue.send) return;
     cue.anim?.cancel();
@@ -933,13 +1032,21 @@
     if (area !== "local" || dead) return;
     if (!alive()) return teardown();
     let relevant = false;
-    for (const [key, { newValue }] of Object.entries(changes)) {
+    for (const [key, { oldValue, newValue }] of Object.entries(changes)) {
       if (!key.startsWith(RUN_PREFIX)) continue;
       const mine = selfWrites.get(key);
       if (mine !== undefined && mine === JSON.stringify(newValue ?? null)) { selfWrites.delete(key); continue; }
       if (newValue) anyRuns = true;
-      relevant = true;
       const nonce = key.slice(RUN_PREFIX.length);
+      // 只有草稿變更時同步記憶體，不把 run 事件重播到正在編輯的面板。
+      if (sameRunExceptDraft(oldValue, newValue)) {
+        if (cache.has(nonce)) cache.get(nonce).draft = newValue.draft;
+        else cache.set(nonce, newValue);
+        if (current?.nonce === nonce) current.draft = newValue.draft;
+        if (localRun?.nonce === nonce) localRun.draft = newValue.draft;
+        continue;
+      }
+      relevant = true;
       // 只處理這個頁面相關的 run（頁面上看得到它的識別碼，或是這個分頁剛送出的）。
       if (!(pageNonces().has(nonce) || localRun?.nonce === nonce)) { if (cache.has(nonce)) { if (newValue) cache.set(nonce, newValue); else cache.delete(nonce); } continue; }
       const prev = cache.get(nonce);
@@ -950,7 +1057,11 @@
         if (prev && prev.status !== "done" && Date.now() - (prev.startedAt ?? 0) < RUN_TTL_MS) toPanel(nonce, { type: "ig-reset" });
         continue;
       }
-      if (prev && prev.status === newValue.status && prev.unsent === newValue.unsent) { Object.assign(prev, { beat: newValue.beat, owner: newValue.owner }); continue; } // 只是心跳
+      if (prev && prev.status === newValue.status && prev.unsent === newValue.unsent) {
+        prev.draft = newValue.draft;
+        Object.assign(prev, { beat: newValue.beat, owner: newValue.owner });
+        continue;
+      } // 只是心跳或附帶草稿更新
       const run = prev ? Object.assign(prev, newValue) : newValue;
       cache.set(nonce, run);
       if (run.status === "done") toPanel(nonce, { type: "ig-galaxy", analysis: run.analysis, goal: run.goal });
@@ -982,12 +1093,51 @@
     if (!alive()) return teardown();
     onPanelMessage(m.msg);
   });
-  let frameLayoutButtons = null;
-  async function onPanelMessage(msg) {
-    if (msg.type === "intent-layout" && frameLayoutButtons) {
-      frameLayoutButtons.summary.setAttribute("aria-pressed", String(!!msg.summary));
-      frameLayoutButtons.cards.setAttribute("aria-pressed", String(!!msg.cards));
+  function validDraftContext(nonce) {
+    return !!panel && nonce === panelNonce && panelBelongsHere();
+  }
+  function validPanelAction(msg) {
+    if (!panel || !panelBelongsHere()) return false;
+    if (msg.nonce) return msg.nonce === panelNonce;
+    return ["local", "demo", "page"].includes(msg.source) && panelPath === location.pathname;
+  }
+  async function persistIntentDraft(msg) {
+    const nonce = msg.nonce;
+    if (typeof nonce !== "string" || !/^[0-9a-f]{8}$/.test(nonce) || !validDraftContext(nonce)) return;
+    const ephemeralContext = ephemeral();
+    const draft = normalizeDraft(msg);
+    if (!draft) return;
+    const key = runKey(nonce);
+    let run = cache.get(nonce) ?? (localRun?.nonce === nonce ? localRun : current?.nonce === nonce ? current : null);
+    if (!run) {
+      if (ephemeralContext) return;
+      const loaded = await loadMany(key);
+      if (!validDraftContext(nonce)) return;
+      run = loaded[key] ?? null;
     }
+    if (!run || run.status !== "done" || run.nonce !== nonce || sameValue(run.draft, draft)) return;
+    run.draft = draft;
+    cache.set(nonce, run);
+    if (current?.nonce === nonce) current.draft = draft;
+    if (localRun?.nonce === nonce) localRun.draft = draft;
+    if (run.ephemeral || ephemeralContext || ephemeral()) return;
+
+    clearTimeout(draftTimers.get(nonce));
+    const timer = setTimeout(async () => {
+      if (draftTimers.get(nonce) !== timer) return;
+      try {
+        const latest = (await loadMany(key))[key];
+        if (draftTimers.get(nonce) !== timer) return;
+        draftTimers.delete(nonce);
+        // run 已被使用者刪除時不重建，也不覆蓋其他分頁較新的欄位。
+        if (!latest || latest.ephemeral || sameValue(latest.draft, draft)) return;
+        await save(key, { ...latest, draft });
+      } catch { if (draftTimers.get(nonce) === timer) draftTimers.delete(nonce); }
+    }, 300);
+    draftTimers.set(nonce, timer);
+  }
+  async function onPanelMessage(msg) {
+    if (msg.type === "intent-draft") { await persistIntentDraft(msg); return; }
     if (msg.type === "intent-close") minimizePanel();
     if (msg.type === "intent-busy") {
       panelBusy = !!msg.busy;
@@ -1004,11 +1154,15 @@
     }
     // 面板手動貼上：記成那個 run 的結果（頁面上的識別碼會帶出它）。沒有 run 的星系（頁面上找到的、本機 CLI 的）不另外記錄。
     if (msg.type === "intent-adopt" && isGalaxy(msg.analysis) && msg.nonce) {
+      const actionPanelId = panelId;
+      if (!validPanelAction(msg)) return;
       const run = cache.get(msg.nonce) ?? ((await loadMany(runKey(msg.nonce)))[runKey(msg.nonce)] ?? null);
+      if (actionPanelId !== panelId || !validPanelAction(msg)) return;
       if (run) { Object.assign(run, { status: "done", analysis: msg.analysis, adopted: true, detail: "", unsent: false }); await saveRun(run); if (localRun?.nonce === run.nonce) localRun = null; refresh(); }
     }
     // 放棄：只取消面板看到的那一個等待中／失敗的 run；已完成的星系不會被刪。
     if (msg.type === "intent-reset" && msg.nonce) {
+      if (!validPanelAction(msg)) return;
       const run = cache.get(msg.nonce);
       // 還沒送出：把輸入框裡的提示詞換回原本的問題，使用者才能直接打新問題。
       if (localRun?.nonce === msg.nonce && localRun.unsent) restoreEditor(localRun.nonce, localRun.goal);
@@ -1022,6 +1176,9 @@
       refresh();
     }
     if (msg.type === "intent-lock") {
+      if (!validPanelAction(msg)) { sendPanel({ type: "ig-chat-error", detail: t("ct.errOtherChat"), failed: false }); return; }
+      clearTimeout(draftTimers.get(msg.nonce));
+      draftTimers.delete(msg.nonce);
       // 星系所屬的問題在前、AST 在後；使用者另外打的補充（問題以外的字、上次 AST 之後補打的）接在最後。
       const editor = targetEditor?.isConnected ? targetEditor : findEditor();
       const goal = String(msg.goal ?? openGoal).trim();
@@ -1043,7 +1200,12 @@
       // 記住這次的選擇：下次在同一個對話重開面板，方案卡與手動調整會還原。
       if (msg.nonce) {
         const run = cache.get(msg.nonce) ?? ((await loadMany(runKey(msg.nonce)))[runKey(msg.nonce)] ?? null);
-        if (run) { run.picks = { baseKey: msg.baseKey ?? null, overrides: msg.overrides ?? {} }; run.filled = true; await saveRun(run); }
+        if (run) {
+          run.picks = { baseKey: msg.baseKey ?? null, overrides: msg.overrides ?? {} };
+          run.draft = normalizeDraft({ ...run.draft, ...msg.draft, ...run.picks, view: "preview" });
+          run.filled = true;
+          await saveRun(run);
+        }
       }
       mountPill(true);
     }

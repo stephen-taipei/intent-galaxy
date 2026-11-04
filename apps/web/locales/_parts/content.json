@@ -44,8 +44,8 @@
   "en": "🌌 Intent Galaxy analysis prompt: “{goal}”  (click to expand)"
  },
  "ct.bannerDone": {
-  "zh-Hant-TW": "✅ 星系已生成　在 iG 面板查看　（點一下展開 JSON）",
-  "en": "✅ Galaxy generated. View it in the iG panel  (click to expand the JSON)"
+  "zh-Hant-TW": "✅ 星系已生成　在 Intent Galaxy 面板查看　（點一下展開 JSON）",
+  "en": "✅ Galaxy generated. View it in the Intent Galaxy panel  (click to expand the JSON)"
  },
  "ct.bannerFailed": {
   "zh-Hant-TW": "⚠ 星系 JSON 讀取失敗　（點一下展開，可複製後貼到面板）",
@@ -80,19 +80,19 @@
   "en": "Could not find this page's input box, so the prompt could not be sent."
  },
  "ct.errOtherChat": {
-  "zh-Hant-TW": "這個面板屬於另一個對話。請按 ✕ 關閉後，在這個對話重新按 iG。",
-  "en": "This panel belongs to another chat. Click ✕ to close it, then click iG again in this chat."
- },
- "ct.toggleSummaryTitle": {
-  "zh-Hant-TW": "顯示／收合右側的方案",
-  "en": "Show or hide the plan panel on the right"
- },
- "ct.toggleCardsTitle": {
-  "zh-Hant-TW": "顯示／收合底部的方案卡",
-  "en": "Show or hide the plan cards at the bottom"
+  "zh-Hant-TW": "這個面板屬於另一個對話。請按 ✕ 關閉後，在這個對話重新按輸入框旁的 Intent Galaxy 圖示。",
+  "en": "This panel belongs to another chat. Click ✕ to close it, then click the Intent Galaxy icon next to the input box in this chat."
  },
  "ct.extraNote": {
   "zh-Hant-TW": "補充：{text}",
   "en": "Notes: {text}"
+ },
+ "ct.undoPrompt": {
+  "zh-Hant-TW": "↩ 返回原始提問",
+  "en": "↩ Back to original question"
+ },
+ "ct.undoPromptTitle": {
+  "zh-Hant-TW": "取消這次分析：輸入框換回你原本的問題，並解除唯讀",
+  "en": "Cancel this analysis: put your original question back in the input box and unlock it"
  }
 }

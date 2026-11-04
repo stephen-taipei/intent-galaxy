@@ -127,6 +127,9 @@ apps/extension-firefox/galaxy/
 apps/extension-firefox/content.js
 apps/extension-firefox/panel.html
 apps/extension-firefox/panel.js
+apps/extension-firefox/decision-view.js
+apps/extension-firefox/decision-view.css
+apps/extension-firefox/panel-boot.js
 apps/extension-firefox/background.js
 apps/extension-firefox/icons/
 apps/extension-firefox/samples/

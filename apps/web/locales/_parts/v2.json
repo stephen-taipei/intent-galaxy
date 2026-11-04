@@ -1,0 +1,202 @@
+{
+ "v2.compare": {
+  "zh-Hant-TW": "比較方案",
+  "en": "Compare options"
+ },
+ "v2.title": {
+  "zh-Hant-TW": "先選一個適合的方向",
+  "en": "Choose a direction that fits"
+ },
+ "v2.currentAi": {
+  "zh-Hant-TW": "沿用目前對話的 AI",
+  "en": "Using this conversation’s AI"
+ },
+ "v2.localAi": {
+  "zh-Hant-TW": "使用本機 AI",
+  "en": "Using local AI"
+ },
+ "v2.sample": {
+  "zh-Hant-TW": "示範資料",
+  "en": "Demo"
+ },
+ "v2.why": {
+  "zh-Hant-TW": "為什麼這樣建議？",
+  "en": "Why this direction?"
+ },
+ "v2.includes": {
+  "zh-Hant-TW": "方案重點",
+  "en": "Plan highlights"
+ },
+ "v2.more": {
+  "zh-Hant-TW": "展開星系，看完整取捨",
+  "en": "Explore the galaxy and trade-offs"
+ },
+ "v2.preview": {
+  "zh-Hant-TW": "確認這個方向",
+  "en": "Confirm this direction"
+ },
+ "v2.previewHint": {
+  "zh-Hant-TW": "下一步會預覽要填回對話的內容",
+  "en": "Next, preview the text to put in your conversation"
+ },
+ "v2.notes": {
+  "zh-Hant-TW": "補充條件（選填）",
+  "en": "Additional conditions (optional)"
+ },
+ "v2.notesPlaceholder": {
+  "zh-Hant-TW": "例如：我更在意省時間",
+  "en": "For example: saving time matters more to me"
+ },
+ "v2.notesHint": {
+  "zh-Hant-TW": "補充內容會一起填回 AI，不會自動重新分析。",
+  "en": "Your notes go back to the AI with your plan; they do not automatically regenerate the analysis."
+ },
+ "v2.back": {
+  "zh-Hant-TW": "回到方案",
+  "en": "Back to options"
+ },
+ "v2.galaxyTitle": {
+  "zh-Hant-TW": "看懂這個方向的取捨",
+  "en": "Understand this direction’s trade-offs"
+ },
+ "v2.current": {
+  "zh-Hant-TW": "目前方向：{title}",
+  "en": "Current direction: {title}"
+ },
+ "v2.fullGalaxy": {
+  "zh-Hant-TW": "完整星系",
+  "en": "Full galaxy"
+ },
+ "v2.focused": {
+  "zh-Hant-TW": "關鍵關係",
+  "en": "Key relationships"
+ },
+ "v2.edit": {
+  "zh-Hant-TW": "進階編輯觀點",
+  "en": "Edit views"
+ },
+ "v2.readonly": {
+  "zh-Hant-TW": "查看理由",
+  "en": "Read explanations"
+ },
+ "v2.viewHint": {
+  "zh-Hant-TW": "查看理由不會改變你的選擇。",
+  "en": "Reading explanations does not change your choices."
+ },
+ "v2.readCondition": {
+  "zh-Hant-TW": "選取一個觀點，查看內容與關聯。",
+  "en": "Select a view to read its details and relationships."
+ },
+ "v2.keep": {
+  "zh-Hant-TW": "納入",
+  "en": "Include"
+ },
+ "v2.avoid": {
+  "zh-Hant-TW": "不做",
+  "en": "Do not do"
+ },
+ "v2.acceptRisk": {
+  "zh-Hant-TW": "接受風險",
+  "en": "Accept risk"
+ },
+ "v2.ignore": {
+  "zh-Hant-TW": "暫不決定",
+  "en": "Leave undecided"
+ },
+ "v2.explanation": {
+  "zh-Hant-TW": "觀點內容",
+  "en": "View details"
+ },
+ "v2.relations": {
+  "zh-Hant-TW": "相關條件",
+  "en": "Related conditions"
+ },
+ "v2.recommended": {
+  "zh-Hant-TW": "建議方案",
+  "en": "Recommended"
+ },
+ "v2.previewTitle": {
+  "zh-Hant-TW": "把決定帶回對話",
+  "en": "Take your decision back to the conversation"
+ },
+ "v2.previewLead": {
+  "zh-Hant-TW": "先預覽內容，再填入目前的輸入框。",
+  "en": "Preview the text before placing it in the current input box."
+ },
+ "v2.chosen": {
+  "zh-Hant-TW": "你選的方向",
+  "en": "Your chosen direction"
+ },
+ "v2.previewBody": {
+  "zh-Hant-TW": "這段內容會填回對話",
+  "en": "This text will go into the conversation"
+ },
+ "v2.fill": {
+  "zh-Hant-TW": "填回對話輸入框",
+  "en": "Put in the conversation input"
+ },
+ "v2.copy": {
+  "zh-Hant-TW": "只複製文字",
+  "en": "Copy text only"
+ },
+ "v2.userSend": {
+  "zh-Hant-TW": "填入後，由你按 AI 網站的送出。",
+  "en": "After filling, you press Send on the AI website."
+ },
+ "v2.preserve": {
+  "zh-Hant-TW": "目前對話與已確認的條件會保留。",
+  "en": "Your conversation and confirmed conditions stay intact."
+ },
+ "v2.defaultGalaxy": {
+  "zh-Hant-TW": "下次直接開啟星系",
+  "en": "Open the galaxy first next time"
+ },
+ "v2.guard": {
+  "zh-Hant-TW": "需要注意的條件",
+  "en": "Conditions to watch"
+ },
+ "v2.empty": {
+  "zh-Hant-TW": "選擇一個方向，或展開星系自行調整。",
+  "en": "Choose a direction, or open the galaxy to make your own choices."
+ },
+ "v2.custom": {
+  "zh-Hant-TW": "自訂方向",
+  "en": "Custom direction"
+ },
+ "v2.unsat": {
+  "zh-Hant-TW": "這些選擇有衝突，請先調整。",
+  "en": "These choices conflict. Adjust them before continuing."
+ },
+ "v2.reviewConflict": {
+  "zh-Hant-TW": "查看衝突",
+  "en": "Review conflicts"
+ },
+ "v2.undo": {
+  "zh-Hant-TW": "復原",
+  "en": "Undo"
+ },
+ "v2.redo": {
+  "zh-Hant-TW": "重做",
+  "en": "Redo"
+ },
+ "v2.resolve": {
+  "zh-Hant-TW": "保留較新的選擇",
+  "en": "Keep the newer choices"
+ },
+ "v2.unselected": {
+  "zh-Hant-TW": "尚未選擇方向",
+  "en": "No direction selected"
+ },
+ "v2.noCard": {
+  "zh-Hant-TW": "這次分析沒有可用方案。可開啟星系查看。",
+  "en": "This analysis has no available options. Open the galaxy to explore."
+ },
+ "v2.noteTitle": {
+  "zh-Hant-TW": "我的補充",
+  "en": "My additional conditions"
+ },
+ "v2.extraNote": {
+  "zh-Hant-TW": "你在輸入框另外打的文字會保留，接在最後。",
+  "en": "Any other text you typed in the input box stays and is added at the end."
+ }
+}
