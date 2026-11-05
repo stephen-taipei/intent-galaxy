@@ -18,7 +18,7 @@
 Turn one vague goal into a galaxy: a central thesis, 4 adversarial experts and 12 thought nodes. Diverge first to see your blind spots, converge in about a minute with the keyboard,
 then a **zero-LLM pure-function compiler** produces a deterministic `LOCKED INTENT AST` and injects it straight into Claude Code or an AI chat box.
 
-![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
+![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-AGPL--3.0--only-blue)
 
 | Diverge: 12 nodes and ✦ blind spots, no edges | Converge: press `1` to light the main path, AST compiles live on the right |
 | --- | --- |
@@ -290,4 +290,4 @@ The README comes in five languages; when you change one, update all of `README.m
 
 ## License
 
-[Apache-2.0](LICENSE)
+[AGPL-3.0-only](LICENSE). Versions up to 0.1.9 were released under Apache-2.0 and stay under it. A commercial license without the AGPL obligations is available: see [COMMERCIAL.md](COMMERCIAL.md). The name and logo are covered by [TRADEMARKS.md](TRADEMARKS.md); contributions need the [CLA](CLA.md).

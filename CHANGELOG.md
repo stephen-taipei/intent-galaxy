@@ -4,6 +4,7 @@ Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.np
 
 ## Unreleased
 
+- **License changed to AGPL-3.0-only** (was Apache-2.0). Versions up to 0.1.9 stay under Apache-2.0. A commercial license is available ([COMMERCIAL.md](COMMERCIAL.md)); added [NOTICE](NOTICE), [TRADEMARKS.md](TRADEMARKS.md), and a [CLA](CLA.md) required for contributions ([CONTRIBUTING.md](CONTRIBUTING.md)).
 - **Extension panel is now three steps**: compare the three options side by side, optionally open the galaxy to read the reasons or adjust views, then preview the exact text before it goes into the chat box. You still press Send on the site yourself. Switching between steps never asks the AI again.
 - **One shared decision state** (`DecisionSession` in `libs/core`): choosing a card, inspecting nodes and advanced edits all use it, with undo/redo; leaving an already-undecided node undecided no longer clears redo.
 - **Your choice and notes come back** when you reopen or refresh a conversation whose galaxy the website AI generated (not in incognito windows or ChatGPT temporary chats).

@@ -1,0 +1,36 @@
+Intent Galaxy
+Copyright (C) 2026 Stephen Chuang (莊宗憲, GitHub: stephen-taipei)
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License, version 3 only
+(AGPL-3.0-only), as published by the Free Software Foundation. See LICENSE.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+details.
+
+Earlier releases
+----------------
+npm versions of @stephen.taipei/intent-galaxy up to and including 0.1.9, and
+the repository contents up to commit c90b0f6 (2026-11-04), were published under
+the Apache License, Version 2.0. Copies obtained under that license remain
+under it. All later versions and commits are AGPL-3.0-only unless a file says
+otherwise.
+
+Commercial license
+------------------
+The copyright holder also offers this program under a separate commercial
+license for uses that cannot meet the AGPL-3.0 terms. See COMMERCIAL.md.
+
+Trademarks
+----------
+The AGPL-3.0 license does not grant rights to the "Intent Galaxy" name or logo.
+See TRADEMARKS.md.
+
+Third-party material
+--------------------
+apps/extension/icons/ui/ and apps/extension-firefox/icons/ui/ contain icons
+from Feather (https://feathericons.com), Copyright (c) 2013-2023 Cole Bemis,
+licensed under the MIT License. The full text is in the LICENSE file in each of
+those folders.

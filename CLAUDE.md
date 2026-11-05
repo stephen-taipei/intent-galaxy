@@ -2,7 +2,7 @@
 
 ## 1. 專案定位與終極目標
 本專案為 Intent Galaxy（npm 套件 `@stephen.taipei/intent-galaxy`；意圖工程與 60 秒視覺化星系決策框架），架構與發行標準完全對標作者另一開源套件 `adorable-git-graph`：
-- **零外部 Runtime 依賴（0 Dependencies）**、Node.js >= 22、Apache-2.0 License。
+- **零外部 Runtime 依賴（0 Dependencies）**、Node.js >= 22、AGPL-3.0-only（另有商業授權，見 `COMMERCIAL.md`；0.1.9 以前為 Apache-2.0）。外部貢獻須同意 `CLA.md`。
 - **三位一體發行形態**：
   1. **Local CLI & MCP Server (`apps/cli`)**：支援 `npx @stephen.taipei/intent-galaxy` 於本機 `127.0.0.1` 啟動，並支援 Stdio MCP 協議直接與 Claude Code / CLI 工具雙向通訊。
   2. **Chrome & Firefox Extensions (`apps/extension`, `apps/extension-firefox`)**：將 Intent Galaxy logo 圖示按鈕（舊版為 `🌌 iG` 文字膠囊）注入各大 AI 網頁版（Claude, ChatGPT, Grok, Gemini），點擊後原地展開星系 Overlay，按下 Enter 直接將鎖定之 `LOCKED INTENT AST` 注入對話輸入框。

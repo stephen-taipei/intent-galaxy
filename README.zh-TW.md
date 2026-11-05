@@ -18,7 +18,7 @@
 把一句模糊目標展開成「中心命題 + 4 位敵對專家 + 12 顆思緒節點」的星系圖。先發散看見盲區，再用鍵盤 1 分鐘收斂，
 最後由**零 LLM 的純函式編譯器**產出確定性的 `LOCKED INTENT AST`，直接注入 Claude Code 或 AI 網頁的輸入框。
 
-![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
+![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-AGPL--3.0--only-blue)
 
 | 先發散：12 顆節點與 ✦ 盲區，不畫連線 | 後收斂：按 `1` 點亮主幹，右側即時編譯 AST |
 | --- | --- |
@@ -290,4 +290,4 @@ README 有五種語言；修改其中一份時，`README.md`、`README.zh-TW.md`
 
 ## License
 
-[Apache-2.0](LICENSE)
+[AGPL-3.0-only](LICENSE)。0.1.9 以前（含）的版本以 Apache-2.0 發布，維持原授權。不想承擔 AGPL 義務可改用商業授權，見 [COMMERCIAL.md](COMMERCIAL.md)。名稱與標誌的使用規則見 [TRADEMARKS.md](TRADEMARKS.md)；貢獻程式碼須同意 [CLA](CLA.md)。
