@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/stephen-taipei/intent-galaxy.git"
   },
-  "license": "Apache-2.0",
+  "license": "AGPL-3.0-only",
   "type": "module",
   "bin": {
     "intent-galaxy": "dist/apps/cli/bin/intent-galaxy.mjs"
@@ -23,7 +23,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "start": "node ./apps/cli/bin/intent-galaxy.mjs --standalone",

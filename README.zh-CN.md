@@ -18,7 +18,7 @@
 把一句模糊的目标展开成「中心命题 + 4 位对立专家 + 12 个思路节点」的星系图。先发散看见盲区，再用键盘 1 分钟收敛，
 最后由**零 LLM 的纯函数编译器**生成确定性的 `LOCKED INTENT AST`，直接注入 Claude Code 或 AI 网页的输入框。
 
-![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
+![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-AGPL--3.0--only-blue)
 
 | 先发散：12 个节点与 ✦ 盲区，不画连线 | 后收敛：按 `1` 点亮主干，右侧实时编译 AST |
 | --- | --- |
@@ -290,4 +290,4 @@ README 有五种语言；修改其中一份时，`README.md`、`README.zh-TW.md`
 
 ## License
 
-[Apache-2.0](LICENSE)
+[AGPL-3.0-only](LICENSE)。0.1.9 及以前的版本以 Apache-2.0 发布，保持原许可。不想承担 AGPL 义务可改用商业许可，见 [COMMERCIAL.md](COMMERCIAL.md)。名称与标志的使用规则见 [TRADEMARKS.md](TRADEMARKS.md)；贡献代码须同意 [CLA](CLA.md)。

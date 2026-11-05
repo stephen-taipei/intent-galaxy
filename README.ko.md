@@ -18,7 +18,7 @@
 모호한 목표 한 문장을 '중심 명제 + 대립하는 전문가 4명 + 생각 노드 12개'로 이루어진 성계도로 펼칩니다. 먼저 발산해서 사각지대를 확인하고, 키보드로 1분 안에 수렴한 뒤,
 **LLM 없는 순수 함수 컴파일러**가 결정적인 `LOCKED INTENT AST`를 만들어 Claude Code나 AI 웹 서비스의 입력창에 바로 넣어 줍니다.
 
-![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
+![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-AGPL--3.0--only-blue)
 
 | 먼저 발산: 노드 12개와 ✦ 사각지대, 연결선 없음 | 다음 수렴: `1`을 누르면 주축이 켜지고 오른쪽에서 AST를 실시간 컴파일 |
 | --- | --- |
@@ -290,4 +290,4 @@ README는 5개 언어로 제공됩니다. 하나를 수정하면 `README.md`, `R
 
 ## License
 
-[Apache-2.0](LICENSE)
+[AGPL-3.0-only](LICENSE). 0.1.9 이하 버전은 Apache-2.0으로 배포되었으며 그대로 유지됩니다. AGPL 의무 없이 쓰려면 상용 라이선스를 이용할 수 있습니다: [COMMERCIAL.md](COMMERCIAL.md). 이름과 로고 사용 규칙은 [TRADEMARKS.md](TRADEMARKS.md), 기여 시에는 [CLA](CLA.md) 동의가 필요합니다.

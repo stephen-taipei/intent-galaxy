@@ -18,7 +18,7 @@
 曖昧な目標の一文を「中心命題 + 対立する 4 人の専門家 + 12 個の思考ノード」からなる星系図に展開します。まず発散して盲点を見つけ、キーボードで 1 分以内に収束させ、
 最後に**LLM を使わない純粋関数コンパイラ**が決定的な `LOCKED INTENT AST` を生成し、Claude Code や AI Web サービスの入力欄へ直接挿入します。
 
-![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
+![0 dependencies](https://img.shields.io/badge/dependencies-0-brightgreen) ![node](https://img.shields.io/badge/node-%E2%89%A5%2022.18-blue) ![license](https://img.shields.io/badge/license-AGPL--3.0--only-blue)
 
 | まず発散：12 ノードと ✦ 盲点、連線は描かない | 次に収束：`1` で主軸を点灯、右側で AST をリアルタイムにコンパイル |
 | --- | --- |
@@ -290,4 +290,4 @@ README は 5 言語あります。どれかを変更したら `README.md`、`REA
 
 ## License
 
-[Apache-2.0](LICENSE)
+[AGPL-3.0-only](LICENSE)。0.1.9 以前のバージョンは Apache-2.0 で公開済みで、そのライセンスのままです。AGPL の義務を負わない商用ライセンスもあります。[COMMERCIAL.md](COMMERCIAL.md) を参照してください。名称とロゴの扱いは [TRADEMARKS.md](TRADEMARKS.md)、コントリビューションには [CLA](CLA.md) への同意が必要です。
