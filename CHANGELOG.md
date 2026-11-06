@@ -2,7 +2,7 @@
 
 Versions follow the npm package [`@stephen.taipei/intent-galaxy`](https://www.npmjs.com/package/@stephen.taipei/intent-galaxy). Each published version has a `vX.Y.Z` tag and a GitHub Release. 0.1.4 was bumped on `main` but never published.
 
-## Unreleased
+## 0.2.0 — 2026-11-06
 
 - **License changed to AGPL-3.0-only** (was Apache-2.0). Versions up to 0.1.9 stay under Apache-2.0. A commercial license is available ([COMMERCIAL.md](COMMERCIAL.md)); added [NOTICE](NOTICE), [TRADEMARKS.md](TRADEMARKS.md), and a [CLA](CLA.md) required for contributions ([CONTRIBUTING.md](CONTRIBUTING.md)).
 - **Extension panel is now three steps**: compare the three options side by side, optionally open the galaxy to read the reasons or adjust views, then preview the exact text before it goes into the chat box. You still press Send on the site yourself. Switching between steps never asks the AI again.
